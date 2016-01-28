@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+      <record id="website_support_ticket_view_form" model="ir.ui.view">
+          <field name="name">website.support.ticket.form.view</field>
+          <field name="model">website.support.ticket</field>
+          <field name="arch" type="xml">
+      	      <form create="false">
+      	          <group>
+      	              <field name="partner_id"/>
+      	              <field name="person_name"/>
+      	              <field name="email"/>
+      	              <field name="category"/>
+      	              <field name="state"/>
+      	              <field name="subject"/>
+      	              <field name="description"/>      	              
+      	              <field name="conversation_history" context="{'ticket_id':active_id}">
+      	                  <tree editable="bottom">
+      	                       <field name="content"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="website_support_ticket_view_tree" model="ir.ui.view">
+          <field name="name">website.support.ticket.tree.view</field>
+          <field name="model">website.support.ticket</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="id" string="Ticket Number"/>
+      	          <field name="person_name"/>
+      	          <field name="category"/>
+      	          <field name="state"/>
+      	          <field name="email"/>
+      	          <field name="description"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="website_support_ticket_action" model="ir.actions.act_window">
+          <field name="name">website.support.ticket.action</field>
+	  <field name="res_model">website.support.ticket</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+	      <p>
+	          No Support Tickets found
+	      </p>
+          </field>
+      </record>
+
+    <record id="website_support_ticket_search" model="ir.ui.view">
+      <field name="name">website.support.ticket.search</field>
+      <field name="model">website.support.ticket</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="partner_id"/>
+          <field name="subject"/>
+        </search>
+      </field>
+    </record>
+
+      <menuitem id="website_support_parent_menu" name="Customer Support" parent="base.menu_administration" sequence="90"/>
+      <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
+      <menuitem id="website_support_config_parent_menu" name="Support Tickets" parent="base.menu_administration" sequence="80"/>
+ 
+    </data>
+</openerp>
