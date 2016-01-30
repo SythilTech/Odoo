@@ -6,6 +6,7 @@ from openerp import api, fields, models
 from openerp.http import request
 from openerp.tools import html_escape as escape, ustr, image_resize_and_sharpen, image_save_for_web
 
+from openerp.addons.website.models.website import slug
 
 class WebsiteSupportHelpGroups(models.Model):
 
@@ -28,14 +29,15 @@ class WebsiteSupportHelpPage(models.Model):
     
     name = fields.Char(string='Page Name')
     url = fields.Char(string="Page URL")
+    url_generated = fields.Char(string="URL", compute='_compute_url_generated')
     group_id = fields.Many2one('website.support.help.groups', string="Group")
+    content = fields.Html(sanatize=False, string='Content')
     
     @api.one
-    @api.onchange('name')
-    def _page_url(self):
-        """Generates the url of the help page (will be become obsolete when 'New Support Page' gets added to website builder"""
-        self.url = request.httprequest.host_url + 'support/help/' + slugify(self.name)
-
+    @api.depends('name')
+    def _compute_url_generated(self):
+        self.url_generated = "/support/help/" + slug(self.group_id) + "/" + slug(self)    
+    
 def slugify(s, max_length=None):
     """ Transform a string to a slug that can be used in a url path.
 

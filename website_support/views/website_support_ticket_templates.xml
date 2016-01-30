@@ -64,6 +64,23 @@
     </t>
 </template>
 
+<template id="help_page" name="Help Page" page="True">
+    <t t-call="website.layout">
+        <div class="container">
+                <div class="mt16 mb16">
+		    <h1 class="text-center" t-field="help_page.name"/>
+		    <div id="wrap" class="oe_structure oe_empty" t-field="help_page.content"/>
+		</div>
+        </div>
+    </t>
+</template>
+
+<template id="assets_editor" inherit_id="website.assets_editor" name="Website Support Editor" groups="base.group_website_publisher">
+    <xpath expr="." position="inside">
+        <script type="text/javascript" src="/website_support/static/src/js/website_support.editor.js"></script>
+    </xpath>
+</template>
+
 <template id="support_ticket_view" name="Support Ticket" page="True">
     <t t-call="website.layout">
         <div class="container mt16 mb16">
@@ -105,21 +122,6 @@
 <template id="support_help_pages" name="Support Help Pages" page="True">
     <t t-call="website.layout">
     
-        <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet"/>
-    	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-	<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-
-    	<script>
-        $(document).ready(function() {
-            $("#search").autocomplete({
-                source: '/support/help/auto-complete',
-                minLength: 2,
-                select: function( event, ui ) {
-                    window.location.href = ui.item.value;
-                }
-            });
-        });
-        </script>
         <div class="container">
             <div class="col-md-12 mt16 mb16">
                 <div class="pull-right">
@@ -146,9 +148,9 @@
             <div class="mt16 mb16 col-md-12">
                 <t t-foreach="help_groups" t-as="help_group">
                     <div class="col-md-4">
-                        <h2><t t-esc="help_group.name"/></h2>
+                        <h2 t-field="help_group.name"></h2>
                         <t t-foreach="help_group.page_ids" t-as="help_page">
-                            <h3 class="mt8 mb8"><a t-attf-href="#{help_page.url}"><t t-esc="help_page.name"/></a></h3>
+                            <h3 class="mt8 mb8"><a t-attf-href="#{help_page.url_generated}" t-field="help_page.name"></a></h3>
                         </t>
                     </div>
                 </t>
@@ -156,6 +158,14 @@
           
         </div>
     </t>
+</template>
+
+<!-- User Navbar -->
+<template id="content_new_helppage" inherit_id="website.user_navbar">
+    <xpath expr="//ul[@id='oe_systray']/li/ul[@class='dropdown-menu oe_content_menu']" position="inside">
+         <li><a href="#" data-action="new_help_group">New Help Group</a></li>
+         <li><a href="#" data-action="new_help_page">New Help Page</a></li>
+    </xpath>
 </template>
 
 <template id="support_thank_you" name="Support Ticket Thank You" page="True">
