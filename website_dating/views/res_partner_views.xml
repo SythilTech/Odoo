@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_partner_form_inherit_website_dating" model="ir.ui.view">
+            <field name="name">res.partner Website Dating</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+      	        <notebook position="inside">
+      	            <page string="Dating">
+      	                <group>
+      	                    <field name="first_name"/>
+      	                    <field name="last_name"/>
+      	                    <field name="dating"/>
+      	                    <field name="fake_profile"/>
+      	                    <field name="birth_date"/>
+			    <field name="age"/>
+			    <field name="min_age_pref"/>
+			    <field name="max_age_pref"/>
+			    <field name="gender"/>
+			    <field name="gender_pref"/>
+			    <field name="interest_list"/>
+			    <field name="profile_visibility"/>			    
+			    <field name="like_list"/>
+			    <field name="contacts"/>
+      	                </group>
+      	            </page>
+      	        </notebook>
+      	    </field>
+        </record>
+        
+        <record id="res_partner_view_tree" model="ir.ui.view">
+            <field name="name">res.partner Tree Website Dating</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+      	        <tree>
+      	            <field name="name"/>
+      	            <field name="age"/>
+	            <field name="gender"/>
+      	        </tree>
+      	    </field>
+        </record>
+       
+       <record id="res_partner_action" model="ir.actions.act_window">
+           <field name="name">Dating Members</field>
+	   <field name="res_model">res.partner</field>
+	   <field name="view_type">form</field>
+	   <field name="view_id" ref="website_dating.res_partner_view_tree"/>
+	   <field name="view_mode">tree,form</field>
+	   <field name="context">{'search_default_dating':1}</field>
+       </record>
+	
+       <menuitem id="res_partner_menu" name="Dating Members" parent="base.menu_sales" action="res_partner_action" sequence="90"/>
+
+    </data>
+</openerp>

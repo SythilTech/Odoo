@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<template id="my_dating_list" name="Browse Dating Profiles" page="True">
+    <t t-call="website.layout">
+        <div class="container">
+
+            <div class="mt16 mb16">
+                <h1 class="text-center">My Dating List</h1>
+                <form method="GET" action="">
+                Min Age: <input type="text" name="min_age"/>
+                Max Age: <input type="text" name="max_age"/>
+                Dist (km): <input type="text" name="dist"/>
+                Gender: <select type="text" name="gender" style="height:24px;">
+                    <option value="">Any</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+	            <button t-attf-class="btn btn-default btn-md">Search</button>
+                </form>
+            </div>
+                  
+            <t t-if="my_dates_count > 0"> 
+                <t t-foreach="my_dates" t-as="my_date">
+                    <div class="col-md-4 mt16 mb16">
+                        <div class="well" style="max-width:240px;min-height:400px;">
+                            <a t-attf-href="/dating/profiles/#{my_date.id}">
+                                <img t-att-src="website.image_url(my_date, 'image')" class="img-rounded mb8" t-attf-alt="#{my_date.first_name} dating profile" width="200" height="200"/></a><br/><t t-esc="my_date.first_name"/> (<t t-esc="my_date.age"/> <t t-esc="my_date.gender.letter"/>)<br/><t t-esc="my_date.city"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.id"/><br/>
+                                <br/>
+                                <t t-esc="my_date.profile_micro"/>
+                            			                        
+		        </div>
+		    </div>
+                </t>
+            </t>
+            <t t-if="my_dates_count == 0">
+                <div class="mt16 mb16">
+		    <h2 class="text-center">No one matches that critera</h2>
+                </div>
+            </t>
+            
+        </div>
+        
+    </t>
+</template>
+
+<template id="dating_second_menu" name="Dating Profile" page="True">
+    <div class="navbar navbar-default navbar-static-top mb16">
+        <div class="container">
+            <div class="collapse navbar-collapse navbar-top-collapse">
+                <ul class="nav navbar-nav navbar-right" id="second_menu">
+	            <li><a href="/dating/profiles">Browse Profiles</a></li>        
+	            <li><a href="/dating/events">Singles Events</a></li>        
+	            <li><a href="/dating/counselling">Counselling</a></li>        
+	            <li><a href="/dating/romantics">Romantics</a></li>
+                    <li><a href="/dating/profiles/messages">Messages</a></li>                    
+                    <li><a href="/dating/account/profiles">My Profile</a></li>
+                    <li><a href="/dating/account/profiles">Settings</a></li>
+                    <li><a href="/dating/account/create">Create Account</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="my_dating_profile" name="Dating Profile" page="True">
+    <t t-call="website.layout">
+        <div class="container mt16 mb16">
+            <div class="col-md-12">
+                <t t-call="website_dating.dating_second_menu"></t>
+                <div id="main" class="well">
+                    <div id="main-header">
+                        <div id="top-right-buttons" style="float:right;">
+                            <t t-if="can_message == True">
+                                <form t-attf-action="/dating/profiles/messages/#{my_date.id}" method="POST">
+                                    <input type="hidden" name="member_id" t-attf-value="#{my_date.id}"/>
+			            <button t-attf-class="btn btn-default btn-md">Message</button>
+			        </form>
+			    </t>
+                            <t t-if="request.env.user.partner_id.name != 'Public user'">
+           	                <t t-if="not you_like">
+           	                    <form action="/dating/profiles/like" method="POST">   
+	                                <input type="hidden" name="member_id" t-attf-value="#{my_date.id}"/>
+	                                <button t-attf-class="btn btn-default btn-md">Like</button>
+                                    </form>
+                                </t>
+                                
+                                <t t-if="you_like">
+                                    <button t-attf-class="btn btn-primary btn-md">Liked</button>
+                                </t>
+                            </t>
+                            
+                            
+                            
+                        </div>
+                        
+                        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+                        
+                        <img t-att-src="website.image_url(my_date, 'image')" class="img-rounded" style="float:left;margin-right:16px;margin-bottom:16px;"  t-attf-alt="#{my_date.first_name} dating profile" width="200" height="200"/>
+                        
+                        <t t-if="request.env.user.partner_id.id == my_date.id">
+			    <a href="/dating/profiles/settings">Settings</a><br/>
+                        </t>
+                            
+			Location: <t t-esc="my_date.city"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.id"/><a t-attf-href="https://www.google.com.au/maps/place/#{my_date.city}, #{my_date.state_id.name}, #{my_date.country_id.name}" target="_blank" class="material-icons">place</a><br/>
+                        Seeking: ? between <t t-esc="my_date.min_age_pref"/> and <t t-esc="my_date.max_age_pref"/> who is within <t t-esc="my_date.dist_pref"/>km<br/>
+                        Age: <t t-esc="my_date.age"/><br/>
+
+                    </div>
+                    
+                    <div id="profile_text" style="clear:both;">
+                        <h1><t t-esc="my_date.first_name"/></h1>
+                        <t t-esc="my_date.profile_text"/>            
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+        
+    </t>
+</template>
+
+<template id="my_dating_profile_settings" name="Dating Profile Settings" page="True">
+    <t t-call="website.layout">
+        <div class="container mt16 mb16">
+            <div class="col-md-12">                            
+                <div id="main" class="well">
+                    <h1>Settings</h1>
+                    <form method="POST" action="/dating/profile/update">
+	                <input type="hidden" name="member_id" t-attf-value="#{my_date.id}"/>
+                        Profile Visibility<br/>
+                        <input type="radio" name="profile_visibility" value="public" t-attf-checked="#{'checked' if my_date.profile_visibility=='public' else ''}"/> Public<br/>
+                        <input type="radio" name="profile_visibility" value="members_only" t-attf-checked="#{'checked' if my_date.profile_visibility=='members_only' else ''}"/> Members Only<br/>
+                        <input type="radio" name="profile_visibility" value="not_listed" t-attf-checked="#{'checked' if my_date.profile_visibility=='not_listed' else ''}"/> Private<br/>
+                        <br/>
+                        Who can message you<br/>
+                        <input type="radio" name="message_setting" value="public" t-attf-checked="#{'checked' if my_date.message_setting=='public' else ''}"/> Anyone
+                        <input type="radio" name="message_setting" value="members_only" t-attf-checked="#{'checked' if my_date.message_setting=='members_only' else ''}"/> Members Only
+                        <input type="radio" name="message_setting" value="i_like" t-attf-checked="#{'checked' if my_date.message_setting=='i_like' else ''}"/> Members I Like
+                        <button t-attf-class="btn btn-primary btn-lg">Update Profile</button>
+                    </form>
+            
+                </div>
+            </div>
+            
+        </div>
+        
+    </t>
+</template>
+
+
+<template id="my_dating_messages" name="Dating Messages" page="True">
+    <t t-call="website.layout">
+        <div class="container mt16 mb16 well">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Messages</h1>
+                </div>
+            </div>
+            <div class="row">   
+                <div class="col-md-3 well">
+                    <ul class="nav nav-pills nav-stacked">
+                        <t t-foreach="my_date.contacts" t-as="contact">            
+                            <li><a data-toggle="pill" t-attf-href="##{contact.to_id.id}"><img t-att-src="website.image_url(contact.to_id, 'image')" t-attf-alt="#{contact.to_id.first_name} dating profile" width="50" height="50"/> <t t-esc="contact.to_id.first_name"/></a></li>
+                        </t>
+                    </ul>
+                </div>
+                <div class="col-md-9 well">
+                            <h3><t t-esc="my_date.first_name"/></h3>
+			        <div>
+			            <t t-foreach="request.env.user.partner_id.dating_messages" t-as="my_message">
+			                <t t-esc="my_message.message_text"/>
+			            </t>
+			        </div>
+			        <form method="POST" action="/dating/profiles/messages/send">
+			            <input type="hidden" name="member_id" t-attf-value="#{my_date.id}"/>
+			            <div class="form-group">
+			                <label for="comment">Comment:</label>
+			                <textarea class="form-control" name="comment" rows="5"></textarea>
+			            </div>
+			        
+			            <button t-attf-class="btn btn-primary btn-lg" style="float:right;">Reply</button>
+			        </form>
+		          
+                </div>   
+            </div>   
+        </div>
+    </t>
+</template>
+
+</data>
+</openerp>

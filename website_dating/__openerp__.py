@@ -1,0 +1,22 @@
+{
+    'name': "Website Dating (Giga Mega Super Alpha)",
+    'version': "0.2.0",
+    'author': "Sythil",
+    'category': "Tools",
+    'summary': "A directory of single people",
+    'license':'AGPL-3',
+    'data': [
+    'views/res_dating_views.xml',
+    'views/res_partner_views.xml',
+    'views/website_dating_templates.xml',
+    'data/ir.cron.csv',
+    'data/res.dating.fake.first.csv',
+    'data/res.dating.fake.last.csv',
+    'data/res.partner.gender.csv',
+    'data/website.menu.csv',
+    'data/res.partner.relationship.csv',
+    ],
+    'demo': [],
+    'depends': ['crm','base_location_geonames_import', 'website'],
+    'installable': True,
+}

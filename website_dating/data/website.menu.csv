@@ -1,0 +1,6 @@
+id,name,url,parent_id/id
+website_dating,Dating,/dating,website.main_menu
+website_dating_profiles,Browse Profiles,/dating/profiles,website_dating.website_dating
+website_dating_events,Singles Events,/dating/events,website_dating.website_dating
+website_dating_counselling,Counselling,/dating/counselling,website_dating.website_dating
+website_dating_romantics,Romantics,/dating/romantics,website_dating.website_dating
