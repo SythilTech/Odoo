@@ -11,7 +11,7 @@
     ],
     'demo': [],
     'images':[
-        'static/description/1.png',
+        'static/description/1.jpg',
     ],
     'depends': [],
     'installable': True,
