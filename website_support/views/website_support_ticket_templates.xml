@@ -104,7 +104,7 @@
                     </t>
                 </table>
                 
-                <form method="POST" action="/support/ticket/comment">
+                <form method="GET" action="/support/ticket/comment">
                     <b>Add Comment</b><br/>
                     <textarea  class="form-control" name="comment" style="min-height: 120px" required="True"></textarea>
                     <br/>
@@ -199,11 +199,11 @@
         </div>
       </section>
 
-        <form action="/support/ticket/process" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
+        <form action="/support/ticket/process" method="get" class="form-horizontal mt32" enctype="multipart/form-data">
             <div t-attf-class="form-group #{error and 'person_name' in error and 'has-error' or ''}">
                 <label class="col-md-3 col-sm-4 control-label" for="person_name">Name</label>
                 <div class="col-md-7 col-sm-8">
-                    <input type="text" class="form-control" name="person_name" required="True" t-attf-value="#{person_name or ''}" t-attf-readonly="#{person_name and 'readonly'}"/>
+                    <input type="text" class="form-control" name="person_name" required="True" t-attf-value="#{person_name or ''}"/>
                 </div>
             </div>
             <div name="email_from_container" t-attf-class="form-group #{error and 'email' in error and 'has-error' or ''}">

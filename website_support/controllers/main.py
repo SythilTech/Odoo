@@ -62,13 +62,17 @@ class MyController(http.Controller):
         category = request.env['website.support.ticket.categories'].sudo().browse(int(values['category']))
         
         for my_user in category.cat_user_ids:
-            values = request.env['mail.template'].generate_email(notification_template.id, new_ticket_id.id)
-       	    values['email_to'] = my_user.login
-            values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
-       	    
-       	    msg_id = request.env['mail.mail'].create(values)
+            notification_template.email_to = my_user.login
+            notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
+            notification_template.send_mail(new_ticket_id.id, True)
             
-        request.env['mail.mail'].process_email_queue()
+            #values = request.env['mail.template'].generate_email(notification_template.id, new_ticket_id.id)
+       	    #values['email_to'] = my_user.login
+            #values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
+       	    
+       	    #msg_id = request.env['mail.mail'].create(values)
+            
+        #request.env['mail.mail'].process_email_queue()
         
         return werkzeug.utils.redirect("/support/ticket/thanks")
         
