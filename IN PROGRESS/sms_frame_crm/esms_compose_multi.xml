@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="esms_compose_multi_view">
+            <field name="name">esms compose multi view</field>
+            <field name="model">esms.compose.multi</field>
+            <field name="arch" type="xml">
+                <form>
+      	            <group>
+      	                <field name="sms_gateway"  widget="selection"/>
+      	                <field name="sms_content"/>
+      	            </group>
+                    <footer>
+                        <button type="object" name="send_sms_multi" string="Send Multiple SMS"/>
+                    </footer>
+      	        </form>
+      	    </field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="esms_autoresponse_form_view">
+          <field name="name">eSMS Gateway Auto Response</field>
+          <field name="model">esms.autoresponse</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="from_mobile"/>
+      	              <field name="keyword"/>
+      	              <field name="sms_content"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="esms_autoresponse_tree_view">
+          <field name="name">eSMS Gateway Auto Response</field>
+          <field name="model">esms.autoresponse</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="from_mobile"/>
+      	          <field name="keyword"/>
+      	          <field name="sms_content"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="esms_autoresponse_action">
+          <field name="name">eSMS Auto Response</field>
+      	  <field name="res_model">esms.autoresponse</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Add SMS Autoresponse</p>
+	  </field>
+      </record>      
+
+      <menuitem id="esms_autoresponse_menu" name="Auto Response" parent="esms_gateway_config_menu" action="esms_autoresponse_action" sequence="100"/>
+
+    </data>
+</openerp>

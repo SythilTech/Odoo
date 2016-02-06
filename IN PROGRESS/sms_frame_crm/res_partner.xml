@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="esms_partner_more_menu_server_action" model="ir.actions.server">
+            <field name="name">Send SMS</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="state">code</field>
+            <field name="code">action = self.esms_action(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+        
+        <record id="esms_partner_more_menu_client_action" model="ir.values">
+	    <field name="key2" eval="'client_action_multi'" />
+	    <field name="model" eval="'res.partner'"/>
+	    <field name="name">Send Smses</field>
+	    <field name="value" eval="'ir.actions.server,%d'%esms_partner_more_menu_server_action"/>
+        </record>
+        
+        <!--
+        <act_window name="SMS Partner"
+        res_model="esms.compose"
+        src_model="res.partner"
+        key2="client_action_multi" 
+        view_mode="form" target="new" 
+        view_type="form"
+        context="{'default_field_id':'mobile','default_to_number':mobile_e164, 'default_record_id':active_id,'default_model_id':active_model}"
+        id="act_send_sms_partner_menu" />
+-->
+        <record model="ir.ui.view" id="E164_mobile_placeholder">
+            <field name="name">E.164 mobile placeholder</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+      	        <field name="mobile" position="replace">
+      	            <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760"/>
+      	            <field name="mobile_e164" invisible="True"/>
+      	        </field>
+      	        <notebook position="inside">
+      	            <page string="SMS Marketing">
+      	                <group>
+      	                    <field name="sms_opt_out"/>
+      	                </group>
+      	            </page>
+      	        </notebook>
+      	    </field>
+        </record>
+        
+        
+    </data>
+</openerp>

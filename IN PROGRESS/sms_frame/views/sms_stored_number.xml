@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id="esms_stored_numbers_form_view" model="ir.ui.view">
+          <field name="name">esms stored_numbers form view</field>
+          <field name="model">esms.stored.number</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+                      <field name="mobile_number"/>
+                      <field name="account"/>                      
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="esms_stored_numbers_tree_view" model="ir.ui.view">
+          <field name="name">esms stored_number tree view</field>
+          <field name="model">esms.stored.number</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+                  <field name="mobile_number"/>
+                  <field name="account"/>
+      	      </tree>
+      	  </field>
+      </record>
+      
+      <record id="esms_stored_numbers_action" model="ir.actions.act_window">
+          <field name="name">SMS stored number</field>
+          <field name="res_model">esms.stored.number</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p>
+                    This list of verified mobile numbers.
+                </p>
+      	  </field>
+      </record>
+
+      <menuitem id="sms_stored_number_menu" name="Stored Numbers" parent="esms_gateway_config_menu" action="esms_verified_numbers_action" sequence="10"/>
+   
+   </data>
+</openerp>

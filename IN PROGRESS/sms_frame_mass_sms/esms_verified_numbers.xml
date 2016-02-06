@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.ui.view" id="esms_verified_numbers_form_view">
+          <field name="name">esms verified_numbers form view</field>
+          <field name="model">esms.verified.numbers</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <header>
+      	              <button name="send_mobile_verify" type="object" string="Test Mobile Number" help="Sends an sms from this number to this number to test if the system can receive smses"/>
+      	          </header>
+      	          <group>
+      	              <field name="name"/>
+                      <field name="mobile_number"/>
+                      <field name="account_id"/>
+                      <field name="mobile_verified"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="esms_verified_numbers_tree_view">
+          <field name="name">esms verified_numbers tree view</field>
+          <field name="model">esms.verified.numbers</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+                  <field name="mobile_number"/>
+                  <field name="account_id"/>
+                  <field name="mobile_verified"/>
+      	      </tree>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="esms_verified_numbers_action">
+          <field name="name">SMS verified numbers</field>
+          <field name="res_model">esms.verified.numbers</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p>
+                    This list of verified mobile numbers.
+                </p>
+      	  </field>
+      </record>
+
+      <menuitem id="esms_verified_numbers_menu" name="Verified Numbers" parent="esms_gateway_config_menu" action="esms_verified_numbers_action" sequence="10"/>
+   
+   </data>
+</openerp>

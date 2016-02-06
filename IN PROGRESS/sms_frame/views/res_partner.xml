@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+                
+        <record id="E164_mobile_placeholder" model="ir.ui.view">
+            <field name="name">E.164 mobile placeholder</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+      	        <field name="mobile" position="replace">
+      	            <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760"/>
+      	            <button type="object" name="compose_sms" widget="sms_frame" string="Send SMS"/>
+      	        </field>
+      	        <notebook position="inside">
+      	            <page string="SMS Marketing">
+      	                <group>
+      	                    <field name="sms_opt_out"/>
+      	                </group>
+      	            </page>
+      	        </notebook>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>

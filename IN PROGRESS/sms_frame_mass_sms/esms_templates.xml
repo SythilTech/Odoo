@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>     
+      <record model="ir.ui.view" id="esms_template_form_view">
+          <field name="name">esms template form view</field>
+          <field name="model">esms.templates</field>
+          <field name="arch" type="xml">
+              <form string="Templates">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/><h1><field name="name" required="1"/></h1>
+                            <group>
+                                <field name="model_id" required="1" on_change="onchange_model_id(model_id)" options="{'no_create': True}"/>
+                                <field name="model" invisible="1"/>
+                                <field name="from_mobile"/>
+                                <field name="sms_to"/>
+                            </group>
+                        </div>
+                        <notebook>
+                            <page string="Content">
+                                <field name="template_body"/>
+                            </page>
+                            <page string="Dynamic Placeholder Generator">
+                                <group>
+                                    <field name="model_object_field" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="onchange_sub_model_object_value_field(model_object_field)"/>
+                                    <field name="sub_object" readonly="1"/>
+                                    <field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field)"/>
+                                    <field name="null_value" on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field,null_value)"/>
+                                    <field name="copyvalue"/>
+                                </group>
+                            </page>
+                        </notebook>
+                       </sheet>
+                </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="esms_template_tree_view">
+          <field name="name">esms template tree view</field>
+          <field name="model">esms.templates</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	          <field name="model_id"/>
+      	          <field name="from_mobile"/>
+      	          <field name="sms_to"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="esms_templates_action">
+          <field name="name">SMS Templates</field>
+          <field name="res_model">esms.templates</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">Create an SMS template</p>
+      	  </field>
+      </record>
+      
+      <menuitem id="esms_templates_menu" name="SMS Templates" parent="esms_gateway_config_menu" action="esms_templates_action" sequence="110"/>
+        
+  </data>
+</openerp>
