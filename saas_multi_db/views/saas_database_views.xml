@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="saas_database_view_form" model="ir.ui.view">
+          <field name="name">saas.database.form</field>
+          <field name="model">saas.database</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="name"/>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="saas_database_action" model="ir.actions.act_window">
+          <field name="name">View all SAAS databases</field>
+          <field name="res_model">saas.database</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="target">current</field>
+      </record>
+        
+      <menuitem id="saas_database_parent_menu" name="Saas" parent="base.menu_custom" sequence="80"/>
+      <menuitem id="saas_database_menu" name="Databases" parent="saas_database_parent_menu" action="saas_database_action" sequence="10"/>
+        
+  </data>
+</openerp>
