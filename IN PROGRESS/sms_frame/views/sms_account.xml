@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-      <record id="esms_accounts_form_view" model="ir.ui.view">
-          <field name="name">eSMS Gateway Accounts</field>
+
+      <record id="sms_account_view_form" model="ir.ui.view">
+          <field name="name">sms.account.view.form</field>
           <field name="model">sms.account</field>
           <field name="arch" type="xml">
       	      <form>
       	          <group>
       	              <field name="name"/>
-      	              <field name="account_gateway" widget="selection"/>
-      	              <field name="priority"/>
+      	              <field name="account_gateway_id" widget="selection"/>
       	              <field name="gateway_model" invisible="1"/>
       	          </group>
       	          <h2 id="gatewayhook">Gateway Settings</h2>
@@ -17,20 +17,19 @@
       	  </field>
       </record>
 
-      <record id="esms_accounts_tree_view" model="ir.ui.view">
-          <field name="name">eSMS Gateway Accounts</field>
+      <record id="sms_account_view_tree" model="ir.ui.view">
+          <field name="name">sms.account.view.tree</field>
           <field name="model">sms.account</field>
           <field name="arch" type="xml">     
       	      <tree>
-      	          <field name="priority"/>
       	          <field name="name"/>
-      	          <field name="account_gateway"/>
+      	          <field name="account_gateway_id"/>
       	      </tree>
       	  </field>
       </record>
 
-      <record id="esms_action" model="ir.actions.act_window">
-          <field name="name">eSMS Gateway Accounts</field>
+      <record id="sms_account_action" model="ir.actions.act_window">
+          <field name="name">sms.account.action</field>
       	  <field name="res_model">sms.account</field>
       	  <field name="view_type">form</field>
       	  <field name="view_mode">tree,form</field>
@@ -39,7 +38,7 @@
 	  </field>
       </record>      
 
-      <menuitem id="sms_account_menu" name="Accounts" parent="esms_gateway_config_menu" action="esms_action" sequence="90"/>
+      <menuitem id="sms_account_menu" name="Accounts" parent="sms_parent_menu" action="sms_account_action" sequence="90"/>
 
     </data>
 </openerp>

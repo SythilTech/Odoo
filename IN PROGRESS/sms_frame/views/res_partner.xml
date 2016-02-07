@@ -2,7 +2,7 @@
 <openerp>
     <data>
                 
-        <record id="E164_mobile_placeholder" model="ir.ui.view">
+        <record id="view_partner_form_inherit_sms_frame" model="ir.ui.view">
             <field name="name">E.164 mobile placeholder</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>

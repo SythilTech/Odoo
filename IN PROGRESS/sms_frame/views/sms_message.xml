@@ -2,18 +2,16 @@
 <openerp>
     <data>
 
-      <record id="esms_history_form_view" model="ir.ui.view">
-          <field name="name">esms message form view</field>
+      <record id="sms_message_view_form" model="ir.ui.view">
+          <field name="name">sms.message.view.form</field>
           <field name="model">sms.message</field>
           <field name="arch" type="xml">
-      	      <form create="false" edit="false">
+      	      <form create="false" edit="false" string="SMS Messages">
       	          <group>
-      	              <field name="my_date"/>
+      	              <field name="message_date"/>
       	              <field name="sms_gateway_message_id"/>
-      	              <field name="account_id" options="{'no_open': True}"/>
-      	              <field name="model_id" options="{'no_open': True}"/>
-      	              <field name="model_name"/>
-      	              <field name="field_id" options="{'no_open': True}"/>
+      	              <field name="account_id"/>
+      	              <field name="model_id"/>
       	              <field name="record_id"/>
       	              <field name="create_uid"/>
       	              <field name="direction"/>
@@ -22,23 +20,22 @@
       	              <field name="to_mobile"/>
       	              <field name="status_string"/>
       	              <field name="status_code"/>
-      	              <field name="delivary_error_string"/>
       	              <field name="sms_content"/>
       	          </group>
       	      </form>
       	  </field>
       </record>
 
-      <record id="esms_history_tree_view" model="ir.ui.view">
-          <field name="name">esms history tree view</field>
-          <field name="model">esms.history</field>
+      <record id="sms_message_view_tree" model="ir.ui.view">
+          <field name="name">sms.message.view.tree</field>
+          <field name="model">sms.message</field>
           <field name="arch" type="xml">
       	      <tree edit="false" create="false">
       	          <field name="create_uid" string="By"/>
       	          <field name="account_id"/>
       	          <field name="record_name"/>
       	          <field name="direction"/>
-      	          <field name="my_date"/>
+      	          <field name="message_date"/>
       	          <field name="from_mobile"/>
       	          <field name="to_mobile"/>
       	          <field name="status_code"/>
@@ -47,9 +44,9 @@
       	  </field>
       </record>
 
-        <record id="esms_history_kanban_view" model="ir.ui.view">
-            <field name="name">esms.history.kanban</field>
-            <field name="model">esms.history</field>
+        <record id="sms_message_view_kanban" model="ir.ui.view">
+            <field name="name">sms.message.view.kanban</field>
+            <field name="model">sms.message</field>
             <field name="arch" type="xml">
                 <kanban>
                     <field name="record_name"/>
@@ -69,7 +66,7 @@
                                       <span class="oe_partner_heading"><field name="record_name"/></span><br/>
 				      <field name="sms_content"/>
 				      <br/><br/>
-				      <field name="create_uid"/> <field name="my_date"/>
+				      <field name="create_uid"/> <field name="message_date"/>
                                   </div>
 
                                   <div t-if="record.direction.raw_value == 'O'" style="text-align:left;">
@@ -80,7 +77,7 @@
                                       <span class="oe_partner_heading"><field name="record_name"/></span><br/>
 				      <field name="sms_content"/>
 				      <br/><br/>
-				      <field name="create_uid"/> <field name="my_date"/>
+				      <field name="create_uid"/> <field name="message_date"/>
                                   </div>
            
                                 </a>
@@ -94,19 +91,17 @@
             </field>
         </record>
       
-      <record id="esms_history_action" model="ir.actions.act_window">
-          <field name="name">SMS history</field>
+      <record id="sms_message_action" model="ir.actions.act_window">
+          <field name="name">sms.message.action</field>
           <field name="res_model">sms.message</field>
           <field name="view_type">form</field>
           <field name="view_mode">kanban,tree,form</field>
           <field name="help" type="html">
-      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	      <p class="oe_view_nocontent_create">SMS Messages</p>
       	  </field>
       </record>
       
-      <menuitem id="esms_history_menu" name="SMS History" parent="esms_gateway_config_menu" action="esms_history_action" sequence="100"/>
-      <menuitem id="esms_user_history_title" name="SMS" parent="mail.mail_feeds_main" groups="base.group_user"/>
-      <menuitem id="esms_user_history_menu" name="SMS History" parent="esms_user_history_title" action="esms_user_history_action" sequence="10"/>
+      <menuitem id="sms_message_menu" name="Messages" parent="sms_parent_menu" action="sms_message_action" sequence="100"/>
    
    </data>
 </openerp>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>     
-      <record id="esms_template_form_view" model="ir.ui.view">
-          <field name="name">esms template form view</field>
+      <record id="sms_template_view_form" model="ir.ui.view">
+          <field name="name">sms.template.view.form</field>
           <field name="model">sms.template</field>
           <field name="arch" type="xml">
               <form string="Templates">
@@ -22,9 +22,9 @@
                             </page>
                             <page string="Dynamic Placeholder Generator">
                                 <group>
-                                    <field name="model_object_field" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="onchange_sub_model_object_value_field(model_object_field)"/>
-                                    <field name="sub_object" readonly="1"/>
-                                    <field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field)"/>
+                                    <field name="model_object_field_id" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="onchange_sub_model_object_value_field(model_object_field)"/>
+                                    <field name="sub_object_id" readonly="1"/>
+                                    <field name="sub_model_object_field_id" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field)"/>
                                     <field name="null_value" on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field,null_value)"/>
                                     <field name="copyvalue"/>
                                 </group>
@@ -35,22 +35,22 @@
       	  </field>
       </record>
 
-      <record model="ir.ui.view" id="esms_template_tree_view">
-          <field name="name">esms template tree view</field>
-          <field name="model">esms.templates</field>
+      <record id="sms_template_view_tree" model="ir.ui.view">
+          <field name="name">sms.template.view.tree</field>
+          <field name="model">sms.template</field>
           <field name="arch" type="xml">
       	      <tree>
       	          <field name="name"/>
-      	          <field name="model_id"/>
+      	          <field name="model"/>
       	          <field name="from_mobile"/>
       	          <field name="sms_to"/>
       	      </tree>
       	  </field>
       </record>
 
-      <record model="ir.actions.act_window" id="esms_templates_action">
-          <field name="name">SMS Templates</field>
-          <field name="res_model">esms.templates</field>
+      <record id="sms_template_action" model="ir.actions.act_window">
+          <field name="name">sms.template.action</field>
+          <field name="res_model">sms.template</field>
           <field name="view_type">form</field>
           <field name="view_mode">tree,form</field>
           <field name="help" type="html">
@@ -58,7 +58,7 @@
       	  </field>
       </record>
       
-      <menuitem id="esms_templates_menu" name="SMS Templates" parent="esms_gateway_config_menu" action="esms_templates_action" sequence="110"/>
+      <menuitem id="sms_template_menu" name="Templates" parent="sms_parent_menu" action="sms_template_action" sequence="110"/>
         
   </data>
 </openerp>

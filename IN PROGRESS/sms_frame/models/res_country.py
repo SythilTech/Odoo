@@ -1,4 +1,5 @@
-from openerp import models, fields, api
+# -*- coding: utf-8 -*-
+from openerp import api, fields, models
 
 class ResCountrySms(models.Model):
 

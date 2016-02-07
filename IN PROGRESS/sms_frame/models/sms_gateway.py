@@ -1,12 +1,9 @@
-from openerp import models, fields, api
-import logging
-_logger = logging.getLogger(__name__)
-import requests
-from datetime import datetime
+# -*- coding: utf-8 -*-
+from openerp import api, fields, models
 
-class esms_gateways(models.Model):
+class SmsGateway(models.Model):
 
-    _name = "esms.gateways"
+    _name = "sms.gateway"
     
     name = fields.Char(required=True, string='Gateway Name')
     gateway_model_name = fields.Char(required='True', string='Gateway Model Name')

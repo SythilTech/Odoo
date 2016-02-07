@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <record id="view_server_action_form_sms" model="ir.ui.view">
+        <record id="view_server_action_form_inherit_sms_frame" model="ir.ui.view">
             <field name="name">ir.actions.server.form.sms</field>
             <field name="model">ir.actions.server</field>
             <field name="inherit_id" ref="base.view_server_action_form"/>
@@ -14,8 +14,8 @@
                             Please set the Base Model before setting the action details.
                         </p>
                         <group attrs="{'invisible': [('model_id', '=', False)]}">
-                            <field name="sms_template_id" attrs="{'required': [('state', '=', 'sms')]}"/>
-                            <p colspan="2" attrs="{'invisible': [('sms_template_id', '!=', False)]}">
+                            <field name="sms_template" attrs="{'required': [('state', '=', 'sms')]}"/>
+                            <p colspan="2" attrs="{'invisible': [('sms_template', '!=', False)]}">
                                 Choose a SMS template.
                             </p>
                         </group>

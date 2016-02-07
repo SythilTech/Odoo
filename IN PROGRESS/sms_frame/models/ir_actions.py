@@ -1,10 +1,11 @@
-from openerp import models, fields, api
+# -*- coding: utf-8 -*-
+from openerp import api, fields, models
 
-class actions_server(models.Model):
+class IrActionsServer(models.Model):
 
     _inherit = 'ir.actions.server'
     
-    sms_template = fields.Many2one('sms.template',string="SMS Template")
+    sms_template_id = fields.Many2one('sms.template',string="SMS Template")
 
     @api.model
     def _get_states(self):
@@ -16,5 +17,5 @@ class actions_server(models.Model):
     def run_action_sms(self, action, eval_context=None):
         if not action.sms_template:
             return False
-        self.env['sms.template'].send_sms(action.sms_template.id, self.env.context.get('active_id'))
+        self.env['sms.template'].send_sms(action.sms_template_id.id, self.env.context.get('active_id'))
         return False

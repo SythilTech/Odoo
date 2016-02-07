@@ -1,1 +1,1 @@
-import res_partner, sms_account, res_country, ir_actions, sms_verified_number, sms_message, sms_gateway, sms_compose, sms_template
+import res_partner, sms_account, res_country, ir_actions, sms_number, sms_message, sms_gateway, sms_compose, sms_template
