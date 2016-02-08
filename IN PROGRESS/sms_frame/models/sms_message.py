@@ -29,7 +29,12 @@ class SmsMessage(models.Model):
                 self.record_name = my_record.name
             else:
                 self.record_name = self.to_mobile
-
-    def send_sms(self):
-        """Send the sms, The actual send code is different for each sms gateway"""
-        _logger.error("hi")
+                
+    def find_owner_model(self, sms_message):
+        """Gets the model and record this sms is meant for
+        #look for a partner with this number
+        partner_id = self.env['res.partner'].search([('mobile','=', sms_message.from_mobile)])
+    	if len(partner_id) > 0:
+    	    return {'record_id': partner_id[0], 'target_model': "res.partner"}
+    	else:
+    	    return {'record_id': 0, 'target_model': ""}

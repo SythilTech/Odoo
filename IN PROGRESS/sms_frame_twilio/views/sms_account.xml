@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+      <record id="sms_account_view_form_inherit_sms_frame_twilio" model="ir.ui.view">
+          <field name="name">sms.account.view.form</field>
+          <field name="model">sms.account</field>
+          <field name="inherit_id" ref="sms_frame.sms_account_view_form"/>
+          <field name="arch" type="xml">
+      	      <xpath expr="//h2[@id='gatewayhook']" position="after">
+      	          <div attrs="{'invisible': [('gateway_model', '!=', 'sms.gateway.twilio')]}">
+		      <group>
+	                  <field name="twilio_account_sid"/>
+                          <field name="twilio_auth_token"/>
+                          <field name="twilio_last_check_date"/>
+                          <button name="twilio_quick_setup" type="object" string="Quick Setup" help="Points Twilio to your odoo server"/>
+                      </group>
+    	          </div>
+      	      </xpath>
+      	  </field>
+      </record>
+      
+  </data>
+</openerp>
