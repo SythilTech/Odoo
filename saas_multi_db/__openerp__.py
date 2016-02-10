@@ -1,0 +1,27 @@
+{
+    'name': "SAAS Multi Database",
+    'version': "1.0",
+    'author': "Vuente",
+    'category': "Tools",
+    'summary':'Let public users create new Odoo databases in your Instance',
+    'currency': 'EUR',
+    'price': 95.00,
+    'license':'LGPL-3',
+    'data': [
+        'views/saas_multi_db_templates.xml',
+        'views/saas_database_views.xml',
+        'views/saas_template_database_views.xml',
+        'views/res_partner.xml',
+        'data/website.menu.csv',
+        'security/ir.model.access.csv',
+    ],
+    'demo': [],
+    'images':[
+        'static/description/2.jpg',
+        'static/description/1.jpg',
+        'static/description/3.jpg',
+        'static/description/4.jpg',
+    ],
+    'depends': ['website'],
+    'installable': True,
+}

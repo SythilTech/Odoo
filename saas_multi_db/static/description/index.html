@@ -1,0 +1,86 @@
+<div style="margin-left:100px;margin-right:100px;">
+<h2>Description</h2>
+Share your Odoo instance with others<br/>
+<br/>
+<h3>Instructions</h3>
+1.  Create a <a href="#templatedatabases">template database</a> for the user to pick from<br/>
+2.  Wait for users to create thier databases<br/>
+3.  ???<br/>
+4.  Profit<br/>
+<br/>
+<b>*NOTE* It is advised to have your restrict the SAAS user of your template user so they can't access the app store since a failed install / uninstall can crash all databases in the instance</b><br/>
+<br/>
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan">Manage SAAS databases</h2>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+                <img class="oe_picture oe_screenshot" src="1.jpg" alt="Track SAAS users">
+            </div>
+        </div>
+        <div class="oe_span6">
+            <p class="oe_mt32">
+Keep track of all your saas database.<br/>
+<br/>
+<b>Instructions</b><br/>
+1.  Go to 'Saas->Saas Databases'<br>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan">Sign up via web form</h2>
+        <div class="oe_span6">
+            <p class="oe_mt32">
+Let others try out your specially setup odoo configuration<br/>
+<br/>
+<b>Instructions</b><br/>
+1.  Go to the "Try Odoo" menu on your website<br>
+2.  Enter details on the webform<br/>
+3.  The template database will be cloned and the user can login using the credentials provided in the form<br>
+3.  A new partner is also created in your database with 'saas_partner' field set to true which can be used for mail campaigns<br/>
+            </p>
+        </div>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+<img class="oe_picture oe_screenshot" src="2.jpg" alt="Create instance on website">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan"><a id="templatedatabases">Template Databases</a></h2>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+                <img class="oe_picture oe_screenshot" src="3.jpg" alt="Template Databases Tree">
+                <img class="oe_picture oe_screenshot" src="4.jpg" alt="Template Databases Form">
+            </div>
+        </div>
+        <div class="oe_span6">
+            <p class="oe_mt32">
+Create database templates for different types of systems.<br/>
+<br/>
+<b>Instructions</b><br/>
+1.  Create a new database in your Odoo instance<br/>
+2.  Make changes to the database, it will act as a template so be sure to setup your modules and outgoing email server(s)<br/>
+3.  Install 'saas_multi_db_client' module, this will create a template saas user in the system<br/>
+4.  Configure the new saas user with the permissions you want the new user to possess upon creating thier system<br/>
+5.  Go back to your saas server database<br/>
+6.  Go to 'Saas->Template Databases'<br>
+7.  Type in the display name and the actual database name and click "Save Template Database"<br/>
+8.  New users will get a copy of your template database expect the saas user template will have the name, email, login and password that was provided on the web form<br/>
+            </p>
+        </div>
+    </div>
+</section>
+
+<h2>Extra Modules</h2>
+<h3>saas_multi_db_client</h3>
+Installed on a template database, creates a saas user which will become the new users when a system is created<br/>
+<br/>
+<!--Find a bug? feature idea? send an email to steven@sythiltech.com.au<br>-->
+</div>
