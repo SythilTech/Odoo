@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="saas_user_email" model="mail.template">
+            <field name="name">Saas Campaign Email</field>
+            <field name="model_id" ref="saas_multi_db.model_saas_database"></field>
+            <field name="email_from">${(user.email)|safe}</field>
+            <field name="email_to">$({object.partner_id.email)|safe}</field>
+            <field name="subject">Welcome to your new system</field>
+            <field name="body_html"><![CDATA[
+                <p>Hello ${object.partner_id.name},</p>
+                <p>Thank you for creating your system '${object.name}'</p>
+                <p>You can login using your email and the password you provided on the form</p>
+            ]]>
+            </field>
+        </record>
+        
+    </data>
+</openerp>

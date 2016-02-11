@@ -1,1 +1,0 @@
-import saas_database, res_partner, saas_template_database
