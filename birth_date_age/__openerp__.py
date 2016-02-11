@@ -1,6 +1,6 @@
 {
     'name': "Birth Date(DOB) Age",
-    'version': "1.0",
+    'version': "1.1",
     'author': "Sythil",
     'category': "Tools",
     'summary':'Adds Date of Birth and Age which is updated daily',
