@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="pick_module" name="Pick Module" page="True">
+            <t t-call="website.layout">
+                <div class="container">
+
+                    <div class="mt16 mb16">
+                        <h1 class="text-center">Enter Module Name</h1>
+                    </div>
+
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8">
+                        <form action="/module/overview" method="GET" class="form-horizontal mt32" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label" for="version">Version</label>
+                                <div class="col-md-2">
+                                    <select class="form-control" name="version" required="True">
+                                        <option value="9.0">9.0</option>
+                                        <option value="8.0">8.0</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label" for="name">Module Name</label>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="name" required="True"/>    
+                                </div>
+                                <div class="col-md-1">
+                                    <button t-attf-class="btn btn-default btn-md">Check</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</openerp>
