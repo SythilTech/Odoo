@@ -8,6 +8,7 @@
     'data': [
         'data/sms.gateway.csv',
         'views/sms_account.xml',
+        'views/ir_actions_todo.xml',
     ],
     'demo': [],
     'depends': ['sms_frame'],

@@ -2,7 +2,7 @@
 <openerp>
     <data>
                 
-      <menuitem id="sms_parent_menu" parent="base.menu_administration" name="SMS" sequence="120"/>
+      <menuitem id="sms_parent_menu" parent="base.menu_custom" name="SMS" sequence="1"/>
         
     </data>
 </openerp>
