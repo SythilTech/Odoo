@@ -30,6 +30,14 @@
                                 </div>
                             </div>
                         </form>
+                        <h1><t t-esc="overview.name"/></h1>
+                        <t t-foreach="overview.models_ids" t-as="model">
+			    <h2><t t-esc="model.name"/></h2>
+			    <t t-foreach="model.view_ids" t-as="view">
+			        <t t-esc="view.name"/> (<t t-esc="view.x_id"/>)
+			    </t>
+			</t>
+
                     </div>
                     <div class="col-md-2"></div>
                 </div>
