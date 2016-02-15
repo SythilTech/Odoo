@@ -6,5 +6,5 @@ class SmsNumber(models.Model):
     _name = "sms.number"
     
     name = fields.Char(string="Name") 
-    mobile_number = fields.Char(string="Mobile Number")
+    mobile_number = fields.Char(string="Sender ID", help="A mobile phone number or a 1-11 character alphanumeric name")
     account_id = fields.Many2one('sms.account', string="Account")
