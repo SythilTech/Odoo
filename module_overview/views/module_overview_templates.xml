@@ -10,8 +10,7 @@
                         <h1 class="text-center">Enter Module Name</h1>
                     </div>
 
-                    <div class="col-md-2"></div>
-                    <div class="col-md-8">
+                    <div class="col-md-12">
                         <form action="/module/overview" method="GET" class="form-horizontal mt32" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label class="col-md-2 control-label" for="version">Version</label>
@@ -23,23 +22,57 @@
                                 </div>
                                 <label class="col-md-2 control-label" for="name">Module Name</label>
                                 <div class="col-md-5">
-                                    <input type="text" class="form-control" name="name" required="True"/>    
+                                    <input type="text" class="form-control" name="name" required="True" t-attf-value="#{overview.name}"/>    
                                 </div>
                                 <div class="col-md-1">
                                     <button t-attf-class="btn btn-default btn-md">Check</button>
                                 </div>
                             </div>
                         </form>
-                        <h1><t t-esc="overview.name"/></h1>
-                        <t t-foreach="overview.models_ids" t-as="model">
-			    <h2><t t-esc="model.name"/></h2>
-			    <t t-foreach="model.view_ids" t-as="view">
-			        <t t-esc="view.name"/> (<t t-esc="view.x_id"/>)
-			    </t>
-			</t>
-
+                        <h2>Models</h2>
+                        <div class="panel-group">
+                            <t t-foreach="overview.models_ids" t-as="model">
+                                
+                                <!-- Each Model has it's own tab -->
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h2 class="panel-title">
+                                            <a data-toggle="collapse" t-attf-href="##{model.id}"><t t-esc="model.name"/></a>
+                                        </h2>
+                                    </div>
+                                    <div t-attf-id="#{model.id}" class="panel-collapse collapse">
+                                        <div class="panel-body">
+					    
+					    <!-- Each module has a panel inside it for fields, view and security -->
+					    <div class="panel-group">
+					        
+					        <!-- All the view inside a model -->
+					        <div class="panel panel-default">
+					            <div class="panel-heading">
+					                <h2 class="panel-title">
+					                    <a data-toggle="collapse" t-attf-href="##{model.id}_views">Views</a>
+					                </h2>
+                                                    </div>
+                                                    <div t-attf-id="#{model.id}_views" class="panel-collapse collapse">
+						        <ul class="list-group">
+						            <t t-foreach="model.view_ids" t-as="view">
+							        <li class="list-group-item"><t t-esc="view.name"/> (<t t-esc="view.x_id"/>)</li>
+			                                    </t>
+                                                        </ul>      
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- All the fields inside a Model -->
+                                                <div>
+                                                </div>
+                                                
+					    </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
                     </div>
-                    <div class="col-md-2"></div>
                 </div>
             </t>
         </template>

@@ -25,21 +25,19 @@ class ModuleOverView(http.Controller):
             return http.request.render('module_overview.pick_module', {})
                 
         #Get the download url from the app store page
-        #module_url = "https://apps.openerp.com/apps/modules/" + values['version'] + "/" + values['name'] + "/"
-        #page = requests.get(module_url)        
-        #root = html.fromstring(page.content)
-        #my_elements = root.xpath("//a[@id='dlbtn']")
-	#if len(my_elements) != 0:
-	#    download_url = my_elements[0].attrib['href']
+        module_url = "https://apps.openerp.com/apps/modules/" + values['version'] + "/" + values['name'] + "/"
+        page = requests.get(module_url)        
+        root = html.fromstring(page.content)
+        my_elements = root.xpath("//a[@id='dlbtn']")
+	if len(my_elements) != 0:
+	    download_url = my_elements[0].attrib['href']
 	
 	#Download the file
-	#download_url = "https://apps.odoo.com/loempia/download/website_blog_mgmt/9.0.1.0.0/2Jyn9JzWRtSRItWuTOTV8C.zip?deps"
-	#home = expanduser("~")
-	#name, hdrs = urllib.urlretrieve(download_url, home + "/" + values['name'] + ".zip")
+	home = expanduser("~")
+	name, hdrs = urllib.urlretrieve(download_url, home + "/" + values['name'] + ".zip")
 
         module_overview = request.env['module.overview'].create({'name': values['name']})
 
-        name = "/odoo/sms_frame.zip"
         myzipfile = zipfile.ZipFile(name)
         overview_string = ""
         for file_name in myzipfile.namelist():
@@ -64,16 +62,20 @@ class ModuleOverView(http.Controller):
         insert_records = root.xpath('//record')
         for rec in insert_records:
     	    record_id = rec.attrib['id']
-    	    record_name = rec.xpath("//field[@name='name']")[0].text
-    	    model_name = rec.xpath("//field[@name='model']")[0].text
-    	    model_exist = request.env['module.overview.model'].search([('name','=',model_name )])
-    	    model = ""
     	    
-    	    #if this is the first time encountering model, create it.
-    	    if len(model_exist) == 0:
-    	        model = request.env['module.overview.model'].create({'mo_id': m_id, 'name': model_name})
-    	    else:
-    	        model = model_exist[0]
+    	    #If it's a view
+    	    if rec.attrib['model'] == "ir.ui.view":
+    	    
+    	        record_name = rec.find(".//field[@name='name']").text
+    	        model_name = rec.find(".//field[@name='model']").text
+    	        model_exist = request.env['module.overview.model'].search([('name','=',model_name),('mo_id','=',m_id) ])
+    	        model = ""
+    	    
+    	        #if this is the first time encountering model, create it.
+    	        if len(model_exist) == 0:
+    	            model = request.env['module.overview.model'].create({'mo_id': m_id, 'name': model_name})
+    	        else:
+    	            model = model_exist[0]
     	        
-    	    #add this view to this model
-    	    request.env['module.overview.model.view'].create({'model_id': model.id, 'name': record_name, 'x_id': record_id})
+    	        #add this view to this model
+    	        request.env['module.overview.model.view'].create({'model_id': model.id, 'name': record_name, 'x_id': record_id})
