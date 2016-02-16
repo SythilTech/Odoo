@@ -11,25 +11,42 @@
                     </div>
 
                     <div class="col-md-12">
-                        <form action="/module/overview" method="GET" class="form-horizontal mt32" enctype="multipart/form-data">
+                        <form action="/module/overview" method="POST" class="form-horizontal mt32" enctype="multipart/form-data">
                             <div class="form-group">
-                                <label class="col-md-2 control-label" for="version">Version</label>
+                                <label class="col-md-2 control-label" for="upload">Upload Module Zip</label>
                                 <div class="col-md-2">
-                                    <select class="form-control" name="version" required="True">
-                                        <option value="9.0">9.0</option>
-                                        <option value="8.0">8.0</option>
-                                    </select>
-                                </div>
-                                <label class="col-md-2 control-label" for="name">Module Name</label>
-                                <div class="col-md-5">
-                                    <input type="text" class="form-control" name="name" required="True" t-attf-value="#{overview.name}"/>    
+                                    <input type="file" name="upload" required="True"/>
                                 </div>
                                 <div class="col-md-1">
                                     <button t-attf-class="btn btn-default btn-md">Check</button>
                                 </div>
                             </div>
                         </form>
-                        <h2>Models</h2>
+                        <t t-if="overview">
+                        
+                            <!-- Menu Panel -->
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" href="#menucollapse">Menus</a>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div id="menucollapse" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <table class="table table-striped">
+                                            <tr><th>Name</th><th>XML ID</th><th>Parent</th></tr>
+				            <t t-foreach="overview.menu_ids" t-as="menu">
+					        <tr><td><t t-esc="menu.name"/></td><td><t t-esc="menu.x_id"/></td><td><t t-esc="menu.parent"/></td></tr>
+			                    </t>          
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Model Panel -->
+                            <h2>Models</h2>
                         <div class="panel-group">
                             <t t-foreach="overview.models_ids" t-as="model">
                                 
@@ -72,6 +89,7 @@
                                 </div>
                             </t>
                         </div>
+                        </t>
                     </div>
                 </div>
             </t>

@@ -7,7 +7,17 @@ class ModuleOverview(models.Model):
     
     name = fields.Char(string="Module Name")
     models_ids = fields.One2many('module.overview.model', 'mo_id', string="Models")
+    menu_ids = fields.One2many('module.overview.menu', 'mo_id', string="Menus")
 
+class ModuleOverviewMenu(models.Model):
+
+    _name = "module.overview.menu"
+    
+    mo_id = fields.Many2one('module.overview', string="Module Overview")
+    name = fields.Char(string="Name")
+    x_id = fields.Char(string="XML ID")
+    parent = fields.Char(string="Parent Menu")
+    
 class ModuleOverviewModel(models.Model):
 
     _name = "module.overview.model"

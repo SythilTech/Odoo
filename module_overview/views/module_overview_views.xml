@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="module_overview_view_form" model="ir.ui.view">
+          <field name="name">module.overview.view.form</field>
+          <field name="model">module.overview</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="name"/>
+                     <field name="models_ids">
+                         <tree>
+                             <field name="name"/>
+                             <field name="view_ids"/>
+                         </tree>
+                     </field>
+                     <field name="menu_ids">
+                         <tree>
+                             <field name="x_id"/>
+                             <field name="name"/>
+                             <field name="parent"/>
+                         </tree>
+                     </field>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="module_overview_view_tree" model="ir.ui.view">
+          <field name="name">module.overview.view.tree</field>
+          <field name="model">module.overview</field>
+          <field name="arch" type="xml">
+              <tree>    
+                  <field name="name"/>
+              </tree>
+          </field>
+      </record>
+      
+      <record id="module_overview_action" model="ir.actions.act_window">
+          <field name="name">module.overview.action</field>
+          <field name="res_model">module.overview</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="target">current</field>
+      </record>
+     
+     <menuitem id="module_overview_menu" name="Module Overview" parent="base.menu_custom" action="module_overview_action" sequence="90"/>        
+        
+  </data>
+</openerp>

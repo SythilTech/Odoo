@@ -7,6 +7,7 @@
     'license':'LGPL-3',
     'data': [
         'views/module_overview_templates.xml',
+        'views/module_overview_views.xml',
         'data/website.menu.csv',
     ],
     'demo': [],
