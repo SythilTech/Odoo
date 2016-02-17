@@ -7,8 +7,8 @@
             name="SMS Partner"
             res_model="sms.compose"
             src_model="res.partner"
-            key2="client_action_multi" 
             view_mode="form" target="new" 
+            limit="1"
             view_type="form"
             context="{'default_field_id':'mobile','default_to_number':mobile, 'default_record_id':active_id,'default_model':active_model}"
          />
