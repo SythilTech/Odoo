@@ -22,6 +22,18 @@
                              <field name="parent"/>
                          </tree>
                      </field>
+                     <field name="access_ids">
+                         <tree>
+                             <field name="name"/>
+                             <field name="x_id"/>
+                             <field name="model"/>
+                             <field name="group"/>
+                             <field name="perm_read"/>
+                             <field name="perm_write"/>
+                             <field name="perm_create"/>
+                             <field name="perm_unlink"/>
+                         </tree>
+                     </field>
                   </group>
               </form>
           </field>

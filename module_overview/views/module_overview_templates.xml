@@ -23,7 +23,28 @@
                             </div>
                         </form>
                         <t t-if="overview">
-                        
+
+                            <!-- Security Access Panel -->
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" href="#accesscollapse">Security Access</a>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div id="accesscollapse" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <table class="table table-striped">
+                                            <tr><th>Name</th><th>XML ID</th><th>Model</th><th>Group</th><th>Permissions</th></tr>
+				            <t t-foreach="overview.access_ids" t-as="access">
+					        <tr><td><t t-esc="access.name"/></td><td><t t-esc="access.x_id"/></td><td><t t-esc="access.model"/></td><td><t t-esc="access.group"/></td><td><t t-esc="access.access_string"/></td></tr>
+			                    </t>          
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <!-- Menu Panel -->
                             <div class="panel-group">
                                 <div class="panel panel-default">
@@ -46,7 +67,7 @@
                             </div>
 
                             <!-- Model Panel -->
-                            <h2>Models</h2>
+                            <h2>Models  (<t t-esc="overview.model_count"/>)</h2>
                         <div class="panel-group">
                             <t t-foreach="overview.models_ids" t-as="model">
                                 
