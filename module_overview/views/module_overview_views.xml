@@ -15,6 +15,7 @@
                              <field name="view_ids"/>
                          </tree>
                      </field>
+                     <field name="group_ids"/>
                      <field name="menu_ids">
                          <tree>
                              <field name="x_id"/>
@@ -34,6 +35,20 @@
                              <field name="perm_unlink"/>
                          </tree>
                      </field>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="module_overview_model_view_form" model="ir.ui.view">
+          <field name="name">module.overview.model.view.form</field>
+          <field name="model">module.overview.model</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="name"/>
+                     <field name="view_ids"/>
+                     <field name="access_ids"/>
                   </group>
               </form>
           </field>

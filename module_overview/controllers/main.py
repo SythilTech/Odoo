@@ -62,7 +62,7 @@ class ModuleOverView(http.Controller):
             filename, file_extension = os.path.splitext(file_name)
             zippy = myzipfile.open(file_name)
             if file_extension == ".py":
-                _logger.error("not supported")
+                _logger.info("not supported")
                 #self._read_py(zippy.read(), module_overview.id)
             elif file_extension == ".xml":
                 self._read_xml(zippy.read(), module_overview.id)
@@ -109,9 +109,42 @@ class ModuleOverView(http.Controller):
                          
                          colnum += 1
                 
-                    #Create a access rule record using the premade dictionary from the csv
-                    request.env['module.overview.access'].create(row_dict)
+                    group_name = ""
+                    
+                    if row_dict['group'] != "":
+                        group_name = request.env['ir.model.data'].get_object(row_dict['group'].split(".")[0], row_dict['group'].split(".")[1]).name
+       	
+       	            #Create the group if it does exist
+       	            ex_group = request.env['module.overview.group'].search([('x_id','=',row_dict['group'])])
+       	            
+       	            if len(ex_group) == 0:
+       	                my_group = request.env['module.overview.group'].create({'mo_id': m_id, 'name': group_name, 'x_id': row_dict['group']})       	            
+       	            else:
+       	                my_group = ex_group[0]
+       	
+       	            #If model diiesn't exists, create it
+                    ex_model = request.env['module.overview.model'].search([('name','=', self._ref_to_model(row_dict['model']) )])
+                    
+                    if len(ex_model) == 0:
+                        #create the model
+                        my_model = request.env['module.overview.model'].create({'name':self._ref_to_model(row_dict['model']), 'mo_id': m_id})
+                    else:
+                        my_model = ex_model[0]
+
+                    #Add the access rule to the group
+                    request.env['module.overview.group.access'].create({'mog_id':my_group.id, 'model_id': my_model.id, 'perm_read': row_dict['perm_read'], 'perm_write':row_dict['perm_write'], 'perm_create':row_dict['perm_create'], 'perm_unlink':row_dict['perm_unlink']})
+                    
+                    access_dict = {'model_id':my_model.id, 'name': group_name, 'x_id': row_dict['group'], 'perm_read': row_dict['perm_read'], 'perm_write':row_dict['perm_write'], 'perm_create':row_dict['perm_create'], 'perm_unlink':row_dict['perm_unlink']}
+                    request.env['module.overview.model.access'].create(access_dict)
+                        
+                     
+                    
                 rownum += 1
+
+
+    def _ref_to_model(self, ref_string):
+        """Turns 'model_sms_message' into 'sms.message'"""
+        return ref_string.replace("model_","").replace("_",".")
        
     def _read_xml(self, file_content, m_id):
         return_string = ""
