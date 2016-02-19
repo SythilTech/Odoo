@@ -17,6 +17,7 @@
         'views/ir_actions_server_views.xml',
         'data/ir.cron.csv',
         'data/res.country.csv',
+        'data/ir.model.access.csv',
     ],
     'demo': [],
     'depends': [],

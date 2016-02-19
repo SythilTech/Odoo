@@ -57,4 +57,9 @@ class SmsCompose(models.Model):
 
 	    #for single smses we only record succesful sms, failed ones reopen the form with the error message
 	    sms_message = self.env['sms.message'].create({'record_id': self.record_id,'model_id':my_model[0].id,'account_id':self.from_mobile_id.account_id.id,'from_mobile':self.from_mobile_id.mobile_number,'to_mobile':self.to_number,'sms_content':self.sms_content,'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id})
-	    self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent")
+	    
+	    try:
+	        self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent")
+	    except:
+	        #Message post only works if CRM module is installed
+	        pass
