@@ -2,6 +2,7 @@
     'name': "Module Overview",
     'version': "1.0",
     'author': "Sythil",
+    'website':'http://sythiltech.com.au',
     'category': "Tools",
     'summary': "Gives an overview of what a module does / has in it",
     'license':'LGPL-3',

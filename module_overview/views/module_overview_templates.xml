@@ -7,7 +7,12 @@
                 <div class="container">
 
                     <div class="mt16 mb16">
-                        <h1 class="text-center">Enter Module Name</h1>
+                        <t t-if="overview">
+                            <h1 class="text-center"><t t-esc="overview.name"/> Overview</h1>
+                        </t>
+                        <t t-if="not overview">
+                            <h1 class="text-center">Module Overview</h1>
+                        </t>
                     </div>
 
                     <div class="col-md-12">
@@ -29,7 +34,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <h4 class="panel-title">
-                                            <a data-toggle="collapse" href="#groupcollapse">Groups</a>
+                                            <a data-toggle="collapse" href="#groupcollapse">Groups (<t t-esc="overview.group_count"/>)</a>
                                         </h4>
                                     </div>
                                 </div>
@@ -59,7 +64,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <h4 class="panel-title">
-                                            <a data-toggle="collapse" href="#menucollapse">Menus</a>
+                                            <a data-toggle="collapse" href="#menucollapse">Menus (<t t-esc="overview.menu_count"/>)</a>
                                         </h4>
                                     </div>
                                 </div>
@@ -68,7 +73,7 @@
                                         <table class="table table-striped">
                                             <tr><th>Name</th><th>XML ID</th><th>Parent</th></tr>
                                             <t t-foreach="overview.menu_ids" t-as="menu">
-                                                <tr><td><t t-esc="menu.name"/></td><td><t t-esc="menu.x_id"/></td><td><t t-esc="menu.parent"/></td></tr>
+                                                <tr><td><t t-esc="menu.name"/></td><td><t t-esc="menu.x_id"/></td><td><t t-esc="menu.parent"/> (<t t-esc="menu.parent_x_id"/>)</td></tr>
                                             </t>
                                         </table>
                                     </div>

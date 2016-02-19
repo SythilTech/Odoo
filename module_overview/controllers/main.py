@@ -111,6 +111,10 @@ class ModuleOverView(http.Controller):
                 
                     group_name = ""
                     
+                    #Deal with blank or other malformed rows
+                    if ('group' not in row_dict) or ('x_id' not in row_dict):
+                        continue
+                    
                     if row_dict['group'] != "":
                         group_name = request.env['ir.model.data'].get_object(row_dict['group'].split(".")[0], row_dict['group'].split(".")[1]).name
        	
@@ -159,7 +163,11 @@ class ModuleOverView(http.Controller):
                 menu_dict['name'] = menu.attrib['name']
 
             if 'parent' in menu.attrib:
-                menu_dict['parent'] = menu.attrib['parent']
+                try:
+                    menu_dict['parent'] = request.env['ir.model.data'].get_object(menu.attrib['parent'].split(".")[0], menu.attrib['parent'].split(".")[1]).name
+                except:
+                    pass
+                menu_dict['parent_x_id'] = menu.attrib['parent']
 
             request.env['module.overview.menu'].create(menu_dict)
         

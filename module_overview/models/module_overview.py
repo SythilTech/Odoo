@@ -10,9 +10,21 @@ class ModuleOverview(models.Model):
     models_ids = fields.One2many('module.overview.model', 'mo_id', string="Models")
     model_count = fields.Integer(string="Model Count", compute="_compute_model_count")
     menu_ids = fields.One2many('module.overview.menu', 'mo_id', string="Menus")
+    menu_count = fields.Integer(string="Menu Count", compute="_compute_menu_count")
     access_ids = fields.One2many('module.overview.access', 'mo_id', string="Depricted")
     group_ids = fields.One2many('module.overview.group', 'mo_id', string="Groups")
+    group_count = fields.Integer(string="Group Count", compute="_compute_group_count")
 
+    @api.one
+    @api.depends('menu_ids')
+    def _compute_menu_count(self):
+        self.menu_count = len(self.menu_ids)
+
+    @api.one
+    @api.depends('group_ids')
+    def _compute_group_count(self):
+        self.group_count = len(self.group_ids)
+        
     @api.one
     @api.depends('models_ids')
     def _compute_model_count(self):
@@ -103,6 +115,7 @@ class ModuleOverviewMenu(models.Model):
     name = fields.Char(string="Name")
     x_id = fields.Char(string="XML ID")
     parent = fields.Char(string="Parent Menu")
+    parent_x_id = fields.Char(string="Parent Menu XML ID")
     
 class ModuleOverviewModel(models.Model):
 
