@@ -22,7 +22,7 @@
     'demo': [],
     'depends': [],
     'images':[
-        'static/description/1.jpg',
+        'static/description/3.jpg',
     ],
     'installable': True,
 }
