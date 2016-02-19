@@ -3,6 +3,7 @@
     'version': "1.0.1",
     'author': "Sythil",
     'category': "Tools",
+    'website':'http://sythiltech.com.au/',
     'summary':'Allows you to send and receive smses from multiple gateways',
     'description':'Allows you to send and receive smses from multiple gateways',    
     'license':'LGPL-3',
