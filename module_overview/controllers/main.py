@@ -116,7 +116,7 @@ class ModuleOverView(http.Controller):
                         continue
                     
                     if row_dict['group'] != "":
-                        group_name = request.env['ir.model.data'].get_object(row_dict['group'].split(".")[0], row_dict['group'].split(".")[1]).name
+                        group_name = request.env['ir.model.data'].get_object(row_dict['group'].split(".")[0], row_dict['group'].split(".")[1]).display_name
        	
        	            #Create the group if it does exist
        	            ex_group = request.env['module.overview.group'].search([('x_id','=',row_dict['group'])])
@@ -164,7 +164,7 @@ class ModuleOverView(http.Controller):
 
             if 'parent' in menu.attrib:
                 try:
-                    menu_dict['parent'] = request.env['ir.model.data'].get_object(menu.attrib['parent'].split(".")[0], menu.attrib['parent'].split(".")[1]).name
+                    menu_dict['parent'] = request.env['ir.model.data'].get_object(menu.attrib['parent'].split(".")[0], menu.attrib['parent'].split(".")[1]).display_name
                 except:
                     pass
                 menu_dict['parent_x_id'] = menu.attrib['parent']
