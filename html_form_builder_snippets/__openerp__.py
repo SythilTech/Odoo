@@ -11,7 +11,11 @@
         'views/website_templates.xml',
     ],
     'demo': [],
-    'images':[],
+    'images':[
+        'static/description/3.jpg',
+        'static/description/1.jpg',
+        'static/description/2.jpg',
+    ],
     'depends': ['website','html_form_builder'],
     'installable': True,
 }
