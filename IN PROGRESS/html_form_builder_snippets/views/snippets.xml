@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <template id="ehtml_editor" inherit_id="website.assets_editor" name="eHTML Resources">
+        <xpath expr="/t" position="inside">
+            <script type="text/javascript" src="/html_form_maker/static/src/js/ehtml_editor.js" />
+        </xpath>
+    </template>
+
+<template id="ehtml_navbar" inherit_id="website.snippets" name="eHTML Forms Navbar">
+    <xpath expr="//ul[@class='nav navbar-nav nav-tabs']" position="inside">
+        <li><a href="#snippet_form" data-toggle="tab">HTML Form</a></li>
+    </xpath>
+    
+    
+<xpath expr="//div[@class='scroll']//div[@class='tab-content']" position="inside">
+        <div id="snippet_form" class="tab-pane">
+            <!-- FORM SNIPPET -->
+            <div>
+                <div class="oe_snippet_thumbnail">
+                    <img class="oe_snippet_thumbnail_img" src="/html_form_maker/static/src/img/ui/snippet_thumb_form.jpg"/>
+                    <span class="oe_snippet_thumbnail_title">HTML Form(Alpha)</span>
+                </div>
+ 
+                <section class="oe_snippet_body ehtml_form" data-form-id="0" data-form-model="res.partner" data-form-return-url="/form/thankyou">
+                    <div class="container">
+                        <div class="row">
+                            <h2>My Form</h2>
+                            <form method="POST" action="/form/insert">
+                                <div id="ehtml_fields" class="oe_structure">
+                             
+                                </div>
+                                <input type="hidden" name="form_id" value="1"/>
+                                <input type="submit" class="btn btn-primary btn-lg" value="Send"/>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- FORM TEXTBOX INPUT -->
+            <div>
+                <div class="oe_snippet_thumbnail">
+                    <img class="oe_snippet_thumbnail_img" src="/html_form_maker/static/src/img/ui/snippet_thumb_field_textbox.jpg"/>
+                    <span class="oe_snippet_thumbnail_title">Textbox (Alpha)</span>
+                </div>
+ 
+                <section data-form-type="textbox" data-field-id="0" class="oe_snippet_body ehtml_form_field">
+                    <div class="form-group">
+                        <label for="field1">Field 1</label>
+                        <input type="text" name="field1" class="form-control"/>
+                    </div>
+                </section>
+            </div>
+        
+            <!-- FORM TEXTAREA INPUT -->
+            <div>
+                <div class="oe_snippet_thumbnail">
+                    <img class="oe_snippet_thumbnail_img" src="/html_form_maker/static/src/img/ui/snippet_thumb_field_textarea.jpg"/>
+                    <span class="oe_snippet_thumbnail_title">Textarea (Alpha)</span>
+                </div>
+ 
+                <section data-form-type="textarea" data-field-id="0" class="oe_snippet_body ehtml_form_field">
+                    <div class="form-group">
+                        <label for="field1">Field 1</label>
+                        <textarea class="form-control" name="field1"/>
+                    </div>
+                </section>
+            </div>
+
+            <!-- FORM DROPBOX INPUT -->
+            <div>
+                <div class="oe_snippet_thumbnail">
+                    <img class="oe_snippet_thumbnail_img" src="/html_form_maker/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
+                    <span class="oe_snippet_thumbnail_title">Dropbox (Alpha)</span>
+                </div>
+ 
+                <section data-form-type="dropbox" data-field-id="0" class="oe_snippet_body ehtml_form_field">
+                    <div class="form-group">
+                        <label for="field1">Field 1</label>
+                        <select class="form-control" name="field1">
+                            <option value="">Select an option</option>
+                        </select>
+                    </div>
+                </section>
+            </div>
+        
+        </div>
+    </xpath>
+        
+    
+</template>
+
+<template id="ehtml_snippet_options" inherit_id="website.snippets" name="eHTML Forms Snippet">
+    <xpath expr="//div[@id='snippet_options']" position="inside">
+        <div data-snippet-option-id='html_form_settings' data-selector=".ehtml_form">
+            <li>
+                <a href="#" class="button js_form_settings">Change Form Settings</a>
+            </li>
+        </div>
+        
+        <div data-snippet-option-id='html_form_field_settings' data-selector=".ehtml_form_field">
+	    <li>
+	        <a href="#" class="button js_form_field_settings">Change Field Settings</a>
+	    </li>
+	    
+        </div>
+    </xpath>    
+</template>
+
+  </data>
+</openerp>

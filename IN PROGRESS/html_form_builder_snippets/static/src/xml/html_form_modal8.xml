@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+<t t-name="html_form_maker.html_form_field_config_modal">
+  <div class="modal fade" id="htmlModal" contenteditable="False" contentEditable="false" backdrop="false" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:2001">
+  
+    <div class="modal-dialog">
+      <div class="modal-content gard_modal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <h4 class="modal-title">Customize your field</h4> 
+        </div>
+          
+        <div class="modal-body" contenteditable="false">
+
+            <div class="form-group">
+                <label for="html_form_id" class="control-label">HTML Form</label>
+                <input type="text" id="html_form_id" class="form-control"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="html_form_config_field" class="control-label">ORM Field</label>
+                <input type="text" id="html_form_config_field" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label for="html_form_config_label" class="control-label">Field Label</label>
+                <input type="text" id="html_form_config_label" class="form-control"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="html_form_config_name" class="control-label">Field HTML Name</label>
+                <input type="text" id="html_form_field_config_name" class="form-control"/>
+            </div>            
+            
+            <!--
+            <div class="form-group">
+                <label for="html_form_config_field_type" class="control-label">Field Type</label>
+                <select id="html_form_config_field_type" class="form-control">
+                    <option value="textbox">Textbox</option>
+                    <option value="textarea">Textarea</option>
+                </select>
+            </div>
+            -->
+
+        </div> <!-- modal-body -->
+
+        <div class="modal-footer">
+          <button id="cancel" data-dismiss="modal" class="btn btn-primary">Cancel</button>
+          <button id="save_field"  class="btn btn-danger">Save</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- / .modal -->
+</t>
+
+
+<t t-name="html_form_maker.html_form_config_modal">
+  <div class="modal fade" id="htmlModal" contenteditable="False" contentEditable="false" backdrop="false" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:2001">
+  
+    <div class="modal-dialog">
+      <div class="modal-content gard_modal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <h4 class="modal-title">Customize your form</h4> 
+        </div>
+          
+        <div class="modal-body" contenteditable="false">
+
+            <div class="form-group">
+                <label for="html_form_config_name" class="control-label">Form Name</label>
+                <input type="text" id="html_form_config_name" class="form-control"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="html_form_config_return_url" class="control-label">Return URL</label>
+                <input type="text" id="html_form_config_return_url" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label for="html_form_config_model" class="control-label">ORM Model</label>
+                <input type="text" id="html_form_config_model" class="form-control"/>
+            </div>
+
+        </div> <!-- modal-body -->
+
+        <div class="modal-footer">
+          <button id="cancel" data-dismiss="modal" class="btn btn-primary">Cancel</button>
+          <button id="save_form"  class="btn btn-danger">Save</button>
+          
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- / .modal -->
+</t>
+
+
+
+
+
+
+
+</templates>

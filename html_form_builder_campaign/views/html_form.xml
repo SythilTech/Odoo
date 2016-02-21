@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="html_form_campaign_view_form" model="ir.ui.view">
+         <field name="name">html.form.view.form</field>
+         <field name="model">html.form</field>
+         <field name="arch" type="xml">
+             <form string="HTML Form">
+                  <sheet>
+                      <group>
+                          <field name="submit_url" invisible="1"/>
+                          <field name="campaign_form" invisible="1"/>
+                          <field name="campaign_id"/>
+                          <field name="name"/>
+                          <field name="return_url" placeholder="http://www.vuente.com"/>
+                          <field name="model_id" invisible="1"/>
+                          <field name="fields_ids" context="{'html_id': active_id,'default_model_id':model_id}">
+		              <tree editable="true">
+		                  <field name="model_id" invisible="1"/>
+		                  <field name="model" invisible="1" />
+		                  <field name="field_id" domain="[('name','!=','create_date'),('name','!=','create_uid'),('name','!=','id'),('name','!=','write_date'),('name','!=','write_uid'),('model_id','=',model)]"/>
+		                  <field name="field_type"/>
+		                  <field name="html_name"/>
+		                  <field name="field_label"/>
+		              </tree>
+		          </field>
+		          
+		          <field name="defaults_values" context="{'html_id': active_id,'default_model_id':model_id}">
+			      <tree editable="bottom">
+			      	  <field name="model_id" invisible="1"/>
+		                  <field name="model" invisible="1" />
+			          <field name="field_id" domain="[('name','!=','create_date'),('name','!=','create_uid'),('name','!=','id'),('name','!=','write_date'),('name','!=','write_uid'),('model_id','=',model)]"/>
+			          <field name="default_value"/>
+			      </tree>
+			  </field>
+		          
+                          <field name="output_html"/>
+                      </group>
+                      <footer>
+                          <button type="object" name="generate_form" string="Make Embed Code"/> 
+                      </footer>
+                  </sheet>
+              </form>
+          </field>
+      </record>          
+
+      <record id="html_form_campaign_view_tree" model="ir.ui.view">
+         <field name="name">html.form.view.tree</field>
+         <field name="model">html.form</field>
+         <field name="arch" type="xml">
+             <tree>
+                 <field name="name"/>
+                 <field name="campaign_id"/>
+             </tree>
+          </field>
+      </record>
+      
+      <record id="html_form_campaign_action" model="ir.actions.act_window">
+          <field name="name">html.form.action</field>
+          <field name="res_model">html.form</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="domain">[('campaign_form','=',True)]</field>
+          <field name="context" eval="{'default_campaign_form':True, 'default_model_id':ref('base.model_res_partner')}"/>
+          <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('html_form_campaign_view_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('html_form_campaign_view_form')})]"/>
+
+          <field name="help" type="html">
+              <p class="oe_view_nocontent_create">Create the first HTML Campaign Embed form</p>
+          </field>
+      </record>
+            
+      <menuitem id="html_form_campaign_menu" name="Campaign Forms" parent="marketing_campaign.menu_marketing_campaign_campaigns" action="html_form_campaign_action" sequence="200"/>
+        
+  </data>
+</openerp>
