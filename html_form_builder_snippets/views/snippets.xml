@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+    <template id="html_builder_editor" inherit_id="website.assets_editor" name="HTML Builder Resources">
+        <xpath expr="/t" position="inside">
+            <script type="text/javascript" src="/html_form_builder_snippets/static/src/js/html.form.builder.snippets.editor.js" />
+        </xpath>
+    </template>
+
+    <template id="website_form_builder_options" name="Form Builder Options" inherit_id="website.snippet_options">
+        <xpath expr="//div" position="after">
+            <div data-js='html_form_builder'
+                data-selector=".html_form"
+                data-drop-in=".oe_structure, [data-oe-type=html]">
+            </div>
+        </xpath>
+    </template>
+
+<template id="html_navbar" inherit_id="website.snippets" name="HTML Forms Navbar">
+    
+    <xpath expr="//div[@id='o_scroll']" position="inside">
+            
+        <div id="snippet_form" class="o_panel">
+            <div class="o_panel_header">
+                <span class="fa-stack">
+                    <i class="fa fa-align-justify fa-stack-1x"></i>
+                </span> Form Builder
+            </div>
+            <div class="o_panel_body">
+                <t t-snippet="html_form_builder_snippets.s_form" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form.jpg"/>
+                <t t-snippet="html_form_builder_snippets.s_textbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textbox.jpg"/>
+                <t t-snippet="html_form_builder_snippets.s_textarea" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textarea.jpg"/>            
+                <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>            
+            </div>
+
+        </div>            
+
+    </xpath>    
+    
+</template>
+
+<template id="s_form" name="HTML Form">
+    <section class="html_form">
+        <div class="container">
+            <h2>My Form</h2>
+            <input type="submit" class="btn btn-primary btn-lg" value="Send"/>
+        </div>
+    </section>
+</template>
+
+<template id="s_textbox" name="Textbox">
+    <section data-form-type="textbox" data-field-id="0" class="ehtml_form_field">
+        <div class="form-group">
+            <label for="field1">Field 1</label>
+            <input type="text" name="field1" class="form-control"/>
+        </div>
+    </section>
+</template>   
+
+<template id="s_textarea" name="Textarea">
+    <section data-form-type="textarea" data-field-id="0" class="ehtml_form_field">
+        <div class="form-group">
+            <label for="field1">Field 1</label>
+            <textarea class="form-control" name="field1"/>
+        </div>
+    </section>
+</template>
+
+<template id="s_dropbox" name="Dropbox">
+    <section data-form-type="dropbox" data-field-id="0" class="ehtml_form_field">
+        <div class="form-group">
+            <label for="field1">Field 1</label>
+            <select class="form-control" name="field1">
+                <option value="">Select an option</option>
+            </select>
+        </div>
+    </section>
+</template>
+
+  </data>
+</openerp>
