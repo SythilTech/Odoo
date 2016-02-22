@@ -4,8 +4,8 @@
     'author': "Sythil",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
-    'summary': "Manage both internal and external forms",
-    'description': "Manage both internal and external forms",
+    'summary': "Enter people that sign up to your forms on a marketing campaign",
+    'description': "Enter people that sign up to your forms on a marketing campaign",
     'license':'LGPL-3',
     'data': [
         'views/html_form.xml',
