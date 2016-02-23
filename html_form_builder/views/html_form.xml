@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
-
+      
+      <record id="html_form_action_view_form" model="ir.ui.view">
+         <field name="name">html.form.action.view.form</field>
+         <field name="model">html.form.action</field>
+         <field name="arch" type="xml">
+             <form string="HTML Form">
+                  <sheet>
+                      <group>
+                          <field name="action_type_id"/>
+                          <field name="setting_name" invisible="1"/>
+                          <field name="settings_description" invisible="1"/>
+                      </group>
+                      <h2 id="formactionhook">Action Settings</h2>
+                  </sheet>
+              </form>
+          </field>
+      </record>
+      
       <record id="html_form_view_form" model="ir.ui.view">
          <field name="name">html.form.view.form</field>
          <field name="model">html.form</field>
@@ -29,6 +46,13 @@
 		                  <field name="model" invisible="1" />
 			          <field name="field_id" domain="[('name','!=','create_date'),('name','!=','create_uid'),('name','!=','id'),('name','!=','write_date'),('name','!=','write_uid'),('model_id','=',model)]"/>
 			          <field name="default_value"/>
+			      </tree>
+			  </field>
+			  
+			  <field name="submit_action">
+			      <tree>
+			          <field name="action_type_id"/>
+			          <field name="settings_description"/>
 			      </tree>
 			  </field>
 		          

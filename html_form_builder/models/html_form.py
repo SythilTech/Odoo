@@ -24,6 +24,7 @@ class HtmlForm(models.Model):
     defaults_values = fields.One2many('html.form.defaults', 'html_id', string="Default Values", help="Sets the value of an field before it gets inserted into the database")
     return_url = fields.Char(string="Return URL", default=_default_return_url, help="The URL that the user will be redirected to after submitting the form", required=True)
     submit_url = fields.Char(string="Submit URL", default=_default_submit_url)
+    submit_action = fields.One2many('html.form.action', 'hf_id', string="Submit Actions")
         
     @api.onchange('model_id')
     def _onchange_model_id(self):
@@ -98,6 +99,24 @@ class HtmlForm(models.Model):
 	html_output += "/><br/>\n"
 	
 	return html_output
+
+class HtmlFormAction(models.Model):
+
+    _name = "html.form.action"
+    _description = "HTML Form Action"
+    
+    hf_id = fields.Many2one('html.form', string="HTML Form")
+    action_type_id = fields.Many2one('html.form.action.type', string="Submit Action")
+    setting_name = fields.Char(string="Internal Name", related="action_type_id.internal_name")
+    settings_description = fields.Char(string="Settings Description")
+    
+class HtmlFormActionType(models.Model):
+
+    _name = "html.form.action.type"
+    _description = "HTML Form Action Type"
+    
+    name = fields.Char(string="Name")
+    internal_name = fields.Char(string="Internal Name", help="action is executed in controller '_html_action_<internal_name>'")
 	
 class HtmlFormField(models.Model):
 

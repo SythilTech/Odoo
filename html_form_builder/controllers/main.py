@@ -62,7 +62,20 @@ class HtmlFormController(http.Controller):
         
             new_record = http.request.env[entity_form.model_id.model].sudo().create(secure_values)
             new_history.record_id = entity_form.id
-        
+ 
+ 
+            #Execute all the server actions
+            for sa in entity_form.submit_action:
+             
+                method = '_html_action_%s' % (sa.setting_name,)
+ 	        action = getattr(self, method, None)
+ 	        
+ 	        if not action:
+ 		    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+ 	
+ 	        #Call the submit action, passing the action settings and the history object
+                action(sa, new_history)
+ 
             return werkzeug.utils.redirect(entity_form.return_url)
         
     def _process_html_textbox(self, field, field_data):
