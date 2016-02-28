@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="event_list" name="Dating Events" page="True">
+            <t t-call="website.layout">
+                <div class="container">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+    
+                            <t t-foreach="events" t-as="event">
+                                <div class="panel panel-default">
+			            <div class="panel-body">
+			                <h2 t-field="event.name"></h2>
+			                <span t-field="event.dating_description"/><br/>
+			                <br/>
+			                Males: ? / <span t-field="event.max_male"/><br/>
+			                Females: ? / <span t-field="event.max_female"/><br/>
+			                <br/>
+			                <span t-field="event.date_begin"/> to <span t-field="event.date_end"/> <span t-field="event.date_tz"/>
+			            </div>
+                                </div>
+		            </t>
+		            
+		        </div>
+		    </div>
+		    
+                </div>        
+            </t>
+        </template>
+
+    </data>
+</openerp>
