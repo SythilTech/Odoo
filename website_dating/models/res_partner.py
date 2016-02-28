@@ -12,7 +12,9 @@ class ResPartnerWebsiteDating(models.Model):
     first_name = fields.Char(string="First Name")
     last_name = fields.Char(string="Last Name")
     fake_profile = fields.Boolean(string="Fake Profile")
-    birth_date = fields.Date(string="DOB")
+    birth_date = fields.Date("Birth Date")
+    latitude = fields.Char(string="Latitude")
+    longitude = fields.Char(string="Longitude")
     age = fields.Integer(string="Age")
     gender = fields.Many2one('res.partner.gender', string="Gender")
     gender_pref = fields.Many2many('res.partner.gender', string="Gender Preference")
@@ -20,7 +22,7 @@ class ResPartnerWebsiteDating(models.Model):
     max_age_pref = fields.Integer(string="Max Age Preference")
     dist_pref = fields.Integer(string="Distance Pref")
     relationship_type = fields.Many2one('res.partner.relationship', string="Relationship Type", help="The type of relationship this member is seeking")
-    interest_list = fields.Many2many('res.partner.interests', string="Interest List")
+    interest_list = fields.Many2many('res.partner.interest', string="Interest List")
     profile_visibility = fields.Selection([('public','Public'), ('members_only','Members Only'), ('not_listed','Not Listed')], default="not_listed", string="Profile Visibility", help="Public: can be viewed by anyone on the internet\nMembers Only: Can only be viewed by people who have an account\nNot Listed: Profile will only be visiable to members you have contacted")
     profile_text = fields.Text(string="Profile Text")
     profile_micro = fields.Char(size=100, string="Profile Micro Summary")
@@ -48,26 +50,30 @@ class ResPartnerWebsiteDating(models.Model):
 class ResPartnerWebsiteDatingGender(models.Model):
 
     _name = "res.partner.gender"
-
+    _description = "Partner Gender"
+    
     name = fields.Char(string="Gender")
     letter = fields.Char(string="Letter")
     
-class ResPartnerInterests(models.Model):
+class ResPartnerInterest(models.Model):
 
-    _name = "res.partner.interests"
+    _name = "res.partner.interest"
+    _description = "Partner Interest"
 
     name = fields.Char(string="Name")
     interest_category_id = fields.Many2one('res.partner.interest.categories', string="Interest Category")
     
-class ResPartnerInterestCategories(models.Model):
+class ResPartnerInterestCategory(models.Model):
 
-    _name = "res.partner.interest.categories"
+    _name = "res.partner.interest.category"
+    _description = "Partner Interest Category"
 
     name = fields.Char(string="Name")
-    interest_list = fields.One2many('res.partner.interests', 'interest_category_id', string="Interest List")
+    interest_list = fields.One2many('res.partner.interest', 'interest_category_id', string="Interest List")
     
 class ResPartnerRelationship(models.Model):
 
     _name = "res.partner.relationship"
+    _description = "Partner Relationship"
 
     name = fields.Char(string="Name")

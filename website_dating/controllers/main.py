@@ -69,7 +69,6 @@ class WebsiteDatingController(http.Controller):
         search_list = []
         return_dict = {}
         
-        
         #only dating members
         search_list.append(('dating','=','True'))
         
@@ -79,45 +78,47 @@ class WebsiteDatingController(http.Controller):
         else:
             #if logged in they can view all non private profiles
             search_list.append(('profile_visibility','!=','not_listed'))        
-
-        
         
         #min age preference
         if 'min_age' in values and values['min_age'] != '':
             search_list.append(('age','>=',values['min_age']))
+            min_age = values['min_age']
+        else:
+            min_age = request.env.user.partner_id.min_age_pref
         
         #max age preference
         if 'max_age' in values and values['max_age'] != '':
             search_list.append(('age','<=',values['max_age']))
+            max_age = values['max_age']
+        else:
+            max_age = request.env.user.partner_id.max_age_pref
 
         #gender preference
         if 'gender' in values and values['gender'] != '':
             search_list.append(('gender','=',values['gender']))
                      
+        distance = ""
         if 'dist' in values and values['dist'] != '':
-            
-            user_suburb = http.request.env.user.partner_id.zip_id
-            
-	    mylon = float(user_suburb.longitude)
-	    mylat = float(user_suburb.latitude)
+            distance = values['dist']
+	    mylon = float(request.env.user.partner_id.longitude)
+	    mylat = float(request.env.user.partner_id.latitude)
 	    dist = float(values['dist']) * 0.621371
 	    lon_min = mylon-dist/abs(math.cos(math.radians(mylat))*69);
 	    lon_max = mylon+dist/abs(math.cos(math.radians(mylat))*69);
 	    lat_min = mylat-(dist/69);
 	    lat_max = mylat+(dist/69);
 	            
-	    close_suburbs = http.request.env['res.better.zip'].search([('longitude','>=',lon_min), ('longitude','<=',lon_max), ('latitude','<=',lat_min), ('latitude','>=',lat_max)])
-  
-            search_list.append(('zip_id.longitude','>=',lon_min))
-            search_list.append(('zip_id.longitude','<=',lon_max))
-            search_list.append( ('zip_id.latitude','<=',lat_min) )
-            search_list.append( ('zip_id.latitude','>=',lat_max) )
+            #Within distance
+            search_list.append(('longitude','>=',lon_min))
+            search_list.append(('longitude','<=',lon_max))
+            search_list.append( ('latitude','<=',lat_min) )
+            search_list.append( ('latitude','>=',lat_max) )
             
             
         my_dates = http.request.env['res.partner'].sudo().search(search_list, limit=15)
         my_dates_count = len(my_dates)
         
-        return http.request.render('website_dating.my_dating_list', {'my_dates': my_dates, 'my_dates_count': my_dates_count} )
+        return http.request.render('website_dating.my_dating_list', {'my_dates': my_dates, 'my_dates_count': my_dates_count, 'min_age': min_age, 'max_age': max_age, 'dist':distance} )
 
     @http.route('/dating/profiles/settings', type="http", auth="user", website=True)
     def dating_profile_settings(self, **kwargs):

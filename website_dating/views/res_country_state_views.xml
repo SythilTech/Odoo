@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+        <record id="view_country_state_form_inherit_website_dating" model="ir.ui.view">
+            <field name="name">res.partner Website Dating</field>
+            <field name="model">res.country.state</field>
+            <field name="inherit_id" ref="base.view_country_state_form"/>
+            <field name="arch" type="xml">
+      	        <form position="inside">
+      	            <group>
+      	                <field name="city_ids">
+      	                    <tree>
+      	                        <field name="name"/>
+      	                        <field name="latitude"/>
+      	                        <field name="longitude"/>
+      	                    </tree>
+      	                </field>
+      	            </group>
+      	        </form>
+      	    </field>
+        </record>
+    
+    </data>
+</openerp>

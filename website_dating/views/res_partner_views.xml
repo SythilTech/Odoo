@@ -17,6 +17,8 @@
 			    <field name="age"/>
 			    <field name="min_age_pref"/>
 			    <field name="max_age_pref"/>
+			    <field name="latitude"/>
+			    <field name="longitude"/>
 			    <field name="gender"/>
 			    <field name="gender_pref"/>
 			    <field name="interest_list"/>
@@ -49,8 +51,8 @@
 	   <field name="view_mode">tree,form</field>
 	   <field name="context">{'search_default_dating':1}</field>
        </record>
-	
-       <menuitem id="res_partner_menu" name="Dating Members" parent="base.menu_sales" action="res_partner_action" sequence="90"/>
+
+      <menuitem id="res_partner_menu" name="Dating Members" parent="base.menu_sales" action="res_partner_action" sequence="90"/>
 
     </data>
 </openerp>

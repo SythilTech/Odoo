@@ -8,6 +8,7 @@ from openerp import api, fields, models
 class ResDating(models.Model):
 
     _name = "res.dating"
+    _description = "Dating"
     
     country_id = fields.Many2one('res.country', string='Country')
     state_id = fields.Many2one('res.country.state', string="State")
@@ -30,10 +31,10 @@ class ResDating(models.Model):
         my_delta_young_time = datetime.utcnow() - timedelta(days=calc_min_days)
         my_delta_old_time = datetime.utcnow() - timedelta(days=calc_max_days)	        
 
-        suburb_list = self.env['res.better.zip'].search([('country_id','=',self.country_id.id),('state_id','=',self.state_id.id)])
+        suburb_list = self.state_id.city_ids
 
-        male_gender_id = self.env['res.partner.gender'].search([('name','=','Male')])[0].id
-        female_gender_id = self.env['res.partner.gender'].search([('name','=','Female')])[0].id
+        male_gender = self.env['ir.model.data'].get_object('website_dating', 'website_dating_male')
+        female_gender = self.env['ir.model.data'].get_object('website_dating', 'website_dating_female')
         
         for i in range(0, self.num_profiles):
 	    #random name and with it gender
@@ -81,26 +82,26 @@ class ResDating(models.Model):
             profile_text = "I am " + str(age) + " year old " + first_name.gender + " seeking " + str(relationship_type.name)
             
             #create the partner
-            new_partner = self.env['res.partner'].create({'message_setting':message_setting, 'profile_micro': profile_text, 'profile_text': profile_text,'profile_visibility': profile_vis,'dating':'True', 'fake_profile':'True', 'birth_date': birth_date, 'name': first_name.name + " " + last_name.name, 'first_name':first_name.name, 'last_name':last_name.name,'gender':gender, 'zip_id':rand_suburb.id, 'country_id':rand_suburb.country_id.id, 'state_id':rand_suburb.state_id.id, 'city':rand_suburb.city,'zip':rand_suburb.name, 'age':age, 'relationship_type': relationship_type.id, 'min_age_pref':min_age_pref,'max_age_pref':max_age_pref})           
+            new_partner = self.env['res.partner'].create({'message_setting':message_setting, 'profile_micro': profile_text, 'profile_text': profile_text,'profile_visibility': profile_vis,'dating':'True', 'fake_profile':'True', 'birth_date': birth_date, 'name': first_name.name + " " + last_name.name, 'first_name':first_name.name, 'last_name':last_name.name,'gender':gender, 'country_id':rand_suburb.state_id.country_id.id, 'state_id':rand_suburb.state_id.id, 'city':rand_suburb.name, 'age':age, 'relationship_type': relationship_type.id, 'min_age_pref':min_age_pref,'max_age_pref':max_age_pref, 'latitude': rand_suburb.latitude, 'latitude': rand_suburb.latitude, 'longitude': rand_suburb.longitude})           
             
             #random gender pref
             rand_gender_pref = randint(1, 100)
             if rand_gender_pref <= 80:
                 #80% chance of being straight
                 if first_name.gender == "Male":
-                    new_partner.gender_pref = [(4, female_gender_id)]
+                    new_partner.gender_pref = [(4, female_gender.id)]
                 elif first_name.gender == "Female":
-                    new_partner.gender_pref = [(4, male_gender_id)]
+                    new_partner.gender_pref = [(4, male_gender.id)]
             elif rand_gender_pref <= 90:
                 #10% chance of being gay
                 if first_name.gender == "Male":
-                    new_partner.gender_pref = [(4, male_gender_id)]
+                    new_partner.gender_pref = [(4, male_gender.id)]
                 elif first_name.gender == "Female":
-                    new_partner.gender_pref = [(4, female_gender_id)]    
+                    new_partner.gender_pref = [(4, female_gender.id)]    
             elif rand_gender_pref <= 100:
                 #10% chance of being bi
-                new_partner.gender_pref = [(4, male_gender_id)]
-                new_partner.gender_pref = [(4, female_gender_id)]
+                new_partner.gender_pref = [(4, male_gender.id)]
+                new_partner.gender_pref = [(4, female_gender.id)]
                     
 
 class ResDatingContacts(models.Model):
