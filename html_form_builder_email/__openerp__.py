@@ -1,6 +1,6 @@
 {
     'name': "HTML Form Builder - Send Email",
-    'version': "1.0",
+    'version': "1.0.1",
     'author': "Sythil",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
