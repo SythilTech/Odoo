@@ -17,5 +17,5 @@ class HtmlFormControllerActionEmail(openerp.addons.html_form_builder.controllers
             html_body += insert_data.insert_value + "<br/>\n"
             html_body += "<br/>\n"
         
-        my_mail = request.env['mail.mail'].create({'email_from': submit_action.from_email, 'email_to': submit_action.to_email, 'subject': history_data.html_id.name + " Form Data", 'body_html': html_body})
+        my_mail = request.env['mail.mail'].create({'auto_delete': False, 'email_from': submit_action.from_email, 'email_to': submit_action.to_email, 'subject': history_data.html_id.name + " Form Data", 'body_html': html_body})
         my_mail.send()
