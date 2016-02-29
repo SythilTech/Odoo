@@ -34,6 +34,13 @@
 			          <field name="default_value"/>
 			      </tree>
 			  </field>
+
+			  <field name="submit_action">
+			      <tree>
+			          <field name="action_type_id"/>
+			          <field name="settings_description"/>
+			      </tree>
+			  </field>
 		          
                           <field name="output_html"/>
                       </group>

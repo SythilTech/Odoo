@@ -65,5 +65,18 @@ class HtmlFormControllerCampaign(openerp.addons.html_form_builder.controllers.ma
                 if act.start:
                     wi = request.env['marketing.campaign.workitem'].create({'campaign_id': entity_form.campaign_id.id, 'activity_id': act.id, 'partner_id': new_record.id, 'res_id': new_record.id})
                     wi.process()
+
+
+            #Execute all the server actions
+            for sa in entity_form.submit_action:
+             
+                method = '_html_action_%s' % (sa.setting_name,)
+ 	        action = getattr(self, method, None)
+ 	        
+ 	        if not action:
+ 		    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+ 	
+ 	        #Call the submit action, passing the action settings and the history object
+                action(sa, new_history)
             
             return werkzeug.utils.redirect(entity_form.return_url)
