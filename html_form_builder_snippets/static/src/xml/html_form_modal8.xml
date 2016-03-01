@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
-<t t-name="html_form_maker.html_form_field_config_modal">
+<t t-name="html_form_builder.html_form_field_config_modal">
   <div class="modal fade" id="htmlModal" contenteditable="False" contentEditable="false" backdrop="false" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:2001">
   
     <div class="modal-dialog">
@@ -57,7 +57,7 @@
 </t>
 
 
-<t t-name="html_form_maker.html_form_config_modal">
+<t t-name="html_form_builder.html_form_config_modal">
   <div class="modal fade" id="htmlModal" contenteditable="False" contentEditable="false" backdrop="false" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:2001">
   
     <div class="modal-dialog">

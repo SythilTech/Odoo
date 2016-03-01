@@ -2,15 +2,10 @@ odoo.define('html_form_builder_snippets.editor', function (require) {
 'use strict';
 
 var Model = require('web.Model');
-var ajax = require('web.ajax');
-var core = require('web.core');
 var base = require('web_editor.base');
-var web_editor = require('web_editor.editor');
 var options = require('web_editor.snippets.options');
-var snippet_editor = require('web_editor.snippet.editor');
 var session = require('web.session');
 var website = require('website.website');
-var _t = core._t;
 
 options.registry.html_form_builder = options.Class.extend({
     drop_and_build_snippet: function() {
@@ -20,7 +15,7 @@ options.registry.html_form_builder = options.Class.extend({
 
 	        website.prompt({
 			    id: "editor_new_form",
-			    window_title: _t("New HTML Form"),
+			    window_title: "New HTML Form",
 			    select: "Select Form",
 			    init: function (field) {
 			        return form_ids;
@@ -29,6 +24,8 @@ options.registry.html_form_builder = options.Class.extend({
 
 			    session.rpc('/form/load', {'form_id': form_id}).then(function(result) {
 				    self.$target.html(result.html_string);
+				    self.$target.attr('data-form-model', result.form_model );
+				    self.$target.attr('data-form-id', form_id );
              	});
 			});
 
@@ -36,5 +33,36 @@ options.registry.html_form_builder = options.Class.extend({
     },
 
 });
+
+
+options.registry.html_form_builder_field = options.Class.extend({
+    drop_and_build_snippet: function() {
+        var self = this;
+        var model = new Model('ir.model.fields');
+        var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
+        var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
+
+	    model.call('name_search', ['', [["model_id.model", "=", form_model]] ], { context: base.get_context() }).then(function (field_ids) {
+
+	        website.prompt({
+			    id: "editor_new_field",
+			    window_title: "New HTML Field",
+			    select: "Select ORM Field",
+			    init: function (field) {
+			        return field_ids;
+			    },
+			}).then(function (field_id) {
+
+			    session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type') }).then(function(result) {
+				    self.$target.html(result.html_string);
+             	});
+			});
+
+        });
+
+    },
+});
+
+
 
 });

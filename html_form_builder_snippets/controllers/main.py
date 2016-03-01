@@ -9,30 +9,6 @@ import openerp
 
 class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.main.HtmlFormController):
 
-
-    @http.route('/form/updatefield', website=True, type='json', auth="user")
-    def html_update_field(self, **kw):
-
-        values = {}
-	for field_name, field_value in kw.items():
-            values[field_name] = field_value
-        
-
-        if int(values['html_field_id']) == 0:
-            #create the field
-            my_field = request.env['html.form.field'].create({'html_id':values['form_id'], 'field_id': values['field'], 'field_type': values['field_type'], 'html_name': values['html_name'], 'field_label': values['label'] })
-            
-            method = '_generate_html_%s' % (values['field_type'],)
-            action = getattr(self, method, None)
-        
-            if not action:
-	        raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
-
-            return {'field_id': my_field.id, 'html': action(my_field)}
-            
-            
-        return "0"
-
     def _generate_html_textbox(self, field):
         """Generate textbox HTML"""
         html_output = ""        
@@ -119,11 +95,11 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "        <div class=\"row\">\n"
         form_string += "            <h2>" + html_form.name + "</h2>\n"
         form_string += "            <form method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div id=\"ehtml_fields\" class=\"oe_structure\">\n"
+        form_string += "                <div id=\"html_fields\" class=\"oe_structure\">\n"
 
             
         for form_field in html_form.fields_ids:
-            form_string += "<section data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\" class=\"oe_snippet_body ehtml_form_field\">\n"
+            form_string += "<section data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\" class=\"oe_snippet_body html_form_field\">\n"
 
             method = '_generate_html_%s' % (form_field.field_type.html_type,)
 	    action = getattr(self, method, None)
@@ -141,26 +117,29 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "        </div>\n"
         form_string += "    </div>\n"
 
-        return {'html_string': form_string}
+        return {'html_string': form_string, 'form_model': html_form.model_id.model }
             
-    @http.route('/form/getfields', website=True, type='http', auth="public")
-    def html_get_fields(self, **kw):
+    @http.route('/form/field/add', website=True, type='json', auth="user")
+    def form_add_field(self, **kw):
 
         values = {}
 	for field_name, field_value in kw.items():
-            values[field_name] = field_value        
+            values[field_name] = field_value
+                    
+        field_id = request.env['ir.model.fields'].browse( int(values['field_id']) )
         
-        my_return = []        
-        html_types = request.env['html.form.field.type'].search([('html_type','=',values['html_type'])])
-        html_types_list = []
+        field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
         
-        for ht in html_types:
-            html_types_list.append(ht.data_type)
-            
-        my_fields = request.env['ir.model.fields'].search([('model_id.model','=','res.partner'), ('field_description','=ilike',"%" + values['term'] + "%"), ('ttype','in',html_types_list)], limit=5)
+        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description})
         
-        for my_field in my_fields:
-            return_item = {"label": "[" + my_field.ttype + "] " + my_field.field_description + " (" + my_field.name + ")","description": my_field.field_description, "value": my_field.name, "id": my_field.id}
-            my_return.append(return_item)
+        form_string = ""
+
+        method = '_generate_html_%s' % (values['html_type'],)
+	action = getattr(self, method, None)
+	    	        
+	if not action:
+	    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+	                
+	form_string += action(form_field)
         
-        return json.JSONEncoder().encode(my_return)
+        return {'html_string': form_string}
