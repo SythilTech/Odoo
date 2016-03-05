@@ -1,4 +1,5 @@
 import openerp.http as http
+import requests
 from openerp.http import request
 import logging
 _logger = logging.getLogger(__name__)
@@ -23,13 +24,27 @@ class HtmlFormController(http.Controller):
         values = {}
 	for field_name, field_value in kwargs.items():
             values[field_name] = field_value
+
+        entity_form = http.request.env['html.form'].sudo().browse(int(values['form_id']))
+        ref_url = http.request.httprequest.headers['Referer']
+               
+        #Captcha Check
+        if entity_form.captcha:
+               
+            #Redirect them back if they didn't answer the captcha
+            if 'g-recaptcha-response' not in values:
+                return werkzeug.utils.redirect(ref_url)         
+            
+            payload = {'secret': str(entity_form.captcha_secret_key), 'response': str(values['g-recaptcha-response'])}
+	    response_json = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
+                        
+            if response_json.json()['success'] != True:
+                return werkzeug.utils.redirect(ref_url)
         
         #the referral string is what the campaign looks for
         secure_values = {}
         history_values = {}
         form_error = False
-        ref_url = http.request.httprequest.headers['Referer']
-        entity_form = http.request.env['html.form'].sudo().browse(int(values['form_id']))
         new_history = http.request.env['html.form.history'].sudo().create({'ref_url':ref_url, 'html_id': entity_form.id})
         
         #populate an array which has ONLY the fields that are in the form (prevent injection)

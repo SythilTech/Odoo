@@ -65,4 +65,33 @@ options.registry.html_form_builder_field = options.Class.extend({
 
 
 
+options.registry.html_form_builder_captcha = options.Class.extend({
+    drop_and_build_snippet: function() {
+        var self = this;
+        var model = new Model('html.form.captcha');
+        var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
+
+	    model.call('name_search', [], { context: base.get_context() }).then(function (captcha_ids) {
+
+	        website.prompt({
+			    id: "editor_new_captcha",
+			    window_title: "New Captcha",
+			    select: "Select Captcha Type",
+			    init: function (field) {
+			        return captcha_ids;
+			    },
+			}).then(function (captcha_id) {
+
+			    session.rpc('/form/captcha/load', {'captcha_id': captcha_id, 'form_id': form_id}).then(function(result) {
+				    self.$target.html(result.html_string);
+             	});
+
+			});
+
+        });
+    },
+
+});
+
+
 });

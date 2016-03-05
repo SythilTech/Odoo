@@ -9,6 +9,22 @@ import openerp
 
 class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.main.HtmlFormController):
 
+    @http.route('/form/captcha/load', type="json", auth="user", website=True)
+    def html_captcha(self, **kw):
+
+        values = {}
+	for field_name, field_value in kw.items():
+            values[field_name] = field_value    
+            
+        html_form = request.env['html.form'].browse(int(values['form_id']) )
+        
+        html_form.captcha = int(values['captcha_id'])
+        
+        html_string = ""
+        html_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>"
+                     
+        return {'html_string': html_string}
+        
     def _generate_html_textbox(self, field):
         """Generate textbox HTML"""
         html_output = ""        

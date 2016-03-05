@@ -25,6 +25,9 @@ class HtmlForm(models.Model):
     return_url = fields.Char(string="Return URL", default=_default_return_url, help="The URL that the user will be redirected to after submitting the form", required=True)
     submit_url = fields.Char(string="Submit URL", default=_default_submit_url)
     submit_action = fields.One2many('html.form.action', 'hf_id', string="Submit Actions")
+    captcha = fields.Many2one('html.form.captcha', string="Captcha")
+    captcha_client_key = fields.Char(string="Captcha Client Key")
+    captcha_secret_key = fields.Char(string="Captcha Secret Key")
         
     @api.onchange('model_id')
     def _onchange_model_id(self):
@@ -99,6 +102,14 @@ class HtmlForm(models.Model):
 	html_output += "/><br/>\n"
 	
 	return html_output
+
+class HtmlFormCaptcha(models.Model):
+
+    _name = "html.form.captcha"
+    _description = "HTML Form Captcha"
+    
+    name = fields.Char(string="Captcha Name")
+    internal_name = fields.Char(string="Internal Name")
 
 class HtmlFormAction(models.Model):
 

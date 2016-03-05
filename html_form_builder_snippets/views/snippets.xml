@@ -5,6 +5,7 @@
         <template id="html_builder_editor" inherit_id="website.assets_editor" name="HTML Builder Resources">
             <xpath expr="/t" position="inside">
                 <script type="text/javascript" src="/html_form_builder_snippets/static/src/js/html.form.builder.snippets.editor.js" />
+                <script src="https://www.google.com/recaptcha/api.js"></script>
             </xpath>
         </template>
 
@@ -16,6 +17,10 @@
                 </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
+		    data-drop-in=".form_fields, [data-oe-type=html]">
+                </div>
+                <div data-js='html_form_builder_captcha'
+		    data-selector=".html_form_captcha"
 		    data-drop-in=".form_fields, [data-oe-type=html]">
                 </div>
             </xpath>
@@ -35,7 +40,8 @@
                         <t t-snippet="html_form_builder_snippets.s_form" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_textbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_textarea" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textarea.jpg"/>            
-                        <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>            
+                        <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_captcha" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_captcha.jpg"/>
                     </div>
 
                 </div>            
@@ -82,6 +88,12 @@
                         <option value="">Select an option</option>
                     </select>
                 </div>
+            </section>
+        </template>
+
+        <template id="s_captcha" name="Captcha">
+            <section class="html_form_captcha">
+                Captcha
             </section>
         </template>
 

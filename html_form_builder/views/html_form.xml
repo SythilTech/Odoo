@@ -56,6 +56,10 @@
 			      </tree>
 			  </field>
 		          
+		          <field name="captcha"/>
+		          <field name="captcha_client_key"/>
+		          <field name="captcha_secret_key"/>
+		          
                           <field name="output_html"/>
                       </group>
                       <footer>
