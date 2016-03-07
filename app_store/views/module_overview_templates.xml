@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="app_list" name="Module List" page="True">
+            <t t-call="website.layout">
+                <div class="container">
+                    <t t-foreach="modules" t-as="module">
+                        <div class="col-md-6">
+                            <a t-attf-href="/apps/modules/#{module.name}"><t t-esc="module.name"/></a>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+        <template id="app_page" name="Module Page" page="True">
+            <t t-call="website.layout">
+                <div class="container">
+
+                    <div class="mt16 mb16">
+                        <t t-if="overview">
+                            <h1 class="text-center"><t t-esc="overview.name"/> (<a t-attf-href="/apps/modules/download/#{overview.name}">Download</a>)</h1>
+                        </t>
+                    </div>
+
+                    <div class="col-md-12">
+                        <t t-if="overview">
+
+                            <!-- (Start) Groups -->
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" href="#groupcollapse">Groups (<t t-esc="overview.group_count"/>)</a>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div id="groupcollapse" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <t t-foreach="overview.group_ids" t-as="group">
+                                            <t t-if="group.name == ''">
+                                                <h4>Global</h4>
+                                            </t>
+                                            <t t-if="group.name != ''">
+                                                <h4><t t-esc="group.name"/> (<t t-esc="group.x_id"/>)</h4>
+                                            </t>
+                                            <table class="table table-striped">
+                                                <tr><th>Model</th><th>Permissions</th></tr>
+                                                <t t-foreach="group.access_ids" t-as="gaccess">
+                                                    <tr><td><t t-esc="gaccess.model_id.name"/></td><td><t t-esc="gaccess.access_string"/></td></tr>
+                                                </t>
+                                            </table>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- (End) Groups -->
+
+                            <!-- (Start) Menu Panel -->
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" href="#menucollapse">Menus (<t t-esc="overview.menu_count"/>)</a>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div id="menucollapse" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <table class="table table-striped">
+                                            <tr><th>Name</th><th>XML ID</th><th>Parent</th></tr>
+                                            <t t-foreach="overview.menu_ids" t-as="menu">
+                                                <tr><td><t t-esc="menu.name"/></td><td><t t-esc="menu.x_id"/></td><td><t t-esc="menu.parent"/> (<t t-esc="menu.parent_x_id"/>)</td></tr>
+                                            </t>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- (End) Menu Panel -->
+
+                            <!-- (Start) Model Panel -->
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" href="#modelcollapse">Models (<t t-esc="overview.model_count"/>)</a>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div id="modelcollapse" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <t t-foreach="overview.models_ids" t-as="model">
+
+                                            <!-- Each Model has it's own tab -->
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h2 class="panel-title">
+                                                        <a data-toggle="collapse" t-attf-href="##{model.id}"><t t-esc="model.name"/></a>
+                                                    </h2>
+                                                </div>
+                                                <div t-attf-id="#{model.id}" class="panel-collapse collapse">
+                                                    <div class="panel-body">
+
+                                                        <!-- Each module has a panel inside it for fields, view and security -->
+                                                        <div class="panel-group">
+
+                                                            <!-- (Start) All the view inside a model -->
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-heading">
+                                                                    <h2 class="panel-title">
+                                                                        <a data-toggle="collapse" t-attf-href="##{model.id}_views">Views (<t t-esc="model.view_count"/>)</a>
+                                                                    </h2>
+                                                                </div>
+                                                                <div t-attf-id="#{model.id}_views" class="panel-collapse collapse">
+                                                                    <ul class="list-group">
+                                                                        <t t-foreach="model.view_ids" t-as="view">
+                                                                            <li class="list-group-item"><t t-esc="view.name"/> (<t t-esc="view.x_id"/>)</li>
+                                                                        </t>
+                                                                    </ul>      
+                                                                </div>
+                                                            </div>
+                                                            <!-- (End) All the view inside a model -->
+
+                                                            <!-- (Start) All the access rules a model -->
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-heading">
+                                                                    <h2 class="panel-title">
+                                                                        <a data-toggle="collapse" t-attf-href="##{model.id}_access">Group Permission (<t t-esc="model.access_count"/>)</a>
+                                                                    </h2>
+                                                                </div>
+                                                                <div t-attf-id="#{model.id}_access" class="panel-collapse collapse">
+                                                                    <div class="panel-body">
+                                                                        <table class="table table-striped">
+                                                                            <tr><th>Name</th><th>XML ID</th><th>Permissions</th></tr>
+                                                                            <t t-foreach="model.access_ids" t-as="access">
+                                                                                <tr><td><t t-esc="access.name"/></td><td><t t-esc="access.x_id"/></td><td><t t-esc="access.access_string"/></td></tr>
+                                                                             </t>
+                                                                        </table>
+                                                                    </div>     
+                                                                </div>
+                                                            </div>
+                                                            <!-- (End) All the access rules a model -->
+                                                         
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>    
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</openerp>
