@@ -6,8 +6,11 @@
             <t t-call="website.layout">
                 <div class="container">
                     <t t-foreach="modules" t-as="module">
-                        <div class="col-md-6">
-                            <a t-attf-href="/apps/modules/#{module.name}"><t t-esc="module.name"/></a>
+                        <div class="col-md-4 mt32 mb32">
+                            <a t-attf-href="/apps/modules/#{module.name}">
+                                <img t-att-src="website.image_url(module, 'icon')" class="img-rounded mb8" t-attf-alt="#{module.module_name}" width="200" height="200"/><br/>
+			        <t t-esc="module.module_name"/>
+			    </a>
                         </div>
                     </t>
                 </div>
@@ -25,7 +28,20 @@
                     </div>
 
                     <div class="col-md-12">
+                    
+                        <ul class="nav nav-tabs nav-justified">
+                            <li class="active"><a data-toggle="tab" href="#description">Description</a></li>
+                            <li><a data-toggle="tab" href="#technicial">Technicial</a></li>
+                        </ul>
+
                         <t t-if="overview">
+                            <div class="tab-content">
+                                <div id="description" class="tab-pane fade in active">
+                                    <h3>Description</h3>
+                                    <p>Not done yet</p>
+                                </div>
+                                <div id="technicial" class="tab-pane fade">
+
 
                             <!-- (Start) Groups -->
                             <div class="panel-group">
@@ -150,6 +166,10 @@
                                     </div>
                                 </div>
                             </div>
+                        
+                            </div> <!-- End Technicial Tab -->
+                            </div> <!-- End All Tabs -->
+                        
                         </t>
                     </div>
                 </div>

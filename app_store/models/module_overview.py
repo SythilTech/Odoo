@@ -8,6 +8,8 @@ import fnmatch
 import zipfile
 import logging
 import StringIO
+import ast
+import base64
 _logger = logging.getLogger(__name__)
 
 from openerp import api, fields, models
@@ -17,13 +19,17 @@ class ModuleOverview(models.Model):
     _name = "module.overview"
     _description = "Module Overview"
     
-    name = fields.Char(string="Module Name")
+    name = fields.Char(string="Internal Name")
     models_ids = fields.One2many('module.overview.model', 'mo_id', string="Models")
     model_count = fields.Integer(string="Model Count", compute="_compute_model_count")
     menu_ids = fields.One2many('module.overview.menu', 'mo_id', string="Menus")
     menu_count = fields.Integer(string="Menu Count", compute="_compute_menu_count")
     group_ids = fields.One2many('module.overview.group', 'mo_id', string="Groups")
     group_count = fields.Integer(string="Group Count", compute="_compute_group_count")
+    module_view_count = fields.Char(string="Module View Count", help="The amount of times the page for this module has been viewed")
+    module_download_count = fields.Char(string="Module Download Count", help="The amount of times this module has been downloaded")
+    module_name = fields.Char(string="Module Name")
+    icon = fields.Binary(string="Icon")
 
     @api.one
     @api.depends('menu_ids')
@@ -40,6 +46,13 @@ class ModuleOverview(models.Model):
     def _compute_model_count(self):
         self.model_count = len(self.models_ids)
 
+class ModuleOverviewWizard(models.Model):
+
+    _name = "module.overview.wizard"
+    _description = "Module Overview Wizard"
+    
+    name = fields.Char(string="Module Name")
+
     @api.one
     def update_module_list(self):
         home_directory = os.path.expanduser('~')
@@ -47,20 +60,26 @@ class ModuleOverview(models.Model):
         
         #Go through all module folders under '~/apps' and analyse the module
         for dir in os.listdir(app_directory):
-            self.analyse_module(dir)
+            if os.path.isdir(os.path.join(app_directory, dir)):
+                self.analyse_module(dir)
             
     def analyse_module(self, module_name):
         home_directory = os.path.expanduser('~')
         app_directory = home_directory + "/apps"
-
-        #Delete the existing module record
-        delete_module = self.env['module.overview'].search([('name','=',module_name)])
         
-        if delete_module:
-            delete_module[0].unlink()
+        #Read __openerp__.py file    
+        with open(app_directory + "/" + module_name + "/__openerp__.py", 'r') as myfile:
+            data = myfile.read().replace('\n', '')
+            op_settings = ast.literal_eval(data)
         
-        module_overview = self.env['module.overview'].create({'name': module_name})
-
+        #Convert icon file to base64
+        icon_base64 = ""
+        if os.path.isfile(app_directory + "/" + module_name + "/static/description/icon.png"):
+            with open(app_directory + "/" + module_name + "/static/description/icon.png", "rb") as image_file:
+                icon_base64 = base64.b64encode(image_file.read())
+    
+        module_overview = self.env['module.overview'].create({'name': module_name, 'module_name': op_settings['name'], 'icon': icon_base64})
+        
         for root, dirnames, filenames in os.walk(app_directory + '/' + module_name):
             for filename in fnmatch.filter(filenames, '*.xml'):            
                 self._read_xml(open( os.path.join(root, filename) ).read(), module_overview.id)
@@ -191,7 +210,7 @@ class ModuleOverview(models.Model):
     	        
     	        #add this view to this model
     	        self.env['module.overview.model.view'].create({'model_id': model.id, 'name': record_name, 'x_id': record_id})
-
+    
 class ModuleOverviewGroup(models.Model):
 
     _name = "module.overview.group"
