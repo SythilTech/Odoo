@@ -15,6 +15,10 @@
                     data-selector=".html_form"
                     data-drop-in=".oe_structure, [data-oe-type=html]">
                 </div>
+                <div data-js='html_form_builder_new'
+                    data-selector=".html_form_new"
+                    data-drop-in=".oe_structure, [data-oe-type=html]">
+                </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
 		    data-drop-in=".form_fields, [data-oe-type=html]">
@@ -23,6 +27,19 @@
 		    data-selector=".html_form_captcha"
 		    data-drop-in=".form_fields, [data-oe-type=html]">
                 </div>
+                    <div data-js='field-style'
+		        data-selector="section:not(.carousel):not(.parallax):not(.o_gallery)">
+		        <li class="dropdown-submenu">
+		            <a tabindex="-1" href="#">Field Width</a>
+		            <ul class="dropdown-menu">
+		                <li data-toggle_class="col-md-12"><a>Full Width</a></li>
+		                <li data-toggle_class="col-md-6"><a>1/2 Width</a></li>
+		                <li data-toggle_class="col-md-4"><a>1/3 Width</a></li>
+		                <li data-toggle_class="col-md-3"><a>1/4 Width</a></li>
+		            </ul>
+		        </li>
+		    </div>
+
             </xpath>
         </template>
 
@@ -38,6 +55,7 @@
                     </div>
                     <div class="o_panel_body">
                         <t t-snippet="html_form_builder_snippets.s_form" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_form_new" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form_new.jpg"/>                        
                         <t t-snippet="html_form_builder_snippets.s_textbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_textarea" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textarea.jpg"/>            
                         <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
@@ -50,7 +68,7 @@
     
         </template>
 
-        <template id="s_form" name="HTML Form">
+        <template id="s_form" name="Existing HTML Form">
             <section class="html_form">
                 <div class="container">
                     <h2>My Form</h2>
@@ -62,8 +80,20 @@
             </section>
         </template>
 
+        <template id="s_form_new" name="New HTML Form">
+            <section class="html_form_new">
+                <div class="container">
+                    <h2>My Form</h2>
+                    <div id="html_fields" class="form_fields">
+		                                 
+		    </div>
+                    <input type="submit" class="btn btn-primary btn-lg" value="Send"/>
+                </div>
+            </section>
+        </template>
+        
         <template id="s_textbox" name="Textbox">
-            <section data-form-type="textbox" data-field-id="0" class="html_form_field">
+            <section data-form-type="textbox" data-field-id="0" class="html_form_field col-md-12">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <input type="text" name="field1" class="form-control"/>
@@ -72,7 +102,7 @@
         </template>   
 
         <template id="s_textarea" name="Textarea">
-            <section data-form-type="textarea" data-field-id="0" class="html_form_field">
+            <section data-form-type="textarea" data-field-id="0" class="html_form_field  col-md-12">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <textarea class="form-control" name="field1"/>
@@ -81,7 +111,7 @@
         </template>
 
         <template id="s_dropbox" name="Dropbox">
-            <section data-form-type="dropbox" data-field-id="0" class="html_form_field">
+            <section data-form-type="dropbox" data-field-id="0" class="html_form_field  col-md-12">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <select class="form-control" name="field1">

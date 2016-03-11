@@ -15,7 +15,7 @@ options.registry.html_form_builder = options.Class.extend({
 
 	        website.prompt({
 			    id: "editor_new_form",
-			    window_title: "New HTML Form",
+			    window_title: "Existing HTML Form",
 			    select: "Select Form",
 			    init: function (field) {
 			        return form_ids;
@@ -34,6 +34,34 @@ options.registry.html_form_builder = options.Class.extend({
 
 });
 
+options.registry.html_form_builder_new = options.Class.extend({
+    drop_and_build_snippet: function() {
+        var self = this;
+        var model = new Model('html.form.snippet.action');
+	    model.call('name_search', [], { context: base.get_context() }).then(function (action_ids) {
+
+	        website.prompt({
+			    id: "editor_new_form_new",
+			    window_title: "New HTML Form",
+			    select: "Select Action",
+			    init: function (field) {
+			        return action_ids;
+			    },
+			}).then(function (action_id) {
+
+			    session.rpc('/form/new', {'action_id': action_id}).then(function(result) {
+				    self.$target.html(result.html_string);
+				    self.$target.attr('data-form-model', result.form_model );
+				    self.$target.attr('data-form-id', result.form_id );
+				    //Behaves like a regular form after creation
+				    self.$target.attr('class', 'html_form' );
+             	});
+			});
+
+        });
+    },
+
+});
 
 options.registry.html_form_builder_field = options.Class.extend({
     drop_and_build_snippet: function() {
@@ -42,7 +70,14 @@ options.registry.html_form_builder_field = options.Class.extend({
         var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
         var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
 
-	    model.call('name_search', ['', [["model_id.model", "=", form_model]] ], { context: base.get_context() }).then(function (field_ids) {
+
+	    session.rpc('/form/fieldtype', {'field_type': self.$target.attr('data-form-type') }).then(function(result) {
+		    var field_type = result.field_type;
+
+
+
+
+	    model.call('name_search', ['', [["model_id.model", "=", form_model],["ttype", "=", field_type] ] ], { context: base.get_context() }).then(function (field_ids) {
 
 	        website.prompt({
 			    id: "editor_new_field",
@@ -59,6 +94,10 @@ options.registry.html_form_builder_field = options.Class.extend({
 			});
 
         });
+
+
+        });
+
 
     },
 });

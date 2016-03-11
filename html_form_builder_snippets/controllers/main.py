@@ -134,6 +134,46 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "    </div>\n"
 
         return {'html_string': form_string, 'form_model': html_form.model_id.model }
+
+    @http.route('/form/new', website=True, type='json', auth="public")
+    def new_form(self, **kw):
+        
+        values = {}
+	for field_name, field_value in kw.items():
+            values[field_name] = field_value    
+        
+        
+        action = request.env['html.form.snippet.action'].browse(int(values['action_id']) )
+
+        my_model = request.env['ir.model'].search([('model','=',action.action_model)])
+        html_form = request.env['html.form'].create({'name': 'My New Form', 'model_id': my_model.id })
+        
+        form_string = ""
+        form_string += "    <div class=\"container\">\n"
+        form_string += "        <div class=\"row\">\n"
+        form_string += "            <h2>" + html_form.name + "</h2>\n"
+        form_string += "            <form method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "                <div id=\"html_fields\" class=\"oe_structure\">\n"	    	    
+        form_string += "                </div>\n"
+        form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
+        form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"
+        form_string += "            </form>\n"
+        form_string += "        </div>\n"
+        form_string += "    </div>\n"
+
+        return {'html_string': form_string, 'form_model': action.action_model, 'form_id': html_form.id }
+
+    @http.route('/form/fieldtype', website=True, type='json', auth="public")
+    def form_fieldtype(self, **kw):
+        
+        values = {}
+	for field_name, field_value in kw.items():
+            values[field_name] = field_value    
+            
+        field_type = request.env['html.form.field.type'].search( [ ('html_type', '=', values['field_type'] ) ] )[0]
+        
+        return {'field_type': field_type.data_type }
+
             
     @http.route('/form/field/add', website=True, type='json', auth="user")
     def form_add_field(self, **kw):
