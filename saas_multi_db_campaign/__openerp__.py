@@ -1,7 +1,7 @@
 {
     'name': "SAAS Multi Database Campaign",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Vuente",
     'category': "Tools",
     'summary':'Adds a mail campaign which new saas users go on, designed to be used with saas_multi_db',
     'license':'LGPL-3',
