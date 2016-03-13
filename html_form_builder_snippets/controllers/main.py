@@ -65,8 +65,28 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	
 	return html_output
 
+    def _generate_html_radio_group_selection(self, field):
+        """Generate Radio Group(Selection) HTML"""
+        html_output = ""
+        html_output += "<div class=\"form-group\">\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
+		    		
+	if field.field_id.required == False:
+	    html_output += " style=\"font-weight: normal\""
+		    		
+	html_output += ">" + field.field_label + "</label><br/>\n"
+	
+    	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
+    	        
+    	for selection_value,selection_label in selection_list.items():
+    	    html_output += "    <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"      	
+	
+	html_output += "</div>\n"
+	
+	return html_output
+
     def _generate_html_dropbox(self, field):
-        """Generates a dropbox"""
+        """Generates a dropbox(Selection)"""
         html_output = ""
         
         if field.field_id.ttype == "selection":
@@ -96,6 +116,36 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	    
     	    return html_output
     
+    def _generate_html_dropbox_m2o(self, field):
+        """Generates a dropbox(Many2one)"""
+        html_output = ""
+        
+        html_output += "<div class=\"form-group\">\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
+		                
+        if field.field_id.required == False:
+            html_output += " style=\"font-weight: normal\""                
+                		
+        html_output += ">" + field.field_label
+        html_output += "</label>\n"
+	html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
+                		    
+	if field.field_id.required == True:
+	    html_output += " required"
+	        
+    	html_output += ">\n"
+    	html_output += "    <option value=\"\">Select Option</option>\n"
+    
+
+        selection_list = request.env[field.field_id.relation].search([])
+    	        
+    	for row in selection_list:
+    	    html_output += "    <option value=\"" + str(row.id) + "\">" + row.name + "</option>\n"
+    	        
+    	html_output += "  </select>\n"
+    	html_output += "</div>\n"
+    	    
+    	return html_output
     
     @http.route('/form/load', website=True, type='json', auth="public")
     def load_form(self, **kw):

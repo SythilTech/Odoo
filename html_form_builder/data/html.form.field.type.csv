@@ -2,4 +2,6 @@ id,name,html_type,data_type,default
 file_select_binary,"File Select",file_select,binary,1
 textbox_char,"Textbox",textbox,char,1
 textarea_text,"Textarea",textarea,text,1
-dropbox_selection,"Dropbox",dropbox,selection,1
+dropbox_selection,"Dropbox(Selection)",dropbox,selection,1
+dropbox_many2one,"Dropbox(Many2one)",dropbox_m2o,many2one,1
+radio_group_selection,"Radio Group(Selection)",radio_group_selection,selection,0

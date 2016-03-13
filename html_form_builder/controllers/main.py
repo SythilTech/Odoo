@@ -102,7 +102,8 @@ class HtmlFormController(http.Controller):
 
         return html_response
         
-    def _process_html_textarea(self, field, field_data):
+    def _process_html_dropbox_m2o(self, field, field_data):
+        """Validation for Dropbox(m2o) and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
         html_response.return_data = field_data
@@ -110,6 +111,22 @@ class HtmlFormController(http.Controller):
 
         return html_response
         
+    def _process_html_textarea(self, field, field_data):
+        html_response = html_field_response()
+        html_response.error = ""
+        html_response.return_data = field_data
+        html_response.history_data = field_data
+
+        return html_response
+
+    def _process_html_radio_group_selection(self, field, field_data):
+        html_response = html_field_response()
+        html_response.error = ""
+        html_response.return_data = field_data
+        html_response.history_data = field_data
+
+        return html_response
+    
     def _process_html_dropbox(self, field, field_data):
         """Validation for dropbox and preps for insertion into database"""
         html_response = html_field_response()
