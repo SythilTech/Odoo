@@ -1,3 +1,7 @@
+v1.2
+====
+* Public users can submit feedback on each help page
+
 v1.1
 ====
 * Added file attachment input to submit tick form

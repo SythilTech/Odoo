@@ -32,11 +32,38 @@ class WebsiteSupportHelpPage(models.Model):
     url_generated = fields.Char(string="URL", compute='_compute_url_generated')
     group_id = fields.Many2one('website.support.help.groups', string="Group")
     content = fields.Html(sanatize=False, string='Content')
+    feedback_ids = fields.One2many('website.support.help.page.feedback', 'hp_id', string="Feedback")
+    feedback_average = fields.Float(string="Feedback Average Rating", compute="_compute_feedback_average")
+    feedback_count = fields.Integer(string="Feedback Count", compute="_compute_feedback_count")
     
     @api.one
     @api.depends('name')
     def _compute_url_generated(self):
         self.url_generated = "/support/help/" + slug(self.group_id) + "/" + slug(self)    
+
+    @api.one
+    @api.depends('feedback_ids')
+    def _compute_feedback_count(self):
+        self.feedback_count = len(self.feedback_ids)    
+
+    @api.one
+    @api.depends('feedback_ids')
+    def _compute_feedback_average(self):
+        average = 0
+        
+        for fb in self.feedback_ids:
+            average += fb.feedback_rating
+            
+        self.feedback_average = average / len(self.feedback_ids)
+
+
+class WebsiteSupportHelpPageFeedback(models.Model):
+
+    _name = "website.support.help.page.feedback"
+    
+    hp_id = fields.Many2one('website.support.help.page', string="Help Page")
+    feedback_rating = fields.Integer(string="Feedback Rating")
+    feedback_text = fields.Text(string="Feedback Text")
     
 def slugify(s, max_length=None):
     """ Transform a string to a slug that can be used in a url path.

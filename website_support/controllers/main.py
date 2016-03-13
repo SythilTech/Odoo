@@ -20,6 +20,25 @@ class MyController(http.Controller):
         """Let's public and registered user submit a support ticket"""
         return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': http.request.env.user.name, 'email': http.request.env.user.email})
 
+    @http.route('/support/feedback/process/<help_page>', type="http", auth="public", website=True)
+    def support_feedback(self, help_page, **kw):
+        """Process user feedback"""
+ 
+        values = {}
+ 	for field_name, field_value in kw.items():
+            values[field_name] = field_value
+            
+        #Don't want them distorting the rating by submitting -50000 ratings
+        if int(values['rating']) < 1 or int(values['rating']) > 5:
+            return "Invalid rating"
+           
+        #Feeback is required
+        if values['feedback'] == "":
+            return "Feedback required"
+        
+        request.env['website.support.help.page.feedback'].sudo().create({'hp_id': int(help_page), 'feedback_rating': values['rating'], 'feedback_text': values['feedback'] })
+
+        return werkzeug.utils.redirect("/support/help")
 
     @http.route('/helpgroup/new/<group>', type='http', auth="public", website=True)
     def help_group_create(self, group, **post):

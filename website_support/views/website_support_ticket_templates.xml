@@ -67,10 +67,33 @@
 <template id="help_page" name="Help Page" page="True">
     <t t-call="website.layout">
         <div class="container">
-                <div class="mt16 mb16">
-		    <h1 class="text-center" t-field="help_page.name"/>
-		    <div id="wrap" class="oe_structure oe_empty" t-field="help_page.content"/>
-		</div>
+            <div class="mt16 mb16">
+	        <h1 class="text-center" t-field="help_page.name"/>
+		<div id="wrap" class="oe_structure oe_empty" t-field="help_page.content" style="min-height:200px;"/>
+                
+                <!-- Submit Feedback -->
+                <form method="GET" t-attf-action="/support/feedback/process/#{help_page.id}">
+                
+                    <div t-attf-class="form-group #{error and 'rating' in error and 'has-error' or ''}">
+                        <label class="control-label" for="rating">Rating</label><br/>                  
+                        <input type="radio" name="rating" value="1"/> 1 Star
+                        <input type="radio" name="rating" value="2"/> 2 Star
+                        <input type="radio" name="rating" value="3"/> 3 Star
+                        <input type="radio" name="rating" value="4"/> 4 Star
+                        <input type="radio" name="rating" value="5"/> 5 Star
+                    </div>
+                
+                    <div t-attf-class="form-group mt16 mb16 #{error and 'feedback' in error and 'has-error' or ''}">
+                        <label class="control-label" for="feedback">Feedback</label>
+                        <textarea class="form-control" name="feedback" style="min-height: 120px" required="True"></textarea>
+                    </div>
+                
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-lg">Submit Feedback</button>
+                    </div>
+                </form>
+                
+            </div>
         </div>
     </t>
 </template>
