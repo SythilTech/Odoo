@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import werkzeug
 import json
+import base64
 
 import openerp.http as http
 from openerp.http import request
@@ -38,15 +39,17 @@ class MyController(http.Controller):
         return request.website.render("website_support.help_page", {'help_page':help_page})
 
 
-    @http.route('/support/ticket/process', type="http", auth="public", website=True)
+    @http.route('/support/ticket/process', type="http", auth="public", website=True, csrf=False)
     def support_process_ticket(self, **kwargs):
         """Adds the support ticket to the database and sends out emails to everyone following the support ticket category"""
         values = {}
 	for field_name, field_value in kwargs.items():
             values[field_name] = field_value
         
+        my_attachment = base64.encodestring(values['file'].read() )
+        
         if http.request.env.user.id:
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id})
+            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': values['file'].filename})
             
             partner = http.request.env.user.partner_id
             
@@ -54,7 +57,7 @@ class MyController(http.Controller):
             partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
             
         else:
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject']})
+            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject', 'attachment': my_attachment, 'attachment_filename': values['file'].filename]})
 
         #send an email out to everyone in the category
         notification_template = request.env['ir.model.data'].get_object('website_support', 'new_support_ticket_category')
@@ -66,13 +69,7 @@ class MyController(http.Controller):
             notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
             notification_template.send_mail(new_ticket_id.id, True)
             
-            #values = request.env['mail.template'].generate_email(notification_template.id, new_ticket_id.id)
-       	    #values['email_to'] = my_user.login
-            #values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
-       	    
-       	    #msg_id = request.env['mail.mail'].create(values)
-            
-        #request.env['mail.mail'].process_email_queue()
+
         
         return werkzeug.utils.redirect("/support/ticket/thanks")
         
