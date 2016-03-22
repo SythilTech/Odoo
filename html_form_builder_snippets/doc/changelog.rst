@@ -1,3 +1,7 @@
+v1.5
+====
+* Added checkbox(boolean) field
+
 v1.4
 ====
 * Added 2 fields, dropbox(many2one) and radio button group(selection)

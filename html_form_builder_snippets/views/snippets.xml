@@ -61,6 +61,7 @@
                         <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_dropbox_m2o" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_radio_group_selection" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_radio_group.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_checkbox_boolean" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_checkbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_captcha" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_captcha.jpg"/>
                     </div>
 
@@ -112,7 +113,15 @@
                     <input type="radio" name="field1"/>Option 3<br/>
                 </div>
             </section>
-        </template> 
+        </template>
+
+        <template id="s_checkbox_boolean" name="Checkbox(Boolean)">
+            <section data-form-type="checkbox_boolean" data-field-id="0" class="html_form_field col-md-12">
+                <div class="checkbox">
+                    <label><input type="checkbox" name="field1"/>I Agree</label>
+                </div>
+            </section>
+        </template>
 
         <template id="s_textarea" name="Textarea">
             <section data-form-type="textarea" data-field-id="0" class="html_form_field  col-md-12">

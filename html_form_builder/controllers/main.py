@@ -49,22 +49,24 @@ class HtmlFormController(http.Controller):
         
         #populate an array which has ONLY the fields that are in the form (prevent injection)
         for fi in entity_form.fields_ids:
-            
-            method = '_process_html_%s' % (fi.field_type.html_type,)
-	    action = getattr(self, method, None)
+            if fi.html_name in values:
+                method = '_process_html_%s' % (fi.field_type.html_type,)
+	        action = getattr(self, method, None)
 	        
-	    if not action:
-		raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+	        if not action:
+		    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 	
-            field_valid = html_field_response()
-	    field_valid = action(fi, values[fi.html_name])
+                field_valid = html_field_response()
+	        field_valid = action(fi, values[fi.html_name])
 	    
-	    if field_valid.error == "":
-	        form_error = False
-	        secure_values[fi.field_id.name] = field_valid.return_data
-                new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id':fi.field_id.id, 'insert_value':field_valid.history_data})
-            else:
-                form_error = True
+	        if field_valid.error == "":
+	            form_error = False
+	            secure_values[fi.field_id.name] = field_valid.return_data
+                    new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id':fi.field_id.id, 'insert_value':field_valid.history_data})
+                else:
+                    form_error = True
+
+
 
         if form_error:
             #redirect back to the page
@@ -95,6 +97,15 @@ class HtmlFormController(http.Controller):
         
     def _process_html_textbox(self, field, field_data):
         """Validation for textbox and preps for insertion into database"""
+        html_response = html_field_response()
+        html_response.error = ""
+        html_response.return_data = field_data
+        html_response.history_data = field_data
+
+        return html_response
+
+    def _process_html_checkbox_boolean(self, field, field_data):
+        """Validation for Checkboxes(Boolean) and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
         html_response.return_data = field_data

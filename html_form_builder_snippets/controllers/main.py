@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import openerp.http as http
 from openerp.http import request
 import logging
@@ -81,6 +82,15 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	for selection_value,selection_label in selection_list.items():
     	    html_output += "    <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"      	
 	
+	html_output += "</div>\n"
+	
+	return html_output
+
+    def _generate_html_checkbox_boolean(self, field):
+        """Generate Checkbox(Boolean) HTML"""
+        html_output = ""
+        html_output += "<div class=\"checkbox\">\n"
+	html_output += "  <label><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
 	html_output += "</div>\n"
 	
 	return html_output
