@@ -67,7 +67,7 @@ class HtmlFormControllerCampaign(openerp.addons.html_form_builder.controllers.ma
             #Add the new partner to a campaign
             for act in entity_form.campaign_id.activity_ids:
                 if act.start:
-                    wi = request.env['marketing.campaign.workitem'].create({'campaign_id': entity_form.campaign_id.id, 'activity_id': act.id, 'partner_id': new_record.id, 'res_id': new_record.id})
+                    wi = request.env['marketing.campaign.workitem'].sudo().create({'campaign_id': entity_form.campaign_id.id, 'activity_id': act.id, 'partner_id': new_record.id, 'res_id': new_record.id})
                     wi.process()
 
 
