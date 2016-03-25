@@ -26,8 +26,11 @@ class HtmlFormController(http.Controller):
             values[field_name] = field_value
 
         entity_form = http.request.env['html.form'].sudo().browse(int(values['form_id']))
-        ref_url = http.request.httprequest.headers['Referer']
-               
+        
+        ref_url = ""
+        if 'Referer' in http.request.httprequest.headers:
+            ref_url = http.request.httprequest.headers['Referer']
+                       
         #Captcha Check
         if entity_form.captcha:
                

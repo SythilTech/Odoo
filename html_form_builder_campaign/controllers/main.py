@@ -25,7 +25,11 @@ class HtmlFormControllerCampaign(openerp.addons.html_form_builder.controllers.ma
         secure_values = {}
         history_values = {}
         form_error = False
-        ref_url = http.request.httprequest.headers['Referer']
+        
+        ref_url = ""
+        if 'Referer' in http.request.httprequest.headers:
+            ref_url = http.request.httprequest.headers['Referer']
+
         entity_form = http.request.env['html.form'].sudo().browse(int(values['form_id']))
         new_history = http.request.env['html.form.history'].sudo().create({'ref_url':ref_url, 'html_id': entity_form.id})
         
