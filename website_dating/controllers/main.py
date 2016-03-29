@@ -9,6 +9,43 @@ from openerp.http import request
 
 class WebsiteDatingController(http.Controller):
 
+    @http.route('/dating/profile/register', type="http", auth="public", website=True)
+    def dating_profile_register(self, **kwargs):
+        genders = request.env['res.partner.gender'].search([])
+        return http.request.render('website_dating.my_dating_register', {'genders': genders} )
+
+    @http.route('/dating/profile/register/process', type="http", auth="public", website=True, csrf=False)
+    def dating_profile_register_process(self, **kwargs):
+        
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+	    
+	#Create the new user
+	new_user = request.env['res.users'].sudo().create({'name': values['first_name'] + " " + values['last_name'], 'login': values['email'], 'email': values['email'], 'password': values['password'] })
+	
+	#Add the user to the dating group
+	dating_group = request.env['ir.model.data'].sudo().get_object('website_dating', 'dating_group')
+        dating_group.users = [(4, new_user.id)]
+
+        #Remove 'Contact Creation' permission        
+	contact_creation_group = request.env['ir.model.data'].sudo().get_object('base', 'group_partner_manager')
+        contact_creation_group.users = [(3,new_user.id)]
+
+        #Also remove them as an employee
+	human_resources_group = request.env['ir.model.data'].sudo().get_object('base', 'group_user')
+        human_resources_group.users = [(3,new_user.id)]
+
+        #Modify the users partner record
+	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'gender': values['gender'], 'profile_micro': values['self_description'],'profile_visibility': 'members_only' })
+
+        #Automatically sign the new user in
+        request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
+	request.session.authenticate(request.env.cr.dbname, values['email'], values['password'])
+
+        #Redirect them to thier profile page	
+        return werkzeug.utils.redirect("/dating/profiles/" + str(new_user.partner_id.id) )
+        
     @http.route('/dating/profiles/like', type="http", auth="user", website=True)
     def dating_like(self, **kwargs):
         
@@ -254,11 +291,11 @@ class WebsiteDatingController(http.Controller):
             #if this member likes you, you can view this profile
             if they_like == True:
                 can_view = True
-        
+             
         #the owner can view there own profile
         if http.request.env.user.partner_id.id == int(member_id):
             can_view = True
-        
+      
         if can_view:
             return http.request.render('website_dating.my_dating_profile', {'my_date': member, 'can_message': can_message, 'you_like':you_like, 'they_like':they_like} )
         else:
