@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>  
+        <record id="view_website_form_inherit_website_style_manager" model="ir.ui.view">
+            <field name="name">website.inherit</field>
+            <field name="model">website</field>
+            <field name="inherit_id" ref="website.view_website_form" />
+      	    <field name="arch" type="xml">
+      	        <field name="default_lang_id" position="after">
+      	            <field name="tag_styles">
+      	                <tree editable="bottom">
+      	                    <field name="html_tag"/>
+      	                    <field name="font_family"/>
+      	                    <field name="font_color"/>
+      	                    <field name="font_size"/>
+      	                </tree>
+      	            </field>
+      	            <field name="css_text"/>
+      	        </field>
+            </field>
+        </record>
+    </data>
+</openerp>

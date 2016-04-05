@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="custom_css" inherit_id="website.layout" active="True" customize_show="True" name="Custom CSS">
+            <xpath expr="//head" position="inside">
+                <style>
+                    <t t-raw="website.css_text"/>
+                </style>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>
