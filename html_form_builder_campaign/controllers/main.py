@@ -15,7 +15,7 @@ class html_field_response():
 class HtmlFormControllerCampaign(openerp.addons.html_form_builder.controllers.main.HtmlFormController):
 
     @http.route('/form/campaign',type="http", auth="public", csrf=False)
-    def my_insert(self, **kwargs):
+    def my_insert_campaign(self, **kwargs):
         
         values = {}
 	for field_name, field_value in kwargs.items():
