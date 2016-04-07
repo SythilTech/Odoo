@@ -7,6 +7,7 @@
             <field name="inherit_id" ref="website.view_website_form" />
       	    <field name="arch" type="xml">
       	        <field name="default_lang_id" position="after">
+      	            <field name="force_styles"/>
       	            <field name="tag_styles">
       	                <tree editable="bottom">
       	                    <field name="html_tag"/>
