@@ -7,22 +7,27 @@
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
       	      <form create="false">
-      	          <group>
-      	              <field name="partner_id"/>
-      	              <field name="person_name"/>
-      	              <field name="email"/>
-      	              <field name="category"/>
-      	              <field name="state"/>
-      	              <field name="subject"/>
-      	              <field name="attachment" filename="attachment_filename"/>
-      	              <field name="attachment_filename" invisible="True"/>
-      	              <field name="description"/>      	              
-      	              <field name="conversation_history" context="{'ticket_id':active_id}">
-      	                  <tree editable="bottom">
-      	                       <field name="content"/>
-      	                  </tree>
-      	              </field>
-      	          </group>
+      	          <sheet>    
+      	              <group>
+      	                  <field name="partner_id"/>
+          	          <field name="person_name"/>
+          	          <field name="email"/>
+          	          <field name="category"/>
+          	          <field name="state"/>
+          	          <field name="subject"/>
+          	          <field name="attachment" filename="attachment_filename"/>
+          	          <field name="attachment_filename" invisible="True"/>
+          	          <field name="description"/>      	              
+          	          <field name="conversation_history" context="{'ticket_id':active_id}">
+          	              <tree editable="bottom">
+          	                   <field name="content"/>
+          	              </tree>
+          	          </field>
+          	      </group>
+      	          </sheet>
+      	          <div class="oe_chatter">
+		      <field name="message_ids" widget="mail_thread" options="{&quot;thread_level&quot;: 1}"/>
+		  </div>
       	      </form>
       	  </field>
       </record>

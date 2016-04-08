@@ -4,7 +4,8 @@ from openerp import api, fields, models
 class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
-    
+    _inherit = ['mail.thread']
+
     def _default_state(self):
         open_state = self.env['website.support.ticket.states'].search([('name','=','Open')])
         return open_state[0]

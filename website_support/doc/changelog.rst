@@ -1,3 +1,7 @@
+v1.3
+====
+* Added message log
+
 v1.2
 ====
 * Public users can submit feedback on each help page
