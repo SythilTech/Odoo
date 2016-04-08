@@ -19,6 +19,7 @@
         'data/ir.cron.csv',
         'data/res.country.csv',
         'data/ir.model.access.csv',
+        'security/ir.model.access.csv',
     ],
     'demo': [],
     'depends': [],

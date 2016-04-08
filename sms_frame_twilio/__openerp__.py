@@ -9,6 +9,7 @@
         'data/sms.gateway.csv',
         'views/sms_account.xml',
         'views/ir_actions_todo.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [],
     'depends': ['sms_frame'],
