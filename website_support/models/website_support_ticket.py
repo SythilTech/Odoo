@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from openerp import api, fields, models
 
+import logging
+_logger = logging.getLogger(__name__)
+
 class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
@@ -32,7 +35,26 @@ class WebsiteSupportTicket(models.Model):
 	#values['html_body'] += message.content + "<hr/>" + "<p>You can reply to this message here</p>"
 	#msg_id = self.env['mail.mail'].create(values)
         #self.env['mail.mail'].send([msg_id], True)
-    
+
+    @api.multi
+    def write(self, values, context=None):
+
+        #Post message if category has changed
+        if 'category' in values:
+            old_category = self.category
+            new_category = self.env['website.support.ticket.categories'].browse( int(values['category']) )
+	    self.message_post(body="Category Change: " + old_category.name + " -> " + new_category.name, subject="Category Changed")
+
+        if 'state' in values:
+            old_state = self.state
+            new_state = self.env['website.support.ticket.states'].browse( int(values['state']) )
+            self.message_post(body="State Change: " + old_state.name + " -> " + new_state.name, subject="State Changed")
+
+        update_rec = super(WebsiteSupportTicket, self).write(values)
+        
+        return update_rec
+
+                
 class WebsiteSupportTicketMessage(models.Model):
 
     _name = "website.support.ticket.message"

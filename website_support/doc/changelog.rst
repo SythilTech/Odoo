@@ -1,3 +1,7 @@
+v1.3.1
+======
+* Changes to category and state add to the message log
+
 v1.3
 ====
 * Added message log
