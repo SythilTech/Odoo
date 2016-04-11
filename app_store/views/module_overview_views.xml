@@ -9,7 +9,9 @@
              <form>
                   <group>
                      <field name="name"/>
+                     <field name="version"/>
                      <field name="icon" widget="image"/>
+                     <field name="store_description"/>
                      <field name="module_name"/>
                      <field name="module_view_count"/>
                      <field name="module_download_count"/>
@@ -27,6 +29,11 @@
                              <field name="parent"/>
                          </tree>
                      </field>
+                     <field name="image_ids">
+                         <tree>
+                             <field name="name"/>
+                         </tree>
+                     </field>                     
                   </group>
               </form>
           </field>

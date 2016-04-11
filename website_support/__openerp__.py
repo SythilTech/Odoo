@@ -21,6 +21,12 @@
     ],
     'demo': [],
     'depends': ['mail','web', 'crm', 'website'],
-    'images':['static/description/3.jpg'],
+    'images':[
+        'static/description/3.jpg',
+        'static/description/1.jpg',
+        'static/description/2.jpg',
+        'static/description/4.jpg',
+        'static/description/5.jpg',
+    ],
     'installable': True,
 }

@@ -23,7 +23,12 @@
 
                     <div class="mt16 mb16">
                         <t t-if="overview">
-                            <h1 class="text-center"><t t-esc="overview.name"/> (<a t-attf-href="/apps/modules/download/#{overview.name}">Download</a>)</h1>
+                            <div class="text-center">
+                                <h1><t t-esc="overview.module_name"/></h1>
+                                <h3><t t-esc="overview.name"/></h3>
+                                <h3>Version: <t t-esc="overview.version"/></h3>
+                                <a t-attf-href="/apps/modules/download/#{overview.name}"><button class="btn btn-primary">Download</button></a>
+                            </div>
                         </t>
                     </div>
 
@@ -32,13 +37,19 @@
                         <ul class="nav nav-tabs nav-justified">
                             <li class="active"><a data-toggle="tab" href="#description">Description</a></li>
                             <li><a data-toggle="tab" href="#technicial">Technicial</a></li>
+                            <li><a data-toggle="tab" href="#screenshots">Screenshots</a></li>
                         </ul>
 
                         <t t-if="overview">
                             <div class="tab-content">
                                 <div id="description" class="tab-pane fade in active">
-                                    <h3>Description</h3>
-                                    <p>Not done yet</p>
+                                    <t t-raw="overview.store_description"/>
+                                </div>
+                                <div id="screenshots" class="tab-pane fade">
+                                    <t t-foreach="overview.image_ids" t-as="screenshot">
+                                        <img t-att-src="website.image_url(screenshot, 'file_data')" class="img-responsive mt16" style="border: black 1px solid;"/><br/>
+                                        <hr/>
+                                    </t>
                                 </div>
                                 <div id="technicial" class="tab-pane fade">
 

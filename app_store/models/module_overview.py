@@ -26,10 +26,13 @@ class ModuleOverview(models.Model):
     menu_count = fields.Integer(string="Menu Count", compute="_compute_menu_count")
     group_ids = fields.One2many('module.overview.group', 'mo_id', string="Groups")
     group_count = fields.Integer(string="Group Count", compute="_compute_group_count")
-    module_view_count = fields.Char(string="Module View Count", help="The amount of times the page for this module has been viewed")
-    module_download_count = fields.Char(string="Module Download Count", help="The amount of times this module has been downloaded")
+    image_ids = fields.One2many('module.overview.image', 'mo_id', string="Images")
+    module_view_count = fields.Integer(string="Module View Count", help="The amount of times the page for this module has been viewed")
+    module_download_count = fields.Integer(string="Module Download Count", help="The amount of times this module has been downloaded")
     module_name = fields.Char(string="Module Name")
+    version = fields.Char(string="Version Number")
     icon = fields.Binary(string="Icon")
+    store_description = fields.Html(string="Store Description")
 
     @api.one
     @api.depends('menu_ids')
@@ -45,6 +48,15 @@ class ModuleOverview(models.Model):
     @api.depends('models_ids')
     def _compute_model_count(self):
         self.model_count = len(self.models_ids)
+
+class ModuleOverviewImage(models.Model):
+
+    _name = "module.overview.image"
+    _description = "Module Overview Image"
+    
+    mo_id = fields.Many2one('module.overview', string="Module Overview", ondelete="cascade")
+    name = fields.Char(string="File Path")
+    file_data = fields.Binary(string="File Data")
 
 class ModuleOverviewWizard(models.Model):
 
@@ -77,8 +89,31 @@ class ModuleOverviewWizard(models.Model):
         if os.path.isfile(app_directory + "/" + module_name + "/static/description/icon.png"):
             with open(app_directory + "/" + module_name + "/static/description/icon.png", "rb") as image_file:
                 icon_base64 = base64.b64encode(image_file.read())
-    
-        module_overview = self.env['module.overview'].create({'name': module_name, 'module_name': op_settings['name'], 'icon': icon_base64})
+        
+        if self.env['module.overview'].search_count([('name', '=', module_name)]) == 0:
+            module_overview = self.env['module.overview'].create({'name': module_name})
+        else:
+            #Clear out most things except download / view count
+            module_overview = self.env['module.overview'].search([('name', '=', module_name)])[0]
+            module_overview.models_ids.unlink()
+            module_overview.menu_ids.unlink()
+            module_overview.group_ids.unlink()
+            module_overview.image_ids.unlink()
+
+        module_overview.module_name = op_settings['name']
+        module_overview.icon = icon_base64
+        module_overview.version = op_settings['version']
+
+        #Read /static/description/index.html file
+        with open(app_directory + "/" + module_name + "/static/description/index.html", 'r') as descriptionfile:
+            descriptiondata = descriptionfile.read()
+            module_overview.store_description = descriptiondata
+        
+        for img in op_settings['images']:
+            with open(app_directory + "/" + module_name + "/" + img, "rb") as screenshot_file:
+                screenshot_base64 = base64.b64encode(screenshot_file.read())
+            
+            self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
         
         for root, dirnames, filenames in os.walk(app_directory + '/' + module_name):
             for filename in fnmatch.filter(filenames, '*.xml'):            
