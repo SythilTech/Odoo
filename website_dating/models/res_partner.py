@@ -16,7 +16,9 @@ class ResPartnerWebsiteDating(models.Model):
     latitude = fields.Char(string="Latitude")
     longitude = fields.Char(string="Longitude")
     age = fields.Integer(string="Age")
+    city_id = fields.Many2one('res.country.state.city', string="City")
     gender = fields.Many2one('res.partner.gender', string="Gender")
+    sexual_orientation = fields.Many2one('res.sexualorientation', string="Sexual Orientation")
     gender_pref = fields.Many2many('res.partner.gender', string="Gender Preference")
     min_age_pref = fields.Integer(string="Min Age Preference")
     max_age_pref = fields.Integer(string="Max Age Preference")
@@ -63,6 +65,13 @@ class ResPartnerInterest(models.Model):
     name = fields.Char(string="Name")
     interest_category_id = fields.Many2one('res.partner.interest.categories', string="Interest Category")
     
+class ResSexualOrientation(models.Model):
+
+    _name = "res.sexualorientation"
+    _description = "Partner Sexual Orientation"
+
+    name = fields.Char(string="Name")
+
 class ResPartnerInterestCategory(models.Model):
 
     _name = "res.partner.interest.category"

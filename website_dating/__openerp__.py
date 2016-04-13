@@ -20,6 +20,7 @@
         'data/res.partner.relationship.csv',
         'data/res.groups.csv',
         'data/ir.rule.csv',
+        'data/res.sexualorientation.csv',
         'security/ir.model.access.csv',
     ],
     'demo': [],

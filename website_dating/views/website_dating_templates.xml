@@ -8,15 +8,27 @@
 
             <div class="mt16 mb16">
                 <h1 class="text-center">My Dating List</h1>
-                <form method="GET" action="">
-                Min Age: <input type="text" name="min_age" t-att-value="min_age"/>
-                Max Age: <input type="text" name="max_age" t-att-value="max_age"/>
-                Dist (km): <input type="text" name="dist"  t-att-value="dist"/>
-                Gender: <select type="text" name="gender" style="height:24px;">
-                    <option value="">Any</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
+                <form method="GET" action="" class="form-inline" role="form">
+                    <div class="form-group">
+                        <label for="min_age">Min Age:</label>
+                        <input type="text" name="min_age" class="form-control" t-att-value="min_age"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="max_age">Max Age:</label>
+                        <input type="text" name="max_age" class="form-control" t-att-value="max_age"/>
+                    </div>                
+                    <div class="form-group">
+                        <label for="dist">Dist (km):</label>
+                        <input type="text" name="dist" class="form-control" t-att-value="dist"/>
+                    </div>                
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select name="gender" class="form-control">
+	                    <option value="">Any</option>
+			    <option value="Male">Male</option>
+			    <option value="Female">Female</option>
+                        </select>
+                    </div>
 	            <button t-attf-class="btn btn-default btn-md">Search</button>
                 </form>
             </div>
@@ -26,7 +38,7 @@
                     <div class="col-md-4 mt16 mb16">
                         <div class="well" style="max-width:240px;min-height:400px;">
                             <a t-attf-href="/dating/profiles/#{my_date.id}">
-                                <img t-att-src="website.image_url(my_date, 'image')" class="img-rounded mb8" t-attf-alt="#{my_date.first_name} dating profile" width="200" height="200"/></a><br/><t t-esc="my_date.first_name"/> (<t t-esc="my_date.age"/> <t t-esc="my_date.gender.letter"/>)<br/><t t-esc="my_date.city"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.name"/><br/>
+                                <img t-att-src="website.image_url(my_date, 'image')" class="img-rounded mb8" t-attf-alt="#{my_date.first_name} dating profile" width="200" height="200"/></a><br/><t t-esc="my_date.first_name"/> (<t t-esc="my_date.age"/> <t t-esc="my_date.gender.letter"/>)<br/><t t-esc="my_date.city_id.name"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.name"/><br/>
                                 <br/>
                                 <t t-esc="my_date.profile_micro"/>
                             			                        
@@ -39,7 +51,11 @@
 		    <h2 class="text-center">No one matches that critera</h2>
                 </div>
             </t>
-            
+            <t t-if="request.env.user.partner_id.name == 'Public user'">
+                <div class="col-md-12">
+                    <h3 style="text-align:center;">You are currently viewing only public profiles, to view all profiles please <a href="/dating/profile/register">register an account</a></h3>
+                </div>
+            </t>
         </div>
         
     </t>
@@ -103,7 +119,7 @@
 			    <a href="/dating/profiles/settings">Settings</a><br/>
                         </t>
                             
-			Location: <t t-esc="my_date.city"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.id"/><a t-attf-href="https://www.google.com.au/maps/place/#{my_date.city}, #{my_date.state_id.name}, #{my_date.country_id.name}" target="_blank" class="material-icons">place</a><br/>
+			Location: <t t-esc="my_date.city_id.name"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.name"/><a t-attf-href="https://www.google.com.au/maps/place/#{my_date.city}, #{my_date.state_id.name}, #{my_date.country_id.name}" target="_blank" class="material-icons">place</a><br/>
                         Seeking: ? between <t t-esc="my_date.min_age_pref"/> and <t t-esc="my_date.max_age_pref"/> who is within <t t-esc="my_date.dist_pref"/>km<br/>
                         Age: <t t-esc="my_date.age"/><br/>
 
@@ -156,7 +172,7 @@
             <div class="col-md-12">
                 <div id="main" class="well">
                     <h1>Register your Profile</h1>
-                    <form method="POST" action="/dating/profile/register/process">
+                    <form method="POST" action="/dating/profile/register/process" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="first_name">First Name</label>
                             <input type="text" name="first_name" class="form-control" required="True"/>
@@ -178,14 +194,48 @@
                                 </t>
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select name="country" class="form-control" required="True">
+                                <option value="">Select a Country</option>
+                                <t t-foreach="countries" t-as="country">
+                                    <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <select name="state" class="form-control" required="True">
+                                <option value="">Select a State</option>
+                                <t t-foreach="states" t-as="state">
+                                    <option t-attf-value="#{state.id}"><t t-esc="state.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <select name="city" class="form-control" required="True">
+                                <option value="">Select a City</option>
+                                <t t-foreach="cities" t-as="city">
+                                    <option t-attf-value="#{city.id}"><t t-esc="city.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label for="password">Password</label>
                             <input type="password" name="password" class="form-control" required="True"/>
                         </div>
                         <div class="form-group">
-                            <label>Preference</label><br/>
-                            <label><input type="checkbox" name="gender_male"/> Male</label><br/>
-                            <label><input type="checkbox" name="gender_female"/> Female</label>
+                            <label for="sexual_orientations">Sexual Orientations</label>
+                            <select name="sexual_orientation" class="form-control" required="True">
+                                <t t-foreach="sexual_orientations" t-as="sexual_orientation">
+                                    <option t-attf-value="#{sexual_orientation.id}"><t t-esc="sexual_orientation.name"/></option>
+                                </t>
+                            </select>
                         </div>
                         <div name="file_container" t-attf-class="form-group #{error and 'file' in error and 'has-error' or ''}">
                             <label class="control-label" for="file">Profile Image</label>
