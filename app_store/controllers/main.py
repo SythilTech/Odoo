@@ -42,7 +42,9 @@ class AppsController(http.Controller):
             ('Content-Disposition', "attachment; filename=" + filename ),
         ]
             
-            
+        module = request.env['module.overview'].search([('name', '=', module_name)])
+        module.module_download_count += 1
+        
         home_directory = os.path.expanduser('~')
         app_directory = home_directory + "/apps"
         
@@ -70,4 +72,17 @@ class AppsController(http.Controller):
             values[field_name] = field_value
                 
         module = request.env['module.overview'].search([('name','=',module_name)])
+        
+        module.module_view_count += 1
+        
+        header_string = ""
+        for keys,values in request.httprequest.headers.items():
+	    header_string += keys + ": " + values + "\n"
+        
+        ref = ""
+	if "Referer" in request.httprequest.headers:
+	    ref = request.httprequest.headers['Referer']
+	        
+	request.env['module.overview.store.view'].create({'mo_id': module.id, 'ref':ref, 'ip': request.httprequest.remote_addr,'header':header_string})
+
         return http.request.render('app_store.app_page', {'overview':module})

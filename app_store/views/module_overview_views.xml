@@ -33,7 +33,19 @@
                          <tree>
                              <field name="name"/>
                          </tree>
-                     </field>                     
+                     </field>
+                     <field name="depend_ids">
+                         <tree>
+                             <field name="name"/>
+                         </tree>
+                     </field>
+                     <field name="store_views_ids">
+                         <tree>
+                             <field name="ip"/>
+                             <field name="ref"/>
+                             <field name="create_date"/>
+                         </tree>
+                     </field>
                   </group>
               </form>
           </field>

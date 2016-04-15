@@ -26,7 +26,9 @@ class ModuleOverview(models.Model):
     menu_count = fields.Integer(string="Menu Count", compute="_compute_menu_count")
     group_ids = fields.One2many('module.overview.group', 'mo_id', string="Groups")
     group_count = fields.Integer(string="Group Count", compute="_compute_group_count")
+    depend_ids = fields.One2many('module.overview.depend', 'mo_id', string="Module Dependacies")
     image_ids = fields.One2many('module.overview.image', 'mo_id', string="Images")
+    store_views_ids = fields.One2many('module.overview.store.view', 'mo_id', string="Store Views")
     module_view_count = fields.Integer(string="Module View Count", help="The amount of times the page for this module has been viewed")
     module_download_count = fields.Integer(string="Module Download Count", help="The amount of times this module has been downloaded")
     module_name = fields.Char(string="Module Name")
@@ -48,6 +50,24 @@ class ModuleOverview(models.Model):
     @api.depends('models_ids')
     def _compute_model_count(self):
         self.model_count = len(self.models_ids)
+
+class ModuleOverviewStoreView(models.Model):
+
+    _name = "module.overview.store.view"
+    _description = "Module Overview Store View"
+    
+    mo_id = fields.Many2one('module.overview', string="Module Overview", ondelete="cascade")
+    ip = fields.Char(string="IP")
+    ref = fields.Char(string="Ref", help="The URL the person came from")
+    header = fields.Char(string="Header", help="The raw header which misc info can be extracted from")
+    
+class ModuleOverviewDepend(models.Model):
+
+    _name = "module.overview.depend"
+    _description = "Module Overview Dependacies"
+    
+    mo_id = fields.Many2one('module.overview', string="Module Overview", ondelete="cascade")
+    name = fields.Char(string="name")
 
 class ModuleOverviewImage(models.Model):
 
@@ -99,6 +119,7 @@ class ModuleOverviewWizard(models.Model):
             module_overview.menu_ids.unlink()
             module_overview.group_ids.unlink()
             module_overview.image_ids.unlink()
+            module_overview.depend_ids.unlink()
 
         module_overview.module_name = op_settings['name']
         module_overview.icon = icon_base64
@@ -108,6 +129,9 @@ class ModuleOverviewWizard(models.Model):
         with open(app_directory + "/" + module_name + "/static/description/index.html", 'r') as descriptionfile:
             descriptiondata = descriptionfile.read()
             module_overview.store_description = descriptiondata
+
+        for depend in op_settings['depends']:
+            self.env['module.overview.depend'].create({'mo_id': module_overview.id, 'name': depend})
         
         for img in op_settings['images']:
             with open(app_directory + "/" + module_name + "/" + img, "rb") as screenshot_file:

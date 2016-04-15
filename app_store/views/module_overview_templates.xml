@@ -27,6 +27,11 @@
                                 <h1><t t-esc="overview.module_name"/></h1>
                                 <h3><t t-esc="overview.name"/></h3>
                                 <h3>Version: <t t-esc="overview.version"/></h3>
+                                <ul>
+                                    <t t-foreach="overview.depend_ids" t-as="dependacy">
+                                        <li><t t-esc="dependacy.name"/></li>
+                                    </t>                                
+                                </ul>
                                 <a t-attf-href="/apps/modules/download/#{overview.name}"><button class="btn btn-primary">Download</button></a>
                             </div>
                         </t>
