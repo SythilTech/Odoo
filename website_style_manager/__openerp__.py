@@ -1,6 +1,6 @@
 {
     'name': "Website Style Manager",
-    'version': "1.1",
+    'version': "1.2",
     'author': "Sythil",
     'category': "Tools",
     'summary': "Apply site wide styles to various HTML tags",

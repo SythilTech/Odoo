@@ -7,6 +7,7 @@ class WebsiteStyleManager(models.Model):
     
     tag_styles = fields.One2many('website.style', 'website_id', string="HTML Tag Styles")
     css_text = fields.Text(string="CSS Text")
+    custom_css = fields.Text(string="Text", help="Define website wide styles and classes")
     force_styles = fields.Boolean(string="Force Styles", help="Applies an !important to all styles forcing the style over higher specificity")
     
     @api.onchange('tag_styles', 'force_styles')

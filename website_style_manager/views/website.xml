@@ -16,7 +16,8 @@
       	                    <field name="font_size"/>
       	                </tree>
       	            </field>
-      	            <field name="css_text"/>
+      	            <field name="custom_css"/>
+      	            <field name="css_text" invisible="1"/>
       	        </field>
             </field>
         </record>

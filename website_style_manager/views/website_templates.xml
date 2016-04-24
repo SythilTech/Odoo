@@ -6,6 +6,7 @@
             <xpath expr="//head" position="inside">
                 <style>
                     <t t-raw="website.css_text"/>
+                    <t t-raw="website.custom_css"/>
                 </style>
             </xpath>
         </template>
