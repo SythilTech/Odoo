@@ -1,0 +1,16 @@
+.book_calendar_table {
+  width:100%;
+  border-collapse: collapse;
+  border: 1px solid black;
+  margin-bottom: 10px;
+}
+
+.book_calendar_table td {
+  padding-left: 5px;
+  border: 1px solid black;
+}
+
+.book_calendar_table th {
+  text-align: center;
+  border: 1px solid black;
+}
