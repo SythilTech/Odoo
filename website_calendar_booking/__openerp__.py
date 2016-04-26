@@ -1,4 +1,6 @@
 {
+    'name': "Website Booking Calendar (Alpha)",
+    'version': "0.5",
     'author': "Sythil",
     'category': "Tools",
     'summary': "Allow website users to book meetings from the website",
