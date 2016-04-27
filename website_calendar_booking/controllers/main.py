@@ -99,8 +99,8 @@ class WebsiteBookingController(http.Controller):
             values[field_name] = field_value
                     
         return_string = ""
-        #for event in request.env['calendar.event'].sudo().search([('user_id','=', user), ('start_datetime','>=',values['start']), ('start_datetime','<=', values['end'] ) ]):
-        for event in request.env['calendar.event'].sudo().search([]):
+        #for event in request.env['calendar.event'].sudo().search([('user_id','=', int(user) ), ('start_datetime','>=',values['start']), ('start_datetime','<=', values['end'] ) ]):
+        for event in request.env['calendar.event'].sudo().search([('user_id','=', int(user) )]):
             return_string += '{'
             return_string += '"title": "' + event.name + '",'
             return_string += '"id": "' + str(event.id) + '",'
@@ -108,6 +108,6 @@ class WebsiteBookingController(http.Controller):
             return_string += '"end": "' + str(event.stop) + '+00:00"'
             return_string += '},'                
                 
-        return_string = return_string[:-1]        
+        return_string = return_string[:-1]
         return "[" +  return_string + "]"
         

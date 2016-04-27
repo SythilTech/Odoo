@@ -6,17 +6,12 @@
             <xpath expr="/t" position="inside">
                 <link rel="stylesheet" href="/website_calendar_booking/static/src/css/fullcalendar.css"/>
                 <link rel="stylesheet" href="/website_calendar_booking/static/src/css/website_calendar_booking.css"/>
-            </xpath>
-        </template>
-    
-        <template id="booking_calendar_javascript" inherit_id="website.assets_editor" name="Booking Calendar JS">
-            <xpath expr="/t" position="inside">
                 <script type="text/javascript" src="/web/static/lib/moment/moment.js"></script>
                 <script type="text/javascript" src="/website_calendar_booking/static/src/js/fullcalendar.js" />
                 <script type="text/javascript" src="/website_calendar_booking/static/src/js/booking_website.js" />
             </xpath>
         </template>
-        
+            
         <template id="website_calendar_booking_page" name="Make Appointment" page="True">
 	    <t t-call="website.layout">
 	        <div class="container">
@@ -25,20 +20,6 @@
 	                <h1 class="text-center">Create Booking</h1>
 	            </div>
 	            
-	            <!--
-	            <table class="book_calendar_table">
-	                
-	                <tr><td></td>
-	                    <t t-foreach="['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" t-as="day">
-	                        <th><t t-esc="day"/></th>
-	                    </t>
-	                </tr>
-	                	                
-	                <t t-foreach="['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" t-as="time">
-	                    <tr><td><t t-esc="time"/></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-	                </t>
-	            </table>
-	            -->
 	            <input type="hidden" id="calendar_id" t-attf-value="#{calendar.id}"/>	            
 	            <input type="hidden" id="calendar_slot_duration" t-attf-value="#{calendar.booking_slot_duration}"/>
 	            <input type="hidden" id="calendar_min_time" t-attf-value="#{calendar.booking_min_time}"/>

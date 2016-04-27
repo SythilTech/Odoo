@@ -1,8 +1,10 @@
 {
     'name': "Website Booking Calendar",
-    'version': "1.0",
+    'version': "1.0.1",
     'author': "Vuente",
     'category': "Tools",
+    'currency': 'EUR',
+    'price': 47.00,
     'summary': "Allow website users to book meetings from the website",
     'license':'LGPL-3',
     'data': [
