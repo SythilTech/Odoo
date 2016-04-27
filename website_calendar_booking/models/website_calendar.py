@@ -9,7 +9,7 @@ class WebsiteCalendar(models.Model):
     
     name = fields.Char(string="Name", required=True)
     user_id = fields.Many2one('res.users',string="User", required=True, help="The user the bookings are for")
-    booking_slot_duration = fields.Float(string="Booking Slot Duration", default="0.3")
+    booking_slot_duration = fields.Float(string="Booking Slot Duration", default="0.5")
     booking_min_time = fields.Char(string="Min Booking Time", help="Time before this is cut off the calendar to reduce it's size", compute="_booking_min_time")
     booking_max_time = fields.Char(string="Min Booking Time", help="Time after this is cut off the calendar to reduce it's size",  compute="_booking_max_time")
     url = fields.Char(string="URL", compute="_compute_url")

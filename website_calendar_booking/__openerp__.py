@@ -1,7 +1,7 @@
 {
-    'name': "Website Booking Calendar (Alpha)",
-    'version': "0.5",
-    'author': "Sythil",
+    'name': "Website Booking Calendar",
+    'version': "1.0",
+    'author': "Vuente",
     'category': "Tools",
     'summary': "Allow website users to book meetings from the website",
     'license':'LGPL-3',

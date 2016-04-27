@@ -24,7 +24,7 @@ $(document).ready(function() {
             slotLabelInterval: '00:' + slotDuration + ':00',
             slotLabelFormat: 'hh:mma',
             defaultView: 'agendaWeek',
-            timezone: 'UTC',
+            timezone: 'local',
             allDaySlot: false,
             eventSources: [
                 {

@@ -5,6 +5,8 @@ import base64
 import logging
 _logger = logging.getLogger(__name__)
 from dateutil.parser import parse
+import dateutil
+import pytz
 from datetime import datetime, timedelta
 
 import openerp.http as http
@@ -23,14 +25,20 @@ class WebsiteBookingController(http.Controller):
             values[field_name] = field_value
 
         calendar = request.env['website.calendar'].sudo().browse( int(values['calendar_id']) )        
-        #start_date = datetime.strptime(values['start'], "%a %b %d %Y %H:%M:%S %Z%z")
-        start_date = parse(values['start'])
+        
+        #worlds worse way of converting to UTC...
+        parse_string = values['start']
+        if "+" in parse_string:
+            start_date = parse(parse_string.replace("+","-") ).astimezone(pytz.utc)
+        elif "-" in parse_string:
+            start_date = parse(parse_string.replace("-","+") ).astimezone(pytz.utc)
+        
+        
         alpha_minutes = calendar.booking_slot_duration * 60        
         stop_time = start_date + timedelta(minutes=alpha_minutes)
         stop_time = stop_time.strftime("%Y-%m-%d %H:%M:%S")
-        start_date = start_date.strftime("%Y-%m-%d %H:%M:%S")        
+        start_date = start_date.strftime("%Y-%m-%d %H:%M:%S")
         
-
         calendar.booking_slot_duration
         cal_event = request.env['calendar.event'].sudo().create({'user_id': calendar.user_id.id,'name': values['name'] + " (Booking)", 'start_datetime': start_date, 'stop_datetime': stop_time, 'booking_email': values['email'], 'description': values['email'] + "\n" + values['comment'] })
 
@@ -96,10 +104,9 @@ class WebsiteBookingController(http.Controller):
             return_string += '{'
             return_string += '"title": "' + event.name + '",'
             return_string += '"id": "' + str(event.id) + '",'
-            return_string += '"start": "' + str(event.start_datetime) + '",'
-            return_string += '"end": "' + str(event.stop) + '"'
-            return_string += '},'
-                
+            return_string += '"start": "' + str(event.start_datetime) + '+00:00",'
+            return_string += '"end": "' + str(event.stop) + '+00:00"'
+            return_string += '},'                
                 
         return_string = return_string[:-1]        
         return "[" +  return_string + "]"
