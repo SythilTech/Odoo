@@ -49,7 +49,7 @@
           </field>
       </record>
 
-      <menuitem id="website_calendar_booking_menu" name="Booking Calendar" parent="calendar.menu_calendar_configuration" action="website_calendar_action" sequence="30"/>
+      <menuitem id="website_calendar_booking_menu" name="Booking Calendar" parent="base.menu_administration" action="website_calendar_action" sequence="30"/>
  
     </data>
 </openerp>

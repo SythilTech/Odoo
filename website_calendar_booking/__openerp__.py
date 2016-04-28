@@ -1,6 +1,6 @@
 {
     'name': "Website Booking Calendar",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Vuente",
     'category': "Tools",
     'currency': 'EUR',
