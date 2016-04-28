@@ -19,7 +19,13 @@
 	            <div class="mt16 mb16">
 	                <h1 class="text-center">Create Booking</h1>
 	            </div>
-	            
+
+                    <div style="border: black 1px solid;padding:5px;margin-bottom:10px;width:200px;">
+                        <div style="background-color: #FFFFFF;width:15px;height:15px;float:left;border: black 1px solid;"></div><span style="margin-left:5px;">Non booking hours</span><br/>
+                        <div style="background-color: #DDF5DA;width:15px;height:15px;float:left;border: black 1px solid;"></div><span style="margin-left:5px;">Available booking time</span><br/>
+                        <div style="background-color: #DDC0A4;width:15px;height:15px;float:left;border: black 1px solid;"></div><span style="margin-left:5px;">Taken booking time</span><br/>
+                    </div>
+                
 	            <input type="hidden" id="calendar_id" t-attf-value="#{calendar.id}"/>	            
 	            <input type="hidden" id="calendar_slot_duration" t-attf-value="#{calendar.booking_slot_duration}"/>
 	            <input type="hidden" id="calendar_min_time" t-attf-value="#{calendar.booking_min_time}"/>

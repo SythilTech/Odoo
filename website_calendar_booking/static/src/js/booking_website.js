@@ -40,17 +40,29 @@ $(document).ready(function() {
             ],
            dayClick: function(date, jsEvent, view) {
 
-               this.template = 'website_calendar_booking.calendar_booking_modal';
-    		   var self = this;
-    		   self.$modal = $( qweb.render(this.template, {}) );
-    		   $('body').append(self.$modal);
-               $('#oe_website_calendar_modal').modal('show');
-               $('#booking_form_start').val(date);
-               $('#booking_form_calendar_id').val(calendarID);
 
-               self.$modal.find("#submit_calendar_booking").on('click', function () {
-                   self.$modal.modal('hide');
-                });
+               var allEvents = [];
+               allEvents = $('#booking_calendar').fullCalendar('clientEvents');
+               var event = $.grep(allEvents, function (v) {
+                   return +v.start === +date;
+               });
+               if (event.length == 0) {
+
+                   this.template = 'website_calendar_booking.calendar_booking_modal';
+    		       var self = this;
+    		       self.$modal = $( qweb.render(this.template, {}) );
+    		       $('body').append(self.$modal);
+                   $('#oe_website_calendar_modal').modal('show');
+                   $('#booking_form_start').val(date);
+                   $('#booking_form_calendar_id').val(calendarID);
+
+                   self.$modal.find("#submit_calendar_booking").on('click', function () {
+                       self.$modal.modal('hide');
+                   });
+
+		   } else {
+			   alert("This timeslot has already been booked");
+		   }
 
            }
     }); //end fullcalendar load

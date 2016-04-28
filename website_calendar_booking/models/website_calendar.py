@@ -43,6 +43,6 @@ class WebsiteCalendarTimeframe(models.Model):
     _name = "website.calendar.timeframe"
     
     calendar_id = fields.Many2one('website.calendar', string="Calendar")
-    day = fields.Selection([('monday','Monday'), ('tuesday','Tuesday'), ('wednesday','Wenesday'), ('thursday','Thursday'), ('friday','Friday'), ('saturday','Saturday'), ('sunday','Sunday')], string="Day")
+    day = fields.Selection([('monday','Monday'), ('tuesday','Tuesday'), ('wednesday','Wednesday'), ('thursday','Thursday'), ('friday','Friday'), ('saturday','Saturday'), ('sunday','Sunday')], string="Day")
     start_time = fields.Float(string="Start Time")
     end_time = fields.Float(string="End Time")
