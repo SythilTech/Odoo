@@ -1,3 +1,8 @@
+v1.5.2
+====
+* Fixed issue where recaptcha was loaded twice
+* Fixed issue where (non admin)web designers couldn't use snippets
+
 v1.5.1
 ====
 * Fixed issue relating to captcha not working for public user

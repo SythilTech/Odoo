@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_html_form_designer","access_html_form_designer","html_form_builder.model_html_form","base.group_website_designer",1,0,0,0
+"access_html_form_field_designer","access_html_form_field_designer","html_form_builder.model_html_form_field","base.group_website_designer",1,0,0,0
+"access_html_form_field_type_designer","access_html_form_field_type_designer","html_form_builder.model_html_form_field_type","base.group_website_designer",1,0,0,0
