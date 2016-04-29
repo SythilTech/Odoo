@@ -1,3 +1,8 @@
+v1.5.1
+====
+* Fixed issue relating to captcha not working for public user
+* Fixed issue with Captcha not added alongside an existing form
+
 v1.5
 ====
 * Added checkbox(boolean) field

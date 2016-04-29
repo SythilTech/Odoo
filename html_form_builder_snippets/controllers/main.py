@@ -186,6 +186,14 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    form_string += action(form_field)
 	    form_string += "</section>\n"
 	    	    
+	    	    
+	    	    
+        if html_form.captcha:
+            form_string += "<section class=\"html_form_captcha\">\n"
+            form_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
+            form_string += "</section>\n"
+	    	    
+	    	    
         form_string += "                </div>\n"
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
         form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"

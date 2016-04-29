@@ -123,7 +123,7 @@
           </field>
       </record>
         
-      <menuitem id="html_form_parent_menu" name="HTML Embed Forms" parent="base.menu_custom" sequence="160"/>
+      <menuitem id="html_form_parent_menu" name="HTML Embed Forms" parent="base.menu_administration" sequence="160"/>
       <menuitem id="html_form_menu" name="Create Forms" parent="html_form_parent_menu" action="html_form_action" sequence="10"/>
       <menuitem id="html_form_history_menu" name="Inserted Form Data" parent="html_form_parent_menu" action="html_form_history_action" sequence="180"/>
         
