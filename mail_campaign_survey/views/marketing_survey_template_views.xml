@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+      <record id="marketing_survey_template_view_form" model="ir.ui.view">
+          <field name="name">marketing.survey.template.form.view</field>
+          <field name="model">marketing.survey.template</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <sheet>    
+      	              <group>
+      	                  <field name="survey_id"/>
+          	          <field name="subject"/>
+          	          <field name="body" options="{'style-inline': true}"/>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+    </data>
+</openerp>

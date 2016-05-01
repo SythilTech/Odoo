@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_marketing_campaign_activity_form_inherit_survey" model="ir.ui.view">
+            <field name="name">survey.marketing.campaign.activity</field>
+            <field name="model">marketing.campaign.activity</field>
+            <field name="inherit_id" ref="marketing_campaign.view_marketing_campaign_activity_form"/>
+            <field name="arch" type="xml">
+      	        <field name="type" position="after">
+      	            <field name="survey_id" attrs="{'required':[('type','=','survey')], 'invisible':[('type','!=','survey')]}"/>
+      	        </field>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>
