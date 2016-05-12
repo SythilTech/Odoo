@@ -84,11 +84,30 @@ options.registry.html_form_builder_field = options.Class.extend({
 			    window_title: "New HTML Field",
 			    select: "Select ORM Field",
 			    init: function (field) {
+
+                    var $group = this.$dialog.find("div.form-group");
+                    $group.removeClass("mb0");
+
+                    var $add = $(
+                    '<div class="form-group mb0">'+
+                        '<label class="col-sm-3 control-label">Format Validation</label>'+
+                        '<div class="col-sm-9">'+
+                        '  <select name="formatValidation" class="form-control" required="required"> '+
+                        '    <option value="">None</option>'+
+                        '    <option value="email">Email</option>'+
+                        '    <option value="lettersonly">Letters Only</option>'+
+                        '  </select>'+
+                        '</div>'+
+                    '</div>');
+                    //$add.find('label').append(_t("Add page in menu"));
+                    $group.after($add);
+
 			        return field_ids;
 			    },
-			}).then(function (field_id) {
+			}).then(function (val, field_id, $dialog) {
+                var format_validation = $dialog.find('select[name="formatValidation"]').val();
 
-			    session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type') }).then(function(result) {
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': val, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation }).then(function(result) {
 				    self.$target.html(result.html_string);
              	});
 			});

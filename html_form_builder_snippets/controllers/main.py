@@ -36,10 +36,20 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    html_output += " style=\"font-weight: normal\""
 		    		
 	html_output += ">" + field.field_label + "</label>\n"	    
-	html_output += "  <input type=\"text\" class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
+	html_output += "  <input type=\""
+	
+	if field.validation_format == "email":
+	    html_output += "email"
+	else:
+	    html_output += "text"
+	
+	html_output += "\" class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.field_id.required == True:
 	    html_output += " required"
+	
+	if field.validation_format == "lettersonly":
+	    html_output +=  ' pattern="[a-zA-Z ]+" title="Letters Only"'
 	
 	html_output += "/>\n"
 	html_output += "</div>\n"
@@ -254,7 +264,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         
         field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
         
-        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description})
+        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'] })
         
         form_string = ""
 

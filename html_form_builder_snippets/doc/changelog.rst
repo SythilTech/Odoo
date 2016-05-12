@@ -1,3 +1,7 @@
+v1.6
+====
+* Added field format validation(email)
+
 v1.5.2
 ====
 * Fixed issue where recaptcha was loaded twice

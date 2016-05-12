@@ -143,6 +143,7 @@ class HtmlFormField(models.Model):
     field_type = fields.Many2one('html.form.field.type', string="Field Type")
     field_label = fields.Char(string="Field Label")
     html_name = fields.Char(string="HTML Name")
+    validation_format = fields.Char(string="Validation Format")
     setting_general_required = fields.Boolean(string="Required")
     setting_binary_file_type_filter = fields.Selection([('image','Image'), ('audio','Audio')], string="File Type Filter")
 
