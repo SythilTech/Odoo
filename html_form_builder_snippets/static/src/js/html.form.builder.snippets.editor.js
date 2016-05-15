@@ -6,6 +6,7 @@ var base = require('web_editor.base');
 var options = require('web_editor.snippets.options');
 var session = require('web.session');
 var website = require('website.website');
+var return_string = ""; //Global because I can't change html in session.rpc function
 
 options.registry.html_form_builder = options.Class.extend({
     drop_and_build_snippet: function() {
@@ -141,6 +142,7 @@ options.registry.html_form_builder_captcha = options.Class.extend({
 			}).then(function (captcha_id) {
 
 			    session.rpc('/form/captcha/load', {'captcha_id': captcha_id, 'form_id': form_id}).then(function(result) {
+					self.$target.attr('data-captcha-id', captcha_id );
 				    self.$target.html(result.html_string);
              	});
 
@@ -148,7 +150,27 @@ options.registry.html_form_builder_captcha = options.Class.extend({
 
         });
     },
+    clean_for_save: function () {
+        this._super();
+        var self = this;
 
+		//(Back Compatablity) The default is 1 because only recaptcha is implemented at this time
+		var captcha_id = 1;
+
+		$(".html_form_captcha").attr('data-captcha-id', captcha_id );
+
+        var form_id = $(".html_form_captcha").parents().closest(".html_form").attr('data-form-id');
+
+
+	    session.rpc('/form/captcha/load', {'captcha_id': captcha_id, 'form_id': form_id}).done(function(result) {
+		    return_string = result.html_string;
+            $(".html_form_captcha").html(return_string);
+        });
+
+        alert("Recaptcha Regenerated"); //Hate to do this but can't get it to call sync rather then async...
+        $(".html_form_captcha").html(return_string);
+
+    },
 });
 
 

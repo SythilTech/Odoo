@@ -1,3 +1,7 @@
+v1.6.1
+======
+* Fixed issue with recaptcha breaking after page changes (resets recaptcha after every save)
+
 v1.6
 ====
 * Added field format validation(email)
