@@ -10,6 +10,7 @@
       	          <sheet>    
       	              <group>
       	                  <field name="survey_id"/>
+      	                  <field name="email_from"/>
           	          <field name="subject"/>
           	          <field name="body" options="{'style-inline': true}"/>
           	      </group>
