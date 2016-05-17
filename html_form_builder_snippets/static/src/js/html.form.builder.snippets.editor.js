@@ -90,7 +90,7 @@ options.registry.html_form_builder_field = options.Class.extend({
                     $group.removeClass("mb0");
 
                     var $add = $(
-                    '<div class="form-group mb0">'+
+                    '<div class="form-group">'+
                         '<label class="col-sm-3 control-label">Format Validation</label>'+
                         '<div class="col-sm-9">'+
                         '  <select name="formatValidation" class="form-control" required="required"> '+
@@ -98,6 +98,12 @@ options.registry.html_form_builder_field = options.Class.extend({
                         '    <option value="email">Email</option>'+
                         '    <option value="lettersonly">Letters Only</option>'+
                         '  </select>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="form-group mb0">'+
+                        '<label class="col-sm-3 control-label">Character Limit</label>'+
+                        '<div class="col-sm-9">'+
+                        '  <input type="number" name="characterLimit" class="form-control" value="100"/>'+
                         '</div>'+
                     '</div>');
                     //$add.find('label').append(_t("Add page in menu"));
@@ -107,8 +113,9 @@ options.registry.html_form_builder_field = options.Class.extend({
 			    },
 			}).then(function (val, field_id, $dialog) {
                 var format_validation = $dialog.find('select[name="formatValidation"]').val();
+                var character_limit = $dialog.find('input[name="characterLimit"]').val();
 
-                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': val, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation }).then(function(result) {
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': val, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit }).then(function(result) {
 				    self.$target.html(result.html_string);
              	});
 			});
@@ -154,15 +161,12 @@ options.registry.html_form_builder_captcha = options.Class.extend({
         this._super();
         var self = this;
 
-		//(Back Compatablity) The default is 1 because only recaptcha is implemented at this time
-		var captcha_id = 1;
-
-		$(".html_form_captcha").attr('data-captcha-id', captcha_id );
+		var captcha_id = this.$target.attr('data-captcha-id');
 
         var form_id = $(".html_form_captcha").parents().closest(".html_form").attr('data-form-id');
 
-
 	    session.rpc('/form/captcha/load', {'captcha_id': captcha_id, 'form_id': form_id}).done(function(result) {
+		    self.$target.attr('data-captcha-id', captcha_id );
 		    return_string = result.html_string;
             $(".html_form_captcha").html(return_string);
         });

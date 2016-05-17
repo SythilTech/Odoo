@@ -1,3 +1,7 @@
+v1.6
+====
+* Add Character Limit
+
 v1.4
 ====
 * Add checkbox(Boolean) input

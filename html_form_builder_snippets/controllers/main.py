@@ -51,6 +51,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	if field.validation_format == "lettersonly":
 	    html_output +=  ' pattern="[a-zA-Z ]+" title="Letters Only"'
 	
+	html_output += ' maxlength="' + str(field.character_limit) + '"'
+	
 	html_output += "/>\n"
 	html_output += "</div>\n"
 	
@@ -177,15 +179,15 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_form = request.env['html.form'].browse(int(values['form_id']) )
         
         form_string = ""
-        form_string += "    <div class=\"container\">\n"
+        form_string += "    <div class=\"container mt16 mb16\">\n"
         form_string += "        <div class=\"row\">\n"
         form_string += "            <h2>" + html_form.name + "</h2>\n"
-        form_string += "            <form method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div id=\"html_fields\" class=\"oe_structure\">\n"
+        form_string += "            <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "                <div id=\"html_fields\" class=\"oe_structure\" style=\"margin-left:-15px;\">\n"
 
             
         for form_field in html_form.fields_ids:
-            form_string += "<section data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\" class=\"oe_snippet_body html_form_field\">\n"
+            form_string += "<section data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\" class=\"oe_snippet_body html_form_field col-md-12\">\n"
 
             method = '_generate_html_%s' % (form_field.field_type.html_type,)
 	    action = getattr(self, method, None)
@@ -199,8 +201,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    	    
 	    	    
         if html_form.captcha:
-            form_string += "<section class=\"html_form_captcha\">\n"
-            form_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
+            form_string += "<section class=\"html_form_captcha\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
+            form_string += "    <div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
             form_string += "</section>\n"
 	    	    
 	    	    
@@ -227,11 +229,11 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_form = request.env['html.form'].create({'name': 'My New Form', 'model_id': my_model.id })
         
         form_string = ""
-        form_string += "    <div class=\"container\">\n"
+        form_string += "    <div class=\"container mt16 mb16\">\n"
         form_string += "        <div class=\"row\">\n"
         form_string += "            <h2>" + html_form.name + "</h2>\n"
-        form_string += "            <form method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div id=\"html_fields\" class=\"oe_structure\">\n"	    	    
+        form_string += "            <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "                <div id=\"html_fields\" class=\"oe_structure\" style=\"margin-left:-15px;\">\n"	    	    
         form_string += "                </div>\n"
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
         form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"
@@ -264,7 +266,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         
         field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
         
-        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'] })
+        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'], 'character_limit': values['character_limit'] })
         
         form_string = ""
 

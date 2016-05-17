@@ -1,3 +1,10 @@
+v.1.6.2
+=======
+* 2nd Captcha fix
+* Fix form field margin issue 
+* Added role to forms
+* Added character limit validation
+
 v1.6.1
 ======
 * Fixed issue with recaptcha breaking after page changes (resets recaptcha after every save)

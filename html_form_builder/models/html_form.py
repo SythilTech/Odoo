@@ -146,6 +146,7 @@ class HtmlFormField(models.Model):
     validation_format = fields.Char(string="Validation Format")
     setting_general_required = fields.Boolean(string="Required")
     setting_binary_file_type_filter = fields.Selection([('image','Image'), ('audio','Audio')], string="File Type Filter")
+    character_limit = fields.Integer(string="Character Limit", default="100")
 
     @api.model
     def create(self, values):

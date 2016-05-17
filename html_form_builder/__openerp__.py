@@ -1,6 +1,6 @@
 {
     'name': "HTML Form Builder",
-    'version': "1.5",
+    'version': "1.6",
     'author': "Sythil",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
