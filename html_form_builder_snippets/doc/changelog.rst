@@ -1,3 +1,7 @@
+v.1.6.3
+=======
+* Remove display_name from field list since it creates major confusion
+
 v.1.6.2
 =======
 * 2nd Captcha fix

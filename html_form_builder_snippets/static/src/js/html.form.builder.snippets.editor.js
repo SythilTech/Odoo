@@ -78,7 +78,7 @@ options.registry.html_form_builder_field = options.Class.extend({
 
 
 
-	    model.call('name_search', ['', [["model_id.model", "=", form_model],["ttype", "=", field_type] ] ], { context: base.get_context() }).then(function (field_ids) {
+	    model.call('name_search', ['', [["model_id.model", "=", form_model],["ttype", "=", field_type],["name", "!=", "display_name"] ] ], { context: base.get_context() }).then(function (field_ids) {
 
 	        website.prompt({
 			    id: "editor_new_field",
