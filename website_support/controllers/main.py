@@ -18,7 +18,11 @@ class MyController(http.Controller):
     @http.route('/support/ticket/submit', type="http", auth="public", website=True)
     def support_submit_ticket(self, **kw):
         """Let's public and registered user submit a support ticket"""
-        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': http.request.env.user.name, 'email': http.request.env.user.email})
+        person_name = ""
+        if http.request.env.user.name != "Public user":
+            person_name = http.request.env.user.name
+            
+        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email})
 
     @http.route('/support/feedback/process/<help_page>', type="http", auth="public", website=True)
     def support_feedback(self, help_page, **kw):
@@ -65,10 +69,14 @@ class MyController(http.Controller):
 	for field_name, field_value in kwargs.items():
             values[field_name] = field_value
         
-        my_attachment = base64.encodestring(values['file'].read() )
+        my_attachment = ""
+        file_name = ""
+        if 'file' in values:
+            my_attachment = base64.encodestring(values['file'].read() )
+            file_name = values['file'].filename
         
-        if http.request.env.user.id:
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': values['file'].filename})
+        if http.request.env.user.name != "Public user":
+            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name})
             
             partner = http.request.env.user.partner_id
             
@@ -76,15 +84,16 @@ class MyController(http.Controller):
             partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
             
         else:
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject', 'attachment': my_attachment, 'attachment_filename': values['file'].filename]})
+            new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name})
 
         #send an email out to everyone in the category
-        notification_template = request.env['ir.model.data'].get_object('website_support', 'new_support_ticket_category')
+        notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
        	
         category = request.env['website.support.ticket.categories'].sudo().browse(int(values['category']))
         
         for my_user in category.cat_user_ids:
             notification_template.email_to = my_user.login
+            notification_template.email_from = request.website.company_id.email
             notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
             notification_template.send_mail(new_ticket_id.id, True)
             
