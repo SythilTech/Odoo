@@ -1,3 +1,7 @@
+v1.6.1
+======
+* Add sequence handle to fields so you can rearrange via backend
+
 v1.6
 ====
 * Add Character Limit
