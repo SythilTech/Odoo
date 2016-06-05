@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import requests
+from lxml import html, etree
+import logging
+_logger = logging.getLogger(__name__)
+
 from openerp import api, fields, models
 
 class WebsiteStyleManager(models.Model):
@@ -9,6 +14,21 @@ class WebsiteStyleManager(models.Model):
     css_text = fields.Text(string="CSS Text")
     custom_css = fields.Text(string="Custom CSS", help="Define website wide styles and classes")
     force_styles = fields.Boolean(string="Force Styles", help="Applies an !important to all styles forcing the style over higher specificity")
+
+    def bootsnipp_sync(self):
+        #Download the featured page
+        featured = "http://bootsnipp.com/snippets/featured"
+        
+        for i in range(1,1):
+            page = requests.get(featured + "?page=" + i)
+            root = html.fromstring(page.content)
+            
+            #Get all the snippet on the page
+            snippet_list = root.xpath("//p[@class='lead snipp-title']")
+            for snippet in snippet_list:
+                link = html.SubElement(snippet, "a")['href']
+                _logger.error(link)
+
     
     @api.onchange('tag_styles', 'force_styles')
     def _onchange_tag_styles(self):

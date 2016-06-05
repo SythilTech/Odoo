@@ -15,11 +15,17 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 
         values = {}
 	for field_name, field_value in kw.items():
-            values[field_name] = field_value    
+            values[field_name] = field_value
             
         html_form = request.env['html.form'].browse(int(values['form_id']) )
         
         html_form.captcha = int(values['captcha_id'])
+
+        if 'client_key' in values:
+            html_form.captcha_client_key = values['client_key']
+
+        if 'client_secret' in values:
+            html_form.captcha_secret_key = values['client_secret']
         
         html_string = ""
         html_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>"

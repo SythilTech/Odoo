@@ -144,12 +144,34 @@ options.registry.html_form_builder_captcha = options.Class.extend({
 			    window_title: "New Captcha",
 			    select: "Select Captcha Type",
 			    init: function (field) {
+
+                    var $group = this.$dialog.find("div.form-group");
+                    $group.removeClass("mb0");
+
+                    var $add = $(
+                    '<div class="form-group">'+
+                        '<label class="col-sm-3 control-label">Client Key</label>'+
+                        '<div class="col-sm-9">'+
+                        '  <input type="text" name="clientKey" class="form-control"/>'+
+                        '</div>'+
+                    '</div>'+
+                    '<div class="form-group mb0">'+
+                        '<label class="col-sm-3 control-label">Client Secret</label>'+
+                        '<div class="col-sm-9">'+
+                        '  <input type="text" name="clientSecret" class="form-control"/>'+
+                        '</div>'+
+                    '</div>');
+                    $group.after($add);
+
 			        return captcha_ids;
 			    },
-			}).then(function (captcha_id) {
+			}).then(function (val, captcha_ids, $dialog) {
 
-			    session.rpc('/form/captcha/load', {'captcha_id': captcha_id, 'form_id': form_id}).then(function(result) {
-					self.$target.attr('data-captcha-id', captcha_id );
+                var client_key = $dialog.find('input[name="clientKey"]').val();
+                var client_secret = $dialog.find('input[name="clientSecret"]').val();
+
+			    session.rpc('/form/captcha/load', {'captcha_id': val, 'form_id': form_id, 'client_key': client_key, 'client_secret':client_secret}).then(function(result) {
+					self.$target.attr('data-captcha-id', val );
 				    self.$target.html(result.html_string);
              	});
 

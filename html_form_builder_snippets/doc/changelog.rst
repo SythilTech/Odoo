@@ -1,3 +1,9 @@
+v.1.6.4
+=======
+* Let people configure captcha from front end
+* Few CSS fixes so Captcha is aligned correctly
+* Change it so field width only applies to form fields
+
 v.1.6.3
 =======
 * Remove display_name from field list since it creates major confusion

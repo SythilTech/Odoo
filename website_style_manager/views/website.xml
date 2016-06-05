@@ -18,6 +18,7 @@
       	            </field>
       	            <field name="custom_css"/>
       	            <field name="css_text" invisible="1"/>
+      	            <button type="object" name="bootsnipp_sync" string="Test Bootsnipp"/>
       	        </field>
             </field>
         </record>

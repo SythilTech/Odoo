@@ -33,7 +33,7 @@
 		    data-drop-in=".form_fields, [data-oe-type=html]">
                 </div>
                     <div data-js='field-style'
-		        data-selector="section:not(.carousel):not(.parallax):not(.o_gallery)">
+		        data-selector=".html_form_field">
 		        <li class="dropdown-submenu">
 		            <a tabindex="-1" href="#">Field Width</a>
 		            <ul class="dropdown-menu">
@@ -95,7 +95,7 @@
                     <div id="html_fields" class="form_fields">
 		                                 
 		    </div>
-                    <input type="submit" class="btn btn-primary btn-lg" value="Send"/>
+                    <button type="submit" class="btn btn-primary btn-lg">Send</button>
                 </div>
             </section>
         </template>
@@ -160,8 +160,8 @@
         </template>
         
         <template id="s_captcha" name="Captcha">
-            <section class="html_form_captcha">
-                Captcha
+            <section class="html_form_captcha col-md-12 form-group">
+                Placeholder Captcha String
             </section>
         </template>
 
