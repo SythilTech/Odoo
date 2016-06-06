@@ -22,6 +22,17 @@ from openerp.http import request
 
 class AppsController(http.Controller):
 
+    @http.route('/client/apps', type="http", auth="public", website=True)
+    def client_browse_apps(self, **kwargs):
+        """Browse all the modules inside Odoo client"""
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+                
+        modules = request.env['module.overview'].search([])
+        return http.request.render('app_store.client_app_list', {'modules':modules})
+
     @http.route('/apps', type="http", auth="public", website=True)
     def browse_apps(self, **kwargs):
         """Browse all the modules"""

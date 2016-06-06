@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="app_store_client.app_store_iframe">
+        <iframe>
+            Test
+        </iframe>
+    </t>
+</templates>

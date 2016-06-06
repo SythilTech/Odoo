@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="app_store_client_backend_assets" name="App Store Client Assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/app_store_client/static/src/js/app_store.js"></script>
+            </xpath>
+        </template>
+        
+        <record id="app_store_client_action" model="ir.actions.client">
+            <field name="name">CustomApps</field>
+            <field name="type">ir.actions.client</field>
+            <field name="tag">custom_apps</field>
+        </record>
+     
+        <menuitem id="app_store_client_menu" name="Custom App Store" parent="base.menu_management" sequence="90" action="app_store_client_action"/>
+
+    </data>
+</openerp>

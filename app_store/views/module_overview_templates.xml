@@ -2,6 +2,26 @@
 <openerp>
     <data>
 
+        <template id="client_app_list" name="Module List" page="True">
+             <!-- Latest compiled and minified CSS -->
+	    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+	    
+	    <!-- jQuery library -->
+	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+	    
+	    <!-- Latest compiled JavaScript -->
+            <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+            
+            <t t-foreach="modules" t-as="module">
+                <div class="col-md-4 mt32 mb32">
+                    <a t-attf-href="/apps/modules/#{module.name}">
+                        <img t-att-src="website.image_url(module, 'icon')" class="img-rounded mb8" t-attf-alt="#{module.module_name}" width="200" height="200"/><br/>
+	                <t t-esc="module.module_name"/>
+                    </a>
+                </div>
+            </t>
+        </template>
+
         <template id="app_list" name="Module List" page="True">
             <t t-call="website.layout">
                 <div class="container">

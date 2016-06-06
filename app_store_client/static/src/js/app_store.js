@@ -1,0 +1,40 @@
+odoo.define('app_store_client.custom_apps', function (require) {
+"use strict";
+
+var core = require('web.core');
+var framework = require('web.framework');
+var Model = require('web.DataModel');
+var session = require('web.session');
+var web_client = require('web.web_client');
+var Widget = require('web.Widget');
+var ajax = require('web.ajax');
+
+var _t = core._t;
+var qweb = core.qweb;
+
+var CustomApps = Widget.extend({
+    template: 'app_store_client.app_store_iframe',
+    remote_action_tag: 'loempia.embed',
+    failback_action_id: 'base.open_module_tree',
+
+    init: function(parent, action) {
+        this._super(parent, action);
+    },
+    start: function() {
+        var my_iframe = this.$el;
+        my_iframe.css({height: '100%', width: '100%', border: 0});
+
+        //Get the app store url from parameters
+        var P = new Model('ir.config_parameter');
+		P.call('get_param', ['custom_app_store_url']).then(function(app_url) {
+		    my_iframe.attr({src: app_url});
+	    });
+
+        return this._super();
+    },
+
+});
+
+core.action_registry.add("custom_apps", CustomApps);
+
+});
