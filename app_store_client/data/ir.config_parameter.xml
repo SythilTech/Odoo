@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data noupdate="1">
+    <data>
         <record id="custom_app_store_url" model="ir.config_parameter">
             <field name="key">custom_app_store_url</field>
-            <field name="value">http://192.168.56.109:8069/client/apps</field>
+            <field name="value">http://192.168.56.109:8069</field>
         </record>
     </data>
 </openerp>

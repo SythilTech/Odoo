@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store Client",
-    'version': "0.4",
+    'version': "0.5",
     'author': "Sythil",
     'website':'http://sythiltech.com.au',
     'category': "Tools",

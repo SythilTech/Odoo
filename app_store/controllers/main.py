@@ -53,7 +53,7 @@ class AppsController(http.Controller):
             ('Content-Disposition', "attachment; filename=" + filename ),
         ]
             
-        module = request.env['module.overview'].search([('name', '=', module_name)])
+        module = request.env['module.overview'].sudo().search([('name', '=', module_name)])
         module.module_download_count += 1
         
         home_directory = os.path.expanduser('~')
@@ -97,3 +97,27 @@ class AppsController(http.Controller):
 	request.env['module.overview.store.view'].create({'mo_id': module.id, 'ref':ref, 'ip': request.httprequest.remote_addr,'header':header_string})
 
         return http.request.render('app_store.app_page', {'overview':module})
+        
+    @http.route('/client/apps/modules/<module_name>', type="http", auth="public", website=True)
+    def app_page(self, module_name, **kwargs):
+        """View all the details about a module"""
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+                
+        module = request.env['module.overview'].search([('name','=',module_name)])
+        
+        module.module_view_count += 1
+        
+        header_string = ""
+        for keys,values in request.httprequest.headers.items():
+	    header_string += keys + ": " + values + "\n"
+        
+        ref = ""
+	if "Referer" in request.httprequest.headers:
+	    ref = request.httprequest.headers['Referer']
+	        
+	request.env['module.overview.store.view'].create({'mo_id': module.id, 'ref':ref, 'ip': request.httprequest.remote_addr,'header':header_string})
+
+        return http.request.render('app_store.client_app_page', {'overview':module})

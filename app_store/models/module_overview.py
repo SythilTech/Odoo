@@ -149,9 +149,9 @@ class ModuleOverviewWizard(models.Model):
         #Create a zip of the module (TODO include dependacies)
         zf = zipfile.ZipFile(app_directory + "/" + module_name + ".zip", "w")
 	for dirname, subdirs, files in os.walk(app_directory + "/" + module_name):
-	    zf.write(dirname)
 	    for filename in files:
-	        zf.write(os.path.join(dirname, filename))
+	        full_file_path = os.path.join(dirname, filename)
+	        zf.write(full_file_path, arcname=os.path.relpath(full_file_path, app_directory + "/" + module_name))
         zf.close()
 
     def _read_csv(self, file_name, file_content, m_id):
