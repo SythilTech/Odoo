@@ -205,9 +205,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    form_string += "</section>\n"
 	    	    
 	    	    
-	    	    
         if html_form.captcha:
-            form_string += "<section class=\"html_form_captcha\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
+            form_string += "<section class=\"html_form_captcha col-md-12 form-group\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
             form_string += "    <div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
             form_string += "</section>\n"
 	    	    
