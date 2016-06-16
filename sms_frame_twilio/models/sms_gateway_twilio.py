@@ -86,9 +86,9 @@ class SmsGatewayTwilio(models.Model):
             #get all pages
             messages_tag = root.xpath('//Messages')
             
-            
-            num_pages = messages_tag[0].attrib['numpages']
-            for sms_page in xrange(0, int(num_pages)):
+            #Loop through all pages until you have reached the end
+            while True:
+                
                 my_messages = messages_tag[0].xpath('//Message')
                 for sms_message in my_messages:
                     
@@ -97,11 +97,17 @@ class SmsGatewayTwilio(models.Model):
                         self._add_message(sms_message, account_id)
                         
                 #get the next page if there is one
-                if sms_page < (int(num_pages) - 1):
+		next_page_uri = messages_tag[0].attrib['nextpageuri']
+                if next_page_uri != "":
                     response_string = requests.get("https://api.twilio.com" + messages_tag[0].attrib['nextpageuri'], data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
 		    root = etree.fromstring(response_string.text.encode('utf-8'))
 		    messages_tag = root.xpath('//Messages')
-		
+				
+		#End the loop if there are no more pages
+		if next_page_uri == "":
+		    break
+
+
 	
         sms_account.twilio_last_check_date = datetime.utcnow()
             
@@ -187,6 +193,8 @@ class SmsAccountTwilio(models.Model):
 	        payload = {'SmsUrl': str(request.httprequest.host_url + "sms/twilio/receive")}
 	        requests.post("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/IncomingPhoneNumbers/" + sid, data=payload, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
                 
+                #Check for new messages
+                self.env['sms.gateway.twilio'].check_messages(self.id)
         else:
             UserError("Bad Credentials")
 

@@ -4,7 +4,7 @@ from openerp.http import request
 
 class TwilioController(http.Controller):
 
-    @http.route('/sms/twilio/receipt', type="http", auth="public")
+    @http.route('/sms/twilio/receipt', type="http", auth="public", csrf=False)
     def sms_twilio_receipt(self, **kwargs):
         """Update the state of a sms message, don't trust the posted data"""
         
@@ -16,7 +16,7 @@ class TwilioController(http.Controller):
         
         return "<Response></Response>"
         
-    @http.route('/sms/twilio/receive', type="http", auth="public")
+    @http.route('/sms/twilio/receive', type="http", auth="public", csrf=False)
     def sms_twilio_receive(self, **kwargs):
         """Fetch the new message directly from Twilio, don't trust posted data"""
         
