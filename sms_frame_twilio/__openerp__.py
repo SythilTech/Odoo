@@ -14,7 +14,9 @@
     'demo': [],
     'depends': ['sms_frame'],
     'images':[
-    'static/description/1.jpg',
+        'static/description/3.jpg',
+        'static/description/1.jpg',
+        'static/description/2.jpg',
     ],
     'installable': True,
 }
