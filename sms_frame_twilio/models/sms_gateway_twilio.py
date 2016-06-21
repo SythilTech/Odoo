@@ -128,17 +128,20 @@ class SmsGatewayTwilio(models.Model):
         my_message = self.env['sms.message'].search([('sms_gateway_message_id','=', sms_message.find('Sid').text)])
         if len(my_message) == 0 and sms_message.find('Direction').text == "inbound":
 	    
-	    target = self.env['sms.message'].find_owner_model(my_message)
-	    
-	    model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
+	    target = self.env['sms.message'].find_owner_model(sms_message)
 	    
 	    twilio_gateway_id = self.env['sms.gateway'].search([('gateway_model_name', '=', 'sms.gateway.twilio')])
-	    	    
-	    self.env[target['target_model']].search([('id','=', target['record_id'].id)]).message_post(body=sms_message.find('Body').text, subject="SMS Received")
-	    	    
-	    #Create the sms record in history
-	    history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
-                    
+	    
+            if target['target_model'] =="res.partner":
+	        model_id = self.env['ir.model'].search([('model','=', target['target_model'])])	    	    
+	        self.env[target['target_model']].search([('id','=', target['record_id'].id)]).message_post(body=sms_message.find('Body').text, subject="SMS Received")
+	    
+	        #Create the sms record in history
+	        history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
+            else:
+	        #Create the sms record in history without the model or record_id 
+	        history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})
+            
     def delivary_receipt(self, account_sid, message_id):
         """Updates the sms message when it is successfully received by the mobile phone"""
         my_account = self.env['sms.account'].search([('twilio_account_sid','=', account_sid)])[0]
