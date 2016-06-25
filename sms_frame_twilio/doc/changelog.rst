@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Received smses now appear as a notification
+
 v1.0.2
 ======
 * Fix major bug which mapped received messages to the wrong partner

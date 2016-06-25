@@ -2,6 +2,8 @@
 import requests
 from datetime import datetime
 from lxml import etree
+import logging
+_logger = logging.getLogger(__name__)
 
 from openerp.http import request
 from openerp import api, fields, models
@@ -131,17 +133,26 @@ class SmsGatewayTwilio(models.Model):
 	    target = self.env['sms.message'].find_owner_model(sms_message)
 	    
 	    twilio_gateway_id = self.env['sms.gateway'].search([('gateway_model_name', '=', 'sms.gateway.twilio')])
-	    
-            if target['target_model'] =="res.partner":
-	        model_id = self.env['ir.model'].search([('model','=', target['target_model'])])	    	    
-	        self.env[target['target_model']].search([('id','=', target['record_id'].id)]).message_post(body=sms_message.find('Body').text, subject="SMS Received")
-	    
-	        #Create the sms record in history
-	        history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
+
+            discussion_subtype = self.env['ir.model.data'].get_object('mail', 'mt_comment')
+            my_message = ""
+
+            if target['target_model'] == "res.partner":
+                model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
+
+                my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id)
+
+                #Notify followers of this partner who are listenings to the 'discussions' subtype
+                for notify_partner in self.env['mail.followers'].search([('res_model','=','res.partner'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
+                    my_message.needaction_partner_ids = [(4,notify_partner.partner_id.id)]
+
+                #Create the sms record in history
+                history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
             else:
-	        #Create the sms record in history without the model or record_id 
-	        history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})
-            
+                #Create the sms record in history without the model or record_id 
+                history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})
+
     def delivary_receipt(self, account_sid, message_id):
         """Updates the sms message when it is successfully received by the mobile phone"""
         my_account = self.env['sms.account'].search([('twilio_account_sid','=', account_sid)])[0]

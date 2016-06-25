@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework - Twilio Gateway",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil",
     'category': "Tools",
     'summary': "Adds Twilio sms gatway to the sms framework",
@@ -12,7 +12,7 @@
         'security/ir.model.access.csv',
     ],
     'demo': [],
-    'depends': ['sms_frame'],
+    'depends': ['sms_frame','mail'],
     'images':[
         'static/description/3.jpg',
         'static/description/1.jpg',
