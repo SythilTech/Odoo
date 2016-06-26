@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="mass_image_upload_assets" inherit_id="web.assets_common" name="Mass Image Upload Editor">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/mass_image_upload/static/src/js/mass_image_upload.js"></script>
+            </xpath>
+        </template>
+
+        <template id="mass_upload_page" name="Mass Image Upload Page">
+            <t t-call="web.assets_common"/>
+            <t t-call="web.assets_backend"/>
+            <div style="padding:50px;">
+                <form action="demo_form.asp">
+                    Enter the name of the field which matches the filename e.g. field 'pin' with value 138 matches up with 138.jpg<br/>
+                    <b>Mapping Field</b> <input type="textbox" id="mapField" /><br/>
+                    <input id="mass_image_upload_input" name="mass_image_upload_input[]" type="file" multiple="multiple" accept="image/*" /><br/>
+                </form>
+                <br/>
+                <br/>
+                <div id="logdiv" style="float:left;width:50%;">
+                    <b>Log</b><br/>
+                    <textarea id="massimageuploadsuccess" style="width:90%;height:500px;"/>
+                </div>
+                <div id="errordiv" style="float:right;width:50%">
+                    <b>Errors</b><br/>
+                    <textarea id="massimageuploaderror" style="width:100%;height:500px;"/>
+                </div>
+            </div>
+        </template>
+
+    </data>
+</openerp>
