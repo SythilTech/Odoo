@@ -1,0 +1,2 @@
+id,name,model,function,interval_number,interval_type,numbercall,active
+"appstore_check","App Store Repository Sync",appstore.account.repository,check_all_repositories,12,hours,-1,true

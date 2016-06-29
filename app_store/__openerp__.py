@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store",
-    'version': "0.5",
+    'version': "0.5.1",
     'author': "Sythil",
     'website':'http://sythiltech.com.au',
     'category': "Tools",
@@ -9,7 +9,9 @@
     'data': [
         'views/module_overview_templates.xml',
         'views/module_overview_views.xml',
+        'views/appstore_account_views.xml',
         'data/website.menu.csv',
+        'data/ir.cron.csv',
         'security/ir.model.access.csv',
     ],
     'demo': [],
