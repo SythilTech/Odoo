@@ -89,6 +89,28 @@ class HtmlForm(models.Model):
 	html_output += "/><br/>\n"
 	
 	return html_output
+
+    def _generate_html_dropbox(self, fe):
+        html_output = ""
+        
+        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
+		    		
+	html_output += "  <select id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+		                                    
+	if fe.field_id.required == True:
+	    html_output += " required"
+	
+	html_output += ">\n"
+
+    	selection_list = dict(self.env[fe.field_id.model_id.model]._columns[fe.field_id.name].selection)
+    	        
+    	for selection_value,selection_label in selection_list.items():
+    	    html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
+    	        
+
+	html_output += "  </select>\n"
+	
+	return html_output
 	
     def _generate_html_textarea(self, fe):
         html_output = ""
