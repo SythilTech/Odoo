@@ -1,3 +1,7 @@
+v1.6.3
+======
+* Add checkbox and radiobutton to backend form creation
+
 v1.6.2
 ======
 * Add dropbox to backend form creation
