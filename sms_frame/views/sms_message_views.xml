@@ -13,7 +13,7 @@
       	              <field name="account_id"/>
       	              <field name="model_id"/>
       	              <field name="record_id"/>
-      	              <field name="create_uid"/>
+      	              <field name="by_partner_id"/>
       	              <field name="direction"/>
       	              <field name="record_name"/>
       	              <field name="from_mobile"/>
@@ -31,7 +31,7 @@
           <field name="model">sms.message</field>
           <field name="arch" type="xml">
       	      <tree edit="false" create="false">
-      	          <field name="create_uid" string="By"/>
+      	          <field name="by_partner_id"/>
       	          <field name="account_id"/>
       	          <field name="record_name"/>
       	          <field name="direction"/>
@@ -55,7 +55,7 @@
                     <field name="record_id"/>
                     <templates>
                         <t t-name="kanban-box">
-                            <div class="oe_kanban_vignette oe_semantic_html_override esms_history_kanban">
+                            <div class="oe_kanban_vignette oe_semantic_html_override esms_history_kanban" style="min-width:100%;">
                                 <a type="open">
 
                                   <div t-if="record.direction.raw_value == 'I'" style="text-align:right;">
@@ -63,10 +63,10 @@
                                           <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
                                       </span>
 
-                                      <span class="oe_partner_heading"><field name="record_name"/></span><br/>
+                                      <span class="oe_partner_heading">To: <field name="to_mobile"/></span><br/>
 				      <field name="sms_content"/>
 				      <br/><br/>
-				      <field name="create_uid"/> <field name="message_date"/>
+				      By <field name="by_partner_id"/> <field name="message_date"/>
                                   </div>
 
                                   <div t-if="record.direction.raw_value == 'O'" style="text-align:left;">
@@ -74,10 +74,10 @@
                                           <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
                                       </span>
 
-                                      <span class="oe_partner_heading"><field name="record_name"/></span><br/>
+                                      <span class="oe_partner_heading">To: <field name="record_name"/></span><br/>
 				      <field name="sms_content"/>
 				      <br/><br/>
-				      <field name="create_uid"/> <field name="message_date"/>
+				      By <field name="by_partner_id"/> <field name="message_date"/>
                                   </div>
            
                                 </a>

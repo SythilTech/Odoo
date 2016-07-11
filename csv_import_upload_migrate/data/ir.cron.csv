@@ -1,0 +1,2 @@
+id,name,model,function,interval_number,interval_type,numbercall,active
+"process_background_action","Process Background Action",ir.action.background,process_background_actions,300,days,-1,false

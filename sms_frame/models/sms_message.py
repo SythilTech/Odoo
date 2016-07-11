@@ -9,6 +9,7 @@ class SmsMessage(models.Model):
     record_id = fields.Integer(readonly=True, string="Record")
     account_id = fields.Many2one('sms.account', readonly=True, string="SMS Account")
     model_id = fields.Many2one('ir.model', readonly=True, string="Model")
+    by_partner_id = fields.Many2one('res.partner', string="By")
     from_mobile = fields.Char(string="From Mobile", readonly=True)
     to_mobile = fields.Char(string="To Mobile", readonly=True)
     sms_content = fields.Text(string="SMS Message", readonly=True)

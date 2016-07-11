@@ -16,6 +16,9 @@
                     Enter the name of the field which matches the filename e.g. field 'pin' with value 138 matches up with 138.jpg<br/>
                     <b>Mapping Field</b> <input type="textbox" id="mapField" /><br/>
                     <input id="mass_image_upload_input" name="mass_image_upload_input[]" type="file" multiple="multiple" accept="image/*" /><br/>
+                    <br/>
+                    <input type="button" id="mass_image_upload_button" value="Upload"/><br/>
+                    <b>Currently Complete: </b><span id="complete_count"></span>
                 </form>
                 <br/>
                 <br/>

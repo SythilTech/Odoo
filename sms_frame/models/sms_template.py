@@ -59,7 +59,7 @@ class SmsTemplate(models.Model):
     template_body = fields.Text('Body', translate=True, help="Plain text version of the message (placeholders may be used here)")
     sms_from = fields.Char(string='From (Mobile)', help="Sender mobile number (placeholders may be used here). If not set, the default value will be the author's mobile number.")
     sms_to = fields.Char(string='To (Mobile)', help="To mobile number (placeholders may be used here)")
-    account_gateway_id = fields.Many2one('esms.accounts', string="Account")    
+    account_gateway_id = fields.Many2one('sms.accounts', string="Account")    
     model_object_field_id = fields.Many2one('ir.model.fields', string="Field", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
     sub_object_id = fields.Many2one('ir.model', string='Sub-model', readonly=True, help="When a relationship field is selected as first field, this field shows the document model the relationship goes to.")
     sub_model_object_field_id = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")

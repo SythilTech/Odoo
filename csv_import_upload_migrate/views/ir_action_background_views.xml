@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id="ir_action_background_view_form" model="ir.ui.view">
+          <field name="name">ir.action.background.view.form</field>
+          <field name="model">ir.action.background</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="action_file"/>
+      	              <field name="track_progress"/>
+      	              <field name="auto_commit"/>
+      	              <field name="progress_current"/>
+      	              <field name="progress_max"/>
+      	              <field name="start_time"/>
+      	              <field name="finish_time"/>
+      	              <field name="time_taken"/>
+      	          </group>
+      	          <notebook>
+      	              <page string="Log">
+      	                  <field name="log"/>
+      	              </page>
+      	              <page string="Rules">
+      	                  <group string="Char Validation">
+      	                      <field name="rule_char_size"/>
+      	                  </group>
+      	              </page>
+      	          </notebook>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="ir_action_background_view_tree" model="ir.ui.view">
+          <field name="name">ir.action.background.view.tree</field>
+          <field name="model">ir.action.background</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	          <field name="progress_current"/>
+      	          <field name="progress_max"/>
+      	      </tree>
+      	  </field>
+      </record>
+      
+      <record id="ir_action_background_action" model="ir.actions.act_window">
+          <field name="name">Background Actions</field>
+          <field name="res_model">ir.action.background</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p>
+                    List of Background Actions.
+                </p>
+      	  </field>
+      </record>
+
+      <menuitem id="ir_action_background_menu" name="Background Actions" parent="base.menu_automation" action="ir_action_background_action" sequence="10"/>
+   
+   </data>
+</openerp>
