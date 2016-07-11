@@ -7,7 +7,12 @@
           <field name="model">ir.action.background</field>
           <field name="arch" type="xml">
       	      <form>
+      	          <header>
+      	              <button type="object" name="reset_state" string="Reset State"/>
+      	              <button type="object" name="run_now" string="Run Now"/>
+      	          </header>
       	          <group>
+      	              <field name="state"/>
       	              <field name="name"/>
       	              <field name="action_file"/>
       	              <field name="track_progress"/>
