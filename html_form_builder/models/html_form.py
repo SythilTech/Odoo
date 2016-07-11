@@ -2,6 +2,7 @@
 from openerp.http import request
 import logging
 _logger = logging.getLogger(__name__)
+import cgi
 
 from openerp import api, fields, models
 
@@ -120,6 +121,27 @@ class HtmlForm(models.Model):
             html_output += "/> " + selection_label.encode("utf-8") + "<br/>\n"
 	
 	return html_output	
+
+    def _generate_html_dropbox_m2o(self, fe):
+        html_output = ""
+        
+        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
+
+	html_output += "  <select id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+		                                    
+	if fe.field_id.required == True:
+	    html_output += " required"
+	
+	html_output += ">\n"
+	
+        selection_list = request.env[fe.field_id.relation].search([])
+    	        
+    	for row in selection_list:
+    	    html_output += "    <option value=\"" + str(row.id) + "\">" + cgi.escape(row.name) + "</option>\n"
+
+	html_output += "  </select><br/>\n"
+	
+	return html_output
 	
     def _generate_html_dropbox(self, fe):
         html_output = ""
