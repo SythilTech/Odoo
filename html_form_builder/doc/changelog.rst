@@ -1,3 +1,9 @@
+v1.6.5
+======
+* Change required to required="required"
+* remove required from radio group
+* remove display_name because it creates confusion since it has the same label as name
+
 v1.6.4
 ======
 * Add dropbox(m2o) to backend form creation

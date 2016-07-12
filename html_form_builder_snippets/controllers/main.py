@@ -52,7 +52,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "\" class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.field_id.required == True:
-	    html_output += " required"
+	    html_output += " required=\"required\""
 	
 	if field.validation_format == "lettersonly":
 	    html_output +=  ' pattern="[a-zA-Z ]+" title="Letters Only"'
@@ -77,7 +77,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  <textarea class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.field_id.required == True:
-	    html_output += " required"
+	    html_output += " required=\"required\""
 	
 	html_output += "/>\n"
 	html_output += "</div>\n"
@@ -129,7 +129,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
                 		    
 	    if field.field_id.required == True:
-	        html_output += " required"
+	        html_output += " required=\"required\""
 	        
     	    html_output += ">\n"
     	    html_output += "    <option value=\"\">Select Option</option>\n"
@@ -159,7 +159,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
                 		    
 	if field.field_id.required == True:
-	    html_output += " required"
+	    html_output += " required=\"required\""
 	        
     	html_output += ">\n"
     	html_output += "    <option value=\"\">Select Option</option>\n"

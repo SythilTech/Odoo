@@ -1,3 +1,7 @@
+v.1.6.5
+=======
+* Change required to required="required" so Odoo is happy
+
 v.1.6.4
 =======
 * Let people configure captcha from front end
