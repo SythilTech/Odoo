@@ -63,6 +63,7 @@
                             <li class="active"><a data-toggle="tab" href="#description">Description</a></li>
                             <li><a data-toggle="tab" href="#technicial">Technicial</a></li>
                             <li><a data-toggle="tab" href="#screenshots">Screenshots</a></li>
+                            <li><a data-toggle="tab" href="#changelog">Changelog</a></li>
                         </ul>
 
                         <t t-if="overview">
@@ -75,6 +76,9 @@
                                         <img t-att-src="website.image_url(screenshot, 'file_data')" class="img-responsive mt16" style="border: black 1px solid;"/><br/>
                                         <hr/>
                                     </t>
+                                </div>
+                                <div id="changelog" class="tab-pane fade">
+                                    <t t-raw="overview.change_log_html"/>
                                 </div>
                                 <div id="technicial" class="tab-pane fade">
 

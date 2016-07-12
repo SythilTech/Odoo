@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store",
-    'version': "0.5.1",
+    'version': "0.5.2",
     'author': "Sythil",
     'website':'http://sythiltech.com.au',
     'category': "Tools",

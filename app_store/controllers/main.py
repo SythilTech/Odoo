@@ -99,7 +99,7 @@ class AppsController(http.Controller):
         return http.request.render('app_store.app_page', {'overview':module})
         
     @http.route('/client/apps/modules/<module_name>', type="http", auth="public", website=True)
-    def app_page(self, module_name, **kwargs):
+    def app_page_client(self, module_name, **kwargs):
         """View all the details about a module"""
 
         values = {}

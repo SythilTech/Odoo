@@ -15,6 +15,8 @@
                      <field name="module_name"/>
                      <field name="module_view_count"/>
                      <field name="module_download_count"/>
+                     <field name="change_log_raw"/>
+                     <field name="change_log_html"/>
                      <field name="models_ids">
                          <tree>
                              <field name="name"/>

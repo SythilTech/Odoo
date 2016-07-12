@@ -49,3 +49,13 @@ class AppstoreAccountRepository(models.Model):
             thefile.extractall(rep_directory)
                         
             thefile.close()
+            
+            rep_name = account_repository.url.split("/")[4].replace("#","-")
+            
+            full_rep_path = rep_directory + "/" + rep_name
+            _logger.error(full_rep_path)
+        
+            #Go through all module folders under the repository directory and analyse the module
+            for dir in os.listdir(full_rep_path):
+                if os.path.isdir(os.path.join(full_rep_path, dir)):
+                    self.env['module.overview.wizard'].create({'name':'temp wizard'}).analyse_module(dir, full_rep_path)

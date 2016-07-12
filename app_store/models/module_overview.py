@@ -11,6 +11,8 @@ import StringIO
 import ast
 import base64
 _logger = logging.getLogger(__name__)
+import os.path
+from docutils.core import publish_string
 
 from openerp import api, fields, models
 
@@ -35,6 +37,8 @@ class ModuleOverview(models.Model):
     version = fields.Char(string="Version Number")
     icon = fields.Binary(string="Icon")
     store_description = fields.Html(string="Store Description")
+    change_log_raw = fields.Text(string="Change Log")
+    change_log_html = fields.Html(string="Change Log(html)")
 
     @api.one
     @api.depends('menu_ids')
@@ -93,16 +97,18 @@ class ModuleOverviewWizard(models.Model):
         #Go through all module folders under '~/apps' and analyse the module
         for dir in os.listdir(app_directory):
             if os.path.isdir(os.path.join(app_directory, dir)):
-                self.analyse_module(dir)
+                self.analyse_module(dir, app_directory)
             
-    def analyse_module(self, module_name):
-        home_directory = os.path.expanduser('~')
-        app_directory = home_directory + "/apps"
+    def analyse_module(self, module_name, app_directory):
         
-        #Read __openerp__.py file    
-        with open(app_directory + "/" + module_name + "/__openerp__.py", 'r') as myfile:
-            data = myfile.read().replace('\n', '')
-            op_settings = ast.literal_eval(data)
+        #Read __openerp__.py file   
+        if os.path.exists(app_directory + "/" + module_name + "/__openerp__.py"):
+            with open(app_directory + "/" + module_name + "/__openerp__.py", 'r') as myfile:
+                data = myfile.read().replace('\n', '')
+                op_settings = ast.literal_eval(data)
+        else:
+            #If they module does not have a __openerp.py file do not even bother
+            return 0
         
         #Convert icon file to base64
         icon_base64 = ""
@@ -124,6 +130,14 @@ class ModuleOverviewWizard(models.Model):
         module_overview.module_name = op_settings['name']
         module_overview.icon = icon_base64
         module_overview.version = op_settings['version']
+        
+
+        #Read /doc/changelog.rst file
+        if os.path.exists(app_directory + "/" + module_name + "/doc/changelog.rst"):
+            with open(app_directory + "/" + module_name + "/doc/changelog.rst", 'r') as changelogfile:
+                changelogdata = changelogfile.read()
+                module_overview.change_log_raw = changelogdata
+                module_overview.change_log_html = publish_string(changelogdata, writer_name='html').split("\n",2)[2]
 
         #Read /static/description/index.html file
         with open(app_directory + "/" + module_name + "/static/description/index.html", 'r') as descriptionfile:
@@ -134,10 +148,12 @@ class ModuleOverviewWizard(models.Model):
             self.env['module.overview.depend'].create({'mo_id': module_overview.id, 'name': depend})
         
         for img in op_settings['images']:
-            with open(app_directory + "/" + module_name + "/" + img, "rb") as screenshot_file:
-                screenshot_base64 = base64.b64encode(screenshot_file.read())
+            image_path = app_directory + "/" + module_name + "/" + img
+            if os.path.exists(image_path):
+                with open(image_path, "rb") as screenshot_file:
+                    screenshot_base64 = base64.b64encode(screenshot_file.read())
             
-            self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
+                self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
         
         for root, dirnames, filenames in os.walk(app_directory + '/' + module_name):
             for filename in fnmatch.filter(filenames, '*.xml'):            
