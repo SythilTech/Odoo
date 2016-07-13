@@ -1,3 +1,7 @@
+v.1.6.6
+=======
+* Add date picker field
+
 v.1.6.5
 =======
 * Change required to required="required" so Odoo is happy

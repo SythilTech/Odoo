@@ -77,6 +77,27 @@ class HtmlForm(models.Model):
 	
 	return html_output
 
+    def _generate_html_date_picker(self, fe):
+        html_output = ""
+        
+        html_output += "  <script>\n"
+	html_output += "  $( function() {\n"
+	html_output += "    $( \"#" + fe.html_name.encode("utf-8") + "\" ).datepicker({ dateFormat: 'yy-mm-dd' });\n"
+	html_output += "  } );\n"
+        html_output += "  </script>\n"
+  
+        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
+		    		
+	html_output += "  <input type=\"text\" id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+		                                    
+	if fe.field_id.required == True:
+	    html_output += " required=\"required\""
+	
+	html_output += "/><br/>\n"
+	
+	return html_output
+
+
     def _generate_html_textbox(self, fe):
         html_output = ""
         

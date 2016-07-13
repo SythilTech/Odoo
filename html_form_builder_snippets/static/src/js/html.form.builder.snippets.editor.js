@@ -33,6 +33,7 @@ options.registry.html_form_builder = options.Class.extend({
         });
     },
 
+
 });
 
 options.registry.html_form_builder_new = options.Class.extend({
@@ -73,9 +74,7 @@ options.registry.html_form_builder_field = options.Class.extend({
 
 
 	    session.rpc('/form/fieldtype', {'field_type': self.$target.attr('data-form-type') }).then(function(result) {
-		    var field_type = result.field_type;
-
-
+		var field_type = result.field_type;
 
 
 	    model.call('name_search', ['', [["model_id.model", "=", form_model],["ttype", "=", field_type],["name", "!=", "display_name"] ] ], { context: base.get_context() }).then(function (field_ids) {

@@ -1,3 +1,7 @@
+v1.6.6
+======
+* Add date picker input
+
 v1.6.5
 ======
 * Change required to required="required"

@@ -31,7 +31,34 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>"
                      
         return {'html_string': html_string}
+
+    def _generate_html_date_picker(self, field):
+        """Generate datepicker textbox HTML"""
+        html_output = ""        
+        html_output += "  <script>\n"
+	html_output += "  $( function() {\n"
+	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).removeClass(\"hasDatepicker\");\n"
+	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).datepicker({ dateFormat: 'yy-mm-dd' });\n"
+	html_output += "  } );\n"
+        html_output += "  </script>\n"
         
+        html_output += "<div class=\"form-group\">\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
+		    		
+	if field.field_id.required == False:
+	    html_output += " style=\"font-weight: normal\""
+		    		
+	html_output += ">" + field.field_label + "</label>\n"	    
+	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
+		                                    
+	if field.field_id.required == True:
+	    html_output += " required=\"required\""
+	
+	html_output += "/>\n"
+	html_output += "</div>\n"
+	
+	return html_output
+	
     def _generate_html_textbox(self, field):
         """Generate textbox HTML"""
         html_output = ""        

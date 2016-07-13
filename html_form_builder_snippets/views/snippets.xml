@@ -62,6 +62,7 @@
                         <t t-snippet="html_form_builder_snippets.s_form" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_form_new" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form_new.jpg"/>                        
                         <t t-snippet="html_form_builder_snippets.s_textbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textbox.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_date_picker" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_date_picker.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_textarea" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textarea.jpg"/>            
                         <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_dropbox_m2o" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
@@ -102,6 +103,15 @@
         
         <template id="s_textbox" name="Textbox">
             <section data-form-type="textbox" data-field-id="0" class="html_form_field col-md-12">
+                <div class="form-group">
+                    <label for="field1">Field 1</label>
+                    <input type="text" name="field1" class="form-control"/>
+                </div>
+            </section>
+        </template>   
+
+        <template id="s_date_picker" name="Date Picker">
+            <section data-form-type="date_picker" data-field-id="0" class="html_form_field col-md-12">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <input type="text" name="field1" class="form-control"/>
