@@ -31,6 +31,7 @@ class ResPartnerWebsiteDating(models.Model):
     like_list = fields.Many2many(comodel_name='res.partner', relation='like_list', column1='like1', column2='like2', string='Like List')
     message_setting = fields.Selection([('public','Anyone'), ('members_only','Members Only'), ('i_like','Members I Like')], string="Message Setting")
     contacts = fields.One2many('res.dating.contacts', 'partner_id', string="Contact List", help="A member that has contacted you or you have contacted them")
+    questionnaire_answers = fields.One2many('res.dating.questionnaire.answer', 'partner_id')
         
     @api.onchange('birth_date')
     def _onchange_birth_date(self):
@@ -64,6 +65,13 @@ class ResPartnerInterest(models.Model):
 
     name = fields.Char(string="Name")
     interest_category_id = fields.Many2one('res.partner.interest.categories', string="Interest Category")
+
+class ResPartnerInterestCategory(models.Model):
+
+    _name = "res.partner.interest.category"
+    _description = "Partner Interest Category"
+
+    name = fields.Char(string="Name")
     
 class ResSexualOrientation(models.Model):
 

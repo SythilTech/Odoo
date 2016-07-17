@@ -1,0 +1,4 @@
+"id","questionnaire_question_id/id","type","question_compare_id/id","question_compare_option_id/id","question_match_id/id","question_match_option_id/id","option","weight"
+"dating_questionnaire_tall_tall_match","dating_questionnaire_physical","option_match","dating_questionnaire_how_tall","dating_questionnaire_how_tall_short","dating_questionnaire_pref_tall","dating_questionnaire_pref_tall_short","match","10"
+"dating_questionnaire_tall_medium_match","dating_questionnaire_physical","option_match","dating_questionnaire_how_tall","dating_questionnaire_how_tall_medium","dating_questionnaire_pref_tall","dating_questionnaire_pref_tall_medium","match","10"
+"dating_questionnaire_tall_short_match","dating_questionnaire_physical","option_match","dating_questionnaire_how_tall","dating_questionnaire_how_tall_tall","dating_questionnaire_pref_tall","dating_questionnaire_pref_tall_tall","match","10"

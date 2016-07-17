@@ -2,3 +2,8 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_partner_gender,access res.partner.gender,model_res_partner_gender,,1,0,0,0
 access_res_sexualorientation,access res.sexualorientation,model_res_sexualorientation,,1,0,0,0
 access_res_country_state_city,access res.country.state.city,model_res_country_state_city,,1,0,0,0
+access_res_dating_questionnaire,access res.dating.questionnaire,model_res_dating_questionnaire,,1,0,0,0
+access_res_dating_questionnaire_question,access res.dating.questionnaire.question,model_res_dating_questionnaire_question,,1,0,0,0
+access_res_dating_questionnaire_question_option,access res.dating.questionnaire.question.option,model_res_dating_questionnaire_question_option,,1,0,0,0
+access_res_dating_questionnaire_answer,access res.dating.questionnaire.answer,model_res_dating_questionnaire_answer,,0,0,1,0
+access_res_dating_questionnaire_answer_question,access res.dating.questionnaire.answer.question,model_res_dating_questionnaire_answer_question,,0,0,1,0

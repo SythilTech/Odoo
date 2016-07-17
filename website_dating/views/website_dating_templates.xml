@@ -7,7 +7,7 @@
         <div class="container">
 
             <div class="mt16 mb16">
-                <h1 class="text-center">My Dating List</h1>
+                <h1 class="text-center">Profile Search</h1>
                 <form method="GET" action="" class="form-inline" role="form">
                     <div class="form-group">
                         <label for="min_age">Min Age:</label>
@@ -80,6 +80,32 @@
     </div>
 </template>
 
+<template id="dating_questionnaire" name="Dating Questionnaire" page="True">
+    <t t-call="website.layout">
+        <div class="container mt16 mb16">
+            <div class="col-md-12">
+                <div id="main" class="well">
+                    <h1 t-esc="questionnaire.name"/>
+                    <form method="GET" action="/dating/questionnaire/process">
+                        <t t-foreach="questionnaire.question_ids" t-as="question">
+                            <div class="form-group">
+		                <label class="control-label" t-attf-for="question_#{question.id}"><t t-esc="question.name"/></label>
+			        <select class="form-control" t-attf-name="question_#{question.id}">
+			            <t t-foreach="question.option_ids" t-as="option">
+			                <option t-attf-value="#{option.id}"><t t-esc="option.name"/></option>
+			            </t>	    	        
+		    	        </select>
+		            </div>
+                        </t>
+                        <input type="hidden" name="questionnaire_id" t-attf-value="#{questionnaire.id}"/>
+                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
 <template id="my_dating_profile" name="Dating Profile" page="True">
     <t t-call="website.layout">
         <div class="container mt16 mb16">
@@ -128,6 +154,13 @@
                     <div id="profile_text" style="clear:both;">
                         <h1><t t-esc="my_date.first_name"/></h1>
                         <t t-esc="my_date.profile_text"/>            
+                    </div>
+                    
+                    <div id="questionnaires" t-if="request.env.user.partner_id.id == my_date.id">
+                        <h2>Questionnaires</h2>
+                        <t t-foreach="questionnaires" t-as="questionnaire">
+                            <a t-attf-href="/dating/questionnaire/#{questionnaire.id}"><t t-esc="questionnaire.name"/></a><br/>
+                        </t>
                     </div>
                     
                 </div>

@@ -4,6 +4,8 @@ from datetime import datetime
 import json
 import math
 import base64
+import logging
+_logger = logging.getLogger(__name__)
 
 import openerp.http as http
 from openerp.http import request
@@ -227,6 +229,107 @@ class WebsiteDatingController(http.Controller):
 
         return werkzeug.utils.redirect("/dating/profiles/" + str(member_id) )
  
+    @http.route('/dating/questionnaire/<questionnaire_id>', type="http", auth="user", website=True)
+    def dating_questionnaire(self, questionnaire_id, **kwargs):
+        questionnaire = request.env['res.dating.questionnaire'].browse(int(questionnaire_id))
+        return http.request.render('website_dating.dating_questionnaire', {'questionnaire': questionnaire} )
+
+    @http.route('/dating/questionnaire/process', type="http", auth="user", website=True)
+    def dating_questionnaire_process(self, **kwargs):
+
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+	    
+	questionnaire_id = values['questionnaire_id']
+	questionnaire = request.env['res.dating.questionnaire'].sudo().browse( int(questionnaire_id) )
+	
+	#Currently logged in user can only submit answers for a questionnaire once
+	if request.env['res.dating.questionnaire.answer'].sudo().search_count([('questionnaire_id','=',questionnaire.id), ('partner_id','=',http.request.env.user.partner_id.id) ]) > 0:
+	    return "You can only answer this questionnaire once"
+	
+	new_questionnaire_answer = request.env['res.dating.questionnaire.answer'].sudo().create({'questionnaire_id': questionnaire.id, 'partner_id': http.request.env.user.partner_id.id})
+	
+	#Go through each question in this questionnaire
+	for question in questionnaire.question_ids:
+	    #Go through each option and determine if it was selected(prevents submitting options from other questions)
+	    for option in question.option_ids:
+	        if values["question_" + str(question.id)] == str(option.id):
+	            request.env['res.dating.questionnaire.answer.question'].sudo().create({'questionnaire_answer_id': new_questionnaire_answer.id, 'question_id': question.id, 'option_id': option.id})
+	            
+	            #Only one option is allowed(prevent multi option injection)
+	            break
+	            
+        return werkzeug.utils.redirect("/dating/questionnaire/answer/" + str(new_questionnaire_answer.id) )
+
+    @http.route('/dating/questionnaire/answer/<questionnaire_answer_id>', type="http", auth="user", website=True)
+    def dating_questionnaire_answer(self, questionnaire_answer_id, **kwargs):
+	"""Perform the dating match making code"""
+	
+	questionnaire_answer = request.env['res.dating.questionnaire.answer'].sudo().browse( int(questionnaire_answer_id) )
+	questionnaire = request.env['res.dating.questionnaire'].sudo().browse( int(questionnaire_answer.questionnaire_id.id) )
+
+	gender_letter = ""
+	if http.request.env.user.partner_id.gender.letter == "M":
+	    gender_letter = "F"
+
+	if http.request.env.user.partner_id.gender.letter == "F":
+	    gender_letter = "M"
+	
+	output_string = ""
+	candidate_list = []
+	
+	#First through all the answers to this questionaires which are owned by individuals of the opposite gender and are not private
+	for candidate_questionnaire_answer in request.env['res.dating.questionnaire.answer'].sudo().search([('questionnaire_id','=', questionnaire.id), ('partner_id.gender.letter','=',gender_letter),('partner_id.profile_visibility','!=','not_listed') ]):
+	    match_score = 0
+	    skip = False
+	    
+	    #Go through each match rule and determine the candidate final score
+	    for match_rule in questionnaire.matching_rule_ids:
+	        
+	        #Check if user has compare option
+	        user_match_compare_option = len( request.env['res.dating.questionnaire.answer.question'].sudo().search([('questionnaire_answer_id.partner_id','=', http.request.env.user.partner_id.id), ('option_id','=', match_rule.question_compare_option_id.id)]) )
+                
+                #And candidate has match option
+	        candidate_match_match_option = len( request.env['res.dating.questionnaire.answer.question'].sudo().search([('questionnaire_answer_id.partner_id','=', candidate_questionnaire_answer.partner_id.id), ('option_id','=', match_rule.question_match_option_id.id)]) )
+
+                #Check if user has match option
+	        user_match_match_option = len( request.env['res.dating.questionnaire.answer.question'].sudo().search([('questionnaire_answer_id.partner_id','=', http.request.env.user.partner_id.id), ('option_id','=', match_rule.question_match_option_id.id)]) )
+
+	        #And candidate has compare option
+	        candidate_match_compare_option = len( request.env['res.dating.questionnaire.answer.question'].sudo().search([('questionnaire_answer_id.partner_id','=', candidate_questionnaire_answer.partner_id.id), ('option_id','=', match_rule.question_compare_option_id.id)]) )
+	        
+	        if user_match_compare_option and candidate_match_match_option:
+	            if match_rule.option == "match":
+	                match_score += match_rule.weight
+	            elif match_rule.option == "penalise":
+	                match_score -= match_rule.weight
+	            elif match_rule.option == "exclude":
+	                skip = True
+	                break
+	        
+	        if user_match_match_option and candidate_match_compare_option:
+	            if match_rule.option == "match":
+	                match_score += match_rule.weight
+	            elif match_rule.option == "penalise":
+	                match_score -= match_rule.weight
+	            elif match_rule.option == "exclude":
+	                skip = True
+	                break
+	                
+	    #Do not add this person to the candidate list
+	    if skip:
+	        continue
+	    else:
+	        candidate_list.append( {'partner_id': candidate_questionnaire_answer.partner_id.id, 'name':candidate_questionnaire_answer.partner_id.name, 'score': match_score} )	        
+	 
+	candidate_list_sorted = sorted(candidate_list, key=lambda k: k['score'], reverse=True)
+	
+	for cand in candidate_list_sorted:
+	    output_string += "<a href=\"/dating/profiles/" + str(cand["partner_id"]) + "\">" + cand["name"] + " " + str(cand["score"]) + "</a><br/>\n"
+	    
+	return output_string
+	        
     @http.route('/dating/profiles/messages/<member_id>', type="http", auth="user", website=True)
     def dating_profile_messages(self, member_id, **kwargs):
         
@@ -245,7 +348,7 @@ class WebsiteDatingController(http.Controller):
         
         #only logged in members can view this page
         if http.request.env.user.partner_id.name != 'Public user':
-            return "fart"
+            return "Messages"
             #return http.request.render('website_dating.my_dating_messages', {'my_date':member, 'message_list': message_list} )
         else:
             return "Permission Denied"
@@ -261,7 +364,6 @@ class WebsiteDatingController(http.Controller):
         
         member = http.request.env['res.partner'].sudo().search([('id','=',member_id), ('dating','=',True)])[0]
         partner = http.request.env.user.partner_id
-        
         
         for you_likes in partner.like_list:
             if int(member_id) == int(you_likes.id):
@@ -303,6 +405,7 @@ class WebsiteDatingController(http.Controller):
             can_view = True
       
         if can_view:
-            return http.request.render('website_dating.my_dating_profile', {'my_date': member, 'can_message': can_message, 'you_like':you_like, 'they_like':they_like} )
+            questionnaires = request.env['res.dating.questionnaire'].search([])
+            return http.request.render('website_dating.my_dating_profile', {'my_date': member, 'can_message': can_message, 'you_like':you_like, 'they_like':they_like, 'questionnaires': questionnaires} )
         else:
             return "Permission Denied"

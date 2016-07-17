@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id=">res_dating_questionnaire_view_form" model="ir.ui.view">
+          <field name="name">res.dating.questionnaire.view.form</field>
+          <field name="model">res.dating.questionnaire</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="question_ids">
+      	                  <tree>
+      	                      <field name="type"/>
+      	                      <field name="name"/>
+      	                      <field name="option_ids">
+      	                          <tree>
+      	                              <field name="name"/>
+      	                          </tree>
+      	                      </field>
+      	                  </tree>
+      	              </field>
+      	              <field name="matching_rule_ids">
+      	                  <tree>
+      	                      <field name="type"/>
+      	                      <field name="question_compare_id"/>
+      	                      <field name="question_compare_option_id"/>
+      	                      <field name="question_match_id"/>
+      	                      <field name="question_match_option_id"/>
+      	                      <field name="option"/>
+      	                      <field name="weight"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	          <footer>
+      	              <button type="object" name="create_fake_questionnaire_answers" string="Create Fake Questionnaire Answers"/>
+      	          </footer>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id=">res_dating_questionnaire_question_view_form" model="ir.ui.view">
+          <field name="name">res.dating.questionnaire.question.view.form</field>
+          <field name="model">res.dating.questionnaire.question</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="type"/>      	              
+      	              <field name="option_ids">
+      	                  <tree>
+      	                      <field name="name"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id=">res_dating_questionnaire_view_tree" model="ir.ui.view">
+          <field name="name">res.dating.questionnaire.view.tree</field>
+          <field name="model">res.dating.questionnaire</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="res_dating_questionnaire_action" model="ir.actions.act_window">
+          <field name="name">Dating Questionaires</field>
+      	  <field name="res_model">res.dating.questionnaire</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      </record>
+
+      <menuitem id="res_dating_questionnaire_menu" name="Dating Questionnaires" parent="res_dating_parent_menu" action="res_dating_questionnaire_action" sequence="100"/>
+      
+    </data>
+</openerp>

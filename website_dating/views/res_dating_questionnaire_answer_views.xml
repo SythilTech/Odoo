@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id=">res_dating_questionnaire_answer_view_form" model="ir.ui.view">
+          <field name="name">res.dating.questionnaire.answer.view.form</field>
+          <field name="model">res.dating.questionnaire.answer</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="questionnaire_id"/>
+      	              <field name="question_ids">
+      	                  <tree>
+      	                      <field name="question_id"/>
+      	                      <field name="option_id"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id=">res_dating_questionnaire_answer_view_tree" model="ir.ui.view">
+          <field name="name">res.dating.questionnaire.answer.view.tree</field>
+          <field name="model">res.dating.questionnaire.answer</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="create_date" string="Time"/>
+      	          <field name="questionnaire_id"/>
+      	          <field name="partner_id"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="res_dating_questionnaire_answer_action" model="ir.actions.act_window">
+          <field name="name">Dating Questionaire Answers</field>
+      	  <field name="res_model">res.dating.questionnaire.answer</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      </record>
+
+      <menuitem id="res_dating_questionnaire_answer_menu" name="Dating Questionnaire Answers" parent="res_dating_parent_menu" action="res_dating_questionnaire_answer_action" sequence="110"/>
+      
+    </data>
+</openerp>
