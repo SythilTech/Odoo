@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+    <template id="exam_question_page" name="Exam / Test / Quiz Questions">
+        <t t-call="website.layout">
+            <form action="/exam/results" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
+            <div class="wrap">
+                <div class="container">
+                    <div class="mt16 mb16">
+                        <h1 class="text-center"><t t-esc="exam.name"/></h1>
+                    </div>
+		    
+                    <t t-foreach="exam.questions" t-as="question">
+                        <div class="form-group">
+                            <div>
+                            
+                                <t t-if="question.question_type == 'multi_choice'">
+        		            <h2>
+        		            <t t-esc="question_index + 1"/>) <t t-esc="question.question"/>
+        		            <t t-if="question.num_correct > 1">
+        		                <span> (select <t t-esc="question.num_correct"/>)</span>
+        		            </t>
+        		            </h2>
+        		            <t t-foreach="question.question_options" t-as="option">
+        		                <t t-if="question.num_correct == 1">
+                                            <input type="radio" t-attf-name="question#{question.id}" t-attf-value="#{option.id}" required="True"/> <t t-esc="option.option"/><br/>    		            
+        		                </t>
+        		                <t t-if="question.num_correct > 1">
+        		                    <input type="checkbox" t-attf-name="question#{question.id}option#{option.id}" t-attf-value="#{option.id}"/> <t t-esc="option.option"/><br/>
+        		                </t>
+                                    </t>
+                                </t>
+                                
+                                <t t-if="question.question_type == 'fill_blank'">
+                                    <script>
+
+                                    window.onload = function() {
+                                        $('input[type="text"]').keydown(resizeInput)
+                                    };
+    
+                                    function resizeInput() {
+                                        $(this).attr('size', $(this).val().length);
+                                    }
+
+                                    </script>
+    
+                                    <h2>
+			               <t t-esc="question_index + 1"/>) <t t-raw="question.question_rendered"/>
+        		            </h2>
+        		        
+                                </t>
+                                
+                            </div>
+                        </div>
+		    </t>
+            
+                    <div class="form-group">
+		        <div class="col-md-7 col-sm-8">
+		            <input type="hidden" name="ExamID" t-attf-value="#{exam.id}"/>
+		            <button class="btn btn-primary btn-lg">Finish</button>
+		        </div>
+		    </div>
+                    
+                </div>
+            </div>
+        </form>
+        </t>
+    </template>
+
+
+    <template id="exam_results" name="Exam / Test / Quiz Results">
+        <t t-call="website.layout">
+            <div class="wrap">
+                <div class="container">
+                    <div class="mt16 mb16">
+                        <h1 class="text-center">Results</h1>
+                    </div>
+
+                    <div class="mt16 mb16">
+                        <h2 class="text-center text-center">
+                            <t t-esc="correct_count"/> / <t t-esc="question_count"/><br/>
+                            <t t-esc="percent"/>%
+                        </h2>
+                        <t t-if="exam_result.exam_id.show_correct_questions == True">
+                   
+                        <table>
+                        <t t-foreach="exam_result.results" t-as="question_result">
+                            <tr><td><t t-esc="question_result.question.question"/></td>
+                            <td>
+                            <t t-if="question_result.correct == True">
+                                <span style="color:green;">Correct</span>
+                            </t>
+                            <t t-if="question_result.correct == False">
+			        <span style="color:red;">Incorrect</span>
+			    </t>
+                            
+                            </td>
+                            </tr>
+                        </t>
+                        </table>
+                        </t>
+                    </div>
+                   		    
+		    
+                </div>
+            </div>
+        </t>
+    </template>
+    
+</data>
+</openerp>
