@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from urllib import urlencode, quote as quote
+import logging
+_logger = logging.getLogger(__name__)
 
 from openerp import api, fields, models, tools
 
@@ -59,7 +61,7 @@ class SmsTemplate(models.Model):
     template_body = fields.Text('Body', translate=True, help="Plain text version of the message (placeholders may be used here)")
     sms_from = fields.Char(string='From (Mobile)', help="Sender mobile number (placeholders may be used here). If not set, the default value will be the author's mobile number.")
     sms_to = fields.Char(string='To (Mobile)', help="To mobile number (placeholders may be used here)")
-    account_gateway_id = fields.Many2one('sms.accounts', string="Account")    
+    account_gateway_id = fields.Many2one('sms.account', string="Account")    
     model_object_field_id = fields.Many2one('ir.model.fields', string="Field", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
     sub_object_id = fields.Many2one('ir.model', string='Sub-model', readonly=True, help="When a relationship field is selected as first field, this field shows the document model the relationship goes to.")
     sub_model_object_field_id = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")
@@ -90,16 +92,17 @@ class SmsTemplate(models.Model):
             self.from_mobile = self.from_mobile_verified_id.mobile_number
     
     @api.model
-    def send_sms(self, record_id):
+    def send_sms(self, template_id, record_id):
         """Send the sms using all the details in this sms template, using the specified record ID""" 
-        my_template = self.env['esms.templates'].browse(template_id)
+        my_template = self.env['sms.template'].browse( int(template_id) )
+        
         sms_rendered_content = self.env['sms.template'].render_template(my_template.template_body, my_template.model_id.model, record_id)
         
         rendered_sms_to = self.env['sms.template'].render_template(my_template.sms_to, my_template.model_id.model, record_id)
          
-        gateway_model = my_template.from_mobile.account_id.account_gateway.gateway_model_name
+        gateway_model = my_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
         
-	my_sms = self.env[gateway_model].send_message(my_template.from_mobile.account_id.id, my_template.from_mobile.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id)
+	my_sms = self.env[gateway_model].send_message(my_template.from_mobile_verified_id.account_id.id, my_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id)
 	
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``

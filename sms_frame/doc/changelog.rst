@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Fix template send sms code
+
 v1.0.3
 ======
 * Make it easier to have 2 way conversations via sms
