@@ -21,7 +21,6 @@
 			    <field name="latitude"/>
 			    <field name="longitude"/>
 			    <field name="gender"/>
-			    <field name="gender_pref"/>
 			    <field name="interest_list"/>
 			    <field name="profile_visibility"/>			    
 			    <field name="like_list"/>
@@ -52,8 +51,6 @@
 	   <field name="view_mode">tree,form</field>
 	   <field name="domain">[('dating','=',True)]</field>
        </record>
-
-      <menuitem id="res_partner_menu" name="Dating Members" parent="res_dating_parent_menu" action="res_partner_action" sequence="90"/>
 
     </data>
 </openerp>

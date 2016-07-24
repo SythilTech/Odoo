@@ -25,6 +25,11 @@ class ResDating(models.Model):
     @api.one
     def create_fake_profiles(self):
         """Create a large amount of fake profile to aid in testing of dating algorithm"""
+        
+        #Check if there are suburbs for the choosen state
+        #if self.env['res.country.state.city'].search_count([('state_id','=',self.state_id.id)]) > 0:
+        #    return "Import suburbs first"
+        
         calc_min_days = 365 * self.min_age
         calc_max_days = 365 * self.max_age
                 
@@ -82,27 +87,7 @@ class ResDating(models.Model):
             profile_text = "I am " + str(age) + " year old " + first_name.gender + " seeking " + str(relationship_type.name)
             
             #create the partner
-            new_partner = self.env['res.partner'].create({'message_setting':message_setting, 'profile_micro': profile_text, 'profile_text': profile_text,'profile_visibility': profile_vis,'dating':'True', 'fake_profile':'True', 'birth_date': birth_date, 'name': first_name.name + " " + last_name.name, 'first_name':first_name.name, 'last_name':last_name.name,'gender':gender, 'country_id':rand_suburb.state_id.country_id.id, 'state_id':rand_suburb.state_id.id, 'city':rand_suburb.name, 'age':age, 'relationship_type': relationship_type.id, 'min_age_pref':min_age_pref,'max_age_pref':max_age_pref, 'latitude': rand_suburb.latitude, 'latitude': rand_suburb.latitude, 'longitude': rand_suburb.longitude})           
-            
-            #random gender pref
-            rand_gender_pref = randint(1, 100)
-            if rand_gender_pref <= 80:
-                #80% chance of being straight
-                if first_name.gender == "Male":
-                    new_partner.gender_pref = [(4, female_gender.id)]
-                elif first_name.gender == "Female":
-                    new_partner.gender_pref = [(4, male_gender.id)]
-            elif rand_gender_pref <= 90:
-                #10% chance of being gay
-                if first_name.gender == "Male":
-                    new_partner.gender_pref = [(4, male_gender.id)]
-                elif first_name.gender == "Female":
-                    new_partner.gender_pref = [(4, female_gender.id)]    
-            elif rand_gender_pref <= 100:
-                #10% chance of being bi
-                new_partner.gender_pref = [(4, male_gender.id)]
-                new_partner.gender_pref = [(4, female_gender.id)]
-                    
+            new_partner = self.env['res.partner'].create({'message_setting':message_setting, 'profile_micro': profile_text, 'profile_text': profile_text,'profile_visibility': profile_vis,'dating':'True', 'fake_profile':'True', 'birth_date': birth_date, 'name': first_name.name + " " + last_name.name, 'first_name':first_name.name, 'last_name':last_name.name,'gender':gender, 'country_id':rand_suburb.state_id.country_id.id, 'state_id':rand_suburb.state_id.id, 'city':rand_suburb.name, 'age':age, 'relationship_type': relationship_type.id, 'min_age_pref':min_age_pref,'max_age_pref':max_age_pref, 'latitude': rand_suburb.latitude, 'latitude': rand_suburb.latitude, 'longitude': rand_suburb.longitude})
 
 class ResDatingContacts(models.Model):
 

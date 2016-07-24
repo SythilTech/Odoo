@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id="res_partner_interest_fake_view_form" model="ir.ui.view">
+          <field name="name">res.partner.interest.fake.view.form</field>
+          <field name="model">res.partner.interest.fake</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <button type="object" name="create_fake_interests" string="Create Fake Interests"/>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="res_partner_interest_fake_action" model="ir.actions.act_window">
+          <field name="name">Fake Interests</field>
+      	  <field name="res_model">res.partner.interest.fake</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">new</field>
+      </record>
+      
+    </data>
+</openerp>

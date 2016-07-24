@@ -18,8 +18,6 @@ class ResPartnerWebsiteDating(models.Model):
     age = fields.Integer(string="Age")
     city_id = fields.Many2one('res.country.state.city', string="City")
     gender = fields.Many2one('res.partner.gender', string="Gender")
-    sexual_orientation = fields.Many2one('res.sexualorientation', string="Sexual Orientation")
-    gender_pref = fields.Many2many('res.partner.gender', string="Gender Preference")
     min_age_pref = fields.Integer(string="Min Age Preference")
     max_age_pref = fields.Integer(string="Max Age Preference")
     dist_pref = fields.Integer(string="Distance Pref")
@@ -57,36 +55,6 @@ class ResPartnerWebsiteDatingGender(models.Model):
     
     name = fields.Char(string="Gender")
     letter = fields.Char(string="Letter")
-    
-class ResPartnerInterest(models.Model):
-
-    _name = "res.partner.interest"
-    _description = "Partner Interest"
-
-    name = fields.Char(string="Name")
-    interest_category_id = fields.Many2one('res.partner.interest.categories', string="Interest Category")
-
-class ResPartnerInterestCategory(models.Model):
-
-    _name = "res.partner.interest.category"
-    _description = "Partner Interest Category"
-
-    name = fields.Char(string="Name")
-    
-class ResSexualOrientation(models.Model):
-
-    _name = "res.sexualorientation"
-    _description = "Partner Sexual Orientation"
-
-    name = fields.Char(string="Name")
-
-class ResPartnerInterestCategory(models.Model):
-
-    _name = "res.partner.interest.category"
-    _description = "Partner Interest Category"
-
-    name = fields.Char(string="Name")
-    interest_list = fields.One2many('res.partner.interest', 'interest_category_id', string="Interest List")
     
 class ResPartnerRelationship(models.Model):
 

@@ -12,15 +12,61 @@ from openerp.http import request
 
 class WebsiteDatingController(http.Controller):
 
+    @http.route('/dating/interests', type="http", auth="user", website=True)
+    def dating_interests(self, **kwargs):
+        interest_categories = request.env['res.partner.interest.category'].search([])
+        return http.request.render('website_dating.dating_interests', {'interest_categories': interest_categories} )
+
+    @http.route('/dating/interests/process', type="http", auth="user", website=True)
+    def dating_interests_process(self, **kwargs):
+        
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+	    request.env.user.partner_id.interest_list = [(4, int(field_name) )]
+
+        return werkzeug.utils.redirect("/dating/interests/list")
+
+    @http.route('/dating/interests/list', type="http", auth="user", website=True)
+    def dating_interests_list(self, **kwargs):
+        
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+
+	gender_letter = ""
+	if http.request.env.user.partner_id.gender.letter == "M":
+	    gender_letter = "F"
+
+	if http.request.env.user.partner_id.gender.letter == "F":
+	    gender_letter = "M"
+	
+	like_matches = []
+		
+        #Each member in the database and check how many interests they share
+        for member in request.env['res.partner'].search([('dating','=',True), ('gender.letter','=',gender_letter),('profile_visibility','!=','not_listed')]):
+            interests_shared = 0
+            #Go through each interest the user has
+            for interest in request.env.user.partner_id.interest_list:
+            
+                if interest in member.interest_list:
+                    interests_shared += 1
+            
+            if interests_shared > 0:
+                like_matches.append( {'member':member,'interest_count': interests_shared})
+
+        like_matches_sorted = sorted(like_matches, key=lambda k: k['interest_count'], reverse=True)
+        
+        return http.request.render('website_dating.dating_interests_list', {'like_matches_sorted': like_matches_sorted} )
+
     @http.route('/dating/profile/register', type="http", auth="public", website=True)
     def dating_profile_register(self, **kwargs):
         genders = request.env['res.partner.gender'].search([])
-        sexual_orientations = request.env['res.sexualorientation'].search([])
         countries = request.env['res.country'].search([])
         states = request.env['res.country.state'].search([])
         cities = request.env['res.country.state.city'].search([])
         
-        return http.request.render('website_dating.my_dating_register', {'genders': genders,'sexual_orientations': sexual_orientations, 'countries': countries, 'states': states, 'cities': cities} )
+        return http.request.render('website_dating.my_dating_register', {'genders': genders, 'countries': countries, 'states': states, 'cities': cities} )
 
     @http.route('/dating/profile/register/process', type="http", auth="public", website=True, csrf=False)
     def dating_profile_register_process(self, **kwargs):
@@ -45,7 +91,7 @@ class WebsiteDatingController(http.Controller):
         human_resources_group.users = [(3,new_user.id)]
 
         #Modify the users partner record
-	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'gender': values['gender'], 'profile_micro': values['self_description'],'profile_visibility': 'members_only', 'sexual_orientation': values['sexual_orientation'], 'country_id': values['country'], 'state_id': values['state'], 'city_id': values['city'], 'image': base64.encodestring(values['file'].read()) })
+	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'gender': values['gender'], 'profile_micro': values['self_description'],'profile_visibility': 'members_only', 'country_id': values['country'], 'state_id': values['state'], 'city_id': values['city'], 'image': base64.encodestring(values['file'].read()) })
 
         #Automatically sign the new user in
         request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction

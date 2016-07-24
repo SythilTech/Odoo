@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-      <record id=">res_dating_view_form" model="ir.ui.view">
+      <record id="res_dating_view_form" model="ir.ui.view">
           <field name="name">res.dating.form</field>
           <field name="model">res.dating</field>
           <field name="arch" type="xml">
@@ -29,9 +29,6 @@
       	  <field name="view_mode">form</field>
       	  <field name="target">new</field>
       </record>
-
-      <menuitem id="res_dating_parent_menu" name="Dating" parent="base.menu_base_partner" sequence="100"/>
-      <menuitem id="res_dating_menu" name="Create Fake Profiles" parent="res_dating_parent_menu" action="res_dating_action" sequence="90"/>
       
     </data>
 </openerp>
