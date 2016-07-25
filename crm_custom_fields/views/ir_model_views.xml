@@ -19,6 +19,7 @@
                                     <field name="name" invisible="True"/>
                                     <field name="field_description" invisible="True"/>
                                     <field name="crm_limited_types"/>
+                                    <field name="crm_custom_field_widget"/>
                                     <field name="help" string="Help Text"/>
                                 </group>
                                 <notebook>

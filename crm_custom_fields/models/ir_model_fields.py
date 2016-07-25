@@ -6,9 +6,10 @@ class IrModelFieldsCRMFields(models.Model):
     _inherit = "ir.model.fields"
     
     custom_model_id = fields.Many2one('ir.model', string="Custom Model")
-    crm_limited_types = fields.Selection([('char','Single Line Textbox'), ('text','Multi Line Textbox')], default="char" ,string="Field Type")
+    crm_limited_types = fields.Selection([('char','Single Line Textbox'), ('text','Multi Line Textbox'), ('date','Date')], default="char" ,string="Field Type")
     crm_custom_name = fields.Char(string="Field Name")
     crm_custom_field = fields.Boolean(string="Custom CRM Field")
+    crm_custom_field_widget = fields.Many2one('crm.custom.fields.widget', string="Widget")
 
     @api.onchange('crm_custom_name')
     def _onchange_crm_custom_name(self):
@@ -31,3 +32,10 @@ class IrModelFieldsCRMFields(models.Model):
             new_ins.name = "x_" + str(new_ins.id)
         
         return new_ins
+        
+class CrmCustomFieldsWidget(models.Model):
+
+    _name = "crm.custom.fields.widget"
+
+    name = fields.Char(string="Name")
+    internal_name = fields.Char(string="Internal Name", help="The technicial name of the widget")

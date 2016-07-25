@@ -1,6 +1,6 @@
 {
     'name': "CRM Custom Fields",
-    'version': "1.0",
+    'version': "1.1",
     'author': "Sythil",
     'category': "CRM",
     'summary': "Allows users in the 'Sales / Manager' group to add additional fields to the partner form",
@@ -9,6 +9,7 @@
         'views/res_partner_views.xml',
         'views/ir_model_views.xml',
         'security/ir.model.access.csv',
+        'data/crm.custom.fields.widget.csv',
     ],
     'demo': [],
     'depends': ['crm'],

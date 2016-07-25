@@ -27,7 +27,12 @@ class IrModelCRMFields(models.Model):
         custom_form_fields_string += "        <group>\n"
         
         for custom_field in self.env['ir.model.fields'].sudo().search([('crm_custom_field','=',True)]):
-            custom_form_fields_string += "            <field name=\"" + str(custom_field.name) + "\"/>"
+            custom_form_fields_string += "            <field name=\"" + str(custom_field.name) + "\""
+            
+            if custom_field.crm_custom_field_widget:
+                custom_form_fields_string += " widget=\"" + custom_field.crm_custom_field_widget.internal_name + "\""
+            
+            custom_form_fields_string += "/>"
         
         custom_form_fields_string += "            <button name=\"open_custom_field_form\" type=\"object\" groups=\"base.group_sale_manager\"  string=\"Add Custom Field\"/>\n"
         custom_form_fields_string += "        </group>\n"
