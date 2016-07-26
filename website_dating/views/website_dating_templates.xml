@@ -210,7 +210,14 @@
                             <a t-attf-href="/dating/questionnaire/#{questionnaire.id}"><t t-esc="questionnaire.name"/></a><br/>
                         </t>
                     </div>
-                    <a href="/dating/interests">Interests</a>
+
+                    <h2>Interests</h2>
+                    <t t-foreach="my_date.interest_list" t-as="interest">
+                        <t t-esc="interest.name"/><br/>
+                    </t>
+                    
+                    <!-- Display link to register interests if this is your profile -->
+                    <a href="/dating/interests" t-if="request.env.user.partner_id.id == my_date.id">Register Interests</a>
                 </div>
             </div>
             
