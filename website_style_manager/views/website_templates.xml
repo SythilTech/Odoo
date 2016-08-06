@@ -2,12 +2,24 @@
 <openerp>
     <data>
 
+        <template id="website_style_manager_editor" inherit_id="website.assets_editor" name="Website Style Manager Resources">
+            <xpath expr="/t" position="inside">
+                <script type="text/javascript" src="/website_style_manager/static/src/js/custom_css.js" />
+            </xpath>
+        </template>
+
         <template id="custom_css" inherit_id="website.layout" active="True" customize_show="True" name="Custom CSS">
             <xpath expr="//head" position="inside">
                 <style>
                     <t t-raw="website.css_text"/>
                     <t t-raw="website.custom_css"/>
                 </style>
+            </xpath>
+        </template>
+
+        <template id="custom_css_user_navbar" inherit_id="website.user_navbar">
+            <xpath expr="//ul[@id='oe_systray']/li/ul[@class='dropdown-menu oe_content_menu']" position="inside">
+                <li id="sythil_custom_css"><a href="#" data-action="CustomCSSView">Custom CSS</a></li>
             </xpath>
         </template>
 

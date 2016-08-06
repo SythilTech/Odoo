@@ -1,5 +1,5 @@
 {
-    'name': "Website Style Manager",
+    'name': "Website CSS Style Manager",
     'version': "1.2",
     'author': "Sythil",
     'category': "Tools",
