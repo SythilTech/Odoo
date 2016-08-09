@@ -1,6 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_partner_gender,access res.partner.gender,model_res_partner_gender,,1,0,0,0
-access_res_sexualorientation,access res.sexualorientation,model_res_sexualorientation,,1,0,0,0
 access_res_country_state_city,access res.country.state.city,model_res_country_state_city,,1,0,0,0
 access_res_dating_questionnaire,access res.dating.questionnaire,model_res_dating_questionnaire,,1,0,0,0
 access_res_dating_questionnaire_question,access res.dating.questionnaire.question,model_res_dating_questionnaire_question,,1,0,0,0

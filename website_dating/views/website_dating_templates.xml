@@ -2,6 +2,19 @@
 <openerp>
 <data>
 
+        <record id="dating_suggestions" model="mail.template">
+            <field name="name">Dating Suggestions</field>
+            <field name="model_id" ref="model_res_partner"></field>
+            <field name="email_from">${object.company_id.name} <${(object.company_id.email)|safe}></field>
+            <field name="subject">Dating Suggestions</field>
+            <field name="body_html"><![CDATA[
+                <p>Hello ${object.name},</p>
+                <h1>Dating Suggestions</h1>
+                <p>_dating_suggestions_</p>
+            ]]>
+            </field>
+        </record>
+
 <template id="my_dating_list" name="Browse Dating Profiles" page="True">
     <t t-call="website.layout">
         <div class="container">

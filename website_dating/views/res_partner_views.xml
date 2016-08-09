@@ -25,6 +25,7 @@
 			    <field name="profile_visibility"/>			    
 			    <field name="like_list"/>
 			    <field name="contacts"/>
+			    <field name="setting_email_suggestion"/>
       	                </group>
       	            </page>
       	        </notebook>

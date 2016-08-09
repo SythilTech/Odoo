@@ -30,6 +30,7 @@ class ResPartnerWebsiteDating(models.Model):
     message_setting = fields.Selection([('public','Anyone'), ('members_only','Members Only'), ('i_like','Members I Like')], string="Message Setting")
     contacts = fields.One2many('res.dating.contacts', 'partner_id', string="Contact List", help="A member that has contacted you or you have contacted them")
     questionnaire_answers = fields.One2many('res.dating.questionnaire.answer', 'partner_id')
+    setting_email_suggestion = fields.Boolean(string="Setting Email Suggestion")
         
     @api.onchange('birth_date')
     def _onchange_birth_date(self):
@@ -47,7 +48,24 @@ class ResPartnerWebsiteDating(models.Model):
                 d1 = datetime.strptime(rec.birth_date, "%Y-%m-%d").date()
                 d2 = date.today()
                 rec.age = relativedelta(d2, d1).years
-                
+
+    @api.model
+    def dating_suggestion_email(self):
+        """Send email to people surggesting possible partners"""
+        
+        #send an email out to everyone in the category
+        notification_template = request.env['ir.model.data'].sudo().get_object('website_dating', 'dating_suggestions')
+
+        for rec in self.env['res.partner'].search([('setting_email_suggestion','=', True)]):
+            dating_suggestions_html = ""
+
+            
+
+            #Send email
+            notification_template.email_to = rec.email
+            notification_template.body_html = notification_template.body_html.replace("_dating_suggestions_", dating_suggestions_html)
+            notification_template.send_mail(rec.id, True)
+   
 class ResPartnerWebsiteDatingGender(models.Model):
 
     _name = "res.partner.gender"
