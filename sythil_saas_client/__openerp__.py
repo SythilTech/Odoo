@@ -9,6 +9,7 @@
     'data': [
         'data/res.users.csv',
         'data/ir.rule.xml',
+        'data/ir.config_parameter.csv',
         'views/sythil_saas_client_templates.xml',
     ],
     'demo': [],
