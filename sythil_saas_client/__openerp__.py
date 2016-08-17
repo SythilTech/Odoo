@@ -1,6 +1,6 @@
 {
     'name': "Sythil Tech SAAS Client",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'author': "Sythil",
     'category': "Tools",
     'summary':'Interacts with Sythil SAAS Server',

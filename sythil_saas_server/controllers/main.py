@@ -30,7 +30,7 @@ class SaasMultiDB(http.Controller):
 	    values[field_name] = field_value
 	    
 	template_database = request.env['saas.template.database'].browse(int(values['templatedb']))
-        return http.request.render('saas_multi_db.saas_submit', {'template_database': template_database})
+        return http.request.render('sythil_saas_server.saas_submit', {'template_database': template_database})
 
     @http.route('/saas/createdb', type="http", auth="public")
     def saas_create_datadb(self, **kwargs):
@@ -55,7 +55,7 @@ class SaasMultiDB(http.Controller):
 
 	#get the template database
 	template_database = request.env['saas.template.database'].browse(int(values["package"]))
-	chosen_template = template_database.database_name + "_clone"
+	chosen_template = template_database.database_name
         	    
 	#Add this database to the saas list
 	request.env['saas.database'].create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id})
@@ -91,14 +91,17 @@ class SaasMultiDB(http.Controller):
 	#Update the saas user's name, email, login and password
 	with closing(db.cursor()) as cr:
 	    cr.autocommit(True)     # avoid transaction block
-	    saas_user = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'saas_multi_db_client', 'saas_user')
+	    saas_user = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'sythil_saas_client', 'saas_user')
 	    saas_user.write({'name':person_name, 'email':email, 'login':email, 'password':password})
         
         #Auto login the user
-        request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
-	request.session.authenticate(system_name, email, password)
+        #request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
+	#request.session.authenticate(system_name, email, password)
         
-        return werkzeug.utils.redirect("http://" + system_name + "." + request.httprequest.host )
+        if request.env['ir.config_parameter'].get_param('saas_system_redirect') == "db_filter":
+            return werkzeug.utils.redirect("http://" + request.httprequest.host + "/web?db=" + system_name)
+        else:
+            return werkzeug.utils.redirect("http://" + system_name + "." + request.httprequest.host )
         
     def _drop_conn(self, cr, db_name):
         # Try to terminate all other connections that might prevent

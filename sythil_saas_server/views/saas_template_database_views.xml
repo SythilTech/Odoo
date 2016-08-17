@@ -8,7 +8,7 @@
           <field name="arch" type="xml">
              <form>
                   <group>
-                      <field name="image"/>
+                      <field name="image" widget="image"/>
                       <field name="name"/>
                       <field name="database_name"/>
                       <field name="description"/>

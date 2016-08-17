@@ -4,10 +4,11 @@
 
         <template id="assets" name="Sythil SAAS Client Backend Assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
-
                 <script type="text/javascript" src="/sythil_saas_client/static/src/js/sythil_saas_client.js"></script>
-</xpath>
+            </xpath>
         </template>
+
+        <delete id="base.modules_act_cl" model="ir.actions.client"/>
         
     </data>
 </openerp>
