@@ -15,7 +15,7 @@ class HtmlForm(models.Model):
         return request.httprequest.host_url + "form/thankyou"
 
     def _default_submit_url(self):
-        return request.httprequest.host_url + "form/insert"
+        return request.httprequest.host_url + "form/sinsert"
     
     name = fields.Char(string="Form Name", required=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True)

@@ -240,6 +240,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    	    
         form_string += "                </div>\n"
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
+	form_string += "                <input type=\"hidden\" name=\"csrf_token\" t-att-value=\"request.csrf_token()\"/>\n"
+	form_string += "                <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"	
         form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"
         form_string += "            </form>\n"
         form_string += "        </div>\n"
@@ -268,6 +270,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "                <div id=\"html_fields\" class=\"oe_structure\" style=\"margin-left:-15px;\">\n"	    	    
         form_string += "                </div>\n"
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
+	form_string += "                <input type=\"hidden\" name=\"csrf_token\" t-att-value=\"request.csrf_token()\"/>\n"
+	form_string += "                <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
         form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"
         form_string += "            </form>\n"
         form_string += "        </div>\n"

@@ -1,3 +1,7 @@
+v.1.6.7
+=======
+* Increase security
+
 v.1.6.6
 =======
 * Add date picker field

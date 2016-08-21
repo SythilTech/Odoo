@@ -1,3 +1,7 @@
+v1.6.7
+======
+* Display error when missing fields rather than log
+
 v1.6.6
 ======
 * Add date picker input
