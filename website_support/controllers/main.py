@@ -88,13 +88,15 @@ class MyController(http.Controller):
 
         #send an email out to everyone in the category
         notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
+        support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
+        support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
        	
         category = request.env['website.support.ticket.categories'].sudo().browse(int(values['category']))
         
         for my_user in category.cat_user_ids:
             notification_template.email_to = my_user.login
             notification_template.email_from = request.website.company_id.email
-            notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket")
+            notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) )
             notification_template.send_mail(new_ticket_id.id, True)
             
 
@@ -138,7 +140,7 @@ class MyController(http.Controller):
         return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
         
 
-    @http.route('/support/help/auto-complete',auth="user", website=True, type='http')
+    @http.route('/support/help/auto-complete',auth="public", website=True, type='http')
     def support_help_autocomplete(self, **kw):
         """Broken but meant to provide an autocomplete list of help pages"""
         values = {}
@@ -152,7 +154,7 @@ class MyController(http.Controller):
         help_pages = request.env['website.support.help.page'].sudo().search([('name','=ilike',"%" + values['term'] + "%")],limit=5)
         
         for help_page in help_pages:
-            return_item = {"label": help_page.name,"value": help_page.url}
+            return_item = {"label": help_page.name,"value": help_page.url_generated}
             my_return.append(return_item) 
         
         return json.JSONEncoder().encode(my_return)

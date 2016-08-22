@@ -1,9 +1,10 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.3.1",
+    'version': "1.4",
     'author': "Sythil",
     'category': "Tools",
     'summary': "A helpdesk / support ticket system for your website",
+    'description': "A helpdesk / support ticket system for your website",
     'license':'LGPL-3',
     'data': [
         'views/website_support_ticket_templates.xml',

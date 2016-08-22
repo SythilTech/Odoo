@@ -9,7 +9,7 @@
             <field name="subject">New Support Ticket for your category</field>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
-                <p>A new support ticket has been create in a category that you follow</p>
+                <p>A new support ticket has been created in a category that you follow</p>
                 <p>Person Name: ${object.person_name}</p>
                 <p>Category: ${object.category.name}</p>
                 <p>Subject: ${object.subject}</p>
@@ -104,6 +104,12 @@
     </xpath>
 </template>
 
+<template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front Support Editor">
+    <xpath expr="." position="inside">
+        <script type="text/javascript" src="/website_support/static/src/js/website_support.editor.front.js"></script>
+    </xpath>
+</template>
+
 <template id="support_ticket_view" name="Support Ticket" page="True">
     <t t-call="website.layout">
         <div class="container mt16 mb16">
@@ -157,15 +163,15 @@
             
             <div class="mt16 mb16">
                 <h1 class="text-center">Help Pages</h1>
-                <!--
+                
                 <div name="search_from_container" t-attf-class="form-group">
                     <div class="col-md-3"></div>
                     <div class="col-md-6">
-                        <input type="search" class="form-control" id="search" name="search" placeholder="Search"/>
+                        <input type="search" class="form-control" id="search_help_pages" name="search" placeholder="Search"/>
                     </div>
                     <div class="col-md-3"></div>
                 </div>
-                -->
+                
             </div>
             
             <div class="mt16 mb16 col-md-12">

@@ -1,3 +1,7 @@
+v1.4
+====
+* Default permissions, help page search and notification email link improvements
+
 v1.3.1
 ======
 * Changes to category and state add to the message log
