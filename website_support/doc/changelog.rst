@@ -1,3 +1,8 @@
+v1.4.1
+======
+* Category email now uses  user.partner_id.email rather then user.login
+* Category email now users 'Dear user.partner_id.name' rather incorrectly greeting the user with the support ticket email
+
 v1.4
 ====
 * Default permissions, help page search and notification email link improvements

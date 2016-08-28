@@ -5,10 +5,9 @@
         <record id="new_support_ticket_category" model="mail.template">
             <field name="name">Suppport Ticket New Ticket (Category)</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
-            <field name="email_from">${(user.email)|safe}</field>
             <field name="subject">New Support Ticket for your category</field>
             <field name="body_html"><![CDATA[
-                <p>Dear ${object.person_name},</p>
+                <p>Dear _user_name_,</p>
                 <p>A new support ticket has been created in a category that you follow</p>
                 <p>Person Name: ${object.person_name}</p>
                 <p>Category: ${object.category.name}</p>

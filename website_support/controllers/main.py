@@ -94,9 +94,10 @@ class MyController(http.Controller):
         category = request.env['website.support.ticket.categories'].sudo().browse(int(values['category']))
         
         for my_user in category.cat_user_ids:
-            notification_template.email_to = my_user.login
+            notification_template.email_to = my_user.partner_id.email
             notification_template.email_from = request.website.company_id.email
             notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) )
+            notification_template.body_html = notification_template.body_html.replace("_user_name_",  my_user.partner_id.name)
             notification_template.send_mail(new_ticket_id.id, True)
             
 
