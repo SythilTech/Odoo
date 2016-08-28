@@ -1,3 +1,7 @@
+v.1.6.8
+=======
+* Set default permissions to shut log up
+
 v.1.6.7
 =======
 * Increase security

@@ -2,3 +2,4 @@
 "access_html_form_designer","access_html_form_designer","html_form_builder.model_html_form","base.group_website_designer",1,0,0,0
 "access_html_form_field_designer","access_html_form_field_designer","html_form_builder.model_html_form_field","base.group_website_designer",1,0,0,0
 "access_html_form_field_type_designer","access_html_form_field_type_designer","html_form_builder.model_html_form_field_type","base.group_website_designer",1,0,0,0
+"access_html_form_snippet_action","access html.form.snippet.action","model_html_form_snippet_action","",1,0,0,0

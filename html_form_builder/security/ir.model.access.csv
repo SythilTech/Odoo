@@ -5,3 +5,9 @@
 "access_html_form_history_system","Access html.form.history System","model_html_form_history","base.group_system",1,0,0,0
 "access_html_form_history_field_system","Access html.form.history.field System","model_html_form_history_field","base.group_system",1,0,0,0
 "access_html_form_field_type_system","Access html.form.field.type System","model_html_form_field_type","",1,0,0,0
+"access_html_form_captcha","Access html.form.captcha","model_html_form_captcha","",1,0,0,0
+"access_html_form_action_type","Access html.form.action.type","model_html_form_action_type","",1,0,0,0
+"access_html_form_defaults","Access html.form.defaults","model_html_form_defaults","",1,0,0,0
+"access_html_form_history","Access html.form.history","model_html_form_history","",1,0,0,0
+"access_html_form_history_field","Access html.form.history.field","model_html_form_history_field","",1,0,0,0
+"access_html_form_action","Access html.form.action","model_html_form_action","",1,0,0,0
