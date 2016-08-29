@@ -87,7 +87,11 @@ class HtmlFormController(http.Controller):
         else:
             #default values
             for df in entity_form.defaults_values:
-                secure_values[df.field_id.name] = df.default_value
+                if df.field_id.ttype == "many2many":
+                    secure_values[df.field_id.name] = [(4, request.env[df.field_id.relation].search([('name','=',df.default_value)])[0].id )]
+                else:
+                    secure_values[df.field_id.name] = df.default_value
+                
                 new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id':df.field_id.id, 'insert_value':df.default_value})
         
             try:
@@ -175,9 +179,13 @@ class HtmlFormController(http.Controller):
         else:
             #default values
             for df in entity_form.defaults_values:
-                secure_values[df.field_id.name] = df.default_value
+               if df.field_id.ttype == "many2many":
+                    secure_values[df.field_id.name] = [(4, request.env[df.field_id.relation].search([('name','=',df.default_value)])[0].id )]
+                else:
+                    secure_values[df.field_id.name] = df.default_value
+                
                 new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id':df.field_id.id, 'insert_value':df.default_value})
-        
+                     
             try:
                 new_record = http.request.env[entity_form.model_id.model].sudo().create(secure_values)
             except Exception as e:

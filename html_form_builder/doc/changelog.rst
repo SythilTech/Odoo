@@ -1,3 +1,7 @@
+v1.7
+====
+* Can now set defaults for many2many
+
 v1.6.8
 ======
 * Set default permissions to shut log up
