@@ -15,3 +15,4 @@ class SaasDatabase(models.Model):
     login = fields.Char(string="Login")
     password = fields.Char(string="Password")
     template_database_id = fields.Many2one('saas.template.database', string="Template Database", ondelete="SET NULL")
+    backup_ids = fields.One2many('ir.attachment', 'saas_database_id', string="Backups")

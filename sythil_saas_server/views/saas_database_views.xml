@@ -13,6 +13,12 @@
                   <group>
                       <field name="name"/>
                       <field name="login"/>
+                      <field name="backup_ids">
+                          <tree>
+                              <field name="create_date"/>
+                              <field name="datas"/>
+                          </tree>
+                      </field>
                   </group>
               </form>
           </field>

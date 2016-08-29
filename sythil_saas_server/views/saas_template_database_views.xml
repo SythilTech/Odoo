@@ -12,6 +12,8 @@
                       <field name="name"/>
                       <field name="database_name"/>
                       <field name="description"/>
+                      <field name="auto_backup"/>
+                      <field name="auto_backup_days_to_keep"/>
                   </group>
               </form>
           </field>
@@ -25,6 +27,8 @@
                   <field name="name"/>
                   <field name="database_name"/>
                   <field name="description"/>
+                  <field name="auto_backup"/>
+                  <field name="auto_backup_days_to_keep"/>
               </tree>
           </field>
       </record>
