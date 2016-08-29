@@ -44,9 +44,11 @@
           <field name="arch" type="xml">
               <search>
                    <group>
-                      <filter string="INFO Error" domain="[('level','=','INFO')]" help="INFO errors"/>
-                      <filter string="WARNING Error" domain="[('level','=','WARNING')]" help="WARNING errors"/>
-                      <filter string="ERROR Error" domain="[('level','=','ERROR')]" help="ERROR errors"/>
+                      <filter string="INFO Log Entry" domain="[('level','=','INFO')]" help="INFO Log Entry"/>
+                      <filter string="WARNING Log Entry" domain="[('level','=','WARNING')]" help="WARNING Log Entry"/>
+                      <filter string="ERROR Log Entry" domain="[('level','=','ERROR')]" help="ERROR Log Entry"/>
+                      <filter string="CRITICAL Log Entry" domain="[('level','=','CRITICAL')]" help="CRITICAL Log Entry"/>
+                      <filter string="Detailed Errors" domain="[('error_content', '!=', False)]" help="Displays log entries that have details on an error"/>
                   </group>
               </search>
           </field>
