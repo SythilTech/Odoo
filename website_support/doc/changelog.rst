@@ -1,3 +1,7 @@
+v1.4.2
+======
+* Default support ticket filter
+
 v1.4.1
 ======
 * Category email now uses  user.partner_id.email rather then user.login

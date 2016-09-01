@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
+    <data>                    
     
       <record id="website_support_ticket_view_form" model="ir.ui.view">
           <field name="name">website.support.ticket.form.view</field>
@@ -47,10 +47,21 @@
       	  </field>
       </record>
 
+      <record id="website_support_ticket_view_search" model="ir.ui.view">
+          <field name="name">website.support.ticket.form.search</field>
+          <field name="model">website.support.ticket</field>
+          <field name="arch" type="xml">
+      	      <search>
+                  <filter string="Unattended Tickets" name="unattended_tickets" domain="['|',('state', '=', 'Open'), ('state', '=', 'Customer Replied')]"/>
+      	      </search>
+      	  </field>
+      </record>
+
       <record id="website_support_ticket_action" model="ir.actions.act_window">
           <field name="name">website.support.ticket.action</field>
 	  <field name="res_model">website.support.ticket</field>
 	  <field name="view_mode">tree,form</field>
+	  <field name="context">{"search_default_unattended_tickets":1}</field>
 	  <field name="help" type="html">
 	      <p>
 	          No Support Tickets found

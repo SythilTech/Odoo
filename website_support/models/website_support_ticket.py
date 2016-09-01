@@ -8,6 +8,7 @@ class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
     _inherit = ['mail.thread']
+    _rec_name = "subject"
 
     def _default_state(self):
         open_state = self.env['website.support.ticket.states'].search([('name','=','Open')])
