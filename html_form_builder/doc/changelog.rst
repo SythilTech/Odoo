@@ -1,3 +1,7 @@
+v1.7.1
+======
+* Ident issue fix
+
 v1.7
 ====
 * Can now set defaults for many2many
