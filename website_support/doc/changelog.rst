@@ -1,3 +1,7 @@
+v1.4.7
+======
+* Add blank header for addon module
+
 v1.4.6
 ======
 * Add graph view for basic reporting

@@ -7,6 +7,9 @@
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
       	      <form create="false">
+                  <header>
+                  
+                  </header>
       	          <sheet>    
       	              <group>
       	                  <field name="partner_id"/>

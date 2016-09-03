@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_ticket_view_form_inherit_timesheets" model="ir.ui.view">
+          <field name="name">website.support.ticket.view.form.inherit.timesheets</field>
+          <field name="model">website.support.ticket</field>
+          <field name="inherit_id" ref="website_support.website_support_ticket_view_form"/>
+          <field name="arch" type="xml">
+              <header position="inside">
+	          <button type="object" name="invoice_client" string="Invoice Client" attrs="{'invisible':[('partner_id', '=', False)]}"/>
+	      </header>
+              <field name="conversation_history" position="after">
+                  <field name="timesheet_ids">
+                      <tree editable="bottom">
+                          <field name="create_uid" readonly="True" string="By"/>
+                          <field name="hours"/>
+                          <field name="minutes"/>
+                          <field name="project_id"/>
+                      </tree>
+                  </field>
+              </field>
+          </field>
+      </record>
+        
+  </data>
+</openerp>
