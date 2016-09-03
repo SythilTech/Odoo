@@ -22,20 +22,19 @@
                                 <input type="text" class="form-control" name="person_name" required="True"/>
                             </div>
                         </div>
+
+                        <div name="company_from_container" t-attf-class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="company">Company</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="company" required="True"/>
+                            </div>
+                        </div>
         
                         <div name="email_from_container" t-attf-class="form-group">
                             <label class="col-md-3 col-sm-4 control-label" for="email">Email</label>
                             <div class="col-md-7 col-sm-8">
                                 <input type="email" class="form-control" name="email" required="True"/>
                             </div>
-                        </div>
-        
-                        <div t-attf-class="form-group">
-                            <label class="col-md-3 col-sm-4 control-label" for="system_name">System Name</label>
-                            <div class="col-md-7 col-sm-8">
-                                <input type="text" class="form-control" name="system_name" required="True"/>
-                            </div>
-                            <p class="help-block">This will become a subdomain mycrm.<t t-esc="request.httprequest.host"/></p>
                         </div>
         
                         <div t-attf-class="form-group">

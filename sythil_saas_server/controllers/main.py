@@ -42,10 +42,15 @@ class SaasMultiDB(http.Controller):
 	
 	email = values["email"]
 	password = values["password"]
-	system_name = values["system_name"]
+	company = values["company"]
+	system_name = values["company"]
 	person_name = values["person_name"]
         demo = False
 
+        #System name comes from company name
+        system_name = system_name.replace(" ","")
+        system_name = system_name.replace("'","")        
+        
         if system_name.isalnum() == False:
             return "Only AlphaNumeric characters allowed"
 
@@ -93,6 +98,8 @@ class SaasMultiDB(http.Controller):
 	    cr.autocommit(True)     # avoid transaction block
 	    saas_user = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'sythil_saas_client', 'saas_user')
 	    saas_user.write({'name':person_name, 'email':email, 'login':email, 'password':password})
+	    saas_company = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'base', 'main_company')
+	    saas_company.name = company
         
         #Auto login the user
         #request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
