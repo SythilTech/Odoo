@@ -1,3 +1,7 @@
+v1.4.8
+======
+* Translatable state and categories
+
 v1.4.7
 ======
 * Add blank header for addon module
