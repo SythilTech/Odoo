@@ -8,7 +8,7 @@ from openerp.http import request
 
 from openerp.addons.website.models.website import slug
 
-class MyController(http.Controller):
+class SupportTicketController(http.Controller):
 
     @http.route('/support/help', type="http", auth="public", website=True)
     def support_help(self, **kw):
@@ -99,8 +99,6 @@ class MyController(http.Controller):
             notification_template.body_html = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) )
             notification_template.body_html = notification_template.body_html.replace("_user_name_",  my_user.partner_id.name)
             notification_template.send_mail(new_ticket_id.id, True)
-            
-
         
         return werkzeug.utils.redirect("/support/ticket/thanks")
         
@@ -137,13 +135,18 @@ class MyController(http.Controller):
             return "You do not have permission to submit this commment"
         else:
             http.request.env['website.support.ticket.message'].create({'ticket_id':ticket.id,'content':values['comment']})
+            
+            #Should read state change THEN user comment...
+            #ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
+            
+            request.env['website.support.ticket'].browse(ticket.id).message_post(body=values['comment'], subject="Support Ticker Reply", message_type="comment")
         
         return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
         
 
     @http.route('/support/help/auto-complete',auth="public", website=True, type='http')
     def support_help_autocomplete(self, **kw):
-        """Broken but meant to provide an autocomplete list of help pages"""
+        """Provides an autocomplete list of help pages"""
         values = {}
         for field_name, field_value in kw.items():
             values[field_name] = field_value

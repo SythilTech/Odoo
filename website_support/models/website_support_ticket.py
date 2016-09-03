@@ -17,10 +17,10 @@ class WebsiteSupportTicket(models.Model):
     partner_id = fields.Many2one('res.partner', string="Partner", readonly=True)
     person_name = fields.Char(required=True, string='Person Name', readonly=True)
     email = fields.Char(string="Email", readonly=True)
-    category = fields.Many2one('website.support.ticket.categories', string="Category", required=True)
+    category = fields.Many2one('website.support.ticket.categories', string="Category", required=True, track_visibility='onchange')
     subject = fields.Char(string="Subject", readonly=True)
     description = fields.Text(string="Description", readonly=True)
-    state = fields.Many2one('website.support.ticket.states', required=True, default=_default_state, string="State")
+    state = fields.Many2one('website.support.ticket.states', required=True, default=_default_state, string="State", track_visibility='onchange')
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
@@ -40,25 +40,6 @@ class WebsiteSupportTicket(models.Model):
 	#values['html_body'] += message.content + "<hr/>" + "<p>You can reply to this message here</p>"
 	#msg_id = self.env['mail.mail'].create(values)
         #self.env['mail.mail'].send([msg_id], True)
-
-    @api.multi
-    def write(self, values, context=None):
-
-        #Post message if category has changed
-        if 'category' in values:
-            old_category = self.category
-            new_category = self.env['website.support.ticket.categories'].browse( int(values['category']) )
-	    self.message_post(body="Category Change: " + old_category.name + " -> " + new_category.name, subject="Category Changed")
-
-        if 'state' in values:
-            old_state = self.state
-            new_state = self.env['website.support.ticket.states'].browse( int(values['state']) )
-            self.message_post(body="State Change: " + old_state.name + " -> " + new_state.name, subject="State Changed")
-
-        update_rec = super(WebsiteSupportTicket, self).write(values)
-        
-        return update_rec
-
                 
 class WebsiteSupportTicketMessage(models.Model):
 

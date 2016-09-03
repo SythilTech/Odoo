@@ -1,3 +1,8 @@
+v1.4.5
+======
+* State and category change now use the native mail track_visibility
+* User support ticket comments now add to the communication history
+
 v1.4.4
 ======
 * Display menu number for unanswered tickets
