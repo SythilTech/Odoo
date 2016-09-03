@@ -54,7 +54,10 @@ class WebsiteSupportHelpPage(models.Model):
         for fb in self.feedback_ids:
             average += fb.feedback_rating
             
-        self.feedback_average = average / len(self.feedback_ids)
+        if len(self.feedback_ids) > 0:
+            self.feedback_average = average / len(self.feedback_ids)
+        else:
+           self.feedback_average = 0
 
 
 class WebsiteSupportHelpPageFeedback(models.Model):

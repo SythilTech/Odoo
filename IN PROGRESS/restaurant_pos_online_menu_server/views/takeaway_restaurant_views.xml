@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record id="takeaway_restaurant_view_form" model="ir.ui.view">
+          <field name="name">takeaway.restaurant.view.form</field>
+          <field name="model">takeaway.restaurant</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="slug"/>
+      	              <field name="image" widget="image" options="{'preview_image': 'image', 'size': [80, 80]}"/>
+      	              <field name="location_id"/>
+      	              <field name="street"/>
+      	              <field name="delivary_radius_kilometers"/>
+      	              <field name="latitude"/>
+      	              <field name="longitude"/>
+      	              <field name="delivary_suburbs"/>
+      	              <field name="min_order"/>
+      	              <field name="cuisines"/>
+      	              <field name="pos_cats"/>
+      	              <field name="takeaway_time_monday_start" widget="float_time"/>
+		      <field name="takeaway_time_monday_end" widget="float_time"/>
+		      <field name="takeaway_time_tuesday_start" widget="float_time"/>
+		      <field name="takeaway_time_tuesday_end" widget="float_time"/>
+		      <field name="takeaway_time_wednesday_start" widget="float_time"/>
+		      <field name="takeaway_time_wednesday_end" widget="float_time"/>
+		      <field name="takeaway_time_thursday_start" widget="float_time"/>
+		      <field name="takeaway_time_thursday_end" widget="float_time"/>
+		      <field name="takeaway_time_friday_start" widget="float_time"/>
+		      <field name="takeaway_time_friday_end" widget="float_time"/>
+		      <field name="takeaway_time_saturday_start" widget="float_time"/>
+		      <field name="takeaway_time_saturday_end" widget="float_time"/>
+		      <field name="takeaway_time_sunday_start" widget="float_time"/>
+		      <field name="takeaway_time_sunday_end" widget="float_time"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="takeaway_restaurant_view_tree" model="ir.ui.view">
+          <field name="name">takeaway.restaurant.view.tree</field>
+          <field name="model">takeaway.restaurant</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	          <field name="location_id"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="takeaway_restaurant_action" model="ir.actions.act_window">
+          <field name="name">POS Restaurants</field>
+      	  <field name="res_model">takeaway.restaurant</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Don't manually add restaurants, it's done by the POS</p>
+	  </field>
+      </record>      
+
+      <menuitem id="takeaway_restaurant_menu" name="Restaurant" parent="point_of_sale.menu_point_root" sequence="90"/>
+      <menuitem id="takeaway_restaurant_restaurant_menu" name="Restaurants" parent="takeaway_restaurant_menu" action="takeaway_restaurant_action" sequence="10"/>
+      
+    </data>
+</openerp>

@@ -1,3 +1,7 @@
+v1.4.3
+======
+* Average rating becomes 0 if thier is no feedback
+
 v1.4.2
 ======
 * Default support ticket filter

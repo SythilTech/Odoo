@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+        
+<template id="download_client" name="Download Backup Client">
+    Download
+</template>
+
+</data>
+</openerp>
