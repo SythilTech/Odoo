@@ -1,3 +1,7 @@
+v1.4.4
+======
+* Display menu number for unanswered tickets
+
 v1.4.3
 ======
 * Average rating becomes 0 if thier is no feedback

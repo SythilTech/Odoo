@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread','ir.needaction_mixin']
     _rec_name = "subject"
 
     def _default_state(self):
@@ -25,6 +25,10 @@ class WebsiteSupportTicket(models.Model):
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
 
+    @api.model
+    def _needaction_domain_get(self):
+        return ['|',('state', '=', 'Open'), ('state', '=', 'Customer Replied')]
+        
     @api.one
     def add_comment(self):
         """Adds a comment to the support ticket"""
