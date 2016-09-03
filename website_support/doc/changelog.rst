@@ -1,3 +1,7 @@
+v1.4.6
+======
+* Add graph view for basic reporting
+
 v1.4.5
 ======
 * State and category change now use the native mail track_visibility
