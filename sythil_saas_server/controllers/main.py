@@ -5,6 +5,7 @@ import logging
 _logger = logging.getLogger(__name__)
 import os
 import shutil
+import json
 import subprocess
 from datetime import datetime, timedelta
 
@@ -32,6 +33,35 @@ class SaasMultiDB(http.Controller):
 	template_database = request.env['saas.template.database'].browse(int(values['templatedb']))
         return http.request.render('sythil_saas_server.saas_submit', {'template_database': template_database})
 
+    @http.route('/saas/module/requirements', type="http", auth="user")
+    def saas_module_requirements(self, **kwargs):
+        """Determines which modules are required for the template database to work"""
+        
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+	    
+        demo = False
+	template_database = request.env['saas.template.database'].browse(int(values["package"]))
+
+        #connect to the newly created database
+	db = openerp.sql_db.db_connect(template_database.database_name)
+
+        #Create new registry
+        registry = openerp.modules.registry.RegistryManager.new(template_database.database_name, demo, None, update_module=True)
+
+        installed_module_string = ""
+        my_return = []
+
+	#Update the saas user's name, email, login and password
+	with closing(db.cursor()) as cr:
+	    cr.autocommit(True)     # avoid transaction block
+	    for installed_module_id in registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed')] ):
+	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id )	        
+		my_return.append({"name": installed_module.name, "version":installed_module.installed_version}) 
+	        
+        return json.JSONEncoder().encode(my_return)
+	    
     @http.route('/saas/createdb', type="http", auth="public")
     def saas_create_datadb(self, **kwargs):
         """Creates and sets up the new database"""
