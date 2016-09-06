@@ -1,3 +1,7 @@
+v1.7.2
+======
+* Record ID bug fix
+
 v1.7.1
 ======
 * Ident issue fix

@@ -105,7 +105,7 @@
       </record>          
 
       <record id="html_form_action" model="ir.actions.act_window">
-          <field name="name">html.form.action</field>
+          <field name="name">HTML Forms</field>
           <field name="res_model">html.form</field>
           <field name="view_type">form</field>
           <field name="view_mode">tree,form</field>
@@ -115,7 +115,7 @@
       </record>
         
       <record id="html_form_history_action" model="ir.actions.act_window">
-          <field name="name">html.form.history.action</field>
+          <field name="name">HTML Form Submissions</field>
           <field name="res_model">html.form.history</field>
           <field name="view_type">form</field>
           <field name="view_mode">tree,form</field>

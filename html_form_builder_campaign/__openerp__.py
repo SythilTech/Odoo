@@ -1,5 +1,5 @@
 {
-    'name': "HTML Form Builder - Marketing Campaigns",
+    'name': "HTML Form Builder - Marketing Campaigns (discontinued)",
     'version': "1.0.2",
     'author': "Sythil",
     'category': "Tools",
