@@ -4,10 +4,14 @@ from contextlib import closing
 import logging
 _logger = logging.getLogger(__name__)
 import os
+import zipfile
 import shutil
 import json
 import subprocess
 from datetime import datetime, timedelta
+import tempfile
+import StringIO
+import requests
 
 import openerp
 import openerp.http as http
@@ -33,6 +37,81 @@ class SaasMultiDB(http.Controller):
 	template_database = request.env['saas.template.database'].browse(int(values['templatedb']))
         return http.request.render('sythil_saas_server.saas_submit', {'template_database': template_database})
 
+    @http.route('/saas/template/download/<template_id>', type="http", auth="public")
+    def saas_template_download(self, template_id, **kw):
+        """Transfer the saas database to the SAAS client"""
+        template_database = request.env['saas.template.database'].browse( int(template_id) )
+
+        with openerp.tools.osutil.tempdir() as dump_dir:
+            db_name = template_database.database_name
+            filestore = openerp.tools.config.filestore(db_name)
+
+            if os.path.exists(filestore):
+                shutil.copytree(filestore, os.path.join(dump_dir, 'filestore'))
+
+            with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
+                db = openerp.sql_db.db_connect(db_name)
+                with db.cursor() as cr:
+                    json.dump(self.dump_db_manifest(cr), fh, indent=4)
+                    
+            cmd = ['pg_dump', '--no-owner']
+            cmd.append(db_name)
+            cmd.insert(-1, '--file=' + os.path.join(dump_dir, 'dump.sql'))
+            openerp.tools.exec_pg_command(*cmd)
+    
+            t=tempfile.TemporaryFile()
+            openerp.tools.osutil.zip_dir(dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql')
+            
+            headers = [
+                ('Content-Type', 'application/octet-stream; charset=binary'),
+                ('Content-Disposition', "attachment; filename=template.zip" ),
+            ]
+
+            t.seek(0)
+            response = werkzeug.wrappers.Response(t, headers=headers, direct_passthrough=True)
+            return response
+
+    def dump_db_manifest(self, cr):
+        pg_version = "%d.%d" % divmod(cr._obj.connection.server_version / 100, 100)
+        cr.execute("SELECT name, latest_version FROM ir_module_module WHERE state = 'installed'")
+        modules = dict(cr.fetchall())
+        manifest = {
+            'odoo_dump': '1',
+            'db_name': cr.dbname,
+            'version': openerp.release.version,
+            'version_info': openerp.release.version_info,
+            'major_version': openerp.release.major_version,
+            'pg_version': pg_version,
+            'modules': modules,
+        }
+        return manifest
+        
+    @http.route('/saas/module/download/<module_name>', type="http", auth="public")
+    def saas_module_download(self, module_name, **kw):
+        """Download the module for the saas client"""
+
+        values = {}
+	for field_name, field_value in kw.items():
+	    values[field_name] = field_value
+                
+        t = tempfile.TemporaryFile()
+        module_directory = openerp.modules.get_module_path(module_name)
+        with zipfile.ZipFile(t, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
+	    for dirname, subdirs, files in os.walk(module_directory):
+                for filename in files:
+                    full_path = os.path.join(dirname, filename)
+                    zf.write(full_path, os.path.relpath(full_path, module_directory) )
+        
+
+        headers = [
+            ('Content-Type', 'application/octet-stream; charset=binary'),
+            ('Content-Disposition', "attachment; filename=module.zip" ),
+        ]
+
+        t.seek(0)
+        response = werkzeug.wrappers.Response(t.read(), headers=headers, direct_passthrough=True)
+        return response
+
     @http.route('/saas/module/requirements', type="http", auth="user")
     def saas_module_requirements(self, **kwargs):
         """Determines which modules are required for the template database to work"""
@@ -43,6 +122,7 @@ class SaasMultiDB(http.Controller):
 	    
         demo = False
 	template_database = request.env['saas.template.database'].browse(int(values["package"]))
+	server_url = values['url']
 
         #connect to the newly created database
 	db = openerp.sql_db.db_connect(template_database.database_name)
@@ -53,15 +133,18 @@ class SaasMultiDB(http.Controller):
         installed_module_string = ""
         my_return = []
 
-	#Update the saas user's name, email, login and password
+	#Get a list of installed modules on the template database
 	with closing(db.cursor()) as cr:
 	    cr.autocommit(True)     # avoid transaction block
 	    for installed_module_id in registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed')] ):
 	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id )	        
 		my_return.append({"name": installed_module.name, "version":installed_module.installed_version}) 
-	        
-        return json.JSONEncoder().encode(my_return)
-	    
+	        	    
+        payload = {'templatedbdata': json.JSONEncoder().encode({"templatedb": template_database.id, "modules":my_return}) }
+        response_string = requests.post("http://" + server_url + '/saas/client/load', data=payload)
+        
+        return json.JSONEncoder().encode({"templatedb": template_database.id, "modules":my_return})
+        
     @http.route('/saas/createdb', type="http", auth="public")
     def saas_create_datadb(self, **kwargs):
         """Creates and sets up the new database"""

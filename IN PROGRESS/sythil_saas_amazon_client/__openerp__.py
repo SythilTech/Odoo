@@ -13,5 +13,6 @@
         'static/description/1.jpg',
     ],
     'depends': ['base'],
+    'auto_install': True,
     'installable': True,
 }
