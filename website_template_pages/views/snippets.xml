@@ -2,9 +2,10 @@
 <openerp>
     <data>
 
-        <template id="website_template_pages_editor" inherit_id="website.assets_editor" name="Vuente Theme Resources">
+        <template id="website_template_pages_editor" inherit_id="website.assets_editor" name="Website Page Tempalte Assests">
             <xpath expr="/t" position="inside">
                 <script type="text/javascript" src="/website_template_pages/static/src/js/website_template_pages.js" />
+                <link rel="stylesheet" href="/website_template_pages/static/src/css/website_template_pages.css" />
             </xpath>
         </template>
 

@@ -30,12 +30,19 @@ class WebsiteTemplatePages(http.Controller):
         html_string = ""
         for page_template in page_templates:
             html_string += "<div class=\"sythil_page_template\" data-template=\"" + str(page_template.id) + "\">\n"
-            html_string += "    <img src=\"data:image/jpeg;base64," + str(page_template.image) + "\"/><br/>\n"
+            html_string += "<div class=\"sythil_iframe_wrap\"><iframe src=\"/template/pages/preview/" + str(page_template.id) + "\" class=\"sythil_webpage_preview\"/></div>\n"
             html_string += "    " + page_template.name + "<br/>\n"
+            html_string += "    <a href=\"/template/pages/preview/" + str(page_template.id) + "\" target=\"_blank\">Preview</a><br/>\n"
             html_string += "    <br/>\n"
             html_string += "</div>\n"
         
         return {'html_string': html_string}
+
+    @http.route('/template/pages/preview/<template_id>', website=True, type='http', auth="user")
+    def website_template_pages_preview(self, template_id, **kw):
+        template = request.env['ir.ui.view'].browse( int(template_id) )
+        if template.is_webpage_template:
+            return http.request.render(template.id, {})
 
     @http.route('/template/pages/save', website=True, type='json', auth="user")
     def website_template_pages_save(self, **kw):

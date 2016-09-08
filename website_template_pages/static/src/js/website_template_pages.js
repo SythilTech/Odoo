@@ -15,7 +15,7 @@ var Widget = require('web.Widget');
 var contentMenu = require('website.contentMenu');
 var qweb = core.qweb;
 
-ajax.loadXML('/website_template_pages/static/src/xml/website_template_pages_modal3.xml', qweb);
+ajax.loadXML('/website_template_pages/static/src/xml/website_template_pages_modal4.xml', qweb);
 
     contentMenu.TopBar.include({
         new_sythil_webpage: function() {

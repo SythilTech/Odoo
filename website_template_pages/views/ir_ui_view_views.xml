@@ -10,7 +10,6 @@
              <form>
                   <group>
                      <field name="name"/>
-                     <field name="image" widget="image"/>
                      <field name="arch"/>
                   </group>
               </form>

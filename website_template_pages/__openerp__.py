@@ -1,10 +1,10 @@
 {
     'name': "Website Template Pages",
-    'version': "1.0",
-    'author': "Sythil Tech",
+    'version': "1.1",
+    'author': "Sythil",
     'category': "Tools",
-    'summary': "Generates bootstrap forms and add extra fields by dragging snippets",
-    'description': "Generates bootstrap forms and add extra fields by dragging snippets",
+    'summary': "Save webpages as templates to reuse on new pages / websites",
+    'description': "Save webpages as templates to reuse on new pages / websites",
     'license':'LGPL-3',
     'data': [
         'views/snippets.xml',
