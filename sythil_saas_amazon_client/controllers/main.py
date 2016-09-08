@@ -12,6 +12,8 @@ import urllib2
 import requests
 import zipfile
 import StringIO
+import base64
+import tempfile
 
 import openerp
 import openerp.http as http
@@ -19,6 +21,16 @@ from openerp.http import request
 from openerp import SUPERUSER_ID
 
 class SaasAmazonClient(http.Controller):
+
+    @http.route('/saas/client/test', type='http', auth="none")
+    def saas_client_amazon_test(self, **kw):
+        #Now download the template database
+        r = requests.get("http://sythiltech.com.au/saas/template/download/1", stream=True)
+        copy = True
+        data = base64.b64encode(r.content)
+        openerp.service.db.exp_restore("test3425", data, copy)
+
+        return "Test 3425"
 
     @http.route('/saas/client/load', type='http', auth="none")
     def saas_client_amazon_load(self, **kw):
@@ -38,29 +50,20 @@ class SaasAmazonClient(http.Controller):
         if num_databases >= 3:
             #Get a list of modules in this instance
             mod_list = openerp.modules.get_modules()
-            #mod_path = openerp.modules.get_module_path(i)
-            #info = openerp.modules.load_information_from_description_file(i)
             
             #Download the missing modules
             template_data = json.loads(templatedbdata)
             for template_module in template_data['modules']:
                  if template_module['name'] not in mod_list:
-                     _logger.error(template_module['name'])
+                     r = requests.get("http://sythiltech.com.au/saas/module/download/" + template_module['name'], stream=True)
+                     z = zipfile.ZipFile(StringIO.StringIO(r.content))
+                     os.makedirs(home_directory + "/.local/share/Odoo/addons/9.0/" + template_module['name'])
+                     app_directory = home_directory + "/.local/share/Odoo/addons/9.0/" + template_module['name']
+                     z.extractall(app_directory)
+                     
+            #Now download the template database
+            r = requests.get("http://sythiltech.com.au/saas/template/download/" + template_data['templatedb'], stream=True)
+            data = base64.b64encode(r.content)
+            openerp.service.db.exp_restore(template_data['templatedb'], data, True)
 
-            app_directory = home_directory + "/.local/share/Odoo/addons/9.0/" + "crm" + ".zip"
-            r = requests.get("http://192.168.56.109:8069/saas/template/download/1", stream=True)
-            
-            _logger.error( len(r.content) )
-            
-            localFile = open(app_directory, "wb")
-
-            with open(app_directory, 'wb') as f:
-                for data in r.iter_content():
-                    localFile.write(data)
-            
-            #z = zipfile.ZipFile(app_directory)
-            #new_module_directory = app_directory + "crm"
-            #os.makedirs(new_module_directory)
-            #z.extractall(new_module_directory)
-                
         return "Hi"
