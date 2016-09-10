@@ -26,25 +26,12 @@
                 </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
-		    data-drop-in=".form_fields, [data-oe-type=html]">
+		    data-drop-in="#html_fields">
                 </div>
                 <div data-js='html_form_builder_captcha'
 		    data-selector=".html_form_captcha"
-		    data-drop-in=".form_fields, [data-oe-type=html]">
+		    data-drop-in="#html_fields">
                 </div>
-                    <div data-js='field-style'
-		        data-selector=".html_form_field">
-		        <li class="dropdown-submenu">
-		            <a tabindex="-1" href="#">Field Width</a>
-		            <ul class="dropdown-menu">
-		                <li data-toggle_class="col-md-12"><a>Full Width</a></li>
-		                <li data-toggle_class="col-md-6"><a>1/2 Width</a></li>
-		                <li data-toggle_class="col-md-4"><a>1/3 Width</a></li>
-		                <li data-toggle_class="col-md-3"><a>1/4 Width</a></li>
-		            </ul>
-		        </li>
-		    </div>
-
             </xpath>
         </template>
 
@@ -102,77 +89,77 @@
         </template>
         
         <template id="s_textbox" name="Textbox">
-            <section data-form-type="textbox" data-field-id="0" class="html_form_field col-md-12">
+            <div class="html_form_field" data-form-type="textbox" data-field-id="0">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <input type="text" name="field1" class="form-control"/>
                 </div>
-            </section>
+            </div>
         </template>   
 
         <template id="s_date_picker" name="Date Picker">
-            <section data-form-type="date_picker" data-field-id="0" class="html_form_field col-md-12">
+            <div class="html_form_field" data-form-type="date_picker" data-field-id="0">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <input type="text" name="field1" class="form-control"/>
                 </div>
-            </section>
+            </div>
         </template>   
 
         <template id="s_radio_group_selection" name="Radio Group(Selection)">
-            <section data-form-type="radio_group_selection" data-field-id="0" class="html_form_field col-md-12">
+            <div class="html_form_field" data-form-type="radio_group_selection" data-field-id="0">
                 <div class="form-group">
                     <label for="field1">Field 1</label><br/>
                     <input type="radio" name="field1"/>Option 1<br/>
                     <input type="radio" name="field1"/>Option 2<br/>
                     <input type="radio" name="field1"/>Option 3<br/>
                 </div>
-            </section>
+            </div>
         </template>
 
         <template id="s_checkbox_boolean" name="Checkbox(Boolean)">
-            <section data-form-type="checkbox_boolean" data-field-id="0" class="html_form_field col-md-12">
+            <div class="html_form_field" data-form-type="checkbox_boolean" data-field-id="0">
                 <div class="checkbox">
                     <label><input type="checkbox" name="field1"/>I Agree</label>
                 </div>
-            </section>
+            </div>
         </template>
 
         <template id="s_textarea" name="Textarea">
-            <section data-form-type="textarea" data-field-id="0" class="html_form_field  col-md-12">
+            <div class="html_form_field" data-form-type="textarea" data-field-id="0">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <textarea class="form-control" name="field1"/>
                 </div>
-            </section>
+            </div>
         </template>
 
         <template id="s_dropbox" name="Dropbox(Selection)">
-            <section data-form-type="dropbox" data-field-id="0" class="html_form_field  col-md-12">
+            <div class="html_form_field" data-form-type="dropbox" data-field-id="0">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <select class="form-control" name="field1">
                         <option value="">Select an option</option>
                     </select>
                 </div>
-            </section>
+            </div>
         </template>
 
         <template id="s_dropbox_m2o" name="Dropbox(M2O)">
-            <section data-form-type="dropbox_m2o" data-field-id="0" class="html_form_field  col-md-12">
+            <div class="html_form_field" data-form-type="dropbox_m2o" data-field-id="0">
                 <div class="form-group">
                     <label for="field1">Field 1</label>
                     <select class="form-control" name="field1">
                         <option value="">Select an option</option>
                     </select>
                 </div>
-            </section>
+            </div>
         </template>
         
         <template id="s_captcha" name="Captcha">
-            <section class="html_form_captcha col-md-12 form-group">
+            <div class="html_form_captcha col-md-12 form-group">
                 Placeholder Captcha String
-            </section>
+            </div>
         </template>
 
     </data>

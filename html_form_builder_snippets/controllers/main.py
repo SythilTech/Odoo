@@ -216,11 +216,11 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "        <div class=\"row\">\n"
         form_string += "            <h2>" + html_form.name + "</h2>\n"
         form_string += "            <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div id=\"html_fields\" class=\"oe_structure\" style=\"margin-left:-15px;\">\n"
+        form_string += "                <div id=\"html_fields\">\n"
 
             
         for form_field in html_form.fields_ids:
-            form_string += "<section data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\" class=\"oe_snippet_body html_form_field col-md-12\">\n"
+            form_string += "<div class=\"html_form_field\" data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\">\n"
 
             method = '_generate_html_%s' % (form_field.field_type.html_type,)
 	    action = getattr(self, method, None)
@@ -229,13 +229,13 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	        raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 	                
 	    form_string += action(form_field)
-	    form_string += "</section>\n"
+	    form_string += "</div>\n"
 	    	    
 	    	    
         if html_form.captcha:
-            form_string += "<section class=\"html_form_captcha col-md-12 form-group\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
+            form_string += "<div class=\"html_form_captcha col-md-12 form-group\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
             form_string += "    <div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
-            form_string += "</section>\n"
+            form_string += "</div>\n"
 	    	    
 	    	    
         form_string += "                </div>\n"
@@ -267,7 +267,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "        <div class=\"row\">\n"
         form_string += "            <h2>" + html_form.name + "</h2>\n"
         form_string += "            <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div id=\"html_fields\" class=\"oe_structure\" style=\"margin-left:-15px;\">\n"	    	    
+        form_string += "                <div id=\"html_fields\">\n"	    	    
         form_string += "                </div>\n"
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
 	form_string += "                <input type=\"hidden\" name=\"csrf_token\"/>\n"
