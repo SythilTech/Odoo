@@ -1,3 +1,7 @@
+v1.7.3
+======
+* csrf as causing snipet issues, it will be replaced with an allow external access button with domain whitelist
+
 v1.7.2
 ======
 * Record ID bug fix

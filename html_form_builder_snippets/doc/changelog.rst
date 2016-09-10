@@ -1,3 +1,7 @@
+v.1.6.9
+=======
+* csrf as causing snipet issues, it will be replaced with an allow external access button with domain whitelist
+
 v.1.6.8
 =======
 * Set default permissions to shut log up

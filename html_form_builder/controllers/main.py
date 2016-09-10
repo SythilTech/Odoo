@@ -21,7 +21,7 @@ class HtmlFormController(http.Controller):
     def html_thanks(self, **kw):
         return http.request.render('html_form_builder.html_thank_you', {})
 
-    @http.route('/form/sinsert',type="http", auth="public", csrf=True)
+    @http.route('/form/sinsert',type="http", auth="public", csrf=False)
     def my_secure_insert(self, **kwargs):
         
         values = {}
