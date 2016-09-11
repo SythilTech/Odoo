@@ -17,17 +17,58 @@
             ]]>
             </field>
         </record>
-        
-        <record id="ticket_new_message" model="mail.template">
-            <field name="name">Suppport Ticket New Message</field>
+
+        <record id="new_support_ticket_category_change" model="mail.template">
+            <field name="name">Suppport Ticket Category Change</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
-            <field name="email_from">${(user.email)|safe}</field>
-            <field name="email_to">${(object.email)}</field>
-            <field name="auto_delete">False</field>
-            <field name="subject">New Support Ticket Message</field>
-                <field name="body_html"><![CDATA[
+            <field name="email_from">${user.email}</field>            
+            <field name="email_to">${object.email}</field>
+            <field name="subject">Your support ticket has been updated</field>
+            <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
+                <p>Your support ticket has been updated and is now in the category '${object.category.name}' </p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.id}<br/>
+                <b>Ticket Category:</b> ${object.category.name}<br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description}
                 
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_closed" model="mail.template">
+            <field name="name">Suppport Ticket Closed</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from">${user.email}</field>            
+            <field name="email_to">${object.email}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>Your support ticket has been closed by our staff</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.id}<br/>
+                <b>Ticket Category:</b> ${object.category.name}<br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description}
+                
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_reply_wrapper" model="mail.template">
+            <field name="name">Suppport Ticket Reply Wrapper</field>
+            <field name="model_id" ref="model_website_support_ticket_compose"></field>
+            <field name="subject">${object.subject}</field>
+            <field name="email_from">${user.email}</field>            
+            <field name="email_to">${object.email}</field>
+            <field name="body_html"><![CDATA[
+                ${(object.body)|safe}
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
+                <b>Ticket Category:</b> ${object.ticket_id.category.name}<br/>
+                <b>Ticket Description:</b><br/>
+                ${object.ticket_id.description}
             ]]>
             </field>
         </record>

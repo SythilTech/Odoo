@@ -1,3 +1,7 @@
+v1.6
+====
+* Full email integration
+
 v1.4.8
 ======
 * Translatable state and categories

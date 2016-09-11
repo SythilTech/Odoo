@@ -136,10 +136,9 @@ class SupportTicketController(http.Controller):
         else:
             http.request.env['website.support.ticket.message'].create({'ticket_id':ticket.id,'content':values['comment']})
             
-            #Should read state change THEN user comment...
-            #ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
+            ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
             
-            request.env['website.support.ticket'].browse(ticket.id).message_post(body=values['comment'], subject="Support Ticker Reply", message_type="comment")
+            request.env['website.support.ticket'].browse(ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
         
         return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
         

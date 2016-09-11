@@ -8,9 +8,10 @@
           <field name="arch" type="xml">
       	      <form create="false">
                   <header>
-                  
+                      <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply"/>
+                      <button type="object" name="close_ticket" string="Close Ticket"/>                      
                   </header>
-      	          <sheet>    
+      	          <sheet>  
       	              <group>
       	                  <field name="partner_id"/>
           	          <field name="person_name"/>
@@ -28,9 +29,10 @@
           	          </field>
           	      </group>
       	          </sheet>
-      	          <div class="oe_chatter">
-		      <field name="message_ids" widget="mail_thread" options="{&quot;thread_level&quot;: 1}"/>
-		  </div>
+                  <div class="oe_chatter">
+                      <field name="message_follower_ids" widget="mail_followers"/>
+                      <field name="message_ids" widget="mail_thread"/>
+                  </div>
       	      </form>
       	  </field>
       </record>
