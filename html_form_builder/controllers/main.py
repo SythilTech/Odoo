@@ -191,8 +191,7 @@ class HtmlFormController(http.Controller):
             except Exception as e:
                 return "Failed to insert record<br/>\n" + str(e)
                 
-            new_history.record_id = entity_form.id
- 
+            new_history.record_id = new_record.id 
  
             #Execute all the server actions
             for sa in entity_form.submit_action:
