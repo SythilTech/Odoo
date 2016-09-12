@@ -9,6 +9,7 @@
     'data': [
         'views/snippets.xml',
         'views/ir_ui_view_views.xml',
+        'data/ir.config_parameter.xml',
     ],
     'demo': [],
     'images':[

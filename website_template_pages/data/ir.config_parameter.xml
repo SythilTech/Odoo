@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="custom_app_store_url" model="ir.config_parameter">
+            <field name="key">website_template_server</field>
+            <field name="value">http://sythiltech.com.au</field>
+        </record>
+    </data>
+</openerp>
