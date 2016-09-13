@@ -1,6 +1,6 @@
 {
     'name': "Website Template Pages",
-    'version': "1.1",
+    'version': "1.1.1",
     'author': "Sythil",
     'category': "Tools",
     'summary': "Save webpages as templates to reuse on new pages / websites",

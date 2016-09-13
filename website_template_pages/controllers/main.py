@@ -96,14 +96,13 @@ class WebsiteTemplatePages(http.Controller):
             values[field_name] = field_value
 
         view_id = values['view_id']
-        
         current_view = request.env['ir.ui.view'].browse( int( view_id) )
                 
-        #Create the new template page using the content of the current page
-        new_xml_id = request.env['website'].new_page(current_view.name + " - Template", current_view.xml_id)
+        #Duplicate the current view
+        new_view = current_view.copy()
         
         #We need to modify the new page to classify it as a template
-        new_view = request.env['ir.ui.view'].search([('key','=',new_xml_id)])
+        new_view.name = new_view.name + " - Template"
         new_view.is_webpage_template = True
 
         return {'code': 'good'}

@@ -66,7 +66,7 @@ ajax.loadXML('/website_template_pages/static/src/xml/website_template_pages_moda
 
         },
         save_sythil_webpage: function() {
-            var view_id = $("#ace-view-list").val();
+            var view_id = $(document.documentElement).data('view-xmlid');
 			session.rpc('/template/pages/save', {'view_id': view_id}).then(function(result) {
 			    if (result.code == "good") {
 				    alert("Template Saved");
