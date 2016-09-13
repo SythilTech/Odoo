@@ -1,6 +1,6 @@
 {
     'name': "Sythil Tech SAAS Client",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil",
     'category': "Tools",
     'summary':'Interacts with Sythil SAAS Server',
@@ -9,7 +9,7 @@
     'data': [
         'data/res.users.csv',
         'data/ir.rule.xml',
-        'data/ir.config_parameter.csv',
+        'views/ir_actions_todo.xml',
         'views/sythil_saas_client_templates.xml',
     ],
     'demo': [],

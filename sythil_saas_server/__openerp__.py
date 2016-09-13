@@ -14,6 +14,7 @@
         'security/ir.model.access.csv',
         'data/ir.config_parameter.csv',
         'data/ir.cron.csv',
+        'data/saas.modules.builtin.csv',
     ],
     'demo': [],
     'images':[

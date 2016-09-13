@@ -8,7 +8,7 @@
             </xpath>
         </template>
 
-        <delete id="base.modules_act_cl" model="ir.actions.client"/>
+        <!--<delete id="base.modules_act_cl" model="ir.actions.client"/>-->
         
     </data>
 </openerp>

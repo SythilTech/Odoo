@@ -80,11 +80,9 @@
                         <img t-att-src="website.image_url(template_database, 'image')" class="img-rounded mb8" t-attf-alt="#{template_database.name}" width="150" height="150"/><br/>
                                 
                         <p t-field="template_database.description"></p>
-                        <div style="float:right;">
-                            <form method="GET" action="/try/details">
-                                <input type="hidden" name="templatedb" t-attf-value="#{template_database.id}"/>
-                                <button class="btn btn-primary">Create Database</button>
-                            </form>
+                        <div>
+                            <a t-attf-href="/template/details/#{template_database.id}"><button class="btn btn-primary">More Details</button></a>
+                            <a t-attf-href="/try/details?templatedb=#{template_database.id}"><button class="btn btn-primary">Signup</button></a>
                         </div>    
                     </div>
                     
@@ -95,6 +93,23 @@
         </div>        
       </section>
       </div>
+    </t>
+</template>
+
+<template id="template_details" name="Template Details" page="True">
+    <t t-call="website.layout">
+        <h1 class="text-center"><t t-esc="template_database.name"/></h1>
+        <div class="container">
+            <p class="text-center"><t t-esc="template_database.description"/></p>
+            <h2>Applications</h2>
+            <t t-raw="page_data_applications"/>
+            <br/>
+            <h2>Additional modules</h2>
+            <t t-raw="page_data_builtin"/>
+            <br/>
+            <h2>Community Modules</h2>
+            <t t-raw="page_data_community"/>            
+        </div>
     </t>
 </template>
 

@@ -3,11 +3,21 @@ odoo.define('sythil_saas_client.sythil_saas_client', function (require) {
 "use strict";
 
 console.log("2");
+var core = require('web.core');
+var framework = require('web.framework');
+var Model = require('web.DataModel');
+var session = require('web.session');
+var web_client = require('web.web_client');
+var Widget = require('web.Widget');
 
-    var apps = require('base.apps');
+var _t = core._t;
+var qweb = core.qweb;
 
-    var admin_only_app_store = apps.Apps.include({
+var Apps = require('base.apps');
+
+    var admin_only_app_store = Apps.include({
     get_client: function() {
+		alert("Test");
 		console.log("test");
         // return the client via a deferred, resolved or rejected depending if the remote host is available or not.
         var check_client_available = function(client) {

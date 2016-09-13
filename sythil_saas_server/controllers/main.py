@@ -26,6 +26,52 @@ class SaasMultiDB(http.Controller):
         template_databases = request.env['saas.template.database'].search([])
         return http.request.render('sythil_saas_server.saas_choose_package', {'template_databases': template_databases})
 
+    @http.route('/template/details/<template_id>', type="http", auth="public", website=True)
+    def template_details(self, template_id, **kw):
+        """Lists what is inside the template database"""
+
+        template_database = request.env['saas.template.database'].browse( int(template_id) )
+        
+        #connect to the newly created database
+	db = openerp.sql_db.db_connect(template_database.database_name)
+
+        #Create new registry
+        registry = openerp.modules.registry.RegistryManager.new(template_database.database_name, False, None, update_module=True)
+
+        page_data_applications = ""
+        page_data_builtin = ""
+        page_data_community = ""
+        
+        buildin_modules_list = []
+        for buildin_module in request.env['saas.modules.builtin'].search([]):
+            buildin_modules_list.append(buildin_module.name)
+
+	#Get a list of all the installed modules
+	with closing(db.cursor()) as cr:
+	    cr.autocommit(True)     # avoid transaction block
+	    
+	    #Application list
+	    application_modules = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed'), ('application','=',True) ])
+	    for installed_module_id in application_modules:
+	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
+	        page_data_applications += "<h3>" + installed_module.shortdesc + " (" + installed_module.name + ")</h3>"
+	        
+	    #Built in modules
+	    builtin_modules = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed'), ('application','=',False)])
+	    for installed_module_id in builtin_modules:
+	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
+	        if installed_module.name in buildin_modules_list:
+	            page_data_builtin += "<h3>" + installed_module.shortdesc + " (" + installed_module.name + ")</h3>"
+	    
+	    #Community Modules
+	    community_modules = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed')])
+	    for installed_module_id in community_modules:
+	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
+	        if installed_module.name not in buildin_modules_list:
+	            page_data_community += "<h3><a href=\"https://www.odoo.com/apps/modules/9.0/" + installed_module.name + "\">" + installed_module.shortdesc + " (" + installed_module.name + ")</a></h3>"
+
+        return http.request.render('sythil_saas_server.template_details', {'page_data_applications': page_data_applications, 'page_data_builtin': page_data_builtin, 'page_data_community':page_data_community, 'template_database': template_database})
+
     @http.route('/try/details', type="http", auth="public", website=True)
     def saas_info(self, **kw):
         """Webpage for users to enter details about thier saas setup"""
