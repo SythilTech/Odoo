@@ -71,7 +71,7 @@
                     <div id="html_fields" class="form_fields">
 		                                 
 		    </div>
-                    <input type="submit" class="btn btn-primary btn-lg" value="Send"/>
+                    <button class="btn btn-primary btn-lg">Submit</button>
                 </div>
             </section>
         </template>
@@ -83,7 +83,7 @@
                     <div id="html_fields" class="form_fields">
 		                                 
 		    </div>
-                    <button type="submit" class="btn btn-primary btn-lg">Send</button>
+                    <button class="btn btn-primary btn-lg">Submit</button>
                 </div>
             </section>
         </template>

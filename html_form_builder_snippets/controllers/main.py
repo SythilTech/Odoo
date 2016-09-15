@@ -58,6 +58,50 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "</div>\n"
 	
 	return html_output
+
+    def _generate_html_datetime_picker(self, field):
+        """Generate datetime picker textbox HTML"""
+        html_output = ""        
+        html_output += "  <script>\n"
+	html_output += "  $( function() {\n"
+
+	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).removeClass(\"hasDatepicker\");\n"
+
+        html_output += "    $(\"#" + field.html_name.encode("utf-8") + "\").on('click', function(e) {\n"
+        html_output += "      $(e.currentTarget).closest(\"div.date\").datetimepicker({\n"
+        html_output += "        useSeconds: true,\n"
+        html_output += "        format: \"YYYY-MM-DD HH:mm:ss\",\n"
+        html_output += "        icons : {\n"
+        html_output += "          time: 'fa fa-clock-o',\n"
+        html_output += "          date: 'fa fa-calendar',\n"
+        html_output += "          up: 'fa fa-chevron-up',\n"
+        html_output += "          down: 'fa fa-chevron-down'\n"
+        html_output += "        },\n"
+        html_output += "      });\n"
+        html_output += "    });\n"
+
+	html_output += "  } );\n"
+        html_output += "  </script>\n"
+        
+        html_output += "<div class=\"form-group date\">\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
+		    		
+	if field.field_id.required == False:
+	    html_output += " style=\"font-weight: normal\""
+		    		
+	html_output += ">" + field.field_label + "</label>\n"	    
+	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
+		                                    
+	if field.field_id.required == True:
+	    html_output += " required=\"required\""
+	
+	html_output += "/>"
+
+        #html_output += "<span class=\"input-group-addon\"><span class=\"fa fa-calendar\"></span></span>\n"
+	
+	html_output += "</div>\n"
+	
+	return html_output
 	
     def _generate_html_textbox(self, field):
         """Generate textbox HTML"""
@@ -242,7 +286,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
 	form_string += "                <input type=\"hidden\" name=\"csrf_token\"/>\n"
 	form_string += "                <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"	
-        form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"
+        form_string += "                <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
         form_string += "            </form>\n"
         form_string += "        </div>\n"
         form_string += "    </div>\n"
@@ -272,7 +316,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
 	form_string += "                <input type=\"hidden\" name=\"csrf_token\"/>\n"
 	form_string += "                <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
-        form_string += "                <input type=\"submit\" class=\"btn btn-primary btn-lg\" value=\"Send\"/>\n"
+        form_string += "                <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
         form_string += "            </form>\n"
         form_string += "        </div>\n"
         form_string += "    </div>\n"

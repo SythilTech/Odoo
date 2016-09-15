@@ -7,3 +7,4 @@ dropbox_many2one,"Dropbox(Many2one)",dropbox_m2o,many2one,1
 checkbox_boolean,"Checkbox(Boolean)",checkbox_boolean,boolean,1
 radio_group_selection,"Radio Group(Selection)",radio_group_selection,selection,0
 textbox_date,"Date Picker",date_picker,date,1
+textbox_datetime,"Datetime Picker",datetime_picker,datetime,1

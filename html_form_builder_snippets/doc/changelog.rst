@@ -1,3 +1,7 @@
+v.1.7
+=====
+* Datetime generation
+
 v.1.6.10
 ========
 * CSS clean to get the drag and drop functing like it should

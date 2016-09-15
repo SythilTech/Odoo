@@ -225,6 +225,15 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
+    def _process_html_datetime_picker(self, field, field_data):
+        """Validation for datetime picker textbox and preps for insertion into database"""
+        html_response = html_field_response()
+        html_response.error = ""
+        html_response.return_data = field_data
+        html_response.history_data = field_data
+
+        return html_response
+
     def _process_html_checkbox_boolean(self, field, field_data):
         """Validation for Checkboxes(Boolean) and preps for insertion into database"""
         html_response = html_field_response()
