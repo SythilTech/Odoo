@@ -14,7 +14,12 @@ class WebsiteSupportTicket(models.Model):
     def _default_state(self):
         open_state = self.env['website.support.ticket.states'].search([('name','=','Open')])
         return open_state[0]
-    
+
+    def _default_priority_id(self):
+        default_priority = self.env['website.support.ticket.priority'].search([('sequence','=','1')])
+        return default_priority[0]
+
+    priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
     partner_id = fields.Many2one('res.partner', string="Partner", readonly=True)
     person_name = fields.Char(required=True, string='Person Name', readonly=True)
     email = fields.Char(string="Email", readonly=True)
@@ -76,7 +81,21 @@ class WebsiteSupportTicketStates(models.Model):
     _name = "website.support.ticket.states"
     
     name = fields.Char(required=True, translate=True, string='State Name')
-    
+
+class WebsiteSupportTicketPriority(models.Model):
+
+    _name = "website.support.ticket.priority"
+    _order = "sequence asc"
+
+    sequence = fields.Integer(string="Sequence")
+    name = fields.Char(required=True, translate=True, string="Priority Name")
+
+    @api.model
+    def create(self, values):
+        sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.priority')
+        values['sequence']=sequence
+        return super(WebsiteSupportTicketPriority, self).create(values)
+        
 class WebsiteSupportTicketUsers(models.Model):
 
     _inherit = "res.users"

@@ -13,6 +13,7 @@
                   </header>
       	          <sheet>  
       	              <group>
+      	                  <field name="priority_id"/>
       	                  <field name="partner_id"/>
           	          <field name="person_name"/>
           	          <field name="email"/>
@@ -43,6 +44,7 @@
           <field name="arch" type="xml">
       	      <tree>
       	          <field name="id" string="Ticket Number"/>
+      	          <field name="priority_id"/>
       	          <field name="person_name"/>
       	          <field name="category"/>
       	          <field name="state"/>

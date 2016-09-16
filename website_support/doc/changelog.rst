@@ -1,3 +1,7 @@
+v1.7
+====
+* Ticket priority
+
 v1.6
 ====
 * Full email integration

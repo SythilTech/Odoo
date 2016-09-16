@@ -7,3 +7,4 @@ access_website_support_ticket_categories,access.website.support.ticket.categorie
 access_website_support_help_groups,access.website.support.help.groups,model_website_support_help_groups,,1,0,0,0
 access_website_support_help_page,access.website.support.help.page,model_website_support_help_page,,1,0,0,0
 access_website_support_help_page_feedback,access.website.support.help.page.feedback,model_website_support_help_page_feedback,,1,0,0,0
+access_website_support_ticket_priority,access.website.support.ticket.priority,model_website_support_ticket_priority,,1,0,0,0
