@@ -1,3 +1,7 @@
+v1.7.6
+======
+* Automatic partner detection
+
 v1.7.5
 ======
 * Fix bug when Open state name was changed

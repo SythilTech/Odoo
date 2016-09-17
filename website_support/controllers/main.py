@@ -3,6 +3,9 @@ import werkzeug
 import json
 import base64
 
+import logging
+_logger = logging.getLogger(__name__)
+
 import openerp.http as http
 from openerp.http import request
 
@@ -84,7 +87,12 @@ class SupportTicketController(http.Controller):
             partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
             
         else:
-            new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name})
+            search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
+
+            if len(search_partner) > 0:
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id})
+            else:
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name})
 
         #send an email out to everyone in the category
         notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
