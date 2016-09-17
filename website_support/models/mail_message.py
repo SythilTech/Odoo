@@ -12,8 +12,9 @@ class MailMessageSupport(models.Model):
     def create(self, values):
         new_rec = super(MailMessageSupport, self).create(values)
         
-        if new_rec.model == "website.support.ticket":
-        
+        #Reply messages to support tickets
+        if new_rec.model == "website.support.ticket" and new_rec.message_type == "email" and new_rec.parent_id:
+
             #(Depreciated) Add to message history field for back compatablity
             self.env['website.support.ticket.message'].create({'ticket_id': new_rec.res_id, 'content':new_rec.body})
 

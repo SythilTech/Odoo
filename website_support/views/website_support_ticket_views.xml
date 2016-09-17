@@ -60,7 +60,7 @@
           <field name="arch" type="xml">
       	      <search>
       	          <field name="partner_id"/>
-                  <filter string="Unattended Tickets" name="unattended_tickets" domain="['|',('state', '=', 'Open'), ('state', '=', 'Customer Replied')]"/>
+                  <filter string="Unattended Tickets" name="unattended_tickets" domain="[('unattended', '=', True )]" />
       	      </search>
       	  </field>
       </record>

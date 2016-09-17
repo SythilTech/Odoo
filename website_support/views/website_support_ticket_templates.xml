@@ -6,6 +6,7 @@
             <field name="name">Suppport Ticket New Ticket (Category)</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
             <field name="subject">New Support Ticket for your category</field>
+            <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                 <p>Dear _user_name_,</p>
                 <p>A new support ticket has been created in a category that you follow</p>
@@ -24,6 +25,7 @@
             <field name="email_from">${user.email}</field>            
             <field name="email_to">${object.email}</field>
             <field name="subject">Your support ticket has been updated</field>
+            <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been updated and is now in the category '${object.category.name}' </p>
@@ -43,6 +45,7 @@
             <field name="email_from">${user.email}</field>            
             <field name="email_to">${object.email}</field>
             <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been closed by our staff</p>
@@ -62,6 +65,7 @@
             <field name="subject">${object.subject}</field>
             <field name="email_from">${user.email}</field>            
             <field name="email_to">${object.email}</field>
+            <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                 ${(object.body)|safe}
                 <hr/>

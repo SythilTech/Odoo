@@ -1,3 +1,8 @@
+v1.7.5
+======
+* Fix bug when Open state name was changed
+* Fix bug where state would be stuck in Customer replied
+
 v1.7
 ====
 * Ticket priority

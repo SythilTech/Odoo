@@ -12,8 +12,7 @@ class WebsiteSupportTicket(models.Model):
     _inherit = ['mail.thread','ir.needaction_mixin']
 
     def _default_state(self):
-        open_state = self.env['website.support.ticket.states'].search([('name','=','Open')])
-        return open_state[0]
+        return self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
 
     def _default_priority_id(self):
         default_priority = self.env['website.support.ticket.priority'].search([('sequence','=','1')])
@@ -30,10 +29,21 @@ class WebsiteSupportTicket(models.Model):
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History (Depreciated)")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
+    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
 
+    @api.depends('state')
+    def _compute_unattend(self):
+        opened_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
+        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
+
+        if self.state == opened_state or self.state == customer_replied_state:
+            self.unattended = True
+    
     @api.model
     def _needaction_domain_get(self):
-        return ['|',('state', '=', 'Open'), ('state', '=', 'Customer Replied')]
+        open_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
+        custom_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
+        return ['|',('state', '=', open_state.id ), ('state', '=', custom_replied_state.id)]
 
     @api.multi
     def write(self, values, context=None):
@@ -50,13 +60,13 @@ class WebsiteSupportTicket(models.Model):
     @api.one
     def close_ticket(self):
 
-        new_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')
+        closed_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')
         
         #We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
-        message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.state.name + " </span><b>-></b> " + new_state.name + " </span></li></ul>"
+        message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
         self.message_post(body=message, subject="Ticket Closed by Staff")
 
-        self.state = new_state.id
+        self.state = closed_state.id
 
         #Send an email notifing the customer  that the ticket has been closed
         ticket_closed_email = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
@@ -134,6 +144,7 @@ class WebsiteSupportTicketCompose(models.Model):
         self.env['website.support.ticket.message'].create({'ticket_id': self.ticket_id.id, 'content':self.body.replace("<p>","").replace("</p>","")})
         
         #Post in message history
-        self.ticket_id.message_post(body=self.body, subject=self.subject)
+        #self.ticket_id.message_post(body=self.body, subject=self.subject, message_type='comment', subtype='mt_comment')
+	
 	staff_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')
-	self.ticket_id.state = staff_replied.id        
+	self.ticket_id.state = staff_replied.id
