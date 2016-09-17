@@ -1,3 +1,7 @@
+v1.7.7
+======
+* New ticket count on partner view
+
 v1.7.6
 ======
 * Automatic partner detection
