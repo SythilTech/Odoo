@@ -108,7 +108,11 @@
             <t t-raw="page_data_builtin"/>
             <br/>
             <h2>Community Modules</h2>
-            <t t-raw="page_data_community"/>            
+            <t t-raw="page_data_community"/>
+            <br/>
+            <h2>Saas User Permissions</h2>
+            <t t-raw="groups_string"/>
+            <br/>
         </div>
     </t>
 </template>

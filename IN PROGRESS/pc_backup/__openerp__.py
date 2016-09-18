@@ -7,7 +7,8 @@
     'description': "Backs up important files on your desktop computers",
     'license':'LGPL-3',
     'data': [
-        'views/backup_backup_views.xml',
+        'views/backup_computer_views.xml',
+        'views/backup_computer_file_views.xml',
         'views/pc_backup_templates.xml',
     ],
     'demo': [],

@@ -41,6 +41,7 @@ class SaasMultiDB(http.Controller):
         page_data_applications = ""
         page_data_builtin = ""
         page_data_community = ""
+        groups_string = ""
         
         buildin_modules_list = []
         for buildin_module in request.env['saas.modules.builtin'].search([]):
@@ -69,8 +70,13 @@ class SaasMultiDB(http.Controller):
 	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
 	        if installed_module.name not in buildin_modules_list:
 	            page_data_community += "<h3><a href=\"https://www.odoo.com/apps/modules/9.0/" + installed_module.name + "\">" + installed_module.shortdesc + " (" + installed_module.name + ")</a></h3>"
+	            
+	    saas_user_id = registry['ir.model.data'].get_object_reference(cr, SUPERUSER_ID, 'sythil_saas_client', 'saas_user')[1]
+            saas_user = registry['res.users'].browse(cr, SUPERUSER_ID, saas_user_id)
+            for group in saas_user.groups_id:
+                groups_string += "<h3>" + group.display_name + "</h3>\n"
 
-        return http.request.render('sythil_saas_server.template_details', {'page_data_applications': page_data_applications, 'page_data_builtin': page_data_builtin, 'page_data_community':page_data_community, 'template_database': template_database})
+        return http.request.render('sythil_saas_server.template_details', {'page_data_applications': page_data_applications, 'page_data_builtin': page_data_builtin, 'page_data_community':page_data_community, 'template_database': template_database, 'groups_string': groups_string})
 
     @http.route('/try/details', type="http", auth="public", website=True)
     def saas_info(self, **kw):

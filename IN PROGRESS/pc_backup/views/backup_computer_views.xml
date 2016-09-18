@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>                    
+    
+      <record id="backup_computer_view_form" model="ir.ui.view">
+          <field name="name">backup.computer.form.view</field>
+          <field name="model">backup.computer</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <sheet>    
+      	              <group>
+      	                  <field name="user_id"/>
+      	                  <field name="computer_name"/>
+      	                  <field name="backup_file_ids">
+      	                      <tree>
+      	                          <field name="file_name"/>
+      	                          <field name="backup_path"/>
+      	                      </tree>
+      	                  </field>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="backup_computer_view_tree" model="ir.ui.view">
+          <field name="name">backup.computer.tree.view</field>
+          <field name="model">backup.computer</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="user_id"/>
+      	          <field name="computer_name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="backup_computer_action" model="ir.actions.act_window">
+          <field name="name">backup.computer.action</field>
+	  <field name="res_model">backup.computer</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+	      <p>
+	          No backups found
+	      </p>
+          </field>
+      </record>
+
+      <menuitem id="backup_computer_parent_menu" name="Backup" parent="base.menu_administration" sequence="90"/>
+      <menuitem id="backup_computer_menu" name="Computer Backups" parent="backup_computer_parent_menu" action="backup_computer_action" sequence="10"/>
+ 
+    </data>
+</openerp>

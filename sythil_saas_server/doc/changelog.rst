@@ -1,3 +1,7 @@
+v1.1.2
+======
+* Include saas user permissions in details
+
 v1.1.1
 ======
 * Replace system name with company to reduce confusion

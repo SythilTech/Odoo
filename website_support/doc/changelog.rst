@@ -1,3 +1,7 @@
+v1.7.8
+======
+* Fix missing permission
+
 v1.7.7
 ======
 * New ticket count on partner view
