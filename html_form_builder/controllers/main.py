@@ -8,6 +8,7 @@ import werkzeug
 import base64
 import json
 import sys
+from urlparse import urlparse
 
 from openerp.exceptions import ValidationError
 
@@ -30,7 +31,11 @@ class HtmlFormController(http.Controller):
     def my_secure_insert(self, **kwargs):
         
         values = {}
+        my_return_string = "?"
 	for field_name, field_value in kwargs.items():
+	    if field_name != "my_pie" and field_name != "csrf_token" and field_name != "form_id":
+	        my_return_string += field_name + "=" + field_value + "&"
+            
             values[field_name] = field_value
 
         if values['my_pie'] != "3.14":
@@ -84,11 +89,10 @@ class HtmlFormController(http.Controller):
                 else:
                     form_error = True
 
-
-
         if form_error:
             #redirect back to the page
-            return werkzeug.utils.redirect(ref_url)
+            ref_url = ref_url.replace(my_return_string[:-1],"")
+            return werkzeug.utils.redirect(ref_url + my_return_string[:-1])
         else:
             #default values
             for df in entity_form.defaults_values:

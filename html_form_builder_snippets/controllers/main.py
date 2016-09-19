@@ -54,7 +54,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
-	html_output += "/>\n"
+	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -95,7 +95,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
-	html_output += "/>"
+	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
 
         #html_output += "<span class=\"input-group-addon\"><span class=\"fa fa-calendar\"></span></span>\n"
 	
@@ -130,7 +130,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	
 	html_output += ' maxlength="' + str(field.character_limit) + '"'
 	
-	html_output += "/>\n"
+	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -150,7 +150,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
-	html_output += "/>\n"
+	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -169,7 +169,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
     	        
     	for selection_value,selection_label in selection_list.items():
-    	    html_output += "    <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"      	
+    	    html_output += "    <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"
 	
 	html_output += "</div>\n"
 	
