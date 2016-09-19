@@ -45,13 +45,13 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "<div class=\"form-group\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		    		
-	if field.field_id.required == False:
+	if field.setting_general_required == False:
 	    html_output += " style=\"font-weight: normal\""
 		    		
 	html_output += ">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
-	if field.field_id.required == True:
+	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
 	html_output += "/>\n"
@@ -86,13 +86,13 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "<div class=\"form-group date\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		    		
-	if field.field_id.required == False:
+	if field.setting_general_required == False:
 	    html_output += " style=\"font-weight: normal\""
 		    		
 	html_output += ">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
-	if field.field_id.required == True:
+	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
 	html_output += "/>"
@@ -109,7 +109,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "<div class=\"form-group\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		    		
-	if field.field_id.required == False:
+	if field.setting_general_required == False:
 	    html_output += " style=\"font-weight: normal\""
 		    		
 	html_output += ">" + field.field_label + "</label>\n"	    
@@ -122,7 +122,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	
 	html_output += "\" class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
-	if field.field_id.required == True:
+	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
 	if field.validation_format == "lettersonly":
@@ -141,13 +141,13 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "<div class=\"form-group\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		    		
-	if field.field_id.required == False:
+	if field.setting_general_required == False:
 	    html_output += " style=\"font-weight: normal\""
 		    		
 	html_output += ">" + field.field_label + "</label>\n"	    
 	html_output += "  <textarea class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
-	if field.field_id.required == True:
+	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
 	html_output += "/>\n"
@@ -161,7 +161,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "<div class=\"form-group\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		    		
-	if field.field_id.required == False:
+	if field.setting_general_required == False:
 	    html_output += " style=\"font-weight: normal\""
 		    		
 	html_output += ">" + field.field_label + "</label><br/>\n"
@@ -192,14 +192,14 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
             html_output += "<div class=\"form-group\">\n"
 	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		                
-            if field.field_id.required == False:
+            if field.setting_general_required == False:
                 html_output += " style=\"font-weight: normal\""                
                 		
             html_output += ">" + field.field_label
             html_output += "</label>\n"
 	    html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
                 		    
-	    if field.field_id.required == True:
+	    if field.setting_general_required == True:
 	        html_output += " required=\"required\""
 	        
     	    html_output += ">\n"
@@ -222,14 +222,14 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "<div class=\"form-group\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
 		                
-        if field.field_id.required == False:
+        if field.setting_general_required == False:
             html_output += " style=\"font-weight: normal\""                
                 		
         html_output += ">" + field.field_label
         html_output += "</label>\n"
 	html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
                 		    
-	if field.field_id.required == True:
+	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	        
     	html_output += ">\n"
@@ -345,8 +345,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         field_id = request.env['ir.model.fields'].browse( int(values['field_id']) )
         
         field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
-        
-        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'], 'character_limit': values['character_limit'] })
+        _logger.error(values['field_required'])
+        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'], 'character_limit': values['character_limit'], 'setting_general_required': values['field_required'] })
         
         form_string = ""
 

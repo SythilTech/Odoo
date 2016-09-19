@@ -99,13 +99,16 @@ options.registry.html_form_builder_field = options.Class.extend({
                         '  </select>'+
                         '</div>'+
                     '</div>'+
-                    '<div class="form-group mb0">'+
+                    '<div class="form-group">'+
                         '<label class="col-sm-3 control-label">Character Limit</label>'+
                         '<div class="col-sm-9">'+
                         '  <input type="number" name="characterLimit" class="form-control" value="100"/>'+
                         '</div>'+
-                    '</div>');
-                    //$add.find('label').append(_t("Add page in menu"));
+                    '</div>'+
+                    '<div class="checkbox mb0">'+
+                        '<label><input type="checkbox" name="form_required_checkbox">Required</label>'+
+                    '</div>'
+                    );
                     $group.after($add);
 
 			        return field_ids;
@@ -113,8 +116,9 @@ options.registry.html_form_builder_field = options.Class.extend({
 			}).then(function (val, field_id, $dialog) {
                 var format_validation = $dialog.find('select[name="formatValidation"]').val();
                 var character_limit = $dialog.find('input[name="characterLimit"]').val();
+                var field_required = $dialog.find('input[name="form_required_checkbox"]').is(':checked');
 
-                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': val, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit }).then(function(result) {
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': val, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit, 'field_required': field_required }).then(function(result) {
 				    self.$target.html(result.html_string);
              	});
 			});

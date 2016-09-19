@@ -34,16 +34,10 @@
                 <label for="html_form_config_name" class="control-label">Field HTML Name</label>
                 <input type="text" id="html_form_field_config_name" class="form-control"/>
             </div>            
-            
-            <!--
-            <div class="form-group">
-                <label for="html_form_config_field_type" class="control-label">Field Type</label>
-                <select id="html_form_config_field_type" class="form-control">
-                    <option value="textbox">Textbox</option>
-                    <option value="textarea">Textarea</option>
-                </select>
+
+            <div class="checkbox">
+                <label><input type="checkbox" id="form_required_checkbox">Required</label>
             </div>
-            -->
 
         </div> <!-- modal-body -->
 
