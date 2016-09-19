@@ -12,6 +12,7 @@
         'views/html_form_builder_templates.xml',
         'data/html.form.captcha.csv',
         'data/html.form.field.type.csv',
+        'data/html.form.action.type.csv',
         'security/ir.model.access.csv',
     ],
     'demo': [],
