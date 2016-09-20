@@ -1,3 +1,8 @@
+v1.7.9
+======
+* Allow changing of partner
+* Swap description for subject in support ticket tree view 
+
 v1.7.8
 ======
 * Fix missing permission

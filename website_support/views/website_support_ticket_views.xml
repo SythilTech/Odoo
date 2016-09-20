@@ -49,7 +49,7 @@
       	          <field name="category"/>
       	          <field name="state"/>
       	          <field name="email"/>
-      	          <field name="description"/>
+      	          <field name="subject"/>
       	      </tree>
       	  </field>
       </record>

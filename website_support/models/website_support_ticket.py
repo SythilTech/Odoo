@@ -19,9 +19,9 @@ class WebsiteSupportTicket(models.Model):
         return default_priority[0]
 
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
-    partner_id = fields.Many2one('res.partner', string="Partner", readonly=True)
-    person_name = fields.Char(required=True, string='Person Name', readonly=True)
-    email = fields.Char(string="Email", readonly=True)
+    partner_id = fields.Many2one('res.partner', string="Partner")
+    person_name = fields.Char(required=True, string='Person Name')
+    email = fields.Char(string="Email")
     category = fields.Many2one('website.support.ticket.categories', string="Category", required=True, track_visibility='onchange')
     subject = fields.Char(string="Subject", readonly=True)
     description = fields.Text(string="Description", readonly=True)
