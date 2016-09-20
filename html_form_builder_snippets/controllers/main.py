@@ -55,6 +55,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    html_output += " required=\"required\""
 	
 	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
+        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -98,7 +99,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
 
         #html_output += "<span class=\"input-group-addon\"><span class=\"fa fa-calendar\"></span></span>\n"
-	
+        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"	
 	html_output += "</div>\n"
 	
 	return html_output
@@ -131,6 +132,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += ' maxlength="' + str(field.character_limit) + '"'
 	
 	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
+        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -151,6 +153,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    html_output += " required=\"required\""
 	
 	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
+        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -180,6 +183,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output = ""
         html_output += "<div class=\"checkbox\">\n"
 	html_output += "  <label><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
+        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -211,6 +215,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	        html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
     	        
     	    html_output += "  </select>\n"
+            html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
     	    html_output += "</div>\n"
     	    
     	    return html_output
@@ -242,6 +247,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	    html_output += "    <option value=\"" + str(row.id) + "\">" + row.name + "</option>\n"
     	        
     	html_output += "  </select>\n"
+        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
     	html_output += "</div>\n"
     	    
     	return html_output

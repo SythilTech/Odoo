@@ -1,3 +1,7 @@
+v1.7.6
+======
+* Fail safe required validation
+
 v1.7.5
 ======
 * Bug fix datetime field in backend

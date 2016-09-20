@@ -87,6 +87,7 @@ class HtmlFormController(http.Controller):
 	            secure_values[fi.field_id.name] = field_valid.return_data
                     new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id':fi.field_id.id, 'insert_value':field_valid.history_data})
                 else:
+	            my_return_string += "error_" + fi.html_name + "=" + field_valid.error + "&"
                     form_error = True
 
         if form_error:
@@ -220,6 +221,11 @@ class HtmlFormController(http.Controller):
         """Validation for textbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
+        
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+        
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -229,6 +235,11 @@ class HtmlFormController(http.Controller):
         """Validation for date picker textbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -238,6 +249,11 @@ class HtmlFormController(http.Controller):
         """Validation for datetime picker textbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -247,6 +263,11 @@ class HtmlFormController(http.Controller):
         """Validation for Checkboxes(Boolean) and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -256,6 +277,11 @@ class HtmlFormController(http.Controller):
         """Validation for Dropbox(m2o) and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -264,6 +290,11 @@ class HtmlFormController(http.Controller):
     def _process_html_textarea(self, field, field_data):
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -272,6 +303,11 @@ class HtmlFormController(http.Controller):
     def _process_html_radio_group_selection(self, field, field_data):
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
         html_response.return_data = field_data
         html_response.history_data = field_data
 
@@ -281,6 +317,10 @@ class HtmlFormController(http.Controller):
         """Validation for dropbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
+
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
 
         if field.field_id.ttype == "selection":
     
