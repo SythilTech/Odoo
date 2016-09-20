@@ -226,10 +226,17 @@ class SaasMultiDB(http.Controller):
 	#get the template database
 	template_database = request.env['saas.template.database'].browse(int(values["package"]))
 	chosen_template = template_database.database_name
-        	    
-	#Add this database to the saas list
-	request.env['saas.database'].create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id})
 
+        #Create the associated company(res.partner) record
+        saas_tag = request.env['ir.model.data'].sudo().get_object('sythil_saas_server', 'saas_client_tag')
+        new_company = request.env['res.partner'].sudo().create({'name': company, 'company_type':'company', 'email': email, 'category_id': [(4,saas_tag.id)] })
+        new_company.child_ids.sudo().create({'parent_id': new_company.id, 'type':'contact', 'name':person_name, 'email': email, 'category_id': [(4,saas_tag.id)] })
+        
+	#Add this database to the saas list
+	new_saas_database = request.env['saas.database'].create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id, 'partner_id': new_company.id})
+
+        
+        
         #Create the new database from the template database, disconnecting any users that might be using the template database
         db_original_name = chosen_template
         db_name = system_name

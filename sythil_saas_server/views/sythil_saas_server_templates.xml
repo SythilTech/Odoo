@@ -29,6 +29,16 @@
                                 <input type="text" class="form-control" name="company" required="True"/>
                             </div>
                         </div>
+
+                        <!--<div name="instance_type_container" class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="instance_type">Instance Type</label>
+                            <div class="col-md-7 col-sm-8">
+                                <select class="form-control" name="instance_type" required="True">
+                                    <option value="shared_instance">Shared Instance</option>
+                                    <option value="virtual_server">Virtual Server</option>
+                                </select>
+                            </div>
+                        </div>-->
         
                         <div name="email_from_container" t-attf-class="form-group">
                             <label class="col-md-3 col-sm-4 control-label" for="email">Email</label>

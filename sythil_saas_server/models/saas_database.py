@@ -11,6 +11,7 @@ class SaasDatabase(models.Model):
 
     _name = "saas.database"
     
+    partner_id = fields.Many2one('res.partner', string="Partner", help="Company that owns the data")
     name = fields.Char(string="Database Name")
     login = fields.Char(string="Login")
     password = fields.Char(string="Password")

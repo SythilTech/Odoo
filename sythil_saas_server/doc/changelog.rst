@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Create SAAS partner on sign up
+
 v1.1.2
 ======
 * Include saas user permissions in details

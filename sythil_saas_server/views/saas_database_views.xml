@@ -11,6 +11,7 @@
                       <button name="login_to_saas_user" type="object" string="Login to SAAS System"/>
                   </header>
                   <group>
+                      <field name="partner_id"/>
                       <field name="name"/>
                       <field name="login"/>
                       <field name="backup_ids">
@@ -29,6 +30,7 @@
           <field name="model">saas.database</field>
           <field name="arch" type="xml">
               <tree>
+                  <field name="partner_id" string="Company Name"/>
                   <field name="name"/>
                   <field name="template_database_id"/>
               </tree>
