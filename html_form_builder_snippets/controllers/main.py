@@ -43,12 +43,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "  </script>\n"
         
         html_output += "<div class=\"form-group\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		    		
-	if field.setting_general_required == False:
-	    html_output += " style=\"font-weight: normal\""
-		    		
-	html_output += ">" + field.field_label + "</label>\n"	    
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
@@ -85,12 +80,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "  </script>\n"
         
         html_output += "<div class=\"form-group date\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		    		
-	if field.setting_general_required == False:
-	    html_output += " style=\"font-weight: normal\""
-		    		
-	html_output += ">" + field.field_label + "</label>\n"	    
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
@@ -108,12 +98,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generate textbox HTML"""
         html_output = ""        
         html_output += "<div class=\"form-group\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		    		
-	if field.setting_general_required == False:
-	    html_output += " style=\"font-weight: normal\""
-		    		
-	html_output += ">" + field.field_label + "</label>\n"	    
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\""
 	
 	if field.validation_format == "email":
@@ -141,12 +126,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generate textarea HTML"""
         html_output = ""
         html_output += "<div class=\"form-group\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		    		
-	if field.setting_general_required == False:
-	    html_output += " style=\"font-weight: normal\""
-		    		
-	html_output += ">" + field.field_label + "</label>\n"	    
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <textarea class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
@@ -162,12 +142,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generate Radio Group(Selection) HTML"""
         html_output = ""
         html_output += "<div class=\"form-group\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		    		
-	if field.setting_general_required == False:
-	    html_output += " style=\"font-weight: normal\""
-		    		
-	html_output += ">" + field.field_label + "</label><br/>\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
 	
     	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
     	        
@@ -194,12 +169,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         
         if field.field_id.ttype == "selection":
             html_output += "<div class=\"form-group\">\n"
-	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		                
-            if field.setting_general_required == False:
-                html_output += " style=\"font-weight: normal\""                
-                		
-            html_output += ">" + field.field_label
+	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
             html_output += "</label>\n"
 	    html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
                 		    
@@ -225,12 +195,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output = ""
         
         html_output += "<div class=\"form-group\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\""
-		                
-        if field.setting_general_required == False:
-            html_output += " style=\"font-weight: normal\""                
-                		
-        html_output += ">" + field.field_label
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
         html_output += "</label>\n"
 	html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
                 		    

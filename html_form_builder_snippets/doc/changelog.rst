@@ -1,3 +1,7 @@
+v.1.7.2
+=======
+* field labels are always bold, required will be reworked
+
 v.1.7.1
 =======
 * Fail safe required validation
