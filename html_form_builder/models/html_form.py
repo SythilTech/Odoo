@@ -250,7 +250,7 @@ class HtmlFormField(models.Model):
 
     @api.model
     def create(self, values):
-        sequence=self.env['ir.sequence'].get('sequence')
+        sequence=self.env['ir.sequence'].next_by_code('html.form.field')
         values['sequence']=sequence
         return super(HtmlFormField, self).create(values)
 

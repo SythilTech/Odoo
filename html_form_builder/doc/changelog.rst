@@ -1,3 +1,7 @@
+v1.7.7
+======
+* Sequence fix
+
 v1.7.6
 ======
 * Fail safe required validation
