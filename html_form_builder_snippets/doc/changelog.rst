@@ -1,3 +1,9 @@
+v.1.8
+=====
+* Tidy up genersated html
+* Fix issue preventing adding new html fields
+* Misc changes to adapt to new ajax form posting
+
 v.1.7.2
 =======
 * field labels are always bold, required will be reworked

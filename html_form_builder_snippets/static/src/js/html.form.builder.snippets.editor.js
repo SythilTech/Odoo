@@ -7,6 +7,59 @@ var options = require('web_editor.snippets.options');
 var session = require('web.session');
 var website = require('website.website');
 var return_string = ""; //Global because I can't change html in session.rpc function
+var ajax = require('web.ajax');
+
+$(function() {
+  $( ".html_form button" ).click(function(e) {
+
+    e.preventDefault();  // Prevent the default submit behavior
+
+    var my_form = $(".html_form form");
+
+    // Prepare form inputs
+    var form_data = my_form.serializeArray();
+
+     var form_values = {};
+            _.each(form_data, function(input) {
+                if (input.name in form_values) {
+                    // If a value already exists for this field,
+                    // we are facing a x2many field, so we store
+                    // the values in an array.
+                    if (Array.isArray(form_values[input.name])) {
+                        form_values[input.name].push(input.value);
+                    } else {
+                        form_values[input.name] = [form_values[input.name], input.value];
+                    }
+                } else {
+                    if (input.value != '') {
+                        form_values[input.name] = input.value;
+                    }
+                }
+            });
+
+    // Post form and handle result
+    ajax.post(my_form.attr('action'), form_values).then(function(result_data) {
+      result_data = $.parseJSON(result_data);
+      if (result_data.status == "error") {
+        for (var i = 0; i < result_data.errors.length; i++) {
+		  //Find the field and make it displays as an error
+          var input = my_form.find("input[name='" + result_data.errors[i].html_name + "']");
+          var parent_div = input.parents(".html_form_field");
+
+          //Remove any existing help block
+          parent_div.find(".help-block").remove();
+
+          //Insert help block
+          input.after("<span class=\"help-block\">" + result_data.errors[i].error_messsage + "</span>");
+          parent_div.addClass("has-error");
+        }
+      } else if (result_data.status == "success") {
+	      window.location = result_data.redirect_url;
+      }
+    });
+
+  });
+});
 
 options.registry.html_form_builder = options.Class.extend({
     drop_and_build_snippet: function() {
@@ -119,7 +172,7 @@ options.registry.html_form_builder_field = options.Class.extend({
                 var field_required = $dialog.find('input[name="form_required_checkbox"]').is(':checked');
 
                 session.rpc('/form/field/add', {'form_id': form_id, 'field_id': val, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit, 'field_required': field_required }).then(function(result) {
-				    self.$target.html(result.html_string);
+				    self.$target.replaceWith(result.html_string);
              	});
 			});
 

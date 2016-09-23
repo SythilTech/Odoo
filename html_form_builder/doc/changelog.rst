@@ -1,3 +1,7 @@
+v1.8
+====
+* Change to ajax data post/validation
+
 v1.7.7
 ======
 * Sequence fix

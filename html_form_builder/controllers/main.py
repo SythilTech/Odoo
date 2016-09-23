@@ -31,11 +31,7 @@ class HtmlFormController(http.Controller):
     def my_secure_insert(self, **kwargs):
         
         values = {}
-        my_return_string = "?"
 	for field_name, field_value in kwargs.items():
-	    if field_name != "my_pie" and field_name != "csrf_token" and field_name != "form_id":
-	        my_return_string += field_name + "=" + field_value + "&"
-            
             values[field_name] = field_value
 
         if values['my_pie'] != "3.14":
@@ -64,14 +60,20 @@ class HtmlFormController(http.Controller):
             if response_json.json()['success'] != True:
                 return werkzeug.utils.redirect(ref_url)
         
-        #the referral string is what the campaign looks for
         secure_values = {}
         history_values = {}
+        return_errors = []
+        insert_data_dict = []
         form_error = False
-        new_history = http.request.env['html.form.history'].sudo().create({'ref_url':ref_url, 'html_id': entity_form.id})
         
         #populate an array which has ONLY the fields that are in the form (prevent injection)
         for fi in entity_form.fields_ids:
+            #Required field check
+            if fi.setting_general_required and fi.html_name not in values:
+                return_item = {"html_name": fi.html_name,"error_messsage": "This field is required"}
+                return_errors.append(return_item)
+                form_error = True
+        
             if fi.html_name in values:
                 method = '_process_html_%s' % (fi.field_type.html_type,)
 	        action = getattr(self, method, None)
@@ -81,20 +83,23 @@ class HtmlFormController(http.Controller):
 	
                 field_valid = html_field_response()
 	        field_valid = action(fi, values[fi.html_name])
-	    
-	        if field_valid.error == "":
-	            form_error = False
-	            secure_values[fi.field_id.name] = field_valid.return_data
-                    new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id':fi.field_id.id, 'insert_value':field_valid.history_data})
-                else:
-	            my_return_string += "error_" + fi.html_name + "=" + field_valid.error + "&"
-                    form_error = True
 
+	        if field_valid.error == "":
+	            secure_values[fi.field_id.name] = field_valid.return_data
+                    insert_data_dict.append({'field_id':fi.field_id.id, 'insert_value':field_valid.history_data})
+                else:
+                    return_item = {"html_name": fi.html_name,"error_messsage": field_valid.error}
+                    return_errors.append(return_item)
+                    form_error = True
+                    
         if form_error:
-            #redirect back to the page
-            ref_url = ref_url.replace(my_return_string[:-1],"")
-            return werkzeug.utils.redirect(ref_url + my_return_string[:-1])
+            return json.JSONEncoder().encode({'status': 'error', 'errors':return_errors})
         else:
+            new_history = http.request.env['html.form.history'].sudo().create({'ref_url':ref_url, 'html_id': entity_form.id})
+            
+            for insert_field in insert_data_dict:
+                 new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id': insert_field['field_id'], 'insert_value': insert_field['insert_value'] })
+            
             #default values
             for df in entity_form.defaults_values:
                 if df.field_id.ttype == "many2many":
@@ -124,7 +129,7 @@ class HtmlFormController(http.Controller):
  	        #Call the submit action, passing the action settings and the history object
                 action(sa, new_history)
  
-            return werkzeug.utils.redirect(entity_form.return_url)
+            return json.JSONEncoder().encode({'status': 'success', 'redirect_url':entity_form.return_url})
                 
     @http.route('/form/insert',type="http", auth="public", csrf=False)
     def my_insert(self, **kwargs):

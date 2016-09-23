@@ -42,15 +42,14 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  } );\n"
         html_output += "  </script>\n"
         
-        html_output += "<div class=\"form-group\">\n"
+        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
-	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
-        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
+	html_output += "/>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -79,17 +78,16 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  } );\n"
         html_output += "  </script>\n"
         
-        html_output += "<div class=\"form-group date\">\n"
+        html_output += "<div class=\"html_form_field form-group date\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
-	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
+	html_output += "/>\n"
 
         #html_output += "<span class=\"input-group-addon\"><span class=\"fa fa-calendar\"></span></span>\n"
-        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"	
 	html_output += "</div>\n"
 	
 	return html_output
@@ -97,7 +95,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_textbox(self, field):
         """Generate textbox HTML"""
         html_output = ""        
-        html_output += "<div class=\"form-group\">\n"
+        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\""
 	
@@ -116,8 +114,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	
 	html_output += ' maxlength="' + str(field.character_limit) + '"'
 	
-	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
-        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
+	html_output += "/>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -125,15 +122,14 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_textarea(self, field):
         """Generate textarea HTML"""
         html_output = ""
-        html_output += "<div class=\"form-group\">\n"
+        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <textarea class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
-	html_output += " t-att-value=\"request.params.get('" + field.html_name.encode("utf-8") + "', '')\"/>\n"
-        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
+	html_output += "/>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -141,13 +137,13 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_radio_group_selection(self, field):
         """Generate Radio Group(Selection) HTML"""
         html_output = ""
-        html_output += "<div class=\"form-group\">\n"
+        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
 	
     	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
     	        
     	for selection_value,selection_label in selection_list.items():
-    	    html_output += "    <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"
+    	    html_output += "  <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"
 	
 	html_output += "</div>\n"
 	
@@ -156,9 +152,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_checkbox_boolean(self, field):
         """Generate Checkbox(Boolean) HTML"""
         html_output = ""
-        html_output += "<div class=\"checkbox\">\n"
+        html_output += "<div class=\"html_form_field checkbox\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
-        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -168,7 +163,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output = ""
         
         if field.field_id.ttype == "selection":
-            html_output += "<div class=\"form-group\">\n"
+            html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
             html_output += "</label>\n"
 	    html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
@@ -185,7 +180,6 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	        html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
     	        
     	    html_output += "  </select>\n"
-            html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
     	    html_output += "</div>\n"
     	    
     	    return html_output
@@ -194,7 +188,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generates a dropbox(Many2one)"""
         html_output = ""
         
-        html_output += "<div class=\"form-group\">\n"
+        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
         html_output += "</label>\n"
 	html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
@@ -212,7 +206,6 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     	    html_output += "    <option value=\"" + str(row.id) + "\">" + row.name + "</option>\n"
     	        
     	html_output += "  </select>\n"
-        html_output += "  <span style=\"color:red;\" t-if=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\" class=\"help-block\"><t t-esc=\"request.params.get('error_" + field.html_name.encode("utf-8") + "', '')\"/></span>\n"
     	html_output += "</div>\n"
     	    
     	return html_output
@@ -227,15 +220,12 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_form = request.env['html.form'].browse(int(values['form_id']) )
         
         form_string = ""
-        form_string += "    <div class=\"container mt16 mb16\">\n"
-        form_string += "        <div class=\"row\">\n"
-        form_string += "            <h2>" + html_form.name + "</h2>\n"
-        form_string += "            <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div class=\"oe_structure\" id=\"html_fields\">\n"
-
+        form_string += "  <div class=\"container mt16 mb16\">\n"
+        form_string += "    <h2>" + html_form.name + "</h2>\n"
+        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "      <div class=\"oe_structure\" id=\"html_fields\">\n"
             
         for form_field in html_form.fields_ids:
-            form_string += "<div class=\"html_form_field\" data-form-type=\"" + form_field.field_type.html_type + "\" data-field-id=\"" + str(form_field.id) + "\">\n"
 
             method = '_generate_html_%s' % (form_field.field_type.html_type,)
 	    action = getattr(self, method, None)
@@ -243,24 +233,21 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	    if not action:
 	        raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 	                
-	    form_string += action(form_field)
-	    form_string += "</div>\n"
-	    	    
+	    form_string += action(form_field)	    	    
 	    	    
         if html_form.captcha:
             form_string += "<div class=\"html_form_captcha col-md-12 form-group\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
-            form_string += "    <div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
+            form_string += "  <div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
             form_string += "</div>\n"
 	    	    
 	    	    
-        form_string += "                </div>\n"
-        form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
-	form_string += "                <input type=\"hidden\" name=\"csrf_token\"/>\n"
-	form_string += "                <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"	
-        form_string += "                <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
-        form_string += "            </form>\n"
-        form_string += "        </div>\n"
-        form_string += "    </div>\n"
+        form_string += "      </div>\n"
+        form_string += "      <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
+	form_string += "      <input type=\"hidden\" name=\"csrf_token\"/>\n"
+	form_string += "      <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"	
+        form_string += "      <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
+        form_string += "    </form>\n"
+        form_string += "  </div>\n"
 
         return {'html_string': form_string, 'form_model': html_form.model_id.model }
 
@@ -278,19 +265,16 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_form = request.env['html.form'].create({'name': 'My New Form', 'model_id': my_model.id })
         
         form_string = ""
-        form_string += "    <div class=\"container mt16 mb16\">\n"
-        form_string += "        <div class=\"row\">\n"
-        form_string += "            <h2>" + html_form.name + "</h2>\n"
-        form_string += "            <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
-        form_string += "                <div class=\"oe_structure\" id=\"html_fields\">\n"	    	    
-        form_string += "                </div>\n"
-        form_string += "                <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
-	form_string += "                <input type=\"hidden\" name=\"csrf_token\"/>\n"
-	form_string += "                <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
-        form_string += "                <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
-        form_string += "            </form>\n"
-        form_string += "        </div>\n"
-        form_string += "    </div>\n"
+        form_string += "  <div class=\"container mt16 mb16\">\n"
+        form_string += "    <h2>" + html_form.name + "</h2>\n"
+        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "      <div class=\"oe_structure\" id=\"html_fields\"/>\n"
+        form_string += "      <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
+	form_string += "      <input type=\"hidden\" name=\"csrf_token\"/>\n"
+	form_string += "      <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
+        form_string += "      <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
+        form_string += "    </form>\n"
+        form_string += "  </div>\n"
 
         return {'html_string': form_string, 'form_model': action.action_model, 'form_id': html_form.id }
 
@@ -316,7 +300,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         field_id = request.env['ir.model.fields'].browse( int(values['field_id']) )
         
         field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
-        _logger.error(values['field_required'])
+
         form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'], 'character_limit': values['character_limit'], 'setting_general_required': values['field_required'] })
         
         form_string = ""

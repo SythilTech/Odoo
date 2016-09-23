@@ -68,7 +68,7 @@
             <section class="html_form">
                 <div class="container">
                     <h2>My Form</h2>
-                    <div id="html_fields" class="form_fields">
+                    <div  class="oe_structure" id="html_fields">
 		                                 
 		    </div>
                     <button class="btn btn-primary btn-lg">Submit</button>
@@ -80,7 +80,7 @@
             <section class="html_form_new">
                 <div class="container">
                     <h2>My Form</h2>
-                    <div id="html_fields" class="form_fields">
+                    <div class="oe_structure" id="html_fields">
 		                                 
 		    </div>
                     <button class="btn btn-primary btn-lg">Submit</button>
@@ -89,75 +89,61 @@
         </template>
         
         <template id="s_textbox" name="Textbox">
-            <div class="html_form_field" data-form-type="textbox" data-field-id="0">
-                <div class="form-group">
-                    <label for="field1">Field 1</label>
-                    <input type="text" name="field1" class="form-control"/>
-                </div>
+            <div class="html_form_field form-group" data-form-type="textbox" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <input type="text" name="field1" class="form-control"/>
             </div>
         </template>   
 
         <template id="s_date_picker" name="Date Picker">
-            <div class="html_form_field" data-form-type="date_picker" data-field-id="0">
-                <div class="form-group">
-                    <label for="field1">Field 1</label>
-                    <input type="text" name="field1" class="form-control"/>
-                </div>
+            <div class="html_form_field form-group" data-form-type="date_picker" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <input type="text" name="field1" class="form-control"/>
             </div>
         </template>   
 
         <template id="s_radio_group_selection" name="Radio Group(Selection)">
-            <div class="html_form_field" data-form-type="radio_group_selection" data-field-id="0">
-                <div class="form-group">
-                    <label for="field1">Field 1</label><br/>
-                    <input type="radio" name="field1"/>Option 1<br/>
-                    <input type="radio" name="field1"/>Option 2<br/>
-                    <input type="radio" name="field1"/>Option 3<br/>
-                </div>
+            <div class="html_form_field form-group" data-form-type="radio_group_selection" data-field-id="0">
+                <label for="field1">Field 1</label><br/>
+                <input type="radio" name="field1"/>Option 1<br/>
+                <input type="radio" name="field1"/>Option 2<br/>
+                <input type="radio" name="field1"/>Option 3<br/>
             </div>
         </template>
 
         <template id="s_checkbox_boolean" name="Checkbox(Boolean)">
-            <div class="html_form_field" data-form-type="checkbox_boolean" data-field-id="0">
-                <div class="checkbox">
-                    <label><input type="checkbox" name="field1"/>I Agree</label>
-                </div>
+            <div class="html_form_field checkbox" data-form-type="checkbox_boolean" data-field-id="0">
+                <label><input type="checkbox" name="field1"/>I Agree</label>
             </div>
         </template>
 
         <template id="s_textarea" name="Textarea">
-            <div class="html_form_field" data-form-type="textarea" data-field-id="0">
-                <div class="form-group">
-                    <label for="field1">Field 1</label>
-                    <textarea class="form-control" name="field1"/>
-                </div>
+            <div class="html_form_field form-group" data-form-type="textarea" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <textarea class="form-control" name="field1"/>
             </div>
         </template>
 
         <template id="s_dropbox" name="Dropbox(Selection)">
-            <div class="html_form_field" data-form-type="dropbox" data-field-id="0">
-                <div class="form-group">
-                    <label for="field1">Field 1</label>
-                    <select class="form-control" name="field1">
-                        <option value="">Select an option</option>
-                    </select>
-                </div>
+            <div class="html_form_field form-group" data-form-type="dropbox" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <select class="form-control" name="field1">
+                    <option value="">Select an option</option>
+                </select>
             </div>
         </template>
 
         <template id="s_dropbox_m2o" name="Dropbox(M2O)">
-            <div class="html_form_field" data-form-type="dropbox_m2o" data-field-id="0">
-                <div class="form-group">
-                    <label for="field1">Field 1</label>
-                    <select class="form-control" name="field1">
-                        <option value="">Select an option</option>
-                    </select>
-                </div>
+            <div class="html_form_field form-group" data-form-type="dropbox_m2o" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <select class="form-control" name="field1">
+                    <option value="">Select an option</option>
+                </select>
             </div>
         </template>
         
         <template id="s_captcha" name="Captcha">
-            <div class="html_form_captcha col-md-12 form-group">
+            <div class="html_form_captcha form-group">
                 Placeholder Captcha String
             </div>
         </template>
