@@ -129,7 +129,10 @@ class HtmlFormController(http.Controller):
  	        #Call the submit action, passing the action settings and the history object
                 action(sa, new_history)
  
-            return json.JSONEncoder().encode({'status': 'success', 'redirect_url':entity_form.return_url})
+            if 'is_ajax_post' in values:
+                return json.JSONEncoder().encode({'status': 'success', 'redirect_url':entity_form.return_url})
+            else:
+                return werkzeug.utils.redirect(entity_form.return_url)
                 
     @http.route('/form/insert',type="http", auth="public", csrf=False)
     def my_insert(self, **kwargs):

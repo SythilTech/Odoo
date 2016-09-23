@@ -1,3 +1,7 @@
+v.1.8.1
+=======
+* Fail safe form validation for javascript disabled and external forms
+
 v.1.8
 =====
 * Tidy up genersated html

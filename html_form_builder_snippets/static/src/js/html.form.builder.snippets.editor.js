@@ -37,6 +37,8 @@ $(function() {
                 }
             });
 
+    form_values['is_ajax_post'] = "Yes";
+
     // Post form and handle result
     ajax.post(my_form.attr('action'), form_values).then(function(result_data) {
       result_data = $.parseJSON(result_data);

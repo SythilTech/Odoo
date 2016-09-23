@@ -1,3 +1,7 @@
+v1.8.1
+======
+* Fail safe form validation for javascript disabled and external forms
+
 v1.8
 ====
 * Change to ajax data post/validation
