@@ -1,3 +1,7 @@
+v.1.8.2
+=======
+* Dedicated settings view for textboxes(others fields types will come later)
+
 v.1.8.1
 =======
 * Fail safe form validation for javascript disabled and external forms

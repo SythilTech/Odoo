@@ -10,6 +10,23 @@ import openerp
 
 class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.main.HtmlFormController):
 
+    @http.route('/form/field/config/textbox', type="json", auth="user", website=True)
+    def form_field_config_textbox(self, **kw):
+
+        values = {}
+	for field_name, field_value in kw.items():
+            values[field_name] = field_value
+            
+        data_types_list = values['data_types']
+            
+        field_options_html = ""
+        field_options_html = "<option value=\"\">Select Field</option>"
+        
+        for my_field in request.env['ir.model.fields'].search([('ttype', 'in', data_types_list ), ('model_id.model','=', values['form_model']), ('name','!=','display_name') ] ):
+            field_options_html += "<option value=\"" + str(my_field.id) + "\">" + str(my_field.field_description) + " (" + str(my_field.name) + "/" + str(my_field.ttype) + ")" + "</option>\n"
+            
+        return {'field_options_html': field_options_html }
+
     @http.route('/form/captcha/load', type="json", auth="user", website=True)
     def html_captcha(self, **kw):
 
@@ -42,7 +59,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  } );\n"
         html_output += "  </script>\n"
         
-        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
@@ -78,7 +95,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  } );\n"
         html_output += "  </script>\n"
         
-        html_output += "<div class=\"html_form_field form-group date\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff html_form_field form-group date\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
@@ -95,7 +112,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_textbox(self, field):
         """Generate textbox HTML"""
         html_output = ""        
-        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff hff_textbox form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <input type=\""
 	
@@ -112,7 +129,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	if field.validation_format == "lettersonly":
 	    html_output +=  ' pattern="[a-zA-Z ]+" title="Letters Only"'
 	
-	html_output += ' maxlength="' + str(field.character_limit) + '"'
+	if field.character_limit > 0:
+	    html_output += ' maxlength="' + str(field.character_limit) + '"'
 	
 	html_output += "/>\n"
 	html_output += "</div>\n"
@@ -122,7 +140,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_textarea(self, field):
         """Generate textarea HTML"""
         html_output = ""
-        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <textarea class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
@@ -137,7 +155,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_radio_group_selection(self, field):
         """Generate Radio Group(Selection) HTML"""
         html_output = ""
-        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
 	
     	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
@@ -152,7 +170,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_checkbox_boolean(self, field):
         """Generate Checkbox(Boolean) HTML"""
         html_output = ""
-        html_output += "<div class=\"html_form_field checkbox\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff html_form_field checkbox\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
 	html_output += "</div>\n"
 	
@@ -163,7 +181,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output = ""
         
         if field.field_id.ttype == "selection":
-            html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+            html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
             html_output += "</label>\n"
 	    html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
@@ -188,7 +206,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generates a dropbox(Many2one)"""
         html_output = ""
         
-        html_output += "<div class=\"html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
         html_output += "</label>\n"
 	html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""

@@ -24,6 +24,10 @@
                     data-selector=".html_form_new"
                     data-drop-in=".oe_structure, [data-oe-type=html]">
                 </div>
+                <div data-js='html_form_builder_field_textbox'
+		    data-selector=".hff_textbox"
+		    data-drop-in="#html_fields">
+                </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
 		    data-drop-in="#html_fields">
@@ -89,21 +93,21 @@
         </template>
         
         <template id="s_textbox" name="Textbox">
-            <div class="html_form_field form-group" data-form-type="textbox" data-field-id="0">
+            <div class="hff hff_textbox form-group" data-form-type="textbox" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <input type="text" name="field1" class="form-control"/>
             </div>
         </template>   
 
         <template id="s_date_picker" name="Date Picker">
-            <div class="html_form_field form-group" data-form-type="date_picker" data-field-id="0">
+            <div class="hff html_form_field form-group" data-form-type="date_picker" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <input type="text" name="field1" class="form-control"/>
             </div>
         </template>   
 
         <template id="s_radio_group_selection" name="Radio Group(Selection)">
-            <div class="html_form_field form-group" data-form-type="radio_group_selection" data-field-id="0">
+            <div class="hff html_form_field form-group" data-form-type="radio_group_selection" data-field-id="0">
                 <label for="field1">Field 1</label><br/>
                 <input type="radio" name="field1"/>Option 1<br/>
                 <input type="radio" name="field1"/>Option 2<br/>
@@ -112,20 +116,20 @@
         </template>
 
         <template id="s_checkbox_boolean" name="Checkbox(Boolean)">
-            <div class="html_form_field checkbox" data-form-type="checkbox_boolean" data-field-id="0">
+            <div class="hff html_form_field checkbox" data-form-type="checkbox_boolean" data-field-id="0">
                 <label><input type="checkbox" name="field1"/>I Agree</label>
             </div>
         </template>
 
         <template id="s_textarea" name="Textarea">
-            <div class="html_form_field form-group" data-form-type="textarea" data-field-id="0">
+            <div class="hff html_form_field form-group" data-form-type="textarea" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <textarea class="form-control" name="field1"/>
             </div>
         </template>
 
         <template id="s_dropbox" name="Dropbox(Selection)">
-            <div class="html_form_field form-group" data-form-type="dropbox" data-field-id="0">
+            <div class="hff html_form_field form-group" data-form-type="dropbox" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <select class="form-control" name="field1">
                     <option value="">Select an option</option>
@@ -134,7 +138,7 @@
         </template>
 
         <template id="s_dropbox_m2o" name="Dropbox(M2O)">
-            <div class="html_form_field form-group" data-form-type="dropbox_m2o" data-field-id="0">
+            <div class="hff html_form_field form-group" data-form-type="dropbox_m2o" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <select class="form-control" name="field1">
                     <option value="">Select an option</option>
@@ -143,7 +147,7 @@
         </template>
         
         <template id="s_captcha" name="Captcha">
-            <div class="html_form_captcha form-group">
+            <div class="hff html_form_captcha form-group">
                 Placeholder Captcha String
             </div>
         </template>

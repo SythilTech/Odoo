@@ -4,10 +4,14 @@ odoo.define('html_form_builder_snippets.editor', function (require) {
 var Model = require('web.Model');
 var base = require('web_editor.base');
 var options = require('web_editor.snippets.options');
+var core = require('web.core');
 var session = require('web.session');
 var website = require('website.website');
 var return_string = ""; //Global because I can't change html in session.rpc function
 var ajax = require('web.ajax');
+var qweb = core.qweb;
+
+ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal10.xml', qweb);
 
 $(function() {
   $( ".html_form button" ).click(function(e) {
@@ -46,7 +50,7 @@ $(function() {
         for (var i = 0; i < result_data.errors.length; i++) {
 		  //Find the field and make it displays as an error
           var input = my_form.find("input[name='" + result_data.errors[i].html_name + "']");
-          var parent_div = input.parents(".html_form_field");
+          var parent_div = input.parent("div");
 
           //Remove any existing help block
           parent_div.find(".help-block").remove();
@@ -118,6 +122,41 @@ options.registry.html_form_builder_new = options.Class.extend({
         });
     },
 
+});
+
+options.registry.html_form_builder_field_textbox = options.Class.extend({
+    drop_and_build_snippet: function() {
+        var self = this;
+
+    	this.template = 'html_form_builder_snippets.textbox_config';
+    	self.$modal = $( qweb.render(this.template, {}) );
+
+    	$('body').append(self.$modal);
+    	var datatype_dict = ['char'];
+        var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
+        var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
+
+		session.rpc('/form/field/config/textbox', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		    self.$modal.find("#field_config_textbox").html(result.field_options_html);
+        });
+
+        $('#htmlTextboxModal').modal('show');
+
+        $('body').on('click', '#save_textbox_field', function() {
+	        var format_validation = self.$modal.find('#html_form_field_format_validation').val();
+            var character_limit = self.$modal.find('#html_form_field_character_limit').val();
+            var field_required = self.$modal.find('#html_form_field_required').is(':checked');
+            var field_id = self.$modal.find('#field_config_textbox').val();
+
+            session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit, 'field_required': field_required }).then(function(result) {
+			    self.$target.replaceWith(result.html_string);
+            });
+
+            $('#htmlTextboxModal').modal('hide');
+
+        });
+
+    },
 });
 
 options.registry.html_form_builder_field = options.Class.extend({
