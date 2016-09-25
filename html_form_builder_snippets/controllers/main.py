@@ -10,8 +10,8 @@ import openerp
 
 class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.main.HtmlFormController):
 
-    @http.route('/form/field/config/textbox', type="json", auth="user", website=True)
-    def form_field_config_textbox(self, **kw):
+    @http.route('/form/field/config/general', type="json", auth="user", website=True)
+    def form_field_config_general(self, **kw):
 
         values = {}
 	for field_name, field_value in kw.items():
@@ -140,7 +140,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_textarea(self, field):
         """Generate textarea HTML"""
         html_output = ""
-        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff hff_textarea form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"	    
 	html_output += "  <textarea class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
@@ -319,7 +319,17 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         
         field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
 
-        form_field = request.env['html.form.field'].create({'html_id': int(values['form_id']), 'field_id': field_id.id, 'field_type': field_type.id, 'html_name':field_id.name, 'field_label': field_id.field_description, 'validation_format': values['format_validation'], 'character_limit': values['character_limit'], 'setting_general_required': values['field_required'] })
+        insert_values = {}
+        insert_values['html_id'] = int(values['form_id'])
+        insert_values['field_id'] = field_id.id
+        insert_values['field_type'] = field_type.id
+        insert_values['html_name'] = field_id.name
+        insert_values['field_label'] = field_id.field_description
+        if 'format_validation' in values: insert_values['validation_format'] = values['format_validation']
+        if 'character_limit' in values: insert_values['character_limit'] = values['character_limit']
+        if 'setting_general_required' in values: insert_values['setting_general_required'] = values['field_required']
+        
+        form_field = request.env['html.form.field'].create(insert_values)
         
         form_string = ""
 
