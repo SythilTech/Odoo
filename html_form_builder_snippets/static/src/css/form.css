@@ -13,3 +13,13 @@ margin-top:-20px;
   content:"*";
   color:red;
 }
+
+/* Counter balance Odoo's all bold labels */
+.hff .radio-inline label {
+  font-weight:normal;
+}
+
+/* Don't know where the weird margin comes from... */
+.hff .radio:nth-of-type(1) {
+  margin-top: 0px;
+}

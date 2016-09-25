@@ -41,6 +41,10 @@
 		    data-selector=".hff_radio_group"
 		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
+                <div data-js='html_form_builder_field_date_picker'
+		    data-selector=".hff_date_picker"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
 		    data-drop-in="#html_fields">
@@ -112,7 +116,7 @@
         </template>   
 
         <template id="s_date_picker" name="Date Picker">
-            <div class="hff html_form_field form-group" data-form-type="date_picker" data-field-id="0">
+            <div class="hff hff_date_picker form-group" data-form-type="date_picker" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <input type="text" name="field1" class="form-control"/>
             </div>

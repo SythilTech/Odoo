@@ -61,12 +61,15 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         
         html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
-	html_output += "  <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
+	html_output += "  <div class=\"input-group date\">\n"
+	html_output += "    <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 		                                    
 	if field.setting_general_required == True:
 	    html_output += " required=\"required\""
 	
 	html_output += "/>\n"
+	html_output += "    <span class=\"input-group-addon\"><span class=\"fa fa-calendar\"/></span>\n"
+	html_output += "  </div>\n"
 	html_output += "</div>\n"
 	
 	return html_output
@@ -156,15 +159,24 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generate Radio Group(Selection) HTML"""
         html_output = ""
         html_output += "<div class=\"hff hff_radio_group form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
-	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
+
+    	if field.setting_radio_group_layout_type == "multi":
+	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
+    	if field.setting_radio_group_layout_type == "single":
+	    html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
 
     	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
     	        
     	for selection_value,selection_label in selection_list.items():
-    	    html_output += "  <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8")
     	    if field.setting_radio_group_layout_type == "multi":
-    	        html_output += "<br/>"
-	
+    	       html_output += "  <div class=\"radio\">\n"
+    	    if field.setting_radio_group_layout_type == "single":
+    	       html_output += "  <div class=\"radio-inline\">\n"
+    	    
+    	    html_output += "    <label><input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/>" + selection_label.encode("utf-8") + "</label>\n"
+    	    html_output += "  </div>\n"
+    	    
+	html_output += "\n"	
 	html_output += "</div>\n"
 	
 	return html_output

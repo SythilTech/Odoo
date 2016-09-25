@@ -1,3 +1,8 @@
+v.1.8.6
+=======
+* Date picker config window
+* Radio group html adjustments
+
 v.1.8.5
 =======
 * Radio group config window
