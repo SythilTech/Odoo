@@ -11,7 +11,7 @@ var return_string = ""; //Global because I can't change html in session.rpc func
 var ajax = require('web.ajax');
 var qweb = core.qweb;
 
-ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal10.xml', qweb);
+ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal15.xml', qweb);
 
 $(function() {
   $( ".html_form button" ).click(function(e) {
@@ -131,10 +131,42 @@ options.registry.html_form_builder_field_textbox = options.Class.extend({
     	this.template = 'html_form_builder_snippets.textbox_config';
     	self.$modal = $( qweb.render(this.template, {}) );
 
+        //Remove previous instance first
+        $('#htmlTextboxModal').remove();
+
     	$('body').append(self.$modal);
     	var datatype_dict = ['char'];
         var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
         var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
+
+        //Count the amount of bootstrap columns in the row
+        var current_columns = 0;
+        if (self.$target.parent().attr("id") == "html_field_placeholder") {
+            self.$target.parent().parent().find(".hff").each(function( index ) {
+	    	    if ($( this ).hasClass("col-md-12")) { current_columns = 12;}
+	    		if ($( this ).hasClass("col-md-11")) { current_columns = 11;}
+	    		if ($( this ).hasClass("col-md-10")) { current_columns = 10;}
+	    		if ($( this ).hasClass("col-md-9")) { current_columns = 9;}
+	    		if ($( this ).hasClass("col-md-8")) { current_columns = 8;}
+	    		if ($( this ).hasClass("col-md-7")) { current_columns = 7;}
+	    		if ($( this ).hasClass("col-md-6")) { current_columns = 6;}
+	    		if ($( this ).hasClass("col-md-5")) { current_columns = 5;}
+	    		if ($( this ).hasClass("col-md-4")) { current_columns = 4;}
+	    		if ($( this ).hasClass("col-md-3")) { current_columns = 3;}
+	    		if ($( this ).hasClass("col-md-2")) { current_columns = 2;}
+	    		if ($( this ).hasClass("col-md-1")) { current_columns = 1;}
+            });
+	    }
+
+        //Only show sizes that that are less then or equal to the remiaining columns
+        var field_size_html = "";
+        var i = 0;
+        for (i = (12 - current_columns); i > 0; i--) {
+			var number = (i / 12 * 100);
+            field_size_html += "<option value=\"" + i + "\">" + Math.round( number * 10 ) / 10 + "%</option>\n"
+		}
+
+        self.$modal.find('#field_size').html(field_size_html);
 
 		session.rpc('/form/field/config/textbox', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
 		    self.$modal.find("#field_config_textbox").html(result.field_options_html);
@@ -143,16 +175,49 @@ options.registry.html_form_builder_field_textbox = options.Class.extend({
         $('#htmlTextboxModal').modal('show');
 
         $('body').on('click', '#save_textbox_field', function() {
-	        var format_validation = self.$modal.find('#html_form_field_format_validation').val();
-            var character_limit = self.$modal.find('#html_form_field_character_limit').val();
-            var field_required = self.$modal.find('#html_form_field_required').is(':checked');
             var field_id = self.$modal.find('#field_config_textbox').val();
+            if (field_id != "") {
+	            var format_validation = self.$modal.find('#html_form_field_format_validation').val();
+                var character_limit = self.$modal.find('#html_form_field_character_limit').val();
+                var field_required = self.$modal.find('#html_form_field_required').is(':checked');
+                var field_size = self.$modal.find('#field_size').val();
 
-            session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit, 'field_required': field_required }).then(function(result) {
-			    self.$target.replaceWith(result.html_string);
-            });
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'format_validation': format_validation, 'character_limit': character_limit, 'field_required': field_required }).then(function(result) {
+		    	    if (field_size == "12") {
+		    	        self.$target.replaceWith(result.html_string);
+				    } else {
+						var header_wrapper = "";
+						var footer_wrapper = "";
 
-            $('#htmlTextboxModal').modal('hide');
+					    //Create a row if you are the first element in a "row" of fields
+						if (self.$target.parent().attr("id") == "html_fields") {
+						    header_wrapper = "<div class=\"row\">\n";
+						    footer_wrapper = "</div>";
+						}
+
+						//Remove the placeholder div to keep the HTML clean
+                        if (self.$target.parent().attr("id") == "html_field_placeholder") {
+	  	    	            self.$target.unwrap();
+						}
+
+                        //Add the current field size otherwise the reminaing wwhile be off
+                        current_columns += field_size;
+
+                        var remaining_columns = 12 - current_columns;
+
+                        if (remaining_columns > 0) {
+                            footer_wrapper = "<div id=\"html_field_placeholder\" data-field-size=\"" + remaining_columns + "\" class=\"col-md-" + remaining_columns + "\"/>\n" + footer_wrapper;
+					    }
+
+					    self.$target.replaceWith(header_wrapper + result.html_string.replace("hff ","hff col-md-" + field_size + " ") + footer_wrapper);
+
+
+					}
+                });
+
+                $('#htmlTextboxModal').modal('hide');
+
+		    }
 
         });
 

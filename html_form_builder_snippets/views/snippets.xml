@@ -26,7 +26,7 @@
                 </div>
                 <div data-js='html_form_builder_field_textbox'
 		    data-selector=".hff_textbox"
-		    data-drop-in="#html_fields">
+		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"

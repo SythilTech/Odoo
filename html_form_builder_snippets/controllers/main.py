@@ -24,7 +24,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         
         for my_field in request.env['ir.model.fields'].search([('ttype', 'in', data_types_list ), ('model_id.model','=', values['form_model']), ('name','!=','display_name') ] ):
             field_options_html += "<option value=\"" + str(my_field.id) + "\">" + str(my_field.field_description) + " (" + str(my_field.name) + "/" + str(my_field.ttype) + ")" + "</option>\n"
-            
+ 
         return {'field_options_html': field_options_html }
 
     @http.route('/form/captcha/load', type="json", auth="user", website=True)
