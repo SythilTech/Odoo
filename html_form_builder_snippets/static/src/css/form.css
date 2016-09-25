@@ -1,0 +1,15 @@
+/* Snippet drag and drop offset */
+#html_field_placeholder {
+margin-top:20px;
+}
+
+/* Snippet drag and drop offset counter balance */
+#html_field_placeholder .hff{
+margin-top:-20px;
+}
+
+/* Add required red star, required class is manually added */
+.hff.form-group.required .control-label:after {
+  content:"*";
+  color:red;
+}

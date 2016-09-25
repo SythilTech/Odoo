@@ -1,3 +1,11 @@
+v.1.8.4
+=======
+* Offset snippet drag and drop to make it easier to drag fields beside each other
+
+v.1.8.3
+=======
+* Form grid system
+
 v.1.8.2
 =======
 * Dedicated settings view for textboxes(others fields types will come later)
