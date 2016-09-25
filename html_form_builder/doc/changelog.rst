@@ -1,3 +1,7 @@
+v1.8.2
+======
+* Radio group layout type
+
 v1.8.1
 ======
 * Fail safe form validation for javascript disabled and external forms

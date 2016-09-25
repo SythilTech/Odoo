@@ -37,6 +37,10 @@
 		    data-selector=".hff_dropbox"
 		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
+                <div data-js='html_form_builder_field_radio_group'
+		    data-selector=".hff_radio_group"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
 		    data-drop-in="#html_fields">
@@ -114,8 +118,8 @@
             </div>
         </template>   
 
-        <template id="s_radio_group_selection" name="Radio Group(Selection)">
-            <div class="hff html_form_field form-group" data-form-type="radio_group_selection" data-field-id="0">
+        <template id="s_radio_group_selection" name="Radio Group">
+            <div class="hff hff_radio_group form-group" data-form-type="radio_group_selection" data-field-id="0">
                 <label for="field1">Field 1</label><br/>
                 <input type="radio" name="field1"/>Option 1<br/>
                 <input type="radio" name="field1"/>Option 2<br/>

@@ -155,13 +155,15 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_radio_group_selection(self, field):
         """Generate Radio Group(Selection) HTML"""
         html_output = ""
-        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff hff_radio_group form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
-	
+
     	selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
     	        
     	for selection_value,selection_label in selection_list.items():
-    	    html_output += "  <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8") + "<br/>\n"
+    	    html_output += "  <input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/> " + selection_label.encode("utf-8")
+    	    if field.setting_radio_group_layout_type == "multi":
+    	        html_output += "<br/>"
 	
 	html_output += "</div>\n"
 	
@@ -309,6 +311,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         if 'format_validation' in values: insert_values['validation_format'] = values['format_validation']
         if 'character_limit' in values: insert_values['character_limit'] = values['character_limit']
         if 'setting_general_required' in values: insert_values['setting_general_required'] = values['field_required']
+        if 'layout_type' in values: insert_values['setting_radio_group_layout_type'] = values['layout_type']        
         
         form_field = request.env['html.form.field'].create(insert_values)
         
