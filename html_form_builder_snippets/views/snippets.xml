@@ -45,6 +45,10 @@
 		    data-selector=".hff_date_picker"
 		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
+                <div data-js='html_form_builder_field_checkbox'
+		    data-selector=".hff_checkbox"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
 		    data-drop-in="#html_fields">
@@ -131,8 +135,8 @@
             </div>
         </template>
 
-        <template id="s_checkbox_boolean" name="Checkbox(Boolean)">
-            <div class="hff html_form_field checkbox" data-form-type="checkbox_boolean" data-field-id="0">
+        <template id="s_checkbox_boolean" name="Checkbox">
+            <div class="hff hff_checkbox checkbox" data-form-type="checkbox_boolean" data-field-id="0">
                 <label><input type="checkbox" name="field1"/>I Agree</label>
             </div>
         </template>

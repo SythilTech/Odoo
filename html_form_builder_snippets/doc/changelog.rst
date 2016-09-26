@@ -1,3 +1,7 @@
+v.1.8.8
+=======
+* Checkbox config window
+
 v.1.8.7
 =======
 * Date picker date format

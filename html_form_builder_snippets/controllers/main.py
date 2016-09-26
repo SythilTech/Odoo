@@ -69,7 +69,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	html_output += "  } );\n"
         html_output += "  </script>\n"
         
-        html_output += "<div class=\"hff html_form_field form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff hff_date_picker form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
 	html_output += "  <div class=\"input-group date\">\n"
 	html_output += "    <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
@@ -194,7 +194,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
     def _generate_html_checkbox_boolean(self, field):
         """Generate Checkbox(Boolean) HTML"""
         html_output = ""
-        html_output += "<div class=\"hff html_form_field checkbox\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "<div class=\"hff hff_checkbox checkbox\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 	html_output += "  <label><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
 	html_output += "</div>\n"
 	
