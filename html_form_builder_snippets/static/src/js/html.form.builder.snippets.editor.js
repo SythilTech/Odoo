@@ -11,7 +11,7 @@ var return_string = ""; //Global because I can't change html in session.rpc func
 var ajax = require('web.ajax');
 var qweb = core.qweb;
 
-ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal20.xml', qweb);
+ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal22.xml', qweb);
 
 $(function() {
   $( ".html_form button" ).click(function(e) {
@@ -579,8 +579,9 @@ options.registry.html_form_builder_field_date_picker = options.Class.extend({
             if (field_id != "") {
                 var field_required = self.$modal.find('#html_form_field_required').is(':checked');
                 var field_size = self.$modal.find('#field_size').val();
+                var date_format = self.$modal.find('#date_format').val();
 
-                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'field_required': field_required }).then(function(result) {
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'field_required': field_required, 'setting_date_format':date_format }).then(function(result) {
 		    	    if (field_size == "12") {
 		    	        self.$target.replaceWith(result.html_string);
 				    } else {

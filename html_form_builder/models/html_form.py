@@ -246,6 +246,8 @@ class HtmlFormField(models.Model):
     validation_format = fields.Char(string="Validation Format")
     setting_general_required = fields.Boolean(string="Required")
     setting_radio_group_layout_type = fields.Selection([('single','Single'),('multi','Multi')], string="Layout Type")
+    setting_date_format = fields.Selection([('days','Days'),('months','Months'),('years','Years')], string="Date Format")    
+    setting_datetime_format = fields.Selection([('days','Days'),('months','Months'),('years','Years')], string="Datetime Format")
     setting_binary_file_type_filter = fields.Selection([('image','Image'), ('audio','Audio')], string="File Type Filter")
     character_limit = fields.Integer(string="Character Limit", default="100")
 

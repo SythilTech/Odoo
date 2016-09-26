@@ -227,6 +227,15 @@
 
                 </select>
             </div>
+
+            <div class="form-group">
+                <label for="date_format" class="control-label">Date Format</label>
+                <select id="date_format" class="form-control">
+                    <option value="days">Years, Months and Days</option>
+                    <option value="months">Years and Months Only</option>
+                    <option value="years">Years Only</option>
+                </select>
+            </div>
             
             <div class="checkbox">
                 <label><input type="checkbox" id="html_form_field_required"/>Required</label>

@@ -55,7 +55,17 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "  <script>\n"
 	html_output += "  $( function() {\n"
 	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).removeClass(\"hasDatepicker\");\n"
-	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).datepicker({ dateFormat: 'yy-mm-dd' });\n"
+	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).datetimepicker({pickTime: false, "
+	
+	if field.setting_date_format == "years":
+	    html_output += "format: 'YYYY-01-01', minViewMode: 'years' });\n"
+
+	if field.setting_date_format == "months":
+	    html_output += "format: 'YYYY-MM-01', minViewMode: 'months' });\n"
+
+	if field.setting_date_format == "days":
+	    html_output += "format: 'YYYY-MM-DD', minViewMode: 'days' });\n"
+	
 	html_output += "  } );\n"
         html_output += "  </script>\n"
         
@@ -324,6 +334,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         if 'character_limit' in values: insert_values['character_limit'] = values['character_limit']
         if 'setting_general_required' in values: insert_values['setting_general_required'] = values['field_required']
         if 'layout_type' in values: insert_values['setting_radio_group_layout_type'] = values['layout_type']        
+        if 'setting_date_format' in values: insert_values['setting_date_format'] = values['setting_date_format']
         
         form_field = request.env['html.form.field'].create(insert_values)
         

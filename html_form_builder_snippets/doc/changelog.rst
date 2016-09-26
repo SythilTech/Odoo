@@ -1,3 +1,7 @@
+v.1.8.7
+=======
+* Date picker date format
+
 v.1.8.6
 =======
 * Date picker config window

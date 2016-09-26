@@ -1,3 +1,7 @@
+v1.8.3
+======
+* New date picker
+
 v1.8.2
 ======
 * Radio group layout type
