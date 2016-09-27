@@ -82,6 +82,7 @@ class HtmlFormController(http.Controller):
 		    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 	
                 field_valid = html_field_response()
+                
 	        field_valid = action(fi, values[fi.html_name])
 
 	        if field_valid.error == "":
@@ -224,6 +225,29 @@ class HtmlFormController(http.Controller):
                 action(sa, new_history)
  
             return werkzeug.utils.redirect(entity_form.return_url)
+
+    def _process_html_input_group(self, field, field_data):
+        """Validation for input_groups and preps for insertion into database"""
+        html_response = html_field_response()
+        html_response.error = ""
+                        
+        input_group_obj = json.loads(field_data)
+        all_inserts = []
+        for row in input_group_obj:
+            create_list = []
+            
+            #Only allow fields in the sub field list
+            for sub_field in field.setting_input_group_sub_fields:
+                if sub_field.name not in row:
+                    return "hack detected"
+                    
+            all_inserts.append( (0, 0, row ) )
+            
+        _logger.error(all_inserts)
+        html_response.return_data = all_inserts
+        html_response.history_data = all_inserts
+
+        return html_response
         
     def _process_html_textbox(self, field, field_data):
         """Validation for textbox and preps for insertion into database"""

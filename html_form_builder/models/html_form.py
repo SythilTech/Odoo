@@ -248,6 +248,7 @@ class HtmlFormField(models.Model):
     setting_radio_group_layout_type = fields.Selection([('single','Single'),('multi','Multi')], string="Layout Type")
     setting_date_format = fields.Selection([('days','Days'),('months','Months'),('years','Years')], string="Date Format")    
     setting_datetime_format = fields.Selection([('days','Days'),('months','Months'),('years','Years')], string="Datetime Format")
+    setting_input_group_sub_fields = fields.Many2many('ir.model.fields', string="Sub Fields")
     setting_binary_file_type_filter = fields.Selection([('image','Image'), ('audio','Audio')], string="File Type Filter")
     character_limit = fields.Integer(string="Character Limit", default="100")
 

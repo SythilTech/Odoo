@@ -1,3 +1,8 @@
+v.1.8.9
+=======
+* Input group snippet (one2many)
+* Datetime snippet
+
 v.1.8.8
 =======
 * Checkbox config window

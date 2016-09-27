@@ -1,3 +1,7 @@
+v1.8.4
+======
+* Input group snippet
+
 v1.8.3
 ======
 * New date picker

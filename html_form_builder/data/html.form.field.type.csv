@@ -8,3 +8,4 @@ checkbox_boolean,"Checkbox(Boolean)",checkbox_boolean,boolean,1
 radio_group_selection,"Radio Group(Selection)",radio_group_selection,selection,0
 textbox_date,"Date Picker",date_picker,date,1
 textbox_datetime,"Datetime Picker",datetime_picker,datetime,1
+input_group,"Input Group","input_group",one2many,1

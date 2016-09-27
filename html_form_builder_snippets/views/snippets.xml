@@ -45,8 +45,16 @@
 		    data-selector=".hff_date_picker"
 		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
+                <div data-js='html_form_builder_field_datetime_picker'
+		    data-selector=".hff_datetime_picker"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
                 <div data-js='html_form_builder_field_checkbox'
 		    data-selector=".hff_checkbox"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
+                <div data-js='html_form_builder_field_input_group'
+		    data-selector=".hff_input_group"
 		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
                 <div data-js='html_form_builder_field'
@@ -75,10 +83,12 @@
                         <t t-snippet="html_form_builder_snippets.s_form_new" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_form_new.jpg"/>                        
                         <t t-snippet="html_form_builder_snippets.s_textbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_date_picker" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_date_picker.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_datetime_picker" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_date_picker.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_textarea" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_textarea.jpg"/>            
                         <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_radio_group_selection" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_radio_group.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_checkbox_boolean" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_checkbox.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_input_group" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_input_group.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_captcha" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_captcha.jpg"/>
                     </div>
 
@@ -126,6 +136,13 @@
             </div>
         </template>   
 
+        <template id="s_datetime_picker" name="Datetime Picker">
+            <div class="hff hff_datetime_picker form-group" data-form-type="datetime_picker" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <input type="text" name="field1" class="form-control"/>
+            </div>
+        </template>   
+
         <template id="s_radio_group_selection" name="Radio Group">
             <div class="hff hff_radio_group form-group" data-form-type="radio_group_selection" data-field-id="0">
                 <label for="field1">Field 1</label><br/>
@@ -145,6 +162,19 @@
             <div class="hff hff_textarea form-group" data-form-type="textarea" data-field-id="0">
                 <label for="field1">Field 1</label>
                 <textarea class="form-control" name="field1"/>
+            </div>
+        </template>
+
+        <template id="s_input_group" name="Input Group">
+            <div class="hff hff_input_group form-group" data-form-type="input_group" data-field-id="0">
+                <label for="field1" class="o_default_snippet_text">Field 1</label><br/>
+                <div class="row form-group">
+                    <div class="col-md-6"><input type="text" class="form-control" name="field1" placeholder="Sub Field 1"/></div>
+                    <div class="col-md-6"><input type="text" class="form-control" name="field1" placeholder="Sub Field 2"/></div>
+                </div>
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-md row pull-right">Add (+)</button>
+                </div>
             </div>
         </template>
 

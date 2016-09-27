@@ -11,10 +11,10 @@ var return_string = ""; //Global because I can't change html in session.rpc func
 var ajax = require('web.ajax');
 var qweb = core.qweb;
 
-ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal24.xml', qweb);
+ajax.loadXML('/html_form_builder_snippets/static/src/xml/html_form_modal27.xml', qweb);
 
 $(function() {
-  $( ".html_form button" ).click(function(e) {
+  $( ".html_form button.btn-lg" ).click(function(e) {
 
     e.preventDefault();  // Prevent the default submit behavior
 
@@ -41,6 +41,35 @@ $(function() {
                 }
             });
 
+    //Input groups are added differently
+    var input_groups = my_form.find(".hff_input_group")
+    input_groups.each(function( index ) {
+      var html_name = $( this ).attr("data-html-name");
+      var input_group_list = [];
+      input_group_list = [];
+      var row_string = "";
+
+      //Go through each row(exlcuding the add button row)
+      var input_group_row = $( this ).find(".row.form-group")
+      input_group_row.each(function( index ) {
+
+		  var input_group_row_list = [];
+		  input_group_row_list = [];
+          var input_string = "";
+
+		  //Go through each input in the row
+		  $( this ).find("input").each(function( index ) {
+			  var my_key = $( this ).attr('data-sub-field-name');
+			  var my_value = $( this ).val();
+			  input_string += "\"" + my_key + "\":\"" + my_value + "\","
+		  });
+
+          row_string += "{" + input_string.slice(0, -1) + "},";
+	  });
+	  var complete_string = "[" + row_string.slice(0, -1) + "]";
+      form_values[html_name] = complete_string;
+    });
+
     form_values['is_ajax_post'] = "Yes";
 
     // Post form and handle result
@@ -61,7 +90,9 @@ $(function() {
         }
       } else if (result_data.status == "success") {
 	      window.location = result_data.redirect_url;
-      }
+      } else {
+		  alert(result_data);
+	  }
     });
 
   });
@@ -623,6 +654,105 @@ options.registry.html_form_builder_field_date_picker = options.Class.extend({
     },
 });
 
+// ------------------------ DATETIME PICKER CONFIG ----------------------
+options.registry.html_form_builder_field_datetime_picker = options.Class.extend({
+    drop_and_build_snippet: function() {
+        var self = this;
+
+    	this.template = 'html_form_builder_snippets.datetime_picker_config';
+    	self.$modal = $( qweb.render(this.template, {}) );
+
+        //Remove previous instance first
+        $('#htmlDateTimePickerModal').remove();
+
+    	$('body').append(self.$modal);
+    	var datatype_dict = ['datetime'];
+        var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
+        var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
+
+        //Count the amount of bootstrap columns in the row
+        var current_columns = 0;
+        if (self.$target.parent().attr("id") == "html_field_placeholder") {
+            self.$target.parent().parent().find(".hff").each(function( index ) {
+	    	    if ($( this ).hasClass("col-md-12")) { current_columns = 12;}
+	    		if ($( this ).hasClass("col-md-11")) { current_columns = 11;}
+	    		if ($( this ).hasClass("col-md-10")) { current_columns = 10;}
+	    		if ($( this ).hasClass("col-md-9")) { current_columns = 9;}
+	    		if ($( this ).hasClass("col-md-8")) { current_columns = 8;}
+	    		if ($( this ).hasClass("col-md-7")) { current_columns = 7;}
+	    		if ($( this ).hasClass("col-md-6")) { current_columns = 6;}
+	    		if ($( this ).hasClass("col-md-5")) { current_columns = 5;}
+	    		if ($( this ).hasClass("col-md-4")) { current_columns = 4;}
+	    		if ($( this ).hasClass("col-md-3")) { current_columns = 3;}
+	    		if ($( this ).hasClass("col-md-2")) { current_columns = 2;}
+	    		if ($( this ).hasClass("col-md-1")) { current_columns = 1;}
+            });
+	    }
+
+        //Only show sizes that that are less then or equal to the remiaining columns
+        var field_size_html = "";
+        var i = 0;
+        for (i = (12 - current_columns); i > 0; i--) {
+			var number = (i / 12 * 100);
+            field_size_html += "<option value=\"" + i + "\">" + Math.round( number * 10 ) / 10 + "%</option>\n"
+		}
+
+        self.$modal.find('#field_size').html(field_size_html);
+
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		    self.$modal.find("#field_config_id").html(result.field_options_html);
+        });
+
+        $('#htmlDateTimePickerModal').modal('show');
+
+        $('body').on('click', '#save_datetime_picker_field', function() {
+            var field_id = self.$modal.find('#field_config_id').val();
+            if (field_id != "") {
+                var field_required = self.$modal.find('#html_form_field_required').is(':checked');
+                var field_size = self.$modal.find('#field_size').val();
+
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'field_required': field_required}).then(function(result) {
+		    	    if (field_size == "12") {
+		    	        self.$target.replaceWith(result.html_string);
+				    } else {
+						var header_wrapper = "";
+						var footer_wrapper = "";
+
+					    //Create a row if you are the first element in a "row" of fields
+						if (self.$target.parent().attr("id") == "html_fields") {
+						    header_wrapper = "<div class=\"row\">\n";
+						    footer_wrapper = "</div>";
+						}
+
+						//Remove the placeholder div to keep the HTML clean
+                        if (self.$target.parent().attr("id") == "html_field_placeholder") {
+	  	    	            self.$target.unwrap();
+						}
+
+                        //Add the current field size otherwise the reminaing wwhile be off
+                        current_columns += field_size;
+
+                        var remaining_columns = 12 - current_columns;
+
+                        if (remaining_columns > 0) {
+                            footer_wrapper = "<div id=\"html_field_placeholder\" data-field-size=\"" + remaining_columns + "\" class=\"col-md-" + remaining_columns + "\"/>\n" + footer_wrapper;
+					    }
+
+					    self.$target.replaceWith(header_wrapper + result.html_string.replace("hff ","hff col-md-" + field_size + " ") + footer_wrapper);
+
+
+					}
+                });
+
+                $('#htmlDateTimePickerModal').modal('hide');
+
+		    }
+
+        });
+
+    },
+});
+
 // ------------------------ CHECKBOX CONFIG ----------------------
 options.registry.html_form_builder_field_checkbox = options.Class.extend({
     drop_and_build_snippet: function() {
@@ -714,6 +844,59 @@ options.registry.html_form_builder_field_checkbox = options.Class.extend({
                 });
 
                 $('#htmlCheckboxModal').modal('hide');
+
+		    }
+
+        });
+
+    },
+});
+
+// ------------------------ INPUT GROUP CONFIG ----------------------
+options.registry.html_form_builder_field_input_group = options.Class.extend({
+    drop_and_build_snippet: function() {
+        var self = this;
+
+    	this.template = 'html_form_builder_snippets.input_group_config';
+    	self.$modal = $( qweb.render(this.template, {}) );
+
+        //Remove previous instance first
+        $('#htmlInputGroupModal').remove();
+
+    	$('body').append(self.$modal);
+    	var datatype_dict = ['one2many'];
+    	var sub_fields = [];
+        var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
+        var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
+
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		    self.$modal.find("#field_config_id").html(result.field_options_html);
+        });
+
+        $('#htmlInputGroupModal').modal('show');
+
+        //Onchange the ORM field
+        self.$modal.find('#field_config_id').change(function() {
+
+		    session.rpc('/form/field/config/inputgroup', {'field_id': self.$modal.find('#field_config_id').val() }).then(function(result) {
+		        self.$modal.find("#sub_fields_div").html(result.field_options_html);
+            });
+
+        });
+
+        $('body').on('click', '#save_input_group_field', function() {
+            var field_id = self.$modal.find('#field_config_id').val();
+            if (field_id != "") {
+
+                self.$modal.find("input[type='checkbox'][name='input_group_fields']:checked").each(function( index ) {
+                    sub_fields.push( $( this ).val() );
+                });
+
+                session.rpc('/form/field/add', {'form_id': form_id, 'field_id': field_id, 'html_type': self.$target.attr('data-form-type'), 'sub_fields': sub_fields}).then(function(result) {
+			        self.$target.replaceWith(result.html_string);
+                });
+
+                $('#htmlInputGroupModal').modal('hide');
 
 		    }
 
