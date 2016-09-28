@@ -1,3 +1,7 @@
+v1.8.5
+======
+* Checkbox Group snippet
+
 v1.8.4
 ======
 * Input group snippet

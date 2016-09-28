@@ -9,3 +9,4 @@ radio_group_selection,"Radio Group(Selection)",radio_group_selection,selection,0
 textbox_date,"Date Picker",date_picker,date,1
 textbox_datetime,"Datetime Picker",datetime_picker,datetime,1
 input_group,"Input Group","input_group",one2many,1
+checkbox_group,"Checkbox Group","checkbox_group",many2many,1

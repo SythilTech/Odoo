@@ -9,6 +9,7 @@ import base64
 import json
 import sys
 from urlparse import urlparse
+import ast
 
 from openerp.exceptions import ValidationError
 
@@ -260,6 +261,21 @@ class HtmlFormController(http.Controller):
         
         html_response.return_data = field_data
         html_response.history_data = field_data
+
+        return html_response
+
+    def _process_html_checkbox_group(self, field, field_data):
+        """Validation for checkbox group and preps for insertion into database"""
+        html_response = html_field_response()
+        html_response.error = ""
+        
+        create_list = []
+        checkbox_group = ast.literal_eval(field_data)
+        for checkbox in checkbox_group:
+            create_list.append( (4, checkbox ) )
+        
+        html_response.return_data = create_list
+        html_response.history_data = create_list
 
         return html_response
 

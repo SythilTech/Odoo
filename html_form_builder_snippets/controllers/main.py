@@ -243,6 +243,21 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	
 	return html_output
 
+    def _generate_html_checkbox_group(self, field):
+        """Generate Checkbox Group HTML"""
+        html_output = ""
+        html_output += "<div class=\"hff hff_checkbox_group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+        html_output += "  <label for=\"field1\">Field 1</label>\n"
+	
+	for my_record in request.env[field.field_id.relation].search([]):
+	    html_output += "  <div class=\"checkbox\">\n"
+	    html_output += "    <label><input type=\"checkbox\" value=\"" + str(my_record.id) + "\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + my_record.name.encode("utf-8") + "</label>\n"
+	    html_output += "  </div>\n"
+	
+	html_output += "</div>\n"
+	
+	return html_output
+
     def _generate_html_checkbox_boolean(self, field):
         """Generate Checkbox(Boolean) HTML"""
         html_output = ""

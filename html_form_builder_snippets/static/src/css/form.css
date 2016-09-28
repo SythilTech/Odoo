@@ -23,3 +23,8 @@ margin-top:-20px;
 .hff .radio:nth-of-type(1) {
   margin-top: 0px;
 }
+
+/* Remove the first checkbox in the groups top margin so there is roughly 5px between label and checkbox */
+.hff.hff_checkbox_group .checkbox:nth-of-type(1) {
+  margin-top:0px;
+}

@@ -1,3 +1,9 @@
+v.1.8.10
+========
+* Checkbox Group snippet (many2many)
+* Texboxes can now use integer fields
+* Textareas can now use char fields
+
 v.1.8.9
 =======
 * Input group snippet (one2many)
