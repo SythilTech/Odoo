@@ -1,7 +1,10 @@
+v1.8.7
+======
+* Embed forms was missing the anti bot measure(my_pie)
+
 v1.8.6
 ======
 * Binary file type
-
 
 v1.8.5
 ======

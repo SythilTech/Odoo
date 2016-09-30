@@ -61,6 +61,7 @@ class HtmlForm(models.Model):
  
 	html_output += "  <input type=\"hidden\" name=\"form_id\" value=\"" + str(self.id) + "\"/>\n"
         html_output += "  <input type=\"submit\" value=\"Send\"/>\n"
+        html_output += "  <input type=\"hidden\" name=\"my_pie\" value=\"3.14\"/>\n"        
     	html_output += "</form>\n"
         self.output_html = html_output
 
