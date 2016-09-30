@@ -360,6 +360,19 @@ class HtmlFormController(http.Controller):
         html_response.history_data = field_data
 
         return html_response
+
+    def _process_html_file_select(self, field, field_data):
+        html_response = html_field_response()
+        html_response.error = ""
+        
+        #Required Check
+        if field.setting_general_required == True and field_data == "":
+            html_response.error = "Field Required"
+
+        html_response.return_data = base64.encodestring( field_data.read() )
+        html_response.history_data = base64.encodestring( field_data.read() )
+
+        return html_response
     
     def _process_html_dropbox(self, field, field_data):
         """Validation for dropbox and preps for insertion into database"""

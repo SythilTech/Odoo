@@ -181,6 +181,29 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
 	
 	return html_output
 
+    def _generate_html_file_select(self, field):
+        """Generate Binary HTML"""
+        html_output = ""
+
+        #html_output += "<div class=\"hff hff_binary form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+	#html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
+        #html_output += "  <div class=\"input-group\">\n"
+        #html_output += "    <label class=\"input-group-btn\">\n"
+        #html_output += "      <span class=\"btn btn-primary\">\n"
+        #html_output += "        Browse... <input type=\"file\" style=\"display: none;\"/>\n"
+        #html_output += "      </span>\n"
+        #html_output += "    </label>\n"
+        #html_output += "    <input type=\"text\" class=\"form-control\" readonly=\"\"/>\n"
+        #html_output += "  </div>\n"
+        #html_output += "</div>\n"
+
+        html_output += "<div class=\"hff hff_binary form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
+        html_output += "  <input name=\"" + field.html_name.encode("utf-8") + "\" type=\"file\"/>\n"
+        html_output += "</div>\n"
+              
+	return html_output
+
     def _generate_html_input_group(self, field):
         """Generate input group HTML"""
         html_output = ""

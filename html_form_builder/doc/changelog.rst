@@ -1,3 +1,8 @@
+v1.8.6
+======
+* Binary file type
+
+
 v1.8.5
 ======
 * Checkbox Group snippet

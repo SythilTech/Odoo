@@ -61,6 +61,10 @@
 		    data-selector=".hff_checkbox_group"
 		    data-drop-in="#html_field_placeholder, #html_fields">
                 </div>
+                <div data-js='html_form_builder_field_binary'
+		    data-selector=".hff_binary"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
                 <div data-js='html_form_builder_field'
 		    data-selector=".html_form_field"
 		    data-drop-in="#html_fields">
@@ -93,6 +97,7 @@
                         <t t-snippet="html_form_builder_snippets.s_checkbox_group" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_checkbox_group.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_dropbox" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_dropbox.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_checkbox_boolean" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_checkbox.jpg"/>
+                        <t t-snippet="html_form_builder_snippets.s_binary" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_binary.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_input_group" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_input_group.jpg"/>
                         <t t-snippet="html_form_builder_snippets.s_captcha" t-thumbnail="/html_form_builder_snippets/static/src/img/ui/snippet_thumb_field_captcha.jpg"/>
                     </div>
@@ -148,6 +153,20 @@
             </div>
         </template>   
 
+        <template id="s_binary" name="Binary">
+            <div class="hff hff_binary form-group" data-form-type="file_select" data-field-id="0">
+                <label for="field1">Field 1</label>
+                <div class="input-group">
+                    <label class="input-group-btn">
+                        <span class="btn btn-primary">
+                            Browse… <input type="file" style="display: none;"/>
+                        </span>
+                    </label>
+                    <input type="text" class="form-control" readonly=""/>
+                </div>
+            </div>
+        </template>  
+        
         <template id="s_radio_group_selection" name="Radio Group">
             <div class="hff hff_radio_group form-group" data-form-type="radio_group_selection" data-field-id="0">
                 <label for="field1">Field 1</label><br/>

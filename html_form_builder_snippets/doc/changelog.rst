@@ -1,3 +1,7 @@
+v.1.8.11
+========
+* Binary snippet
+
 v.1.8.10
 ========
 * Checkbox Group snippet (many2many)
