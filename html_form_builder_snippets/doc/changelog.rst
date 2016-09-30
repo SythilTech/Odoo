@@ -1,3 +1,7 @@
+v.1.8.12
+========
+* Add integer and selection type fields to input group
+
 v.1.8.11
 ========
 * Binary snippet

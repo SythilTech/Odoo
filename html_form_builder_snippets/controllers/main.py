@@ -20,8 +20,9 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         my_field = request.env['ir.model.fields'].browse( int(values['field_id']) )
         field_options_html = ""
         
-        for field in request.env['ir.model.fields'].search([('model_id.model', '=', my_field.relation ), ('ttype','=','char') ] ):
-            field_options_html += "<input type=\"checkbox\" name=\"input_group_fields\" value=\"" + str(field.id) + "\"/> " + str(field.field_description) + " (" + str(field.ttype) + ")<br/>\n"
+        for field in request.env['ir.model.fields'].search([('model_id.model', '=', my_field.relation )] ):
+            if (field.ttype == 'char' or field.ttype == 'integer' or field.ttype == 'selection'):
+                field_options_html += "<input type=\"checkbox\" name=\"input_group_fields\" value=\"" + str(field.id) + "\"/> " + str(field.field_description) + " (" + str(field.ttype) + ")<br/>\n"
  
         return {'field_options_html': field_options_html }
 
@@ -227,7 +228,23 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         html_output += "    <div id=\"" + str(field.html_name) + "_placeholder\" class=\"row form-group\">\n"
         
         for sub_field in field.setting_input_group_sub_fields:
-            html_output += "      <div class=\"col-md-" + str(column_width) + "\"><input type=\"text\" class=\"form-control\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\"/></div>\n"
+            if sub_field.ttype == "char" or sub_field.ttype == "integer":
+                html_output += "      <div class=\"col-md-" + str(column_width) + "\"><input type=\"text\" class=\"form-control\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\"/></div>\n"
+            elif sub_field.ttype == "selection":
+                html_output += "      <div class=\"col-md-" + str(column_width) + "\">\n"
+                html_output += "<select class=\"form-control\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\">\n"
+                
+                   	    
+                selection_list = dict(request.env[sub_field.model_id.model]._columns[sub_field.name].selection)
+
+                html_output += "<option value\"\">Select Option</option>\n"
+     	        
+		for selection_value,selection_label in selection_list.items():
+                    html_output += "<option value\"" + selection_value.encode("utf-8") + "\">" + selection_label + "</option>\n"
+
+                html_output += "</select>\n"
+                html_output += "</div>\n"
+
 
 	html_output += "    </div>\n"
         html_output += "  </div>\n"
