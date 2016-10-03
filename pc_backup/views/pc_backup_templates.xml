@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <template id="download_client" name="Download Backup Client">
+            <a href="/backup/client/download/file">Download</a>
+        </template>
+
+        <template id="list_machines" name="List user backed up the machine">
+            <t t-foreach="user_machines" t-as="user_machine">
+                <a t-attf-href="/backup/client/machines/#{user_machine.id}"><t t-esc="user_machine.computer_name"/></a><br/>
+            </t>
+        </template>
+
+        <template id="list_files" name="List backed up files for the machine">
+            <h1><t t-esc="user_machine.computer_name"/></h1>
+            <t t-foreach="user_machine.backup_file_ids" t-as="backup_file">
+                <a t-attf-href="/backup/client/machines/#{user_machine.id}/#{backup_file.id}"><t t-esc="backup_file.backup_path"/></a><br/>
+            </t>
+        </template>
+
+        <template id="list_revisions" name="List the revisions of the file">
+            <h1><t t-esc="user_file.file_name"/></h1>
+            <t t-foreach="user_file.revision_ids" t-as="revision">
+                <t t-esc="revision.create_date"/> - <a t-attf-href="/backup/client/machines/#{user_file.bc_id.id}/#{user_file.id}/#{revision.id}">Download</a><br/>
+            </t>
+        </template>
+
+    </data>
+</openerp>
