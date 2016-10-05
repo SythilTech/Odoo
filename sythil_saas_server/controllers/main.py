@@ -20,6 +20,55 @@ from openerp import SUPERUSER_ID
 
 class SaasMultiDB(http.Controller):
 
+    @http.route('/saas/portal', type="http", auth="user", website=True)
+    def saas_portal(self, **kw):
+        """Displays a list of databases owned by the current user"""
+        user_databases = request.env['saas.database'].search([('user_id','=',request.env.user.id)])
+        return http.request.render('sythil_saas_server.saas_portal', {'user_databases': user_databases})
+
+    @http.route('/saas/portal/backup', type="http", auth="user", website=True)
+    def saas_portal_backup(self, **kw):
+        """Backs up the database only if they own it"""
+
+        values = {}
+	for field_name, field_value in kw.items():
+	    values[field_name] = field_value
+
+        user_database = request.env['saas.database'].search([('user_id','=',request.env.user.id), ('id','=', int(values['db']) )])
+        
+        if len(user_database) == 0:
+            return "Hack attempt detected!!!"
+        elif len(user_database) == 1:
+
+            with openerp.tools.osutil.tempdir() as dump_dir:
+                db_name = user_database.name
+                filestore = openerp.tools.config.filestore(db_name)
+
+                if os.path.exists(filestore):
+                    shutil.copytree(filestore, os.path.join(dump_dir, 'filestore'))
+
+                with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
+                    db = openerp.sql_db.db_connect(db_name)
+                    with db.cursor() as cr:
+                        json.dump(self.dump_db_manifest(cr), fh, indent=4)
+                    
+                cmd = ['pg_dump', '--no-owner']
+                cmd.append(db_name)
+                cmd.insert(-1, '--file=' + os.path.join(dump_dir, 'dump.sql'))
+                openerp.tools.exec_pg_command(*cmd)
+    
+                t=tempfile.TemporaryFile()
+                openerp.tools.osutil.zip_dir(dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql')
+            
+                headers = [
+                    ('Content-Type', 'application/octet-stream; charset=binary'),
+                    ('Content-Disposition', "attachment; filename=backup.zip" ),
+                ]
+
+                t.seek(0)
+                response = werkzeug.wrappers.Response(t, headers=headers, direct_passthrough=True)
+                return response
+
     @http.route('/try/package', type="http", auth="public", website=True)
     def saas_package(self, **kw):
         """Webpage that let's a user select a template database / package"""
@@ -227,15 +276,29 @@ class SaasMultiDB(http.Controller):
 	template_database = request.env['saas.template.database'].browse(int(values["package"]))
 	chosen_template = template_database.database_name
 
+	#Create the new user
+	new_user = request.env['res.users'].sudo().create({'name': person_name, 'login': values['email'], 'email': values['email'], 'password': values['password'] })
+	
+	#Add the user to the saas portal group
+	saas_portal_group = request.env['ir.model.data'].sudo().get_object('sythil_saas_server', 'saas_portal_group')
+        saas_portal_group.users = [(4, new_user.id)]
+
+        #Remove 'Contact Creation' permission        
+	contact_creation_group = request.env['ir.model.data'].sudo().get_object('base', 'group_partner_manager')
+        contact_creation_group.users = [(3,new_user.id)]
+
+        #Also remove them as an employee
+	human_resources_group = request.env['ir.model.data'].sudo().get_object('base', 'group_user')
+        human_resources_group.users = [(3,new_user.id)]
+
         #Create the associated company(res.partner) record
         saas_tag = request.env['ir.model.data'].sudo().get_object('sythil_saas_server', 'saas_client_tag')
-        new_company = request.env['res.partner'].sudo().create({'name': company, 'company_type':'company', 'email': email, 'category_id': [(4,saas_tag.id)] })
+        new_user.partner_id.write({'name': company, 'company_type':'company', 'email': email, 'category_id': [(4,saas_tag.id)] })
+        new_company = new_user.partner_id
         new_company.child_ids.sudo().create({'parent_id': new_company.id, 'type':'contact', 'name':person_name, 'email': email, 'category_id': [(4,saas_tag.id)] })
         
 	#Add this database to the saas list
-	new_saas_database = request.env['saas.database'].create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id, 'partner_id': new_company.id})
-
-        
+	new_saas_database = request.env['saas.database'].create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id, 'partner_id': new_company.id, 'user_id':new_user.id}) 
         
         #Create the new database from the template database, disconnecting any users that might be using the template database
         db_original_name = chosen_template
@@ -273,14 +336,15 @@ class SaasMultiDB(http.Controller):
 	    saas_company = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'base', 'main_company')
 	    saas_company.name = company
         
-        #Auto login the user
-        #request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
-	#request.session.authenticate(system_name, email, password)
+        #Automatically sign the new user in
+        request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
+	request.session.authenticate(request.env.cr.dbname, values['email'], values['password'])
         
-        if request.env['ir.config_parameter'].get_param('saas_system_redirect') == "db_filter":
-            return werkzeug.utils.redirect("http://" + request.httprequest.host + "/web?db=" + system_name)
-        else:
-            return werkzeug.utils.redirect("http://" + system_name + "." + request.httprequest.host )
+        return werkzeug.utils.redirect("/saas/portal")
+        #if request.env['ir.config_parameter'].get_param('saas_system_redirect') == "db_filter":
+        #    return werkzeug.utils.redirect("http://" + request.httprequest.host + "/web?db=" + system_name)
+        #else:
+        #    return werkzeug.utils.redirect("http://" + system_name + "." + request.httprequest.host )
         
     def _drop_conn(self, cr, db_name):
         # Try to terminate all other connections that might prevent

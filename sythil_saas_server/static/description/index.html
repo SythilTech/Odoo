@@ -1,7 +1,8 @@
 <div style="margin-left:100px;margin-right:100px;">
 <h2>Description</h2>
 Share your Odoo instance with others<br/>
-<br/>
+<b>*IMPORTANT*</b> Be security conscious when you set up the SAAS users permissions, if a user has sufficient permissions to install a hacking module they could steal confidential information from other databases inside the instance<br/>
+<b>*IMPORTANT*</b> Setting up a database filter is advised but not neccassary for the saas environment to work<br/>
 <h3>Instructions</h3>
 1.  Create a <a href="#templatedatabases">template database</a> for the user to pick from<br/>
 2.  Go to &lt;domain_name&gt;/try/package and select one of the templates setup<br/>
@@ -74,8 +75,27 @@ Create database templates for different types of systems.<br/>
         </div>
     </div>
 </section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan">SAAS Portal</h2>
+        <div class="oe_span6">
+            <p class="oe_mt32">
+After users sign up for there first system they can access the saas server portal to manage thier databases<br/>
 <br/>
-Setting up a database filter is advised but not neccassary for the saas environment to work<br/>
+<b>Instructions</b><br/>
+1.  Login as a saas user<br>
+2.  Go to the now visible SAAS Portal website menu<br/>
+3.  From there you can go to any of your databases or freely export your database<br>
+            </p>
+        </div>
+        <div class="oe_span6">
+            <div class="oe_row_img oe_centered">
+<img class="oe_picture oe_screenshot" src="5.jpg" alt="SAAS Portal">
+            </div>
+        </div>
+    </div>
+</section>
 <br/>
 <h2>Extra Modules</h2>
 <h3><a href="https://www.odoo.com/apps/modules/9.0/sythil_saas_client/">sythil_saas_client</a></h3>

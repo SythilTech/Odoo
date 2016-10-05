@@ -1,3 +1,7 @@
+v1.2
+====
+* SAAS portal
+
 v1.1.3
 ======
 * Create SAAS partner on sign up

@@ -1,6 +1,6 @@
 {
     'name': "Sythil SAAS Server",
-    'version': "1.1.3",
+    'version': "1.2",
     'author': "Sythil",
     'category': "Tools",
     'summary':'Share your Odoo instace with others',
@@ -16,6 +16,9 @@
         'data/ir.cron.csv',
         'data/saas.modules.builtin.csv',
         'data/res.partner.category.csv',
+        'data/res.groups.csv',
+        'data/website.menu.csv',
+        'data/ir.rule.csv',
     ],
     'demo': [],
     'images':[
@@ -23,6 +26,7 @@
         'static/description/2.jpg',
         'static/description/1.jpg',
         'static/description/4.jpg',
+        'static/description/5.jpg',
     ],
     'depends': ['website'],
     'installable': True,

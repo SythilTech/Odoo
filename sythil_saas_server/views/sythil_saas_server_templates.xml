@@ -127,5 +127,36 @@
     </t>
 </template>
 
+<template id="saas_portal" name="SAAS Portal" page="True">
+    <t t-call="website.layout">
+  <script type="text/javascript">
+  $(function() {
+      // db modal
+      $('body').on('click','.sythil_database_action_backup', function(ev) {
+          ev.preventDefault();
+          var db = $(ev.currentTarget).data('db');
+          window.location = "/saas/portal/backup?db=" + db;
+      });
+  });
+  </script>
+
+        <h1 class="text-center">Database List</h1>
+        <div class="container">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="list-group">
+                    <t t-foreach="user_databases" t-as="user_database">
+                        <a t-attf-href="#{user_database.access_url}" class="list-group-item">
+                            <t t-esc="user_database.name"/>
+                            <div class="text-right pull-right">
+                                <span t-attf-data-db="#{user_database.id}" class="sythil_database_action_backup btn-link"><i class="fa fa-floppy-o fa-fw"></i> Backup</span>
+                            </div>
+                        </a>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
 </data>
 </openerp>
