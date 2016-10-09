@@ -1,3 +1,9 @@
+v1.7.10
+=======
+* Strip reply footer when someone replies via email
+* Remove communication history from form view
+* Add portal_access_key field in preparation for letting public users view thier ticket inline
+
 v1.7.9
 ======
 * Allow changing of partner

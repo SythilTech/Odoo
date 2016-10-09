@@ -1,1 +1,1 @@
-import website_support_ticket, res_partner, website_support_help, mail_message
+import website_support_ticket, res_partner, website_support_help

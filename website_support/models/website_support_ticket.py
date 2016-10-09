@@ -1,9 +1,20 @@
 # -*- coding: utf-8 -*-
 from openerp import api, fields, models
+from openerp import tools
+from HTMLParser import HTMLParser
 
 import logging
 _logger = logging.getLogger(__name__)
 
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+        
 class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
@@ -29,7 +40,27 @@ class WebsiteSupportTicket(models.Model):
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History (Depreciated)")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
-    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
+    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
+    portal_access_key = fields.Char(string="Portal Access Key")
+
+    def message_update(self, msg_dict, update_vals=None):
+        """ Override to update the support ticket according to the email. """
+
+        body_short = tools.html_email_clean(msg_dict['body'], shorten=True, remove=True)
+                
+        #s = MLStripper()
+        #s.feed(body_short)
+        #body_short = s.get_data()
+                
+        #(Depreciated) Add to message history field for back compatablity
+        self.conversation_history.create({'ticket_id': self.id, 'content': body_short })
+
+	customer_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
+        self.state = customer_replied.id
+
+        super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
+
+        return True
 
     @api.depends('state')
     def _compute_unattend(self):

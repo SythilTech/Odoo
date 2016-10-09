@@ -23,11 +23,11 @@
           	          <field name="attachment" filename="attachment_filename"/>
           	          <field name="attachment_filename" invisible="True"/>
           	          <field name="description"/>      	              
-          	          <field name="conversation_history" context="{'ticket_id':active_id}">
+          	          <!--<field name="conversation_history" context="{'ticket_id':active_id}">
           	              <tree editable="bottom">
           	                   <field name="content"/>
           	              </tree>
-          	          </field>
+          	          </field>-->
           	      </group>
       	          </sheet>
                   <div class="oe_chatter">
