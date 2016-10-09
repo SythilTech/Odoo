@@ -2,6 +2,7 @@
 import werkzeug
 import json
 import base64
+from random import randint
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -92,7 +93,8 @@ class SupportTicketController(http.Controller):
             if len(search_partner) > 0:
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id})
             else:
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name})
+                portal_access_key = randint(1000000000,2000000000)
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
 
         #send an email out to everyone in the category
         notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
@@ -127,6 +129,13 @@ class SupportTicketController(http.Controller):
         """View an individual support ticket"""
         #only let the user this ticket is assigned to view this ticket
         support_ticket = http.request.env['website.support.ticket'].sudo().search([('partner_id','=',http.request.env.user.partner_id.id), ('id','=',ticket) ])[0]        
+        return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket})
+
+    @http.route('/support/portal/ticket/view/<portal_access_key>', type="http", auth="public", website=True)
+    def support_portal_ticket_view(self, portal_access_key):
+        """View an individual support ticket (portal access)"""
+        
+        support_ticket = http.request.env['website.support.ticket'].sudo().search([('portal_access_key','=',portal_access_key) ])[0]
         return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket})
 
     @http.route('/support/ticket/comment',type="http", auth="user")

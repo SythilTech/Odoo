@@ -1,3 +1,7 @@
+v1.7.11
+=======
+* Portal access for publicly sent tickets
+
 v1.7.10
 =======
 * Strip reply footer when someone replies via email
