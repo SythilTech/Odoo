@@ -1,3 +1,7 @@
+v1.2.1
+======
+* Fix files loading in wrong order
+
 v1.2
 ====
 * SAAS portal

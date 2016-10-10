@@ -26,6 +26,12 @@ class SaasMultiDB(http.Controller):
         user_databases = request.env['saas.database'].search([('user_id','=',request.env.user.id)])
         return http.request.render('sythil_saas_server.saas_portal', {'user_databases': user_databases})
 
+    @http.route('/saas/portal/domains', type="http", auth="user", website=True)
+    def saas_portal_domains(self, **kw):
+        """Displays a list of domains owned by the current user"""
+        user_domains = request.env['saas.database.domain'].search([('database_id.user_id','=',request.env.user.id)])
+        return http.request.render('sythil_saas_server.saas_portal_domain_list', {'user_domains': user_domains})
+
     @http.route('/saas/portal/backup', type="http", auth="user", website=True)
     def saas_portal_backup(self, **kw):
         """Backs up the database only if they own it"""

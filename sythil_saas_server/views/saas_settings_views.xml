@@ -24,7 +24,7 @@
           <field name="target">inline</field>
       </record>
         
-      <menuitem id="saas_settings_menu" name="Settings" parent="saas_database_parent_menu" action="saas_settings_action" sequence="30"/>
+      <menuitem id="saas_settings_menu" name="Settings" parent="saas_database_parent_menu" action="saas_settings_action" sequence="40"/>
         
   </data>
 </openerp>
