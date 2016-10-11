@@ -29,4 +29,3 @@ class SaasDatabase(models.Model):
             self.access_url = "http://" + request.httprequest.host + "/web?db=" + self.name
         elif system_redirect == "subdomain":
             self.access_url = "http://" + self.name + "." + request.httprequest.host
-
