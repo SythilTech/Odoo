@@ -61,10 +61,25 @@ $(function() {
 		  $( this ).find("input").each(function( index ) {
 			  var my_key = $( this ).attr('data-sub-field-name');
 			  var my_value = $( this ).val();
-			  input_string += "\"" + my_key + "\":\"" + my_value + "\","
+
+			  if (my_value != "") {
+			      input_string += "\"" + my_key + "\":\"" + my_value + "\","
+		      }
 		  });
 
-          row_string += "{" + input_string.slice(0, -1) + "},";
+		  //Go through each selection in the row
+		  $( this ).find("select").each(function( index ) {
+			  var my_key = $( this ).attr('data-sub-field-name');
+			  var my_value = $( this ).val();
+
+			  if (my_value != "") {
+			      input_string += "\"" + my_key + "\":\"" + my_value + "\","
+		      }
+		  });
+
+          if (input_string != "") {
+              row_string += "{" + input_string.slice(0, -1) + "},";
+	      }
 	  });
 	  var complete_string = "[" + row_string.slice(0, -1) + "]";
       form_values[html_name] = complete_string;
@@ -213,7 +228,7 @@ options.registry.html_form_builder_field_textbox = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -314,7 +329,7 @@ options.registry.html_form_builder_field_textarea = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -413,7 +428,7 @@ options.registry.html_form_builder_field_checkbox_group = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -511,7 +526,7 @@ options.registry.html_form_builder_field_dropbox = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -610,7 +625,7 @@ options.registry.html_form_builder_field_radio_group = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -710,7 +725,7 @@ options.registry.html_form_builder_field_date_picker = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -810,7 +825,7 @@ options.registry.html_form_builder_field_datetime_picker = options.Class.extend(
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -909,7 +924,7 @@ options.registry.html_form_builder_field_checkbox = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -1008,7 +1023,7 @@ options.registry.html_form_builder_field_binary = options.Class.extend({
 
         self.$modal.find('#field_size').html(field_size_html);
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 
@@ -1078,7 +1093,7 @@ options.registry.html_form_builder_field_input_group = options.Class.extend({
         var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
         var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
 
-		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model}).then(function(result) {
+		session.rpc('/form/field/config/general', {'data_types':datatype_dict, 'form_model':form_model, 'form_id': form_id}).then(function(result) {
 		    self.$modal.find("#field_config_id").html(result.field_options_html);
         });
 

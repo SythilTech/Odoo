@@ -1,3 +1,7 @@
+v.1.8.13
+========
+* Fix issue with input group and selection sub fields
+
 v.1.8.12
 ========
 * Add integer and selection type fields to input group

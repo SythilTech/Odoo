@@ -20,7 +20,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         my_field = request.env['ir.model.fields'].browse( int(values['field_id']) )
         field_options_html = ""
         
-        for field in request.env['ir.model.fields'].search([('model_id.model', '=', my_field.relation )] ):
+        for field in request.env['ir.model.fields'].search([('model_id.model', '=', my_field.relation ), ('name','!=','display_name')] ):
             if (field.ttype == 'char' or field.ttype == 'integer' or field.ttype == 'selection'):
                 field_options_html += "<input type=\"checkbox\" name=\"input_group_fields\" value=\"" + str(field.id) + "\"/> " + str(field.field_description) + " (" + str(field.ttype) + ")<br/>\n"
  
@@ -34,6 +34,8 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
             values[field_name] = field_value
             
         data_types_list = values['data_types']
+            
+        my_form = request.env['html.form'].browse( int(values['form_id']) )
             
         field_options_html = ""
         field_options_html = "<option value=\"\">Select Field</option>"
@@ -237,10 +239,10 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
                    	    
                 selection_list = dict(request.env[sub_field.model_id.model]._columns[sub_field.name].selection)
 
-                html_output += "<option value\"\">Select Option</option>\n"
+                html_output += "<option value=\"\">" + sub_field.field_description + "</option>\n"
      	        
 		for selection_value,selection_label in selection_list.items():
-                    html_output += "<option value\"" + selection_value.encode("utf-8") + "\">" + selection_label + "</option>\n"
+                    html_output += "<option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label + "</option>\n"
 
                 html_output += "</select>\n"
                 html_output += "</div>\n"
@@ -287,9 +289,9 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         """Generate Checkbox Group HTML"""
         html_output = ""
         html_output += "<div class=\"hff hff_checkbox_group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
-        html_output += "  <label for=\"field1\">Field 1</label>\n"
+        html_output += "  <label for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
 	
-	for my_record in request.env[field.field_id.relation].search([]):
+	for my_record in request.env[field.field_id.relation].search([('name','!=','')]):
 	    html_output += "  <div class=\"checkbox\">\n"
 	    html_output += "    <label><input type=\"checkbox\" value=\"" + str(my_record.id) + "\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + my_record.name.encode("utf-8") + "</label>\n"
 	    html_output += "  </div>\n"
@@ -428,6 +430,10 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
             values[field_name] = field_value
                     
         field_id = request.env['ir.model.fields'].browse( int(values['field_id']) )
+        
+        #Don't add the same field twice to this form
+        if len(request.env['html.form.field'].search([('html_id','=', int(values['form_id']) ), ('field_id','=',field_id.id)])) > 0:
+            return {'html_string': "Field already added"}
         
         field_type = request.env['html.form.field.type'].search([('html_type','=', values['html_type'] )])[0]
 

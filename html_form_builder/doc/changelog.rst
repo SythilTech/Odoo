@@ -1,3 +1,7 @@
+v1.8.8
+======
+* Fix issue with input group and selection sub field
+
 v1.8.7
 ======
 * Embed forms was missing the anti bot measure(my_pie)

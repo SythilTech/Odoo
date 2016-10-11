@@ -233,18 +233,20 @@ class HtmlFormController(http.Controller):
         html_response.error = ""
                         
         input_group_obj = json.loads(field_data)
+        _logger.error(field_data)
         all_inserts = []
         for row in input_group_obj:
-            create_list = []
+            _logger.error(row)
+            valid_row = True
             
             #Only allow fields in the sub field list
             for sub_field in field.setting_input_group_sub_fields:
                 if sub_field.name not in row:
-                    return "hack detected"
+                    valid_row = False
                     
-            all_inserts.append( (0, 0, row ) )
+            if valid_row:
+                all_inserts.append( (0, 0, row ) )
             
-        _logger.error(all_inserts)
         html_response.return_data = all_inserts
         html_response.history_data = all_inserts
 
