@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        
+        <record id="view_partner_form_inherit_crm_custom_fields" model="ir.ui.view">
+            <field name="name">Custom CRM fields Form View</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Custom Fields">
+                        <group>
+                        
+                            <button name="open_custom_field_form" type="object" groups="sales_team.group_sale_manager" string="Add Custom Field"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+       </record>
+       
+   </data>
+</openerp>

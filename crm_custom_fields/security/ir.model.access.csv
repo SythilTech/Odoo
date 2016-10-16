@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ir_model_fields,access ir.model.fields,model_ir_model_fields,sales_team.group_sale_manager,1,1,1,1
+access_ir_model,access ir.model,model_ir_model,sales_team.group_sale_manager,1,1,0,0
