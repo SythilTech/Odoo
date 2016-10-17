@@ -17,7 +17,7 @@ except ImportError:
     slugify_lib = None
     
 class WebsiteStyleManager(http.Controller):    
-    
+
     @http.route('/style/load', website=True, type='json', auth="user")
     def style_manager_load(self, **kw):
         

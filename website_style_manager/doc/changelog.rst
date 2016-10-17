@@ -1,3 +1,7 @@
+v1.3
+====
+* Override LESS variables
+
 v1.2
 ====
 * Custom CSS text box

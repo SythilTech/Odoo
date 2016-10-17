@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 from lxml import html, etree
+import openerp
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -14,20 +15,31 @@ class WebsiteStyleManager(models.Model):
     css_text = fields.Text(string="CSS Text")
     custom_css = fields.Text(string="Custom CSS", help="Define website wide styles and classes")
     force_styles = fields.Boolean(string="Force Styles", help="Applies an !important to all styles forcing the style over higher specificity")
+    color_profile = fields.Many2one('website.style.profile', string="Color Profile")
+    custom_less_ids = fields.One2many('website.style.less', 'website_id', string="LESS Variables")
 
-    def bootsnipp_sync(self):
-        #Download the featured page
-        featured = "http://bootsnipp.com/snippets/featured"
+    @api.one
+    @api.onchange('color_profile')
+    def _onchange_color_profile(self):
+
+        if self.color_profile:
+
+            self.custom_less_ids.unlink()
+            for less_style in self.color_profile.custom_less_ids:
+
+                self.env['website.style.less'].create({'website_id': 1, 'name': less_style.name, 'internal_name': less_style.internal_name, 'value': less_style.value})
+
+    @api.one
+    def generate_less(self):
+        module_directory = openerp.modules.get_module_path("website_style_manager")
+        full_path = module_directory + "/static/src/less/override.less"
         
-        for i in range(1,1):
-            page = requests.get(featured + "?page=" + i)
-            root = html.fromstring(page.content)
-            
-            #Get all the snippet on the page
-            snippet_list = root.xpath("//p[@class='lead snipp-title']")
-            for snippet in snippet_list:
-                link = html.SubElement(snippet, "a")['href']
-                _logger.error(link)
+        less_data = ""
+        for less_style in self.custom_less_ids:
+            less_data += "@" + less_style.internal_name + ": " + less_style.value + ";\n"
+        
+        with open(full_path, "w") as less_file:
+            less_file.write(less_data)
 
     
     @api.onchange('tag_styles', 'force_styles')
@@ -65,6 +77,32 @@ class WebsiteStyle(models.Model):
     font_family = fields.Many2one('website.style.fontfamily', string="Font Family")
     font_color = fields.Char(string="Font Color", default="#000000")
     font_size = fields.Char(string="Font Size", help="The Size of the font, please include the suffix", default="16px")
+
+class WebsiteStyleProfile(models.Model):
+
+    _name = "website.style.profile"
+    
+    name = fields.Char(string="Profile Name")
+    custom_less_ids = fields.One2many('website.style.profile.less', 'profile_id', string="LESS Variables")
+
+class WebsiteStyleProfileLess(models.Model):
+
+    _name = "website.style.profile.less"
+    
+    profile_id = fields.Many2one('website.style.profile', string="Profile")
+    name = fields.Char(string="Name", help="Display name of the less variable")
+    internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable")
+    value = fields.Char(string="Value", help="Color HEX code")
+    
+    
+class WebsiteStyleLess(models.Model):
+
+    _name = "website.style.less"
+    
+    website_id = fields.Many2one('website', string="Website")
+    name = fields.Char(string="Name", help="Display name of the less variable")
+    internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable")
+    value = fields.Char(string="Value", help="Color HEX code")
     
 class WebsiteStyleHTMLTag(models.Model):
 

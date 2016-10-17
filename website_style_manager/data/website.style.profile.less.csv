@@ -1,0 +1,7 @@
+"id","profile_id","name","internal_name","value"
+"cosmo_profile_primary","Cosmo","Brand Primary Color","brand-primary","#2780E3"
+"cosmo_profile_succes","Cosmo","Brand Success Color","brand-success","#3FB618"
+"cosmo_profile_info","Cosmo","Brand Info Color","brand-info","#9954BB"
+"cosmo_profile_warning","Cosmo","Brand Warning Color","brand-warning","#FF7518"
+"cosmo_profile_danger","Cosmo","Brand Danger Color","brand-danger","#FF0039"
+"cosmo_profile_navbar_default_bg","Cosmo","Menu Background Color","navbar-default-bg","#FFFFFF"

@@ -17,8 +17,15 @@
       	                </tree>
       	            </field>
       	            <field name="custom_css"/>
+      	            <field name="color_profile"/>
+      	            <field name="custom_less_ids" context="{'default_website_id': active_id}">
+      	                <tree>
+      	                    <field name="name"/>
+      	                    <field name="value"/>
+      	                </tree>
+      	            </field>
       	            <field name="css_text" invisible="1"/>
-      	            <button type="object" name="bootsnipp_sync" string="Test Bootsnipp"/>
+      	            <button type="object" name="generate_less" string="Generate LESS"/>
       	        </field>
             </field>
         </record>
