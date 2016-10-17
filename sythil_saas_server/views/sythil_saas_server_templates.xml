@@ -148,7 +148,7 @@
                         <a t-attf-href="#{user_database.access_url}" class="list-group-item">
                             <t t-esc="user_database.name"/>
                             <div class="text-right pull-right">
-                                <span t-attf-data-db="#{user_database.id}" class="sythil_database_action_backup btn-link"><i class="fa fa-floppy-o fa-fw"></i> Backup</span>
+                                <!--<span t-attf-data-db="#{user_database.id}" class="sythil_database_action_backup btn-link"><i class="fa fa-floppy-o fa-fw"></i> Backup</span>-->
                             </div>
                         </a>
                     </t>

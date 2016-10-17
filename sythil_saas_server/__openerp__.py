@@ -1,6 +1,6 @@
 {
     'name': "Sythil SAAS Server",
-    'version': "1.2.1",
+    'version': "1.2.2",
     'author': "Sythil",
     'category': "Tools",
     'summary':'Share your Odoo instace with others',

@@ -32,48 +32,48 @@ class SaasMultiDB(http.Controller):
         user_domains = request.env['saas.database.domain'].search([('database_id.user_id','=',request.env.user.id)])
         return http.request.render('sythil_saas_server.saas_portal_domain_list', {'user_domains': user_domains})
 
-    @http.route('/saas/portal/backup', type="http", auth="user", website=True)
-    def saas_portal_backup(self, **kw):
-        """Backs up the database only if they own it"""
+    #@http.route('/saas/portal/backup', type="http", auth="user", website=True)
+    #def saas_portal_backup(self, **kw):
+    #    """Backs up the database only if they own it"""
 
-        values = {}
-	for field_name, field_value in kw.items():
-	    values[field_name] = field_value
-
-        user_database = request.env['saas.database'].search([('user_id','=',request.env.user.id), ('id','=', int(values['db']) )])
-        
-        if len(user_database) == 0:
-            return "Hack attempt detected!!!"
-        elif len(user_database) == 1:
-
-            with openerp.tools.osutil.tempdir() as dump_dir:
-                db_name = user_database.name
-                filestore = openerp.tools.config.filestore(db_name)
-
-                if os.path.exists(filestore):
-                    shutil.copytree(filestore, os.path.join(dump_dir, 'filestore'))
-
-                with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
-                    db = openerp.sql_db.db_connect(db_name)
-                    with db.cursor() as cr:
-                        json.dump(self.dump_db_manifest(cr), fh, indent=4)
-                    
-                cmd = ['pg_dump', '--no-owner']
-                cmd.append(db_name)
-                cmd.insert(-1, '--file=' + os.path.join(dump_dir, 'dump.sql'))
-                openerp.tools.exec_pg_command(*cmd)
-    
-                t=tempfile.TemporaryFile()
-                openerp.tools.osutil.zip_dir(dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql')
-            
-                headers = [
-                    ('Content-Type', 'application/octet-stream; charset=binary'),
-                    ('Content-Disposition', "attachment; filename=backup.zip" ),
-                ]
-
-                t.seek(0)
-                response = werkzeug.wrappers.Response(t, headers=headers, direct_passthrough=True)
-                return response
+    #    values = {}
+#	for field_name, field_value in kw.items():
+#	    values[field_name] = field_value
+#
+#        user_database = request.env['saas.database'].search([('user_id','=',request.env.user.id), ('id','=', int(values['db']) )])
+#        
+#        if len(user_database) == 0:
+#            return "Hack attempt detected!!!"
+#        elif len(user_database) == 1:
+#
+#            with openerp.tools.osutil.tempdir() as dump_dir:
+#                db_name = user_database.name
+#                filestore = openerp.tools.config.filestore(db_name)
+#
+#                if os.path.exists(filestore):
+#                    shutil.copytree(filestore, os.path.join(dump_dir, 'filestore'))
+#
+#                with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
+#                    db = openerp.sql_db.db_connect(db_name)
+#                    with db.cursor() as cr:
+#                        json.dump(self.dump_db_manifest(cr), fh, indent=4)
+#                    
+#                cmd = ['pg_dump', '--no-owner']
+#                cmd.append(db_name)
+#                cmd.insert(-1, '--file=' + os.path.join(dump_dir, 'dump.sql'))
+#                openerp.tools.exec_pg_command(*cmd)
+#    
+#                t=tempfile.TemporaryFile()
+#                openerp.tools.osutil.zip_dir(dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql')
+#            
+#                headers = [
+#                    ('Content-Type', 'application/octet-stream; charset=binary'),
+#                    ('Content-Disposition', "attachment; filename=backup.zip" ),
+#                ]
+#
+#                t.seek(0)
+#                response = werkzeug.wrappers.Response(t, headers=headers, direct_passthrough=True)
+#                return response
 
     @http.route('/try/package', type="http", auth="public", website=True)
     def saas_package(self, **kw):

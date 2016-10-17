@@ -1,3 +1,7 @@
+v1.2.2
+======
+* Disable database export since it allowed people to reverse engineer the super user password
+
 v1.2.1
 ======
 * Fix files loading in wrong order
