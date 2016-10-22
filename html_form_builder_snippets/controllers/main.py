@@ -41,7 +41,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         field_options_html = "<option value=\"\">Select Field</option>"
         
         for my_field in request.env['ir.model.fields'].search([('ttype', 'in', data_types_list ), ('model_id.model','=', values['form_model']), ('name','!=','display_name') ] ):
-            field_options_html += "<option value=\"" + str(my_field.id) + "\">" + str(my_field.field_description) + " (" + str(my_field.name) + "/" + str(my_field.ttype) + ")" + "</option>\n"
+            field_options_html += "<option value=\"" + str(my_field.id) + "\">" + my_field.field_description.encode("utf-8") + " (" + my_field.name.encode("utf-8") + "/" + str(my_field.ttype) + ")" + "</option>\n"
  
         return {'field_options_html': field_options_html }
 

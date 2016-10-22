@@ -1,0 +1,1 @@
+import res_partner, website_directory_booking

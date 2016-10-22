@@ -1,3 +1,7 @@
+v.1.8.14
+========
+* Fix issue character encoding with field modal config
+
 v.1.8.13
 ========
 * Fix issue with input group and selection sub fields
