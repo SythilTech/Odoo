@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_ticket_view_form_inherit_tasks" model="ir.ui.view">
+          <field name="name">website.support.ticket.view.form.inherit.tasks</field>
+          <field name="model">website.support.ticket</field>
+          <field name="inherit_id" ref="website_support.website_support_ticket_view_form"/>
+          <field name="arch" type="xml">
+              <header position="inside">
+	          <button type="object" name="create_task" string="Convert to Task"/>
+	      </header>
+              <field name="priority_id" position="before">
+                  <field name="task_id"/>
+              </field>
+          </field>
+      </record>
+        
+  </data>
+</openerp>
