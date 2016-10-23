@@ -34,7 +34,7 @@
           <field name="target">current</field>
       </record>
         
-      <!--<menuitem id="saas_database_domain_menu" name="Database Domains" parent="saas_database_parent_menu" action="saas_database_domain_action" sequence="30"/>-->
+      <menuitem id="saas_database_domain_menu" name="Database Domains" parent="saas_database_parent_menu" action="saas_database_domain_action" sequence="30"/>
         
   </data>
 </openerp>

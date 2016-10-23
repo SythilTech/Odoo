@@ -30,7 +30,7 @@ class SaasSettings(models.TransientModel, configmanager):
     
     @api.one
     def add_saas_setting(self):
-
+        
         version = "%s %s" % (release.description, release.version)
         self.parser = parser = optparse.OptionParser(version=version, option_class=MyOption)
 
@@ -40,4 +40,5 @@ class SaasSettings(models.TransientModel, configmanager):
                 
     @api.one
     def saas_server_setting(self):
+        _logger.error(openerp.conf.server_wide_modules)
         _logger.error(openerp.tools.config['sythilsaasserver'])

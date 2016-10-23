@@ -13,7 +13,7 @@
                  <group>
                      <field name="system_redirect"/>
                      <!--<button type="object" name="add_saas_setting" string="Set as SAAS Server"/>-->
-                     <!--<button type="object" name="saas_server_setting" string="Log SAAS Server"/>-->
+                     <button type="object" name="saas_server_setting" string="Log SAAS Server"/>
                  </group>
               </form>
           </field>
