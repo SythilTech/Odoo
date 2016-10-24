@@ -2,14 +2,55 @@
 <openerp>
 <data>
 
-<template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front Directory Editor">
+        <record id="directory_booking" model="mail.template">
+            <field name="name">Directory Restaurant Booking</field>
+            <field name="model_id" ref="model_website_directory_booking"></field>
+            <field name="email_from">${object.email}</field>            
+            <field name="email_to">${object.partner_id.email}</field>
+            <field name="subject">New online booking</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.partner_id.name},</p>
+                <p>A new online booking has been made, here are the details,</p>
+                <hr/>
+                <b>Booking Name:</b> ${object.booking_name}<br/>
+                <b>Email:</b> ${object.email}<br/>
+                <b>Number of People:</b> ${object.number_of_people}<br/>
+                <b>Booking Time:</b> ${object.booking_datetime}<br/>
+                <b>Notes:</b><br/>
+                ${object.notes}
+                
+            ]]>
+            </field>
+        </record>
+
+<!--<template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front Directory Editor">
     <xpath expr="." position="inside">
         <script type="text/javascript" src="/website_business_directory/static/src/js/website_business_directory.editor.front.js"></script>
     </xpath>
-</template>
+</template>-->
 
 <template id="directory_search" name="Directory Search" page="True">
     <t t-call="website.layout">    
+
+        <script>
+
+$(document).ready(function() {
+    $("#search_business_directory").autocomplete({
+        source: '/directory/auto-complete',
+        minLength: 1,
+        select: function( event, ui ) {
+            window.location.href = ui.item.value;
+        }
+    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+         return $("<li></li>")
+             .data("item.autocomplete", item)
+             .append("<a>" + item.label + "</a>")
+             .appendTo(ul);
+    };
+});
+
+        </script>
         <div class="container">
             <div class="mt16 mb16">
                 <h1 class="text-center">Directory Search</h1>                
@@ -42,6 +83,7 @@
                 <div class="panel panel-default">
 	            <div class="panel-body">
 	                <a t-attf-href="/directory/company/#{ slug(directory_company) }">
+	                    <img t-att-src="website.image_url(directory_company, 'image')" class="img-rounded" t-attf-alt="#{directory_company.name} Logo" width="100" height="100"/>
 	                    <span t-field="directory_company.name"/>
 	                </a><br/>
 	                <span t-field="directory_company.street"/>, <span t-field="directory_company.city"/>, <span t-field="directory_company.state_id.name"/>, <span t-field="directory_company.zip"/>
@@ -88,7 +130,7 @@
     <t t-call="website.layout">
         <div class="container">
             <h1>My Listings</h1>
-            <t foreach="businesses" t-as="business">
+            <t t-foreach="businesses" t-as="business">
                 <t t-esc="business.name"/><br/>
             </t>
             <a href="/directory/account/business/add">Add Business</a>
@@ -117,6 +159,7 @@
                 <div class="form-group">
                     <label for="country">Country*</label>
                     <select name="country" class="form-control" required="True">
+                        <option value="">Select Country</option>
                         <t t-foreach="countries" t-as="country">
                             <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
                         </t>
@@ -125,6 +168,7 @@
                 <div class="form-group">
                     <label for="state">State*</label>
                     <select name="state" class="form-control" required="True">
+                        <option value="">Select State</option>
                         <t t-foreach="states" t-as="state">
                             <option t-attf-value="#{state.id}"><t t-esc="state.name"/></option>
                         </t>
@@ -144,7 +188,7 @@
                 </div>
                 <div class="form-group">
                     <label for="description">Business Description</label>
-                    <input type="text" name="description" class="form-control"/>
+                    <textarea name="description" class="form-control"/>
                 </div>
                 <div class="form-group">
                     <label for="directory_monday_start">Monday Start Time</label>
@@ -155,7 +199,7 @@
                     <input type="text" name="directory_monday_end" class="form-control"/>
                 </div>
                 <div class="form-group">
-                    <label for="directory_tuesday_start">Monday Start Time</label>
+                    <label for="directory_tuesday_start">Tuesday Start Time</label>
                     <input type="text" name="directory_tuesday_start" class="form-control"/>
                 </div>
                 <div class="form-group">
@@ -202,12 +246,8 @@
                     <label for="directory_sunday_end">Sunday End Time</label>
                     <input type="text" name="directory_sunday_end" class="form-control"/>
                 </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_start">Monday Start Time</label>
-                    <input type="text" name="directory_tuesday_start" class="form-control"/>
-                </div>
                 <div class="checkbox">
-		  <label><input type="checkbox" name="allow_restaurant_booking"/>Allow Restaurant Bookings</label>
+		  <label><input type="checkbox" name="allow_restaurant_booking"/> Allow Restaurant Bookings</label>
                 </div>
                 <button t-attf-class="btn btn-primary btn-lg">Add Business</button>
             </form>
@@ -241,10 +281,26 @@
 
 <template id="directory_company_booking" name="Directory Company Booking" page="True">
     <t t-call="website.layout">
-        <div class="container">
+
+        <script>
+	$( function() {
+	    $("#booking_datetime").datetimepicker({inline: true, sideBySide: true,
+	        format: "YYYY-MM-DD HH:mm:ss",
+                icons : {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down'
+                },    
+            });
+	});
+        </script>
+
+        <div class="container mt32 mb32">
             <h1>Create a Booking</h1>
             <form method="POST" action="/directory/company/booking/process" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-attf-value="#{directory_company.id}"/>                
                 <div class="form-group">
                     <label for="booking_name">Booking Name*</label>
                     <input type="text" name="booking_name" class="form-control" required="True"/>
@@ -258,18 +314,17 @@
                     <input type="number" name="number_of_people" class="form-control" required="True"/>
                 </div>
                 <div class="form-group">
-                    <label for="booking_date">Date*</label>
-                    <input type="text" name="booking_date" class="form-control" required="True"/>
-                </div>
-                <div class="form-group">
-                    <label for="booking_time">Time*</label>
-                    <input type="text" name="booking_time" class="form-control" required="True"/>
+                    <label for="booking_datetime">Time*</label>
+                    <div class="input-group date">
+                        <input type="text" id="booking_datetime" name="booking_datetime" class="form-control" required="True"/>
+	                <span class="input-group-addon"><span class="fa fa-calendar"/></span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="notes">Notes</label>
                     <textarea name="notes" class="form-control"/>
                 </div>
-                <button t-attf-class="btn btn-primary btn-lg">Create Account</button>
+                <button t-attf-class="btn btn-primary btn-lg">Make Booking</button>
             </form>
         </div>
     </t>

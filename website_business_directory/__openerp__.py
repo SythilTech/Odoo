@@ -1,6 +1,6 @@
 {
-    'name': "Website Business Directory (ALPHA)",
-    'version': "0.5",
+    'name': "Website Business Directory",
+    'version': "0.6",
     'author': "Sythil",
     'category': "Tools",
     'summary': "A directory of local companies",
@@ -11,6 +11,7 @@
         'views/res_partner_directory_department_views.xml',
         'data/website.menu.csv',
         'data/res.groups.csv',
+        'security/ir.model.access.csv',
     ],
     'demo': [],
     'depends': ['website'],

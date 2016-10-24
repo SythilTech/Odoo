@@ -51,7 +51,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
     @http.route('/directory/account', type='http', auth="user", website=True)
     def directory_account(self, **kwargs):
-        businesses = request.env['res.partner'].search([('in_directory','=', True), ('business_owner','=', request.env.user.id)])
+        businesses = request.env['res.partner'].sudo().search([('in_directory','=', True), ('business_owner','=', request.env.user.id)])
         return http.request.render('website_business_directory.directory_account', {'businesses': businesses} )
 
     @http.route('/directory/account/business/add', type='http', auth="user", website=True)
@@ -60,14 +60,16 @@ class WebsiteBusinessDiretoryController(http.Controller):
         states = request.env['res.country.state'].search([])
         return http.request.render('website_business_directory.directory_account_business_add', {'countries': countries,'states': states} )
 
-    @http.route('/directory/account/business/process', type='http', auth="user", website=True)
+    @http.route('/directory/account/business/add/process', type='http', auth="user", website=True)
     def directory_account_business_add_process(self, **kwargs):
 
         values = {}
 	for field_name, field_value in kwargs.items():
 	    values[field_name] = field_value
 
-        new_listing = request.env['res.partner'].sudo().create({'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name'], 'street': values['street'], 'city': values['city'], 'state_id': values['state'], 'country_id': values['country'], 'directory_description': values['description'], 'directory_monday_start': values['directory_monday_start'], 'directory_monday_end': values['directory_monday_end'], 'directory_tuesday_start': values['directory_tuesday_start'], 'directory_tuesday_end': values['directory_tuesday_end'], 'directory_wednbesday_start': values['directory_wednesday_start'], 'directory_wednbesday_end': values['directory_wednesday_end'], 'directory_thursday_start': values['directory_thursday_start'], 'directory_thursday_end': values['directory_thursday_end'], 'directory_friday_start': values['directory_friday_start'], 'directory_friday_end': values['directory_friday_end'], 'directory_saturday_start': values['directory_saturday_start'], 'directory_saturday_end': values['directory_saturday_end'], 'directory_sunday_start': values['directory_sunday_start'], 'directory_sunday_end': values['directory_sunday_end'], 'allow_restaurant_booking': values['allow_restaurant_booking'] })
+        business_logo = base64.encodestring(values['logo'].read() )
+
+        new_listing = request.env['res.partner'].sudo().create({'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name'], 'email': values['email'], 'street': values['street'], 'city': values['city'], 'state_id': values['state'], 'country_id': values['country'], 'directory_description': values['description'], 'directory_monday_start': values['directory_monday_start'], 'directory_monday_end': values['directory_monday_end'], 'directory_tuesday_start': values['directory_tuesday_start'], 'directory_tuesday_end': values['directory_tuesday_end'], 'directory_wednbesday_start': values['directory_wednesday_start'], 'directory_wednbesday_end': values['directory_wednesday_end'], 'directory_thursday_start': values['directory_thursday_start'], 'directory_thursday_end': values['directory_thursday_end'], 'directory_friday_start': values['directory_friday_start'], 'directory_friday_end': values['directory_friday_end'], 'directory_saturday_start': values['directory_saturday_start'], 'directory_saturday_end': values['directory_saturday_end'], 'directory_sunday_start': values['directory_sunday_start'], 'directory_sunday_end': values['directory_sunday_end'], 'allow_restaurant_booking': values['allow_restaurant_booking'], 'image': business_logo })
 
         #Redirect them to thier account page
         return werkzeug.utils.redirect("/directory/account")
@@ -98,15 +100,21 @@ class WebsiteBusinessDiretoryController(http.Controller):
         """Insert the booking into the database then notify the restaurant of the booking via thier preferred notification method(email only atm)"""
 
         values = {}
-        for field_name, field_value in kw.items():
+        for field_name, field_value in kwargs.items():
             values[field_name] = field_value
 
-        request.env['website.directory.booking'].create({'booking_name': values['booking_name'], 'email': values['email'], 'number_of_people': values['number_of_people'], 'booking_datetime': values['booking_date'] + " " + values['booking_time'], 'notes': values['notes']})
+        directory_company = request.env['res.partner'].sudo().browse( int(values['business_id']) )
         
-        #Send email
+        if directory_company.allow_restaurant_booking:
+            new_booking = request.env['website.directory.booking'].sudo().create({'partner_id': values['business_id'], 'booking_name': values['booking_name'], 'email': values['email'], 'number_of_people': values['number_of_people'], 'booking_datetime': values['booking_datetime'], 'notes': values['notes']})
         
-        return "Not finished"
-        #return werkzeug.utils.redirect("/directory")
+            #Send email
+            notification_template = request.env['ir.model.data'].sudo().get_object('website_business_directory', 'directory_booking')
+            notification_template.send_mail(new_booking.id, True)
+            
+            return werkzeug.utils.redirect("/directory")
+        else:
+            return "BOOKINGS NOT ALLOWED"
 
     @http.route('/directory/search/<search_string>', type="http", auth="public", website=True)
     def directory_search_results(self, search_string, **kwargs):

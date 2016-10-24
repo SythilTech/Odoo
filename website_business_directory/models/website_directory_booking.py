@@ -5,6 +5,7 @@ class WebsiteDirectoryBooking(models.Model):
 
     _name = "website.directory.booking"
 
+    partner_id = fields.Many2one('res.partner', string="Business")
     booking_name = fields.Char(string="Booking Name")
     email = fields.Char(string="Email")
     number_of_people = fields.Char(string="Number of People")
