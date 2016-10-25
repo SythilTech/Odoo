@@ -1,6 +1,6 @@
 {
     'name': "Website Business Directory",
-    'version': "0.6",
+    'version': "0.6.1",
     'author': "Sythil",
     'category': "Tools",
     'summary': "A directory of local companies",

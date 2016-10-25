@@ -131,7 +131,7 @@ $(document).ready(function() {
         <div class="container">
             <h1>My Listings</h1>
             <t t-foreach="businesses" t-as="business">
-                <t t-esc="business.name"/><br/>
+                <t t-esc="business.name"/> <a t-attf-href="/directory/account/business/edit/#{ slug(business) }">Edit</a><br/>
             </t>
             <a href="/directory/account/business/add">Add Business</a>
         </div>
@@ -140,7 +140,7 @@ $(document).ready(function() {
 
 <template id="directory_account_business_add" name="Directory Business Add" page="True">
     <t t-call="website.layout">
-        <div class="container">
+        <div class="container mt32 mb32">
             <h1>Enter Business Info</h1>
             <form method="POST" action="/directory/account/business/add/process" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
@@ -250,6 +250,124 @@ $(document).ready(function() {
 		  <label><input type="checkbox" name="allow_restaurant_booking"/> Allow Restaurant Bookings</label>
                 </div>
                 <button t-attf-class="btn btn-primary btn-lg">Add Business</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<template id="directory_account_business_edit" name="Directory Business Edit" page="True">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1>Edit Business Info</h1>
+            <form method="POST" action="/directory/account/business/edit/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-att-value="directory_company.id"/>
+                <div class="form-group">
+                    <label for="name">Business Logo</label>
+                    <input type="file" name="logo"/>
+                </div>                
+                <div class="form-group">
+                    <label for="name">Business Name*</label>
+                    <input type="text" name="name" class="form-control" required="True" t-att-value="directory_company.name"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">Business Email*</label>
+                    <input type="text" name="email" class="form-control" required="True" t-att-value="directory_company.email"/>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country*</label>
+                    <select name="country" class="form-control" required="True">
+                        <option value="">Select Country</option>
+                        <t t-foreach="countries" t-as="country">
+                            <option t-attf-value="#{country.id}" t-att-selected="directory_company.country_id.id == country.id"><t t-esc="country.name"/></option>
+                        </t>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="state">State*</label>
+                    <select name="state" class="form-control" required="True">
+                        <option value="">Select State</option>
+                        <t t-foreach="states" t-as="state">
+                            <option t-attf-value="#{state.id}" t-att-selected="directory_company.state_id.id == state.id"><t t-esc="state.name"/></option>
+                        </t>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="city">City*</label>
+                    <input type="text" name="city" class="form-control" required="True"  t-att-value="directory_company.city"/>
+                </div>
+                <div class="form-group">
+                    <label for="street">Street Address*</label>
+                    <input type="text" name="street" class="form-control" required="True" t-att-value="directory_company.street"/>
+                </div>
+                <div class="form-group">
+                    <label for="zip">Zip*</label>
+                    <input type="text" name="zip" class="form-control" required="True" t-att-value="directory_company.zip"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">Business Description</label>
+                    <textarea name="description" class="form-control"><t t-esc="directory_company.directory_description"/></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="directory_monday_start">Monday Start Time</label>
+                    <input type="text" name="directory_monday_start" class="form-control" t-att-value="directory_company.directory_monday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_monday_end">Monday End Time</label>
+                    <input type="text" name="directory_monday_end" class="form-control" t-att-value="directory_company.directory_monday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_tuesday_start">Tuesday Start Time</label>
+                    <input type="text" name="directory_tuesday_start" class="form-control" t-att-value="directory_company.directory_tuesday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_tuesday_end">Tuesday End Time</label>
+                    <input type="text" name="directory_tuesday_end" class="form-control" t-att-value="directory_company.directory_tuesday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_wednesday_start">Wednesday Start Time</label>
+                    <input type="text" name="directory_wednesday_start" class="form-control" t-att-value="directory_company.directory_wednesday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_wednesday_end">Wednesday End Time</label>
+                    <input type="text" name="directory_wednesday_end" class="form-control" t-att-value="directory_company.directory_wednesday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_thursday_start">Thursday Start Time</label>
+                    <input type="text" name="directory_thursday_start" class="form-control" t-att-value="directory_company.directory_thursday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_thursday_end">Tuesday End Time</label>
+                    <input type="text" name="directory_thursday_end" class="form-control" t-att-value="directory_company.directory_thursday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_friday_start">Friday Start Time</label>
+                    <input type="text" name="directory_friday_start" class="form-control" t-att-value="directory_company.directory_friday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_friday_end">Friday End Time</label>
+                    <input type="text" name="directory_friday_end" class="form-control" t-att-value="directory_company.directory_friday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_saturday_start">Saturday Start Time</label>
+                    <input type="text" name="directory_saturday_start" class="form-control" t-att-value="directory_company.directory_saturday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_saturday_end">Saturday End Time</label>
+                    <input type="text" name="directory_saturday_end" class="form-control" t-att-value="directory_company.directory_saturday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_sunday_start">Sunday Start Time</label>
+                    <input type="text" name="directory_sunday_start" class="form-control" t-att-value="directory_company.directory_sunday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_sunday_end">Sunday End Time</label>
+                    <input type="text" name="directory_sunday_end" class="form-control" t-att-value="directory_company.directory_sunday_end"/>
+                </div>
+                <div class="checkbox">
+		  <label><input type="checkbox" name="allow_restaurant_booking" t-att-checked="directory_company.allow_restaurant_booking"/> Allow Restaurant Bookings</label>
+                </div>
+                <button t-attf-class="btn btn-primary btn-lg">Update Business Details</button>
             </form>
         </div>
     </t>
