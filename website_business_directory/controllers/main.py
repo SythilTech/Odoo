@@ -58,6 +58,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
     @http.route('/directory/account/business/edit/<model("res.partner"):directory_company>', type='http', auth="user", website=True)
     def directory_account_business_edit(self, directory_company, **kwargs):
+        if directory_company.in_directory and directory_company.business_owner.id == request.env.user.id:
             countries = request.env['res.country'].search([])
             states = request.env['res.country.state'].search([])
             return http.request.render('website_business_directory.directory_account_business_edit', {'directory_company': directory_company, 'countries': countries,'states': states} )
