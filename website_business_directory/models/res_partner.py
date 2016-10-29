@@ -28,6 +28,16 @@ class ResPartnerDirectory(models.Model):
     allow_restaurant_booking = fields.Boolean(string="Allow Restaurant Booking")
     display_online_menu = fields.Boolean(string="Display Online Menu")
     menu = fields.One2many('res.partner.directory.department', 'restaurant_id', string="Menu")
+    directory_review_ids = fields.One2many('res.partner.directory.review', 'business_id', string=" Reviews")
+    
+class ResPartnerDirectoryReview(models.Model):
+
+    _name = "res.partner.directory.review"
+
+    business_id = fields.Many2one('res.partner', string="Business")
+    name = fields.Char(string="Name")
+    description = fields.Text(string="Description")
+    rating = fields.Selection([('1','1 Star'), ('2','2 Star'), ('3','3 Star'), ('4','4 Star'), ('5','5 Star')], string="Rating")
 
 class ResPartnerDirectoryDepartment(models.Model):
 

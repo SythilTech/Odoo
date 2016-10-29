@@ -6,6 +6,7 @@ import math
 import base64
 import logging
 _logger = logging.getLogger(__name__)
+from openerp.addons.website.models.website import slug
 
 import openerp.http as http
 from openerp.http import request
@@ -103,6 +104,22 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
         #Redirect them to thier account page
         return werkzeug.utils.redirect("/directory/account")
+
+    @http.route('/directory/review/process', type='http', auth="public", website=True)
+    def directory_review_process(self, **kwargs):
+        
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+
+        directory_company = request.env['res.partner'].sudo().browse( int(values['business_id']) )        
+        
+        if directory_company.in_directory:
+            if int(values['rating']) >= 1 and int(values['rating']) <= 5:
+                request.env['res.partner.directory.review'].sudo().create({'business_id': values['business_id'], 'name': values['name'], 'description': values['description'], 'rating': values['rating'] })
+                return werkzeug.utils.redirect("/directory/company/" + slug(directory_company) )
+        else:
+            return "ACCESS DENIED"
 
     @http.route('/directory/company/<model("res.partner"):directory_company>', type='http', auth="public", website=True)
     def directory_company_page(self, directory_company, **kwargs):
