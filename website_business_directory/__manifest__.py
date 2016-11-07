@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Website Business Directory",
-    'version': "0.6.1",
+    'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "A directory of local companies",
