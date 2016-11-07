@@ -1,7 +1,7 @@
 {
     'name': "HTML Form Builder - Marketing Campaign Signup",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Signs the person who fills in the form into a campaign",
     'description': "Signs the person who fills in the form into a campaign",

@@ -1,7 +1,7 @@
 {
     'name': "HTML Form Builder - Send Email",
     'version': "1.0.1",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
     'summary': "Email the form submit data to someone",

@@ -1,7 +1,7 @@
 {
     'name': "HTML Form Builder - Marketing Campaigns (discontinued)",
     'version': "1.0.2",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
     'summary': "Enter people that sign up to your forms on a marketing campaign",

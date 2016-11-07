@@ -1,7 +1,7 @@
 {
     'name': "Mass Image Upload",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Designed to migrate images from proprietary system which store images in the filesystem",
     'license':'LGPL-3',

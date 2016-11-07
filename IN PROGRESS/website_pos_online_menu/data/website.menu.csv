@@ -1,6 +1,0 @@
-id,name,url,parent_id/id
-website_directory,Business Directory,/directory,website.main_menu
-website_directory_account,My Account,/directory/account,website_directory
-website_directory_search,Search,/directory,website_directory
-website_directory_categories,Categories,/directory/categories,website_directory
-website_directory_register,Register,/directory/register,website_directory

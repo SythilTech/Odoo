@@ -1,7 +1,7 @@
 {
     'name': "Website Template Pages Server",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Central storage of webpage templates",
     'description': "Central storage of webpage templates",

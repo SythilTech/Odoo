@@ -1,7 +1,7 @@
 {
     'name': "HTML Form Builder",
     'version': "1.8.8",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
     'summary': "Manage both internal and external forms",

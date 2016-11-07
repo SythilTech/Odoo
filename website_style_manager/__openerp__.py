@@ -1,7 +1,7 @@
 {
     'name': "Website Color Palettes",
     'version': "1.3",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Website",
     'summary': "Define custom css color codes to style your website",
     'description': "Define custom css color codes to style your website",

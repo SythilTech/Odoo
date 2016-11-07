@@ -1,2 +1,0 @@
-name,model,function,interval_number,interval_type,numbercall,active
-"SMS Check",esms.accounts,check_all_messages,1,hours,-1,true

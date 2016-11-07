@@ -1,7 +1,7 @@
 {
     'name': "Online Exam / Test / Quiz",
     'version': "1.0.1",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Informal Online Exam / Test / Quiz",
     'license':'GPL-3',

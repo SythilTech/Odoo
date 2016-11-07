@@ -1,7 +1,7 @@
 {
     'name': "Website Help Desk / Support Ticket",
     'version': "1.7.11",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "A helpdesk / support ticket system for your website",
     'description': "A helpdesk / support ticket system for your website",

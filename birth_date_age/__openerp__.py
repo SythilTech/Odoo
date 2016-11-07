@@ -1,7 +1,7 @@
 {
     'name': "Birth Date(DOB) Age",
     'version': "1.2",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Adds Date of Birth and Age which is updated daily',
     'license':'LGPL-3',

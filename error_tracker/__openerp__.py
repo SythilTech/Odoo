@@ -1,7 +1,7 @@
 {
     'name': "Error Tracker",
     'version': "1.1",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Assists in the resolution of extermly ambiguous error messages',
     'description':'Assists in the resolution of extermly ambiguous error messages',

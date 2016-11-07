@@ -1,7 +1,7 @@
 {
     'name': "Advanced CSV Importer (Alpha)",
     'version': "0.1.1",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Uploads CSV files',
     'description':'Uploads CSV files',    

@@ -1,7 +1,7 @@
 {
     'name': "Entity Relationship Diagram(ERD) Maker",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Creates an Entity Relationship Diagram (ERD)',
     'license':'LGPL-3',

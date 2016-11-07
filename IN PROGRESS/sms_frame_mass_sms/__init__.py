@@ -1,1 +1,0 @@
-import esms_mass_sms, esms_autoresponse, esms_verified_numbers, crm_lead, res_partner, res_country, esms_templates, esms_import, esms_gateways, esms_accounts, esms_compose, esms_compose_multi, esms_history, controllers, smsglobal, smsgateway, twilio, ir_actions, esms_settings

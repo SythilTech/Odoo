@@ -1,8 +1,7 @@
 {
     'name': "Custom App Store Client",
     'version': "0.5",
-    'author': "Sythil",
-    'website':'http://sythiltech.com.au',
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Let's clients access your custom app store directly from within Odoo",
     'license':'LGPL-3',

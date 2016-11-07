@@ -1,7 +1,7 @@
 {
     'name': "HTML Form Builder - Website Snippets",
     'version': "1.8.14",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Generates bootstrap forms and add extra fields by dragging snippets",
     'description': "Generates bootstrap forms and add extra fields by dragging snippets",

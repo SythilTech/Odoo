@@ -1,7 +1,7 @@
 {
     'name': "Sythil Tech SAAS Client",
     'version': "1.0.3",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Interacts with Sythil SAAS Server',
     'license':'LGPL-3',

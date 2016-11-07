@@ -1,7 +1,7 @@
 {
     'name': "Website Business Directory",
     'version': "0.6.1",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "A directory of local companies",
     'license':'LGPL-3',

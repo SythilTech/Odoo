@@ -1,7 +1,7 @@
 {
     'name': "Campaign Survey",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'website':'http://sythiltech.com.au',
     'summary': "Adds the ability to send sureys during a marketing campaign",

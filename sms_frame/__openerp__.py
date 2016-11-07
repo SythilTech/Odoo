@@ -1,9 +1,8 @@
 {
     'name': "SMS Framework",
     'version': "1.0.4",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
-    'website':'http://sythiltech.com.au/',
     'summary':'Allows you to send and receive smses from multiple gateways',
     'description':'Allows you to send and receive smses from multiple gateways',    
     'license':'LGPL-3',

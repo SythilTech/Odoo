@@ -1,9 +1,8 @@
 {
     'name': "SMS Framework - SMS Campaign",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
-    'website':'http://sythiltech.com.au',
     'summary': "Adds the ability to more easily send smses from a marketing campaign",
     'license':'LGPL-3',
     'data': [

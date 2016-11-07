@@ -1,7 +1,7 @@
 {
     'name': "Custom App Store",
     'version': "0.5.2",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'website':'http://sythiltech.com.au',
     'category': "Tools",
     'summary': "Create your own app store",

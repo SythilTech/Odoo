@@ -1,5 +1,0 @@
-replace
-1. module.template
-2. module_template
-3. add extra fields
-4. rename menus 

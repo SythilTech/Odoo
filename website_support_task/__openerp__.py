@@ -1,7 +1,7 @@
 {
     'name': "Website Help Desk / Support Ticket - Create Task",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Create a task from a support ticket',
     'license':'LGPL-3',

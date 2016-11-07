@@ -1,7 +1,7 @@
 {
     'name': "Website Dating (Giga Mega Super Ultra Omega Pre Alpha)",
     'version': "0.2",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "A directory of single people",
     'license':'LGPL-3',

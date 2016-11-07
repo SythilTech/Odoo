@@ -1,7 +1,7 @@
 {
     'name': "PC Backup",
     'version': "0.1",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Backs up important files on your desktop computers",
     'description': "Backs up important files on your desktop computers",

@@ -1,7 +1,7 @@
 {
     'name': "CRM Custom Fields",
     'version': "1.2",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "CRM",
     'summary': "Allows users in the 'Sales / Manager' group to add additional fields to the partner form",
     'license':'LGPL-3',

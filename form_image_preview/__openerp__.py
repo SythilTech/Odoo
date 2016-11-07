@@ -1,7 +1,7 @@
 {
     'name': "Form Image Preview",
     'version': "1.0",
-    'author': "Sythil",
+    'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Preview images with the 'image' widget by clicking on them",
     'license':'LGPL-3',
