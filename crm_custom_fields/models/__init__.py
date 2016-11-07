@@ -1,1 +1,0 @@
-import ir_model, ir_model_fields, res_partner
