@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="online_menu" name="Online Menu" page="True">
+            <t t-call="website.layout">
+                <div class="container mt6 mb16">
+                    <h1>Online Menu</h1>
+                    
+                    <t t-foreach="pos_categories" t-as="category">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><h2><t t-esc="category.name"/></h2></div>
+                            <div class="panel-body">                                
+                                <t t-foreach="category.product_ids" t-as="product">
+                                    <t t-esc="product.name"/> $<t t-esc="product.lst_price"/><br/>
+                                    <t t-if="not product.description_sale">
+                                        <i>No Description</i>
+                                    </t>
+                                    <t t-esc="product.description_sale"/>
+                                    <hr/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</openerp>
