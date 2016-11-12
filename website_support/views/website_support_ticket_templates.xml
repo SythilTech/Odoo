@@ -67,7 +67,7 @@
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
-                <p>Thank your for submitting a support ticket to us, we will get back to your shortly</p>
+                <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
                 <hr/>
                 <b>Ticket Number:</b> ${object.id}<br/>
                 <b>Ticket Category:</b> ${object.category.name}<br/>
