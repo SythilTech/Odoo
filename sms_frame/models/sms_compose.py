@@ -14,7 +14,7 @@ class SmsCompose(models.Model):
     from_mobile_id = fields.Many2one('sms.number', required=True, string="From Mobile") 
     to_number = fields.Char(required=True, string='To Mobile Number', readonly=True)
     sms_content = fields.Text(string='SMS Content')
-       
+    media_id = fields.Binary(string="Media (MMS)")      
     
     @api.onchange('sms_template_id')
     def _onchange_sms_template_id(self):
@@ -32,7 +32,7 @@ class SmsCompose(models.Model):
         self.ensure_one()
 
         gateway_model = self.from_mobile_id.account_id.account_gateway_id.gateway_model_name
-        my_sms = self.from_mobile_id.account_id.send_message(self.from_mobile_id.mobile_number, self.to_number, self.sms_content.encode('utf-8'), self.model, self.record_id)
+        my_sms = self.from_mobile_id.account_id.send_message(self.from_mobile_id.mobile_number, self.to_number, self.sms_content.encode('utf-8'), self.model, self.record_id, self.media_id)
         
         #use the human readable error message if present
         error_message = ""

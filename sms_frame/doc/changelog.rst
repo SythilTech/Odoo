@@ -1,3 +1,7 @@
+v1.0.5
+======
+* MMS framework
+
 v1.0.4
 ======
 * Fix template send sms code

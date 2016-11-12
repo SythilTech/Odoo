@@ -13,6 +13,7 @@ class sms_response():
      delivary_state = ""
      response_string = ""
      human_read_error = ""
+     mms_url = ""
      message_id = ""
 
 class SmsGatewayTwilio(models.Model):
@@ -22,7 +23,7 @@ class SmsGatewayTwilio(models.Model):
     
     api_url = fields.Char(string='API URL')
     
-    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0):
+    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None):
         """Actual Sending of the sms"""
         sms_account = self.env['sms.account'].search([('id','=',sms_gateway_id)])
         
@@ -34,9 +35,19 @@ class SmsGatewayTwilio(models.Model):
         format_to = to_number
         if " " in format_to: format_to.replace(" ", "")        
         
+        media_url = ""
+        #Create an attachment for the mms now since we need a url now
+        if media:
+            attachment_id = request.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True})
+            media_url = request.httprequest.host_url + "web/image/" + str(attachment_id.id)
+
         #send the sms/mms
         base_url = self.env['ir.config_parameter'].search([('key','=','web.base.url')])[0].value
         payload = {'From': str(format_from), 'To': str(format_to), 'Body': str(sms_content), 'StatusCallback': base_url + "/sms/twilio/receipt"}
+
+        if media:
+            payload['MediaUrl'] = media_url
+            
         response_string = requests.post("https://api.twilio.com/2010-04-01/Accounts/" + str(sms_account.twilio_account_sid) + "/Messages", data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
 
         #Analyse the reponse string and determine if it sent successfully other wise return a human readable error message   

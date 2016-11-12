@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Send MMS messages
+
 v1.0.4
 ======
 * Make it easier to have 2 way conversations via sms
