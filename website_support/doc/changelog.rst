@@ -1,3 +1,9 @@
+v1.7.12
+=======
+* Fix email support ticket link returning false
+* Send initial email after ticket is submitted
+
+
 v1.7.11
 =======
 * Portal access for publicly sent tickets

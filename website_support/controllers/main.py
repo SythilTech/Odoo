@@ -91,10 +91,16 @@ class SupportTicketController(http.Controller):
             search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
 
             if len(search_partner) > 0:
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id})
+                portal_access_key = randint(1000000000,2000000000)
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key})
             else:
                 portal_access_key = randint(1000000000,2000000000)
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
+
+        #Send autoreply back to customer
+        new_ticket_email_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_new')
+        new_ticket_email_template.email_from = request.website.company_id.email
+        new_ticket_email_template.send_mail(new_ticket_id.id, True)
 
         #send an email out to everyone in the category
         notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')

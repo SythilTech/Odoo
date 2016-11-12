@@ -59,6 +59,25 @@
             </field>
         </record>
 
+        <record id="support_ticket_new" model="mail.template">
+            <field name="name">Suppport Ticket New</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_to">${object.email}</field>
+            <field name="subject">We have received your support ticket '${object.description}' and will get back to you shortly</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>Thank your for submitting a support ticket to us, we will get back to your shortly</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.id}<br/>
+                <b>Ticket Category:</b> ${object.category.name}<br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description}
+                
+            ]]>
+            </field>
+        </record>
+        
         <record id="support_ticket_reply_wrapper" model="mail.template">
             <field name="name">Suppport Ticket Reply Wrapper</field>
             <field name="model_id" ref="model_website_support_ticket_compose"></field>
