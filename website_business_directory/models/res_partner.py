@@ -29,6 +29,7 @@ class ResPartnerDirectory(models.Model):
     display_online_menu = fields.Boolean(string="Display Online Menu")
     menu = fields.One2many('res.partner.directory.department', 'restaurant_id', string="Menu")
     directory_review_ids = fields.One2many('res.partner.directory.review', 'business_id', string=" Reviews")
+    featured_listing = fields.Boolean(string="Featured Listing")
     
 class ResPartnerDirectoryReview(models.Model):
 

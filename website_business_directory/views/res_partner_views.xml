@@ -30,6 +30,7 @@
                             <field name="directory_sunday_end"/>
                             <field name="allow_restaurant_booking"/>
                             <field name="display_online_menu"/>
+                            <field name="featured_listing"/>
                             <field name="menu">
                                 <tree>
                                     <field name="name"/>

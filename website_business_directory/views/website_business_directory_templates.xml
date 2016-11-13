@@ -79,7 +79,31 @@ $(document).ready(function() {
                 </div>     
             </div>
 
-            <t t-foreach="directory_companies" t-as="directory_company">
+            <t t-foreach="featured_listings" t-as="directory_company">
+                <div class="panel panel-warning">
+	            <div class="panel-body">
+	                <div class="directory-list-top">
+	                    <a t-attf-href="/directory/company/#{ slug(directory_company) }">
+	                        <img t-att-src="website.image_url(directory_company, 'image')" style="margin-right:10px;margin-bottom:10px;" class="img-rounded pull-left" t-attf-alt="#{directory_company.name} Logo" t-attf-title="#{directory_company.name}" width="100" height="100"/>
+	                        <span t-field="directory_company.name"/><br/>
+	                    </a>
+	                    <span t-field="directory_company.directory_description"/>
+	                    
+	                </div>
+	                <div class="directory-list-bottom" style="clear:both;">
+	                    <span t-field="directory_company.street"/>, <span t-field="directory_company.city"/>, <span t-field="directory_company.state_id.name"/>, <span t-field="directory_company.zip"/><br/>
+	                    <t t-if="directory_company.allow_restaurant_booking">
+	                        <a t-attf-href="/directory/company/#{ slug(directory_company) }/booking">Make Booking</a>
+	                    </t>
+	                    <t t-if="directory_company.menu">
+	                        <a t-attf-href="/directory/company/#{ slug(directory_company) }/Menu">Online Menu</a>
+	                    </t>
+	                </div>
+	            </div>
+                </div>
+            </t>
+
+            <t t-foreach="regular_listings" t-as="directory_company">
                 <div class="panel panel-default">
 	            <div class="panel-body">
 	                <div class="directory-list-top">
