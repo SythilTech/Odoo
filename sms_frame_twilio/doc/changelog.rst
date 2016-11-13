@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Add filename to MMS
+
 v1.0.5
 ======
 * Send MMS messages
