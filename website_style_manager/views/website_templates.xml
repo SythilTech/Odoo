@@ -17,7 +17,7 @@
             </xpath>
         </template>
 
-        <template id="style_override" name="Style Override" inherit_id="website.assets_frontend">
+        <template id="style_override" name="Style Override" inherit_id="website.assets_frontend" priority="666">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/less/override.less'/>
                 <!--<link rel="stylesheet" type="text/less" href='http://192.168.56.109:8069/style/override.less'/>-->
