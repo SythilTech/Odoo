@@ -24,6 +24,7 @@ class SmsCompose(models.Model):
             sms_rendered_content = self.env['sms.template'].render_template(self.sms_template_id.template_body, self.sms_template_id.model_id.model, self.record_id)
             
             self.from_mobile_id = self.sms_template_id.from_mobile_verified_id.id
+            self.media_id = self.sms_template_id.media_id
             self.sms_content = sms_rendered_content
 
     @api.multi

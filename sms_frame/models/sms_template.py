@@ -70,6 +70,7 @@ class SmsTemplate(models.Model):
     lang = fields.Char(string='Language', help="Optional translation language (ISO code) to select when sending out an email. If not set, the english version will be used. This should usually be a placeholder expression that provides the appropriate language, e.g. ${object.partner_id.lang}.", placeholder="${object.partner_id.lang}")
     from_mobile_verified_id = fields.Many2one('sms.number', string="From Mobile (stored)")
     from_mobile = fields.Char(string="From Mobile", help="Placeholders are allowed here")
+    media_id = fields.Binary(string="Media(MMS)")
         
     @api.onchange('model_object_field_id')
     def _onchange_model_object_field_id(self):

@@ -15,6 +15,7 @@
                                 <field name="from_mobile_verified_id"/>
                                 <field name="from_mobile"/>
                                 <field name="sms_to"/>
+                                <field name="media_id"/>
                             </group>
                         </div>
                         <notebook>

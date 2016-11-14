@@ -1,3 +1,7 @@
+v1.0.6
+======
+* MMS templates
+
 v1.0.5
 ======
 * MMS framework
