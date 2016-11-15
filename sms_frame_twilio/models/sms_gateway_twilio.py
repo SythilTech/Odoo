@@ -38,10 +38,20 @@ class SmsGatewayTwilio(models.Model):
         media_url = ""
         #Create an attachment for the mms now since we need a url now
         if media:
-            attachment_id = request.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True})
+        
             media_url = request.httprequest.host_url + "web/image/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
-            _logger.error(media_url)
 
+            #Force the creation of the new attachment before you make the request
+            cr = request.env.db.cursor()
+	    try:
+                attachment_id = request.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True})
+	        cr.commit() # all good, we commit
+	    except Exception:
+	        cr.rollback() # error, rollback everything atomically
+	        raise
+	    finally:
+                cr.close() # always close cursor opened manually
+            
         #send the sms/mms
         base_url = self.env['ir.config_parameter'].search([('key','=','web.base.url')])[0].value
         payload = {'From': str(format_from), 'To': str(format_to), 'Body': str(sms_content), 'StatusCallback': base_url + "/sms/twilio/receipt"}

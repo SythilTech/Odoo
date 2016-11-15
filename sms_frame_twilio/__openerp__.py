@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework - Twilio Gateway",
-    'version': "1.0.6",
+    'version': "1.0.7",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Adds Twilio sms gatway to the sms framework",
