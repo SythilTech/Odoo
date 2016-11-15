@@ -80,7 +80,8 @@ class SupportTicketController(http.Controller):
             file_name = values['file'].filename
         
         if http.request.env.user.name != "Public user":
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name})
+            portal_access_key = randint(1000000000,2000000000)
+            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
             
             partner = http.request.env.user.partner_id
             

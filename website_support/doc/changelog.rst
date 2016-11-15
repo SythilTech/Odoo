@@ -1,3 +1,7 @@
+v1.7.13
+=======
+* fix email support ticket link returning false(again)...
+
 v1.7.12
 =======
 * Fix email support ticket link returning false
