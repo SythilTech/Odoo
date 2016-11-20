@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_call_view_form" model="ir.ui.view">
+        <field name="name">voip.call view form</field>
+        <field name="model">voip.call</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="status"/>
+      	            <field name="create_date" string="Start Date"/>
+      	            <field name="end_time"/>
+      	            <field name="duration"/>
+      	            <field name="transcription"/>
+      	            <field name="notes"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_call_view_tree" model="ir.ui.view">
+        <field name="name">voip.call view tree</field>
+        <field name="model">voip.call</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="create_uid" string="By"/>
+      	        <field name="partner_id"/>
+      	        <field name="status"/>
+      	        <field name="create_date"/>
+      	        <field name="duration"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_call_action" model="ir.actions.act_window">
+        <field name="name">Call Log</field>
+	<field name="res_model">voip.call</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No Calls
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="voip_call_menu" name="Call Log" parent="sales_team.menu_base_partner" action="voip_call_action" sequence="10"/>
+
+</odoo>
