@@ -293,6 +293,8 @@
       </section>
 
         <form action="/support/ticket/process" method="POST" class="form-horizontal mt32" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+	    <input style="display:none;" name="my_gold" value="256"/>
             <div t-attf-class="form-group #{error and 'person_name' in error and 'has-error' or ''}">
                 <label class="col-md-3 col-sm-4 control-label" for="person_name">Name</label>
                 <div class="col-md-7 col-sm-8">

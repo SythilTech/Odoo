@@ -3,6 +3,7 @@ import werkzeug
 import json
 import base64
 from random import randint
+import os
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -66,18 +67,24 @@ class SupportTicketController(http.Controller):
         return request.website.render("website_support.help_page", {'help_page':help_page})
 
 
-    @http.route('/support/ticket/process', type="http", auth="public", website=True, csrf=False)
+    @http.route('/support/ticket/process', type="http", auth="public", website=True, csrf=True)
     def support_process_ticket(self, **kwargs):
         """Adds the support ticket to the database and sends out emails to everyone following the support ticket category"""
         values = {}
 	for field_name, field_value in kwargs.items():
             values[field_name] = field_value
+
+        if values['my_gold'] != "256":
+            return "Bot Detected"
         
         my_attachment = ""
         file_name = ""
         if 'file' in values:
             my_attachment = base64.encodestring(values['file'].read() )
             file_name = values['file'].filename
+            file_extension = os.path.splitext(file_name)[1]
+            if file_extension == ".exe":
+                return "exe files are not allowed"
         
         if http.request.env.user.name != "Public user":
             portal_access_key = randint(1000000000,2000000000)
