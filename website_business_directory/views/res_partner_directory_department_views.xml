@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
- 
-        <record id="res_partner_directory_department_view_form" model="ir.ui.view">
-            <field name="name">res.partner.directory.department.view.form</field>
-            <field name="model">res.partner.directory.department</field>
-            <field name="arch" type="xml">
-      	        <form>
-      	            <group>
-      	                <field name="name"/>
-      	                <field name="description"/>
-      	                <field name="menu_item_ids">
-      	                    <tree editable="bottom">
-      	                        <field name="name"/>
-      	                        <field name="description"/>
-      	                        <field name="single_price"/>
-      	                    </tree>
-      	                </field>
-      	            </group>
-      	        </form>
-      	    </field>
-        </record>
-        
-    </data>
-</openerp>
+<odoo>
+
+    <record id="res_partner_directory_department_view_form" model="ir.ui.view">
+        <field name="name">res.partner.directory.department.view.form</field>
+        <field name="model">res.partner.directory.department</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="description"/>
+      	            <field name="menu_item_ids">
+      	                <tree editable="bottom">
+      	                    <field name="name"/>
+      	                    <field name="description"/>
+      	                    <field name="single_price"/>
+      	                </tree>
+      	            </field>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+    <record id="business_directory_action" model="ir.actions.act_window">
+        <field name="name">Business Directory Action</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('in_directory','=',True)]</field>
+        <field name="context">{'default_in_directory':1}</field>
+    </record>
+
+    <menuitem id="biz_directory_top_menu" name="Directory" sequence="80"/>        
+    <menuitem id="biz_directory_parent_menu" parent="biz_directory_top_menu" name="Business Directory" sequence="10"/>        
+    <menuitem id="biz_directory_listing_menu" parent="biz_directory_parent_menu" name="Listings" action="business_directory_action" sequence="20"/>
+
+</odoo>

@@ -108,7 +108,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         if 'state_id' in values: insert_values['state_id'] = values['state']
         if 'country_id' in values: insert_values['country_id'] = values['country']
         if 'zip' in values: insert_values['zip'] = values['zip']
-        if 'directory_description' in values: insert_values['directory_description'] = values['description']
+        if 'directory_description' in values: insert_values['directory_description'] = values['directory_description']
         if 'directory_monday_start' in values: insert_values['directory_monday_start'] = values['directory_monday_start']
         if 'directory_monday_end' in values: insert_values['directory_monday_end'] = values['directory_monday_end']
         if 'directory_tuesday_start' in values: insert_values['directory_tuesday_start'] = values['directory_tuesday_start']
@@ -142,7 +142,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         
         if directory_company.in_directory:
             if int(values['rating']) >= 1 and int(values['rating']) <= 5:
-                request.env['res.partner.directory.review'].sudo().create({'business_id': values['business_id'], 'name': values['name'], 'description': values['description'], 'rating': values['rating'] })
+                request.env['res.partner.directory.review'].create({'business_id': values['business_id'], 'name': values['name'], 'description': values['description'], 'rating': values['rating'] })
                 return werkzeug.utils.redirect("/directory/company/" + slug(directory_company) )
         else:
             return "ACCESS DENIED"
