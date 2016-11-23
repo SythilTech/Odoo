@@ -17,6 +17,10 @@ class ResUsersVoip(models.Model):
 
         #Add the selected user as participant 2        
         new_room.partner_ids = [(4,self.partner_id.id)]
+
+        #Notify the user of the call
+	#voip_action = request.env['ir.model.data'].get_object('voip_sip_webrtc', 'voip_client_action')                        
+        #voip_action.run()
         
         return {
             'type': 'ir.actions.act_url',

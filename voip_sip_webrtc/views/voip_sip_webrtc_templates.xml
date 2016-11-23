@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <template id="voip_backend_assets" name="VOIP Client Assets" inherit_id="web.assets_backend">
+       <xpath expr="." position="inside">
+           <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/notification.js"></script>
+       </xpath>
+   </template>
+
+   <record id="voip_client_action" model="ir.actions.client">
+       <field name="name">VOIP Call Notification</field>
+       <field name="type">ir.actions.client</field>
+       <field name="tag">voip_call_notification</field>
+    </record>
+
     <template id="voip_window" name="Voip Window" page="True">
         <html>
             <head>
