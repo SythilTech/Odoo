@@ -1,12 +1,12 @@
 {
     'name': "Online Exam / Test / Quiz",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Informal Online Exam / Test / Quiz",
     'license':'GPL-3',
     'data': [
-        #'mail.template.csv',
+        'mail.template.csv',
         'etq_exam.xml',
         'views/exam_templates.xml',
         'etq_results.xml',
@@ -16,6 +16,6 @@
     'images':[
     'static/description/2.jpg',
     ],
-    'depends': ['base', 'web', 'website'],
+    'depends': ['base', 'web', 'website', 'mail'],
     'installable': True,
 }
