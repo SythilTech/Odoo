@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
 from openerp.http import request
 
 from openerp import api, fields, models
@@ -18,12 +19,13 @@ class ResUsersVoip(models.Model):
         #Add the selected user as participant 2        
         new_room.partner_ids = [(4,self.partner_id.id)]
 
-        #Notify the user of the call
-	#voip_action = request.env['ir.model.data'].get_object('voip_sip_webrtc', 'voip_client_action')                        
-        #voip_action.run()
+        notifications = []
+
+        notification = {'room': new_room.id}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.room', self.partner_id.id), notification)
         
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'url': "/voip/window?room=" + str(new_room.id)
-        }
+        #return {
+        #    'type': 'ir.actions.act_url',
+        #    'target': 'new',
+        #    'url': "/voip/window?room=" + str(new_room.id)
+        #}

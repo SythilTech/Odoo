@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication (Alpha)",
-    'version': "0.5.1",
+    'version': "0.5.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Log call times",
@@ -13,7 +13,8 @@
         'security/ir.model.access.csv',
     ],
     'demo': [],
-    'depends': ['crm'],
+    'depends': ['crm','bus'],
+    'qweb': ['static/src/xml/*.xml'],
     'images':[
         'static/description/1.jpg',
     ],

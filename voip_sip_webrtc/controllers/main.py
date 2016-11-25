@@ -7,6 +7,7 @@ _logger = logging.getLogger(__name__)
 import werkzeug.utils
 import werkzeug.wrappers
 import urllib2
+import werkzeug
 
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools import ustr
@@ -15,6 +16,19 @@ from openerp.http import request
 
 class VoipController(http.Controller):
 
+    @http.route('/voip/accept/<room>', type="http", auth="user")
+    def voip_accept(self, room):
+        """Mark the call as accepted, and open the VOIP window"""
+        
+        voip_room = request.env['voip.room'].browse( int(room) )
+        return werkzeug.utils.redirect("/voip/window?room=" + str(room) )
+
+    @http.route('/voip/reject/<room>', type="http", auth="user")
+    def voip_reject(self, room):
+        """Mark the call as rejected"""
+        
+        voip_room = request.env['voip.room'].browse( int(room) )
+            
     @http.route('/voip/window', type="http", auth="user")
     def voip_window(self, **kwargs):
         """Window for video calls which can be dragged around"""

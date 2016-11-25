@@ -7,12 +7,6 @@
        </xpath>
    </template>
 
-   <record id="voip_client_action" model="ir.actions.client">
-       <field name="name">VOIP Call Notification</field>
-       <field name="type">ir.actions.client</field>
-       <field name="tag">voip_call_notification</field>
-    </record>
-
     <template id="voip_window" name="Voip Window" page="True">
         <html>
             <head>
