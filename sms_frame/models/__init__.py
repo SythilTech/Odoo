@@ -1,0 +1,1 @@
+import res_partner, sms_account, res_country, ir_actions_server, sms_number, sms_message, sms_gateway, sms_compose, sms_template, sms_gateway_twilio

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        
+        <!-- After installation of the module, open the related menu -->
+        
+        <record id="sms_account_action_twilio" model="ir.actions.act_window">
+            <field name="name">sms.account.action.twilio</field>
+            <field name="res_model">sms.account</field>
+      	    <field name="view_type">form</field>
+      	    <field name="view_mode">tree,form</field>
+      	    <field name="view_id" ref="sms_frame.sms_account_view_form"/>
+      	    <field name="context" eval="{'default_name':'Twilio Account','default_account_gateway_id':ref('sms_twilio')}"/>
+      	    <field name="help" type="html">
+	        <p class="oe_view_nocontent_create">Add SMS Gateway Accounts</p>
+	    </field>
+        </record>
+        
+        <record id="base.open_menu" model="ir.actions.todo">
+            <field name="action_id" ref="sms_account_action_twilio"/>
+            <field name="state">open</field>
+        </record>
+        
+    </data>
+</openerp>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+      <record id="sms_compose_view_form" model="ir.ui.view">
+          <field name="name">sms.compose.view.form</field>
+          <field name="model">sms.compose</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <span style="color:red;font-size:20px;"><field name="error_message"/></span>
+      	          <group>
+      	              <field name="record_id" invisible="1"/>      	              
+                      <field name="model" invisible="1"/>
+      	              <field name="sms_template_id" domain="[('model_id.model','=',model)]" />
+      	              <field name="from_mobile_id"/>
+      	              <field name="to_number" />
+      	              <field name="sms_content"/>
+      	              <field name="media_id"/>
+      	          </group>
+                  <footer>
+                      <button type="object" name="send_entity" string="Send SMS"/>
+                  </footer>      	          
+      	      </form>
+      	  </field>
+      </record>
+      
+    </data>
+</openerp>
