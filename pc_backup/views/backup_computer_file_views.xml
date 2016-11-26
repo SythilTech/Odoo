@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+      <record id="backup_computer_file_view_form" model="ir.ui.view">
+          <field name="name">backup.computer.file.form.view</field>
+          <field name="model">backup.computer.file</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <sheet>
+      	              <group>
+      	                  <field name="bc_id"/>
+      	                  <field name="file_name"/>
+      	                  <field name="backup_path"/>
+      	                  <field name="revision_ids">
+      	                      <tree>
+      	                          <field name="create_date" string="Revision Date"/>
+      	                          <field name="type"/>
+      	                          <field name="backup_data" filename="backup_data_filename"/>
+      	                          <field name="backup_data_filename" invisible="True"/>
+      	                      </tree>
+      	                  </field>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+ 
+</odoo>
