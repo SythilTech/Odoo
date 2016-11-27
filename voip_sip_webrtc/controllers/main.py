@@ -8,6 +8,7 @@ import werkzeug.utils
 import werkzeug.wrappers
 import urllib2
 import werkzeug
+import base64
 
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools import ustr
@@ -16,18 +17,46 @@ from openerp.http import request
 
 class VoipController(http.Controller):
 
-    @http.route('/voip/accept/<room>', type="http", auth="user")
-    def voip_accept(self, room):
+    @http.route('/voip/ringtone/<ringtone>/<filename>', type="http", auth="user")
+    def voip_ringtone(self, ringtone, filename):
+        """Return the ringtone file to be used by javascript"""
+        
+        voip_ringtone = request.env['voip.ringtone'].browse( int(ringtone) )
+
+        headers = []
+        ringtone_base64 = base64.b64decode(voip_ringtone.media)
+        headers.append(('Content-Length', len(ringtone_base64)))
+        response = request.make_response(ringtone_base64, headers)
+
+        return response
+
+    @http.route('/voip/accept/<call>', type="http", auth="user")
+    def voip_accept(self, call):
         """Mark the call as accepted, and open the VOIP window"""
         
-        voip_room = request.env['voip.room'].browse( int(room) )
-        return werkzeug.utils.redirect("/voip/window?room=" + str(room) )
+        voip_call = request.env['voip.call'].browse( int(call) )
+        voip_call.start_time = datetime.datetime.now()
+        
+        #Assign yourself as the to partner
+        voip_call.partner_id = request.env.user.partner_id.id
 
-    @http.route('/voip/reject/<room>', type="http", auth="user")
-    def voip_reject(self, room):
+        return werkzeug.utils.redirect("/voip/window?call=" + str(call) )
+
+    @http.route('/voip/reject/<call>', type="json", auth="user")
+    def voip_reject(self, call):
         """Mark the call as rejected"""
         
-        voip_room = request.env['voip.room'].browse( int(room) )
+        voip_call = request.env['voip.call'].browse( int(call) )
+        voip_call.status = "rejected"
+        return True
+
+    @http.route('/voip/missed/<call>', type="json", auth="user")
+    def voip_missed(self, call):
+        """Mark the call as missed"""
+        
+        voip_call = request.env['voip.call'].browse( int(call) )
+        voip_call.status = "missed"
+        return True
             
     @http.route('/voip/window', type="http", auth="user")
     def voip_window(self, **kwargs):
@@ -37,23 +66,13 @@ class VoipController(http.Controller):
         for field_name, field_value in kwargs.items():
             values[field_name] = field_value
         
-        voip_room = request.env['voip.room'].browse( int(values['room']) )
-        to_partner = voip_room.partner_ids[1]
-        return http.request.render('voip_sip_webrtc.voip_window', {'voip_room':voip_room, 'to_partner': to_partner})
+        voip_call = request.env['voip.call'].browse( int(values['call']) )
         
-    @http.route('/voip/call/begin', type="http", auth="user")
-    def voip_call_begin(self, **kwargs):
-        """Call starts after a person accepts access to camera"""
-
-        values = {}
-        for field_name, field_value in kwargs.items():
-            values[field_name] = field_value
-
-        to_partner = request.env['res.partner'].browse( int(values['to_partner']) )
-        call_id = request.env['voip.call'].create({'status': 'pending', 'partner_id': to_partner.id})
-        
-        return json.dumps({'call_id': call_id.id})
-        
+        if voip_call.status == "pending":
+            return http.request.render('voip_sip_webrtc.voip_window', {'voip_call':voip_call})
+        else:
+            return "Error this call is not pending"
+            
     @http.route('/voip/call/end', type="http", auth="user")
     def voip_call_end(self, **kwargs):
         """Call ends when person clicks the the end call button"""
@@ -65,6 +84,6 @@ class VoipController(http.Controller):
         call = request.env['voip.call'].browse( int(values['call_id']) )
         call.status = 'over'
         call.end_time = datetime.datetime.now()
-        diff_time = datetime.datetime.strptime(call.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(call.create_date, DEFAULT_SERVER_DATETIME_FORMAT)
+        diff_time = datetime.datetime.strptime(call.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(call.start_date, DEFAULT_SERVER_DATETIME_FORMAT)
         call.duration = str(diff_time.seconds) + " Seconds"
         return True

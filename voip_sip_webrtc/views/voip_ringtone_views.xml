@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_ringtone_view_form" model="ir.ui.view">
+        <field name="name">voip.ringtone view form</field>
+        <field name="model">voip.ringtone</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="media"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_ringtone_view_tree" model="ir.ui.view">
+        <field name="name">voip.ringtone view tree</field>
+        <field name="model">voip.ringtone</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="media"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_ringtone_action" model="ir.actions.act_window">
+        <field name="name">Ringtones</field>
+	<field name="res_model">voip.ringtone</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No Ringtones
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="voip_ringtone_menu" name="Ringtones" parent="sales_team.menu_base_partner" action="voip_ringtone_action" sequence="20"/>
+
+</odoo>

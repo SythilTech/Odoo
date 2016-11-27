@@ -47,18 +47,8 @@
             if (navigator.getUserMedia) {
                 
 	        navigator.getUserMedia({audio: true, video: true}, function(stream) {
-	            
 	            localStream = stream;
-		    video.src = window.URL.createObjectURL(stream);
-		    
-		    $.ajax({
-		        method: "GET",
-		        url: "/voip/call/begin",
-		        data: { to_partner: <t t-esc="to_partner.id"/> },
-		        dataType: "json"
-                    }).done(function(json){
-                        $('#call_id').val(json['call_id']);                    
-                    });
+		    video.src = window.URL.createObjectURL(stream);		    
 		}, errorCallback);	
             }
 

@@ -11,21 +11,28 @@ class ResUsersVoip(models.Model):
     @api.multi
     def create_voip_room(self):
         self.ensure_one()
-        new_room = self.env['voip.room'].create({})
-        
-        #Add the current user as participant 1
-        new_room.partner_ids = [(4,self.env.user.partner_id.id)]
 
-        #Add the selected user as participant 2        
-        new_room.partner_ids = [(4,self.partner_id.id)]
+        #The call is created now so we can update it as a missed / rejected call or accepted, the timer for the call starts after being accepted though
+        voip_call = request.env['voip.call'].create({})
+        
+        #Add the current user is the call owner
+        voip_call.from_partner_id = self.env.user.partner_id.id
+
+        #Add the selected user as the to partner        
+        voip_call.partner_id = self.partner_id.id
 
         notifications = []
 
-        notification = {'room': new_room.id}
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.room', self.partner_id.id), notification)
+        rintones = request.env['voip.ringtone'].search([])
+        ringtone = "/voip_sip_webrtc/static/src/audio/ringtone.mp3"
+        if len(rintones) > 0:
+            ringtone = "/voip/ringtone/1/ringtone.mp3"
         
-        #return {
-        #    'type': 'ir.actions.act_url',
-        #    'target': 'new',
-        #    'url': "/voip/window?room=" + str(new_room.id)
-        #}
+        notification = {'call_id': voip_call.id, 'ringtone': ringtone, 'from_name': self.env.user.partner_id.name}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.call', self.partner_id.id), notification)
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': "/voip/window?call=" + str(voip_call.id)
+        }

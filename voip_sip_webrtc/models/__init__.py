@@ -1,1 +1,1 @@
-import res_users, voip_call, voip_room
+import res_users, voip_call, voip_room, voip_ringtone

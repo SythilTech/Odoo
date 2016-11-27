@@ -1,3 +1,7 @@
+v0.5.3
+======
+Custom Ringtones
+
 v0.5.2
 ======
 Notification System

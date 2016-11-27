@@ -9,6 +9,8 @@
         </t>
         <t t-jquery=".o_notification_content" t-operation="append">
             <br/><br/>
+            <span id="callsecondsleft"></span> seconds remaining...<br/>
+            <br/>
             <button type="button" class="btn btn-sm btn-primary link2accept oe_highlight oe_form oe_button"><span>Accept</span></button>
             <button type="button" class="btn btn-sm btn-link link2reject">Reject</button>
         </t>

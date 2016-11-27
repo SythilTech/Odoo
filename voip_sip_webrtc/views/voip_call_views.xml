@@ -8,7 +8,10 @@
       	    <form>
       	        <group>
       	            <field name="status"/>
-      	            <field name="create_date" string="Start Date"/>
+      	            <field name="from_partner_id"/>
+      	            <field name="partner_id"/>
+      	            <field name="create_date" string="Call Start"/>
+      	            <field name="start_time"/>
       	            <field name="end_time"/>
       	            <field name="duration"/>
       	            <field name="transcription"/>
@@ -23,7 +26,7 @@
         <field name="model">voip.call</field>
         <field name="arch" type="xml">
       	    <tree>
-      	        <field name="create_uid" string="By"/>
+      	        <field name="from_partner_id"/>
       	        <field name="partner_id"/>
       	        <field name="status"/>
       	        <field name="create_date"/>
