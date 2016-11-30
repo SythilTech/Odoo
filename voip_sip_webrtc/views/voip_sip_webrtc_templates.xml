@@ -13,66 +13,25 @@
                 <link rel="stylesheet" href="/web/static/lib/bootstrap/css/bootstrap.css"/>
                 <script type="text/javascript" src="/web/static/lib/jquery/jquery.js"></script>
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"/>
-                <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/window.js"/>
             </head>
             <body>
-                <input type="hidden" id="call_id"/>
+                <input type="hidden" id="call_id" t-attf-value="#{voip_call.id]"/>
       	        <div id="window_container" style="width:100%;height:100%;">
       	            <div id="right_panel" style="float:right;padding:10px;width:200px;height:100%;background-color:#EEEEEE;">
-                        <button type="button" class="btn btn-primary" onclick="call()">Call</button><br/>
+                        <button type="button" class="btn btn-primary" onclick="start(true)">Call</button><br/>
                         <br/>
                         <button type="button" class="btn btn-danger" onclick="end_call()">Hang Up</button><br/>
-      	                <video id="self_video" autoplay="autoplay" style="position:absolute;bottom:10px;right:20px;width:160px;height:160px;border: solid black 1px;"/>
+      	                <video id="localVideo" autoplay="autoplay" muted="muted" style="position:absolute;bottom:10px;right:20px;width:160px;height:160px;border: solid black 1px;"/>
       	            </div>
                     <div id="left_panel" style="float:left;width:200px;height:100%;padding:10px;background-color:#EEEEEE;text-align:center;">
       	                Transcribe Log<br/>
       	                <textarea id="transcribe_log" class="form-control" rows="10"/>
                     </div>
-                    <div id="video_container" style="text-align:center;width:100%;height:100%;background-color:#000000;">
-      	                <video id="other_video" autoplay="autoplay" style="height:100%"/>
+                    <div id="video_container" style="text-align:center;width:100%;height:100%;background-color:#111111;">
+      	                <video id="remoteVideo" autoplay="autoplay" style="height:100%"/>
       	            </div>
+                    <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/window.js"/>
       	        </div>
-                <script>
-
-            var errorCallback = function(e) {
-                alert("Failed to access to camera");
-            };
-
-  
-      	    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-		
-            var video = document.querySelector('#self_video');
-
-
-            if (navigator.getUserMedia) {
-                
-	        navigator.getUserMedia({audio: true, video: true}, function(stream) {
-	            localStream = stream;
-		    video.src = window.URL.createObjectURL(stream);		    
-		}, errorCallback);	
-            }
-
-            
-            function end_call() {
-
-		$.ajax({     
-	            method: "GET",
-		    url: "/voip/call/end",
-		    data: { call_id: $('#call_id').val() },
-                    success: function(data) {
-                
-                    }
-                });
-                
-                video.src = "";
-                localStream.getAudioTracks()[0].stop();
-                localStream.getVideoTracks()[0].stop();
-          
-            }
-
-
-
-                </script>
             </body>
         </html>
     </template>

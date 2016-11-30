@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 from openerp.http import request
+import socket
 
 from openerp import api, fields, models
 
@@ -29,8 +30,11 @@ class ResUsersVoip(models.Model):
             ringtone = "/voip/ringtone/1/ringtone.mp3"
         
         notification = {'call_id': voip_call.id, 'ringtone': ringtone, 'from_name': self.env.user.partner_id.name}
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.call', self.partner_id.id), notification)
-        
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', self.partner_id.id), notification)
+  
+        #Start the Socket server, don't block
+        #openerp.jsonRpc('/voip/socket/server');
+
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',

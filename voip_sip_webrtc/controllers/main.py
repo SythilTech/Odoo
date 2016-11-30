@@ -15,8 +15,8 @@ from openerp.tools import ustr
 import openerp.http as http
 from openerp.http import request
 
-class VoipController(http.Controller):
-
+class VoipController(http.Controller):         
+   
     @http.route('/voip/ringtone/<ringtone>/<filename>', type="http", auth="user")
     def voip_ringtone(self, ringtone, filename):
         """Return the ringtone file to be used by javascript"""
@@ -68,10 +68,10 @@ class VoipController(http.Controller):
         
         voip_call = request.env['voip.call'].browse( int(values['call']) )
         
-        if voip_call.status == "pending":
-            return http.request.render('voip_sip_webrtc.voip_window', {'voip_call':voip_call})
-        else:
-            return "Error this call is not pending"
+        #if voip_call.status == "pending":
+        return http.request.render('voip_sip_webrtc.voip_window', {'voip_call':voip_call})
+        #else:
+        #    return "Error this call is not pending"
             
     @http.route('/voip/call/end', type="http", auth="user")
     def voip_call_end(self, **kwargs):

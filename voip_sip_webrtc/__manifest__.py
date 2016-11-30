@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication (Alpha)",
-    'version': "0.5.3",
+    'version': "0.5.4",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Log call times",

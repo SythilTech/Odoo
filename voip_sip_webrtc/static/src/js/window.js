@@ -1,150 +1,112 @@
 var localStream;
-var pc1;
-var pc2;
-var offerOptions = {
-  offerToReceiveAudio: 1,
-  offerToReceiveVideo: 1
+var localVideo = document.querySelector('#localVideo');
+var remoteVideo = document.querySelector('#remoteVideo');
+
+var peerConnection;
+var serverConnection;
+var peerConnectionConfig = {'iceServers': [{'urls': 'stun:stun.services.mozilla.com'}, {'urls': 'stun:stun.l.google.com:19302'}]};
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+window.RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
+window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
+
+if (navigator.getUserMedia) {
+    navigator.getUserMedia({audio: true, video: true}, getUserMediaSuccess, getUserMediaError);
+}
+
+function getUserMediaSuccess(stream) {
+    console.log("Got Camera Access");
+    localStream = stream;
+	localVideo.src = window.URL.createObjectURL(stream);
+    //serverConnection = new WebSocket('ws://192.168.56.101:8045/');
+    serverConnection = new WebSocket('ws://' + window.location.hostname + ':8045/');
+    serverConnection.onopen = gotConnectionFromServer;
+    serverConnection.onmessage = gotMessageFromServer;
+    serverConnection.onerror = gotConectionErrorFromServer;
+}
+
+function getUserMediaError(error) {
+    alert("Failed to access to camera");
 };
 
-function gotRemoteStream(e) {
-  document.querySelector('#other_video').srcObject = e.stream;
-  console.log('pc2 received remote stream');
+function end_call() {
+    $.ajax({
+	    method: "GET",
+		url: "/voip/call/end",
+		data: { call_id: $('#call_id').val() },
+            success: function(data) {
+
+        }
+    });
+
+    localVideo.src = "";
+    localStream.getAudioTracks()[0].stop();
+    localStream.getVideoTracks()[0].stop();
 }
 
-function getName(pc) {
-  return (pc === pc1) ? 'pc1' : 'pc2';
+function start(isCaller) {
+    console.log("Call Start");
+    peerConnection = new RTCPeerConnection(peerConnectionConfig);
+    peerConnection.onicecandidate = gotIceCandidate;
+    peerConnection.onatrack = gotRemoteStream;
+    peerConnection.addStream(localStream);
+    if(isCaller) {
+        peerConnection.createOffer(gotDescription, createOfferError);
+    }
 }
 
-function onAddIceCandidateSuccess(pc) {
-  console.log(getName(pc) + ' addIceCandidate success');
+function gotDescription(description) {
+    console.log('Got Description: ' + description);
+    peerConnection.setLocalDescription(description, function () {
+        serverConnection.send(JSON.stringify({'sdp': description}));
+    }, function() {console.log('Set Description Error')});
 }
 
-function onSetRemoteSuccess(pc) {
-  console.log(getName(pc) + ' setRemoteDescription complete');
+function gotIceCandidate(event) {
+	console.log("Got Ice Candidate: " + event.candidate);
+    if(event.candidate != null) {
+        serverConnection.send(JSON.stringify({'ice': event.candidate}));
+    }
 }
 
-function getOtherPc(pc) {
-  return (pc === pc1) ? pc2 : pc1;
+function gotRemoteStream(event) {
+    console.log("Got Remote Stream");
+    remoteVideo.src = window.URL.createObjectURL(event.stream);
 }
 
-function onIceStateChange(pc, event) {
-  if (pc) {
-    console.log(getName(pc) + ' ICE state: ' + pc.iceConnectionState);
-    console.log('ICE state change event: ', event);
-  }
+function createOfferError(error) {
+    console.log("Create Offer Error: " + error);
 }
 
-function onIceCandidate(pc, event) {
-  if (event.candidate) {
-    getOtherPc(pc).addIceCandidate(
-      new RTCIceCandidate(event.candidate)
-    ).then(
-      function() {
-        onAddIceCandidateSuccess(pc);
-      },
-      function(err) {
-        onAddIceCandidateError(pc, err);
-      }
-    );
-    console.log(getName(pc) + ' ICE candidate: \n' + event.candidate.candidate);
-  }
+//--------------Connection based functions-------------------
+
+function gotConnectionFromServer() {
+    console.log("Web Socket Contection Successful");
 }
 
-function onSetLocalSuccess(pc) {
-  console.log(getName(pc) + ' setLocalDescription complete');
+function gotMessageFromServer(message) {
+    if(!peerConnection) start(false);
+
+    console.log(message.data);
+
+    var signal = JSON.parse(message.data);
+    if(signal.sdp) {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp), function() {
+            peerConnection.createAnswer(gotDescription, createAnswerError);
+        }, function(error) {
+            alert("failed to set remote description: " + error);
+        }
+        );
+    } else if(signal.ice) {
+        peerConnection.addIceCandidate(new RTCIceCandidate(signal.ice));
+    }
 }
 
-function onCreateAnswerSuccess(desc) {
-  console.log('Answer from pc2:\n' + desc.sdp);
-  console.log('pc2 setLocalDescription start');
-  pc2.setLocalDescription(desc).then(
-    function() {
-      onSetLocalSuccess(pc2);
-    },
-    onSetSessionDescriptionError
-  );
-  console.log('pc1 setRemoteDescription start');
-  pc1.setRemoteDescription(desc).then(
-    function() {
-      onSetRemoteSuccess(pc1);
-    },
-    onSetSessionDescriptionError
-  );
+function createAnswerError(error) {
+    console.log("Create Answer Error: " + error);
 }
 
-function onSetSessionDescriptionError(error) {
-  console.log('Failed to set session description: ' + error.toString());
-}
-
-function onCreateSessionDescriptionError(error) {
-  console.log('Failed to create session description: ' + error.toString());
-}
-
-function onCreateOfferSuccess(desc) {
-  console.log('Offer from pc1\n' + desc.sdp);
-  console.log('pc1 setLocalDescription start');
-  pc1.setLocalDescription(desc).then(
-    function() {
-      onSetLocalSuccess(pc1);
-    },
-    onSetSessionDescriptionError
-  );
-  console.log('pc2 setRemoteDescription start');
-  pc2.setRemoteDescription(desc).then(
-    function() {
-      onSetRemoteSuccess(pc2);
-    },
-    onSetSessionDescriptionError
-  );
-  console.log('pc2 createAnswer start');
-  // Since the 'remote' side has no media stream we need
-  // to pass in the right constraints in order for it to
-  // accept the incoming offer of audio and video.
-  pc2.createAnswer().then(
-    onCreateAnswerSuccess,
-    onCreateSessionDescriptionError
-  );
-}
-
-function call() {
-    alert("Call Start");
-
-    var servers = null;
-    pc1 = new RTCPeerConnection(servers);
-    console.log('Created local peer connection object pc1');
-
-    pc1 = new RTCPeerConnection(servers);
-    console.log('Created local peer connection object pc1');
-    pc1.onicecandidate = function(e) {
-        onIceCandidate(pc1, e);
-    };
-
-    pc2 = new RTCPeerConnection(servers);
-    console.log('Created remote peer connection object pc2');
-
-    pc2.onicecandidate = function(e) {
-        onIceCandidate(pc2, e);
-    };
-
-    pc1.oniceconnectionstatechange = function(e) {
-        onIceStateChange(pc1, e);
-    };
-
-    pc2.oniceconnectionstatechange = function(e) {
-        onIceStateChange(pc2, e);
-    };
-
-    pc2.onaddstream = gotRemoteStream;
-
-    pc1.addStream(localStream);
-    console.log('Added local stream to pc1');
-
-    console.log('pc1 createOffer start');
-    pc1.createOffer(
-        offerOptions
-    ).then(
-        onCreateOfferSuccess,
-        onCreateSessionDescriptionError
-    );
-
+function gotConectionErrorFromServer(error) {
+	console.log(error);
 }

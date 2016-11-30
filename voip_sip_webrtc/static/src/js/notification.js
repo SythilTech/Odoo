@@ -26,7 +26,7 @@ WebClient.include({
 
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
-                if (notification[0][1] === 'voip.call') {
+                if (notification[0][1] === 'voip.notification') {
 					var self = this;
 					var ringtone = notification[1].ringtone;
 					call_id = notification[1].call_id;
@@ -39,7 +39,9 @@ WebClient.include({
 	                mySound = new Audio(ringtone);
 	                mySound.loop = true;
 	                mySound.play();
-                }
+                } else if(notification[0][1] === 'voip.call') {
+					alert("Call data");
+				}
             }).bind(this));
 
         });

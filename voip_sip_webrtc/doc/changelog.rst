@@ -1,3 +1,7 @@
+v0.5.4
+======
+Socket Server
+
 v0.5.3
 ======
 Custom Ringtones
