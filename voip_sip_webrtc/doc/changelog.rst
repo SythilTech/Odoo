@@ -1,3 +1,7 @@
+v0.5.5
+======
+* Access fix and working video calls
+
 v0.5.4
 ======
 Socket Server

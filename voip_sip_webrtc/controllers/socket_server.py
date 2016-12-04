@@ -43,13 +43,12 @@ def client_socket_thread(clientsocket, address):
         
         #Broadcast the data
         for c in clients:
-            if c == clientsocket:
-                c.send(data)
+            c.send(data)
 
 def socket_server():
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serversocket.bind(('', 8045));
-    serversocket.listen(5);
+    serversocket.listen(50);
 
     while 1:
         #accept connections from outside
