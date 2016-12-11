@@ -67,12 +67,37 @@ class VoipController(http.Controller):
             values[field_name] = field_value
         
         voip_call = request.env['voip.call'].browse( int(values['call']) )
+
+        request.uid = request.session.uid
+        context = request.env['ir.http'].webclient_rendering_context()
+
+        context['voip_call'] = voip_call
         
         #if voip_call.status == "pending":
-        return http.request.render('voip_sip_webrtc.voip_window', {'voip_call':voip_call})
+        return http.request.render('voip_sip_webrtc.voip_window', qcontext=context)
         #else:
         #    return "Error this call is not pending"
-            
+
+    @http.route('/voip/call/connect', type="http", auth="user")
+    def voip_call_connect(self, **kwargs):
+        """The user has accepted camera / audio access, notify everyone else in the call room"""
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+
+        voip_call = request.env['voip.call'].browse( int(values['call_id']) )
+
+        _logger.error("Call Connect")
+        
+        #Send the notiofication to everyone including yourself
+        for voip_client in voip_call.client_ids:
+            _logger.error(voip_client.name)
+            notification = {'call_id': voip_call.id, 'client_name': request.env.user.partner_id.name}
+            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.join', voip_client.partner_id.id), notification)
+
+        return True
+        
     @http.route('/voip/call/end', type="http", auth="user")
     def voip_call_end(self, **kwargs):
         """Call ends when person clicks the the end call button"""

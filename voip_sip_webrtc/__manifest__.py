@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication (Beta)",
-    'version': "0.5.5",
+    'version': "0.6",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Make video calls with other users",
@@ -14,7 +14,7 @@
         'security/ir.model.access.csv',
     ],
     'demo': [],
-    'depends': ['crm','bus'],
+    'depends': ['web','crm','bus'],
     'qweb': ['static/src/xml/*.xml'],
     'images':[
         'static/description/1.jpg',

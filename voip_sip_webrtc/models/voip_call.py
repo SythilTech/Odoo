@@ -15,3 +15,14 @@ class VoipCall(models.Model):
     duration = fields.Char(string="Duration", help="Length of the call")
     transcription = fields.Text(string="Transcription", help="Automatic transcription of the call")
     notes = fields.Text(string="Notes", help="Additional comments outside the transcription")
+    client_ids = fields.One2many('voip.call.client', 'vc_id', string="Client List")
+
+class VoipCallClient(models.Model):
+
+    _name = "voip.call.client"
+    
+    vc_id = fields.Many2one('voip.call', string="VOIP Call")
+    partner_id = fields.Many2one('res.partner', string="Partner")
+    name = fields.Char(string="Name", help="Can be a number if the client is from outside the system")
+    state = fields.Selection([('invited','Invited'),('joined','joined'),('media_access','Media Access')], string="State", default="invited")
+    

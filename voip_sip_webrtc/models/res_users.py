@@ -22,6 +22,10 @@ class ResUsersVoip(models.Model):
         #Add the selected user as the to partner        
         voip_call.partner_id = self.partner_id.id
 
+        #Also add both partners to the client list
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.env.user.partner_id.id, 'state':'invited', 'name': self.env.user.partner_id.name})
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.partner_id.id, 'state':'invited', 'name': self.partner_id.name})
+        
         notifications = []
 
         rintones = request.env['voip.ringtone'].search([])
@@ -30,10 +34,7 @@ class ResUsersVoip(models.Model):
             ringtone = "/voip/ringtone/1/ringtone.mp3"
         
         notification = {'call_id': voip_call.id, 'ringtone': ringtone, 'from_name': self.env.user.partner_id.name}
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', self.partner_id.id), notification)
-  
-        #Start the Socket server, don't block
-        #openerp.jsonRpc('/voip/socket/server');
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', self.partner_id.id), notification)  
 
         return {
             'type': 'ir.actions.act_url',

@@ -24,9 +24,18 @@ if (navigator.getUserMedia) {
 
 function getUserMediaSuccess(stream) {
     console.log("Got Camera Access");
+
+    $.ajax({
+	    method: "GET",
+		url: "/voip/call/connect",
+		data: { call_id: $('#call_id').val() },
+            success: function(data) {
+
+        }
+    });
+
     localStream = stream;
 	localVideo.src = window.URL.createObjectURL(stream);
-    //serverConnection = new WebSocket('ws://192.168.56.101:8045/');
     serverConnection = new WebSocket('ws://' + window.location.hostname + ':8045/');
     serverConnection.onopen = gotConnectionFromServer;
     serverConnection.onmessage = gotMessageFromServer;

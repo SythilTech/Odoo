@@ -216,7 +216,6 @@ class HtmlFormAction(models.Model):
     settings_description = fields.Char(string="Settings Description")
     custom_server_action = fields.Many2one('ir.actions.server',string="Custom Server Action")
     
-    @api.one
     @api.onchange('custom_server_action')
     def _onchange_custom_server_action(self):
         if self.custom_server_action:

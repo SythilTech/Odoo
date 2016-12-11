@@ -1,23 +1,27 @@
+v0.6
+====
+* Room client listing
+
 v0.5.5
 ======
 * Access fix and working video calls
 
 v0.5.4
 ======
-Socket Server
+* Socket Server
 
 v0.5.3
 ======
-Custom Ringtones
+* Custom Ringtones
 
 v0.5.2
 ======
-Notification System
+* Notification System
 
 v0.5.1
 ======
-Permission fix
+* Permission fix
 
 v0.5
 ====
-Initial Release
+* Initial Release
