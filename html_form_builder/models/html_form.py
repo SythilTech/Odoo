@@ -45,7 +45,9 @@ class HtmlForm(models.Model):
     @api.one
     def generate_form(self):
         html_output = ""
-        html_output += "<form method=\"POST\" action=\"" + self.submit_url + "\" enctype=\"multipart/form-data\">\n"
+        html_output += "<form method=\"POST\" action=\"" + request.httprequest.host_url + "form/insert\" enctype=\"multipart/form-data\">\n"
+        html_output += "  <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
+
         html_output += "  <h1>" + self.name.encode("utf-8") + "</h1>\n"
                                  
         for fe in self.fields_ids:

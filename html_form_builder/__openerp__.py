@@ -1,6 +1,6 @@
 {
     'name': "HTML Form Builder",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Manage both internal and external forms",

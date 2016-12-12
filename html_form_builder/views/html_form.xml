@@ -77,7 +77,7 @@
                           <field name="output_html"/>
                       </group>
                       <footer>
-                          <button type="object" name="generate_form" string="Make Embed Code"/> 
+                          <button type="object" name="generate_form" string="Generate External Website Embed Code"/> 
                       </footer>
                   </sheet>
               </form>

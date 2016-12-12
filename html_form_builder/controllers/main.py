@@ -481,9 +481,8 @@ class HtmlFormController(http.Controller):
 	form_string += action(form_field)
         
         return {'html_string': form_string}
-        
-    @http.route('/form/sinsert',type="http", auth="public", csrf=True)
-    def my_secure_insert(self, **kwargs):
+
+    def process_form(self, kwargs):
         
         values = {}
 	for field_name, field_value in kwargs.items():
@@ -589,6 +588,14 @@ class HtmlFormController(http.Controller):
                 return json.JSONEncoder().encode({'status': 'success', 'redirect_url':entity_form.return_url})
             else:
                 return werkzeug.utils.redirect(entity_form.return_url)
+    
+    @http.route('/form/sinsert',type="http", auth="public", csrf=True)
+    def my_secure_insert(self, **kwargs):
+        return self.process_form(kwargs)
+
+    @http.route('/form/insert',type="http", auth="public", csrf=False)
+    def my_insert(self, **kwargs):
+        return self.process_form(kwargs)
                 
     def _process_html_input_group(self, field, field_data):
         """Validation for input_groups and preps for insertion into database"""
