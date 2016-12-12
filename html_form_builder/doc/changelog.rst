@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Fix public csrf form submit issue
+
 v1.0.2
 ======
 * Fix external embed forms
