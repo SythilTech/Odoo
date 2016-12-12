@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket - Timesheets",
-    'version': "1.0",
+    'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Track time spend on tickets and send an invoice',

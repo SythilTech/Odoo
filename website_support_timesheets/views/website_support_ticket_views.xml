@@ -10,7 +10,7 @@
               <header position="inside">
 	          <button type="object" name="invoice_client" string="Invoice Client" attrs="{'invisible':[('partner_id', '=', False)]}"/>
 	      </header>
-              <field name="conversation_history" position="after">
+              <field name="description" position="after">
                   <field name="timesheet_ids">
                       <tree editable="bottom">
                           <field name="create_uid" readonly="True" string="By"/>
