@@ -1,31 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
+
+    <template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front POS Menu Assets">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/website_pos_online_menu/static/src/js/pos.online.menu.js"></script>
+        </xpath>
+    </template>
 
         <template id="online_menu" name="Online Menu" page="True">
             <t t-call="website.layout">
                 <div class="container mt6 mb16">
-                    <h1>Online Menu</h1>
-                    
-                    <t t-foreach="pos_categories" t-as="category">
-
-                        <div class="panel panel-default">
-                            <div class="panel-heading"><h2><t t-esc="category.name"/></h2></div>
-                            <div class="panel-body">                                
-                                <t t-foreach="category.product_ids" t-as="product">
-                                    <t t-esc="product.name"/> $<t t-esc="product.lst_price"/><br/>
-                                    <t t-if="not product.description_sale">
-                                        <i>No Description</i>
+                    <div id="pos-menu-container" class="pos-menu-container">    
+                        <h1 class="text-center">Online Menu</h1>
+                        <t t-foreach="pos_categories" t-as="category">
+                            <div class="panel panel-default">
+                                <div class="panel-heading"><h2><t t-esc="category.name"/></h2></div>
+                                <div class="panel-body">                                
+                                    <t t-foreach="category.product_ids" t-as="product">
+                                        <t t-esc="product.name"/> $<t t-esc="product.lst_price"/><br/>
+                                        <t t-if="not product.description_sale">
+                                            <i>No Description</i>
+                                        </t>
+                                        <t t-esc="product.description_sale"/>
+                                        <hr/>
                                     </t>
-                                    <t t-esc="product.description_sale"/>
-                                    <hr/>
-                                </t>
+                                </div>
                             </div>
-                        </div>
-                    </t>
+                        </t>
+                    </div>
                 </div>
             </t>
         </template>
+        
+    <template id="online_menu_order" name="Online Menu Order" customize_show="True" inherit_id="online_menu" active="False">
+        <xpath expr="//div[@id='pos-menu-container']" position="attributes">
+            <attribute name="class">pos-menu-container col-md-9</attribute>
+        </xpath>
+        <xpath expr="//div[@id='pos-menu-container']" position="after">
+            <div class="col-md-3">
+                <h2 class="text-center">Order</h2>
+                <div id="pos-order-panel" style="min-height:300px;padding:5px" class="panel panel-default"/>
+                <button type="button" class="btn btn-primary pos-order-submit">Place Order</button>
+            </div>
+        </xpath>
+        <xpath expr="//t[@t-esc='product.description_sale']" position="after">
+            <br/><button type="button" class="btn btn-primary pos-order-button" t-att-data-item-id="product.id" t-att-data-item-name="product.name" t-att-data-item-price="product.lst_price">Order</button>
+        </xpath>
+    </template>
 
-    </data>
-</openerp>
+</odoo>
