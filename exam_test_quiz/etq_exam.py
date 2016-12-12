@@ -13,7 +13,7 @@ class EtqExam(models.Model):
     _name = "etq.exam"
     
     name = fields.Char(string="Name")
-    slug = fields.Char(string="Slug", compute="slug_me")
+    slug = fields.Char(string="Slug", compute="slug_me", store="True")
     show_correct_questions = fields.Boolean(string="Show Correct Answers?")
     questions = fields.One2many('etq.question','exam_id', string="Questions")
 
@@ -26,6 +26,7 @@ class EtqExam(models.Model):
                   'url'      : quiz_url
                }        
        
+    @api.one
     @api.depends('name')
     def slug_me(self):
         if self.name:

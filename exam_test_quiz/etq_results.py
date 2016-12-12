@@ -11,13 +11,16 @@ import re
 class etq_results(models.Model):
 
     _name = "etq.result"
+    _description = "Exam Result"
     
     exam_id = fields.Many2one('etq.exam', string="Exam", readonly=True)
+    user_id = fields.Many2one('res.users', string="User")
     results = fields.One2many('etq.result.question', 'result_id', string="Results", readonly=True)
     
 class etq_result_question(models.Model):
 
     _name = "etq.result.question"
+    _description = "Exam Result Question"
     
     result_id = fields.Many2one('etq.result', string="Result", readonly=True)
     question = fields.Many2one('etq.question', string="Question", readonly=True)
@@ -28,8 +31,11 @@ class etq_result_question(models.Model):
 class etq_result_question_options(models.Model):
 
     _name = "etq.result.question.option"
+    _desciption = "Exam Result Question Option"
     
     question_id = fields.Many2one('etq.result.question',string="Question ID", readonly=True)
+    question_name = fields.Char(related="question_id.question.question", string="Question")    
     option_id = fields.Many2one('etq.question.option', string="Option", readonly=True)
+    option_name = fields.Char(related="option_id.option", string="Option")
     question_options_value = fields.Char(string="Option Value", readonly=True)
     

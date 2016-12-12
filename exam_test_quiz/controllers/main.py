@@ -8,9 +8,10 @@ import json
 
 class MyController(http.Controller):
 
-    @http.route('/exam/<exam>', type="http", auth="public", website=True)
-    def take_exam(self, exam):
-        exam = http.request.env['etq.exam'].sudo().search([('slug','=',exam)])[0]
+    @http.route('/exam/<exam_slug>', type="http", auth="public", website=True)
+    def take_exam(self, exam_slug):
+        _logger.error(exam_slug)
+        exam = http.request.env['etq.exam'].sudo().search([('slug','=',exam_slug)])[0]
         return http.request.render('exam_test_quiz.exam_question_page', {'exam': exam})
         
     @http.route('/exam/results', type="http", auth="public", website=True)
@@ -27,6 +28,9 @@ class MyController(http.Controller):
         correct_count = 0
         
         exam_result = http.request.env['etq.result'].sudo().create({'exam_id':exam.id})
+
+        if request.env.user.partner_id.name != 'Public user':
+            exam_result.user_id = request.env.user.id
         
         for question in exam.questions:
             question_count += 1
