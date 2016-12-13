@@ -7,17 +7,24 @@
         </xpath>
     </template>
 
-        <template id="online_menu" name="Online Menu" page="True">
-            <t t-call="website.layout">
+    <template id="online_menu" name="Online Menu" page="True">
+        <t t-call="website.layout">
                 <div class="container mt6 mb16">
-                    <div id="pos-menu-container" class="pos-menu-container">    
-                        <h1 class="text-center">Online Menu</h1>
+                    <h1 class="text-center">Online Menu</h1>
+                    <div id="pos-categories-container">
+                    </div>
+                    <div id="pos-menu-container" class="pos-menu-container col-md-12">
                         <t t-foreach="pos_categories" t-as="category">
+                            <a t-attf-name="category_#{category.id}"/>
                             <div class="panel panel-default">
                                 <div class="panel-heading"><h2><t t-esc="category.name"/></h2></div>
-                                <div class="panel-body">                                
+                                <div class="panel-body">
                                     <t t-foreach="category.product_ids" t-as="product">
-                                        <t t-esc="product.name"/> $<t t-esc="product.lst_price"/><br/>
+                                        <a t-attf-name="product_#{product.id}"/>
+                                        <div id="pos_product_details">
+                                            <span class="pull-right">$<t t-esc="product.lst_price"/></span>                                            
+                                            <h3><t t-esc="product.name"/></h3>
+                                        </div>
                                         <t t-if="not product.description_sale">
                                             <i>No Description</i>
                                         </t>
@@ -28,24 +35,107 @@
                             </div>
                         </t>
                     </div>
+                    <div id="pos-order-container">
+                    
+                    </div>
                 </div>
-            </t>
-        </template>
-        
-    <template id="online_menu_order" name="Online Menu Order" customize_show="True" inherit_id="online_menu" active="False">
-        <xpath expr="//div[@id='pos-menu-container']" position="attributes">
-            <attribute name="class">pos-menu-container col-md-9</attribute>
+        </t>
+    </template>
+
+    <template id="online_menu_checkout" name="Online Menu Checkout" page="True">
+        <t t-call="website.layout">
+            <div class="container mt6 mb16">
+                <div class="col-md-9">
+                    Select Time
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><h2>Order Details</h2></div>
+                        <div class="panel-body">
+                            <b><t t-esc="website_pos_order.type"/></b><br/>
+                            <t t-foreach="website_pos_order.line_ids" t-as="product_line">
+                                <t t-esc="product_line.product_id.name"/> $<t t-esc="product_line.product_id.lst_price"/> x<t t-esc="product_line.quantity"/><br/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </t>
+    </template>
+       
+    <template id="online_menu_categories" name="Categories Panel" customize_show="True" inherit_id="online_menu" active="False">
+
+        <xpath expr="//div[@id='pos-categories-container']" position="attributes">
+            <attribute name="class">col-md-3</attribute>
         </xpath>
-        <xpath expr="//div[@id='pos-menu-container']" position="after">
-            <div class="col-md-3">
-                <h2 class="text-center">Order</h2>
-                <div id="pos-order-panel" style="min-height:300px;padding:5px" class="panel panel-default"/>
-                <button type="button" class="btn btn-primary pos-order-submit">Place Order</button>
+        
+        <xpath expr="//div[@id='pos-menu-container']" position="attributes">
+            <attribute name="class">pos-menu-container col-md-6</attribute>
+        </xpath>
+
+        <xpath expr="//div[@id='pos-order-container']" position="attributes">
+            <attribute name="class">col-md-3</attribute>
+        </xpath>
+        
+        <xpath expr="//div[@id='pos-categories-container']" position="inside">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h2>Menu</h2></div>
+                <div class="panel-body">
+                    <t t-foreach="pos_categories" t-as="category">
+                        <a t-attf-href="#category_#{category.id}"><t t-esc="category.name"/></a>
+                        <ul>
+                            <t t-foreach="category.product_ids" t-as="product">
+                                <li><a t-attf-href="#product_#{product.id}"><t t-esc="product.name"/> $<t t-esc="product.lst_price"/></a></li>                              
+                            </t>
+                        </ul>
+                    </t>
+                </div>
             </div>
         </xpath>
+    </template>
+    
+    <template id="online_menu_order" name="Order Panel" customize_show="True" inherit_id="online_menu" active="False">
+        
+        <xpath expr="//div[@id='pos-categories-container']" position="attributes">
+            <attribute name="class">col-md-3</attribute>
+        </xpath>
+        
+        <xpath expr="//div[@id='pos-menu-container']" position="attributes">
+            <attribute name="class">pos-menu-container col-md-6</attribute>
+        </xpath>
+
+        <xpath expr="//div[@id='pos-order-container']" position="attributes">
+            <attribute name="class">col-md-3</attribute>
+        </xpath>
+        
+        <xpath expr="//div[@id='pos-order-container']" position="inside">
+
+            <div class="panel panel-default">
+                <div class="panel-heading"><h2>Order Details</h2></div>
+                <div class="panel-body">
+                    <b>Order Type</b><br/>
+                    <div class="radio">
+                        <label><input type="radio" name="order_type" value="delivery" checked="checked"/>Delivery</label>
+                    </div>
+                    <div id="pos-order-panel">
+                    
+                    </div>
+                </div>
+            </div>
+            <a href="/restaurant/checkout"><button type="button" class="btn btn-primary pos-order-submit">Place Order</button></a>
+        </xpath>
+        
         <xpath expr="//t[@t-esc='product.description_sale']" position="after">
             <br/><button type="button" class="btn btn-primary pos-order-button" t-att-data-item-id="product.id" t-att-data-item-name="product.name" t-att-data-item-price="product.lst_price">Order</button>
         </xpath>
+        
     </template>
 
+    <template id="online_menu_images" name="Product Images" customize_show="True" inherit_id="online_menu" active="False">
+        <xpath expr="//div[@id='pos_product_details']" position="before">
+            <img t-att-src="website.image_url(product, 'image_medium')" style="margin:10px;width:128px;height:128px;" class="img-rounded pull-left" t-attf-alt="#{product.name}" t-attf-title="#{product.name}"/>
+        </xpath>
+    </template>
+    
 </odoo>

@@ -1,3 +1,8 @@
+odoo.define('website_pos_online_menu.ordering', function (require) {
+    "use strict";
+
+    var ajax = require('web.ajax');
+
 $(document).ready(function() {
 	var pos_menu_order = [];
     $(".pos-order-button").click(function() {
@@ -18,6 +23,10 @@ $(document).ready(function() {
             pos_menu_order.push({'id': item_id, 'name': item_name, 'price': item_price, 'quantity': 1})
 		}
 
+        ajax.jsonRpc("/restaurant/order/update", 'call', {
+            'product_id': parseInt(item_id)
+        })
+
         $("#pos-order-panel").empty();
 
         //Loop through the orders and output them as HTML
@@ -27,4 +36,7 @@ $(document).ready(function() {
 		}
 
     });
+});
+
+
 });
