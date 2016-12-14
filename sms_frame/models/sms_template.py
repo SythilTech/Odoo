@@ -103,7 +103,7 @@ class SmsTemplate(models.Model):
          
         gateway_model = my_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
         
-	my_sms = self.env[gateway_model].send_message(my_template.from_mobile_verified_id.account_id.id, my_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id)
+	my_sms = self.env[gateway_model].send_message(my_template.from_mobile_verified_id.account_id.id, my_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id, my_template.media_id)
 	
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``

@@ -1,3 +1,7 @@
+v1.0.7
+======
+* MMS template sending fix
+
 v1.0.6
 ======
 * MMS templates

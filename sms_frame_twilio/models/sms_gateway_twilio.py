@@ -46,7 +46,7 @@ class SmsGatewayTwilio(models.Model):
             
         #send the sms/mms
         base_url = self.env['ir.config_parameter'].search([('key','=','web.base.url')])[0].value
-        payload = {'From': str(format_from), 'To': str(format_to), 'Body': str(sms_content), 'StatusCallback': base_url + "/sms/twilio/receipt"}
+        payload = {'From': format_from.encode('utf-8'), 'To': format_to.encode('utf-8'), 'Body': sms_content.encode('utf-8'), 'StatusCallback': base_url + "/sms/twilio/receipt"}
 
         if media:
             payload['MediaUrl'] = media_url

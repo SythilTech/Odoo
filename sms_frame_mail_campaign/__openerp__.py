@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework - SMS Campaign",
-    'version': "1.0",
+    'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Adds the ability to more easily send smses from a marketing campaign",
