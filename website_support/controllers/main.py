@@ -64,7 +64,7 @@ class SupportTicketController(http.Controller):
     @http.route(['''/support/help/<model("website.support.help.groups"):help_group>/<model("website.support.help.page", "[('group_id','=',help_group[0])]"):help_page>'''], type='http', auth="public", website=True)
     def help_page(self, help_group, help_page, enable_editor=None, **post):
         """Displays help page template"""
-        return request.website.render("website_support.help_page", {'help_page':help_page})
+        return http.request.render("website_support.help_page", {'help_page':help_page})
 
 
     @http.route('/support/ticket/process', type="http", auth="public", website=True, csrf=True)

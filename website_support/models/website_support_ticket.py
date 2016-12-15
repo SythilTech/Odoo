@@ -37,6 +37,7 @@ class WebsiteSupportTicket(models.Model):
     subject = fields.Char(string="Subject", readonly=True)
     description = fields.Text(string="Description", readonly=True)
     state = fields.Many2one('website.support.ticket.states', required=True, readonly=True, default=_default_state, string="State")
+    conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
     unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
@@ -51,7 +52,7 @@ class WebsiteSupportTicket(models.Model):
         #s.feed(body_short)
         #body_short = s.get_data()
                 
-        #(Depreciated) Add to message history field for back compatablity
+        #Add to message history field for back compatablity
         self.conversation_history.create({'ticket_id': self.id, 'content': body_short })
 
 	customer_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
@@ -107,7 +108,7 @@ class WebsiteSupportTicketMessage(models.Model):
     _name = "website.support.ticket.message"
     
     ticket_id = fields.Many2one('website.support.ticket', string='Ticket ID')
-    content = fields.Text(string="Content")
+    content = fields.Html(string="Content")
    
 class WebsiteSupportTicketCategories(models.Model):
 
@@ -150,7 +151,7 @@ class WebsiteSupportTicketCompose(models.Model):
     partner_id = fields.Many2one('res.partner', string="Partner", readonly="True")
     email = fields.Char(string="Email", readonly="True")
     subject = fields.Char(string="Subject", readonly="True")
-    body = fields.Html(string="Message Body")
+    body = fields.Text(string="Message Body")
     template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket')]")
     
     @api.onchange('template_id')
@@ -170,7 +171,7 @@ class WebsiteSupportTicketCompose(models.Model):
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send()
         
-        #(Depreciated) Add to message history field for back compatablity
+        #Add to message history field for back compatablity
         self.env['website.support.ticket.message'].create({'ticket_id': self.ticket_id.id, 'content':self.body.replace("<p>","").replace("</p>","")})
         
         #Post in message history

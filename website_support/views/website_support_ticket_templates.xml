@@ -86,7 +86,7 @@
             <field name="email_to">${object.email}</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
-                ${(object.body)|safe}
+                ${object.body}
                 <hr/>
                 <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
                 <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
@@ -258,7 +258,7 @@
         <li groups="event.group_event_manager"><a href="#" data-action="new_event"><i class="fa fa-glass"/><p>New Event</p></a></li>
 
          <li><a href="#" data-action="new_help_group"><i class="fa fa-question-circle"/><p>New Help Group</p></a></li>
-         <li><a href="#" data-action="new_help_page"><i class="fa a-info-circle"/><p>New Help Page</p></a></li>
+         <li><a href="#" data-action="new_help_page"><i class="fa fa-info-circle"/><p>New Help Page</p></a></li>
 
     </xpath>
 </template>
@@ -306,7 +306,7 @@
             <div name="email_from_container" t-attf-class="form-group #{error and 'email' in error and 'has-error' or ''}">
                 <label class="col-md-3 col-sm-4 control-label" for="email">Email</label>
                 <div class="col-md-7 col-sm-8">
-                    <input type="email" class="form-control" name="email" required="True" t-attf-value="#{email or ''}" t-attf-readonly="#{email and 'readonly'}"/>
+                    <input type="email" class="form-control" name="email" required="True" t-attf-value="#{email or ''}" t-att-readonly="'readonly' if email else None"/>
                 </div>
             </div>
             <div t-attf-class="form-group #{error and 'category' in error and 'has-error' or ''}">
