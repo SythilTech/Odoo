@@ -25,4 +25,4 @@ class VoipCallClient(models.Model):
     partner_id = fields.Many2one('res.partner', string="Partner")
     name = fields.Char(string="Name", help="Can be a number if the client is from outside the system")
     state = fields.Selection([('invited','Invited'),('joined','joined'),('media_access','Media Access')], string="State", default="invited")
-    
+    sdp = fields.Text(string="SDP")

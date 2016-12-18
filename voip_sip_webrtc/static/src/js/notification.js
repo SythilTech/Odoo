@@ -39,13 +39,7 @@ WebClient.include({
 	                mySound = new Audio(ringtone);
 	                mySound.loop = true;
 	                mySound.play();
-                } else if(notification[0][1] === 'voip.join') {
-					var client_name = notification[1].client_name;
-
-					//Append the new client to the end of the div
-					$("#join-list").append(client_name + "<br/>");
-					console.log(client_name + " Joined the call");
-				}
+                }
             }).bind(this));
 
         });

@@ -4,7 +4,7 @@
     <template id="voip_backend_assets" name="VOIP Client Assets" inherit_id="web.assets_backend">
        <xpath expr="." position="inside">
            <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/notification.js"></script>
-       </xpath>>
+       </xpath>
     </template>
    
     <template id="voip_window" name="Voip Window">
@@ -24,24 +24,32 @@
                 <link rel="stylesheet" href="/web/static/lib/bootstrap/css/bootstrap.css"/>
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"/>
 
-                <t t-call-assets="voip_sip_webrtc.voip_backend_assets"/>
-
             </t>
             <t t-set="head" t-value="head_web + (head or '')"/>
             <input type="hidden" id="call_id" t-attf-value="#{voip_call.id}"/>
       	    <div id="window_container" style="width:100%;height:100%;">
       	        <div id="right_panel" style="float:right;padding:10px;width:200px;height:100%;background-color:#EEEEEE;">
-                    <button type="button" class="btn btn-primary" onclick="start(true)">Call</button><br/>
+                    <button type="button" class="btn btn-primary" id="voip_start_call">Call</button><br/>
                     <br/>
-                    <button type="button" class="btn btn-danger" onclick="end_call()">Hang Up</button><br/>
+                    <button type="button" class="btn btn-danger" id="voip_end_call">Hang Up</button><br/>
       	            <video id="localVideo" autoplay="autoplay" muted="muted" style="position:absolute;bottom:10px;right:20px;width:160px;height:160px;border: solid black 1px;"/>
       	        </div>
                 <div id="left_panel" style="float:left;width:200px;height:100%;padding:10px;background-color:#EEEEEE;">
       	            Transcribe Log<br/>
       	            <textarea id="transcribe_log" class="form-control" rows="10"/>
 
-      	            <b>Clients</b><br/>      	                
-      	            <div id="join-list"/>
+                    <script>
+                        var clientList = [];
+                        var peerConnection;
+                    </script>
+                    
+      	            <b>Clients</b><br/>
+      	            <div id="join-list">
+      	                <t t-foreach="voip_call.client_ids" t-as="voip_client">
+      	                    <t t-esc="voip_client.name"/> <t t-esc="voip_client.state"/><br/>
+      	                    <script>clientList.push({'client_name': '<t t-esc="voip_client.name"/>', 'state': '<t t-esc="voip_client.state"/>' });</script>
+      	                </t>
+      	            </div>
                 </div>
                 <div id="video_container" style="text-align:center;width:100%;height:100%;background-color:#111111;">
       	            <video id="remoteVideo" autoplay="autoplay" style="height:100%"/>

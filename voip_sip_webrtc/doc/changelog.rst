@@ -1,3 +1,7 @@
+v1.0
+====
+* Converted sdp and ice exchange to longpolling to increase reliabilty
+
 v0.6
 ====
 * Room client listing

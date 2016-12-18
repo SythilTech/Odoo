@@ -23,7 +23,7 @@ class ResUsersVoip(models.Model):
         voip_call.partner_id = self.partner_id.id
 
         #Also add both partners to the client list
-        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.env.user.partner_id.id, 'state':'invited', 'name': self.env.user.partner_id.name})
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.env.user.partner_id.id, 'state':'joined', 'name': self.env.user.partner_id.name})
         self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.partner_id.id, 'state':'invited', 'name': self.partner_id.name})
         
         notifications = []

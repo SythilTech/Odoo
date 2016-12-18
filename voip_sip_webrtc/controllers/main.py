@@ -39,6 +39,15 @@ class VoipController(http.Controller):
         
         #Assign yourself as the to partner
         voip_call.partner_id = request.env.user.partner_id.id
+        
+        #Mark your yourself as joined
+        self_client = request.env['voip.call.client'].sudo().search([('partner_id','=', request.env.user.partner_id.id), ('vc_id','=', voip_call.id)])
+        self_client.state = 'joined'
+
+        #Send the notiofication to everyone including yourself thath you have joined the room
+        for voip_client in voip_call.client_ids:
+            notification = {'call_id': voip_call.id, 'client_name': request.env.user.partner_id.name}
+            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.join', voip_client.partner_id.id), notification)
 
         return werkzeug.utils.redirect("/voip/window?call=" + str(call) )
 
@@ -73,10 +82,7 @@ class VoipController(http.Controller):
 
         context['voip_call'] = voip_call
         
-        #if voip_call.status == "pending":
         return http.request.render('voip_sip_webrtc.voip_window', qcontext=context)
-        #else:
-        #    return "Error this call is not pending"
 
     @http.route('/voip/call/connect', type="http", auth="user")
     def voip_call_connect(self, **kwargs):
@@ -88,15 +94,61 @@ class VoipController(http.Controller):
 
         voip_call = request.env['voip.call'].browse( int(values['call_id']) )
 
-        _logger.error("Call Connect")
         
         #Send the notiofication to everyone including yourself
         for voip_client in voip_call.client_ids:
-            _logger.error(voip_client.name)
             notification = {'call_id': voip_call.id, 'client_name': request.env.user.partner_id.name}
             request.env['bus.bus'].sendone((request._cr.dbname, 'voip.join', voip_client.partner_id.id), notification)
 
-        return True
+        return "Hi"
+
+    @http.route('/voip/call/sdp', type="http", auth="user")
+    def voip_call_sdp(self, **kwargs):
+        """Store the description and send it to everyone else"""
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+
+        voip_call = request.env['voip.call'].browse( int(values['call_id']) )
+        
+        _logger.error("voip SDP")
+        sdp_json = values['sdp']
+        
+        for voip_client in voip_call.client_ids:
+            if voip_client.partner_id.id == request.env.user.partner_id.id:
+                _logger.error("self sdp")
+                voip_client.sdp = sdp_json
+            else:
+                _logger.error("other sdp")
+                notification = {'call_id': voip_call.id, 'sdp': sdp_json }
+                request.env['bus.bus'].sendone((request._cr.dbname, 'voip.sdp', voip_client.partner_id.id), notification)
+        
+        return "Hello"
+
+    @http.route('/voip/call/ice', type="http", auth="user")
+    def voip_call_ice(self, **kwargs):
+        """send it to everyone else"""
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+
+        voip_call = request.env['voip.call'].browse( int(values['call_id']) )
+        
+        _logger.error("voip ICE")
+        ice_json = values['ice']
+        
+        for voip_client in voip_call.client_ids:
+            if voip_client.partner_id.id == request.env.user.partner_id.id:
+                _logger.error("self ice")
+                voip_client.sdp = ice_json
+            else:
+                _logger.error("other ice")
+                notification = {'call_id': voip_call.id, 'ice': ice_json }
+                request.env['bus.bus'].sendone((request._cr.dbname, 'voip.ice', voip_client.partner_id.id), notification)
+        
+        return "Hello"
         
     @http.route('/voip/call/end', type="http", auth="user")
     def voip_call_end(self, **kwargs):

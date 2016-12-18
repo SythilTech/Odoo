@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Voip Communication (Beta)",
-    'version': "0.6",
+    'name': "Voip Communication",
+    'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Make video calls with other users",

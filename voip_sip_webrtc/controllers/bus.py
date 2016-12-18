@@ -12,4 +12,6 @@ class VoipBusController(BusController):
         if request.session.uid:
             channels.append((request.db, 'voip.notification', request.env.user.partner_id.id))
             channels.append((request.db, 'voip.join', request.env.user.partner_id.id))
+            channels.append((request.db, 'voip.sdp', request.env.user.partner_id.id))
+            channels.append((request.db, 'voip.ice', request.env.user.partner_id.id))
         return super(VoipBusController, self)._poll(dbname, channels, last, options)
