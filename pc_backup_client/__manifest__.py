@@ -1,6 +1,6 @@
 {
     'name': "PC Backup - Odoo Client",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Backs up your Odoo databases to your backup server",

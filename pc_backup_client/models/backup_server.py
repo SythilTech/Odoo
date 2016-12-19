@@ -10,6 +10,7 @@ _logger = logging.getLogger(__name__)
 import shutil
 import json
 import datetime
+import odoo
 
 from openerp import api, fields, models
 
@@ -37,38 +38,37 @@ class BackupServer(models.Model):
     @api.model
     def backup_now(self):
         _logger.error("backup now")
-        for backup_server in self.env['backup.server'].sudo().search([]):
-            _logger.error(backup_server.name)
-            with openerp.tools.osutil.tempdir() as dump_dir:
-                db_name = self.env.cr.dbname
-                filestore = openerp.tools.config.filestore(db_name)
 
-                if os.path.exists(filestore):
-                    shutil.copytree(filestore, os.path.join(dump_dir, 'filestore'))
+        db_name = self.env.cr.dbname
+        cmd = ['pg_dump', '--no-owner']
+        cmd.append(db_name)
 
-                with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
-                    db = openerp.sql_db.db_connect(db_name)
-                    with db.cursor() as cr:
-                        json.dump(self.dump_db_manifest(cr), fh, indent=4)
-                    
-                cmd = ['pg_dump', '--no-owner']
-                cmd.append(db_name)
-                cmd.insert(-1, '--file=' + os.path.join(dump_dir, 'dump.sql'))
-                openerp.tools.exec_pg_command(*cmd)
-    
-                t=tempfile.TemporaryFile()
-                openerp.tools.osutil.zip_dir(dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql')
+        t=tempfile.TemporaryFile()
+
+        with odoo.tools.osutil.tempdir() as dump_dir:
+            filestore = odoo.tools.config.filestore(db_name)
+            if os.path.exists(filestore):
+                shutil.copytree(filestore, os.path.join(dump_dir, 'filestore'))
+            with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
+                db = odoo.sql_db.db_connect(db_name)
+                with db.cursor() as cr:
+                    json.dump(self.dump_db_manifest(cr), fh, indent=4)
+            cmd.insert(-1, '--file=' + os.path.join(dump_dir, 'dump.sql'))
+            odoo.tools.exec_pg_command(*cmd)
+
             
-                t.seek(0)
-                save_name = db_name + ' ' +  datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' Backup'
-                file_name = db_name + ' ' +  datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') + '.zip'
-                
-                #self.env['ir.attachment'].create({'name': save_name, 'mimetype': 'application/zip', 'datas_fname': file_name, 'type': 'binary', 'datas': base64.b64encode( t.read() ) , 'description': 'Automatic backup of ' + db_name + ' ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'res_model': 'saas.database', 'res_id':  saas_database.id, 'res_name': save_name, 'saas_database_id': saas_database.id})
-        
+            odoo.tools.osutil.zip_dir(dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql')
+            t.seek(0)
+            save_name = db_name + ' ' +  datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' Backup'
+            file_name = db_name + ' ' +  datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') + '.zip'
+
+
+        for backup_server in self.env['backup.server'].sudo().search([]):
+                #Connect to the backup server and save the database
                 common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(backup_server.host))
                 uid = common.authenticate(backup_server.database_name, backup_server.username, backup_server.password, {})
                 models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(backup_server.host))
-                backup = models.execute_kw(backup_server.database_name, uid, backup_server.password,'backup.odoo', 'create',[{'user_id':uid, 'backup_type': 'full', 'database_name': self.env.cr.dbname, 'data': 'data', 'data_filename': file_name}])
+                backup = models.execute_kw(backup_server.database_name, uid, backup_server.password,'backup.odoo', 'create',[{'user_id':uid, 'backup_type': 'full', 'database_name': self.env.cr.dbname, 'data': base64.b64encode( t.read() ), 'data_filename': file_name}])
 
     @api.model
     def dump_db_manifest(self, cr):
