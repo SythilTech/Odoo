@@ -40,7 +40,7 @@ class BackupServer(models.Model):
         for backup_server in self.env['backup.server'].sudo().search([]):
             _logger.error(backup_server.name)
             with openerp.tools.osutil.tempdir() as dump_dir:
-                db_name = backup_server.database_name
+                db_name = self.env.cr.dbname
                 filestore = openerp.tools.config.filestore(db_name)
 
                 if os.path.exists(filestore):
