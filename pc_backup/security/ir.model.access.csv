@@ -1,2 +1,2 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_remote_odoo_backup","Access backup.odoo","model_backup_odoo","remote_backup_user_group",1,1,1,0
+"access_remote_odoo_backup","Access backup.odoo","model_backup_odoo","remote_backup_user_group",0,0,1,0
