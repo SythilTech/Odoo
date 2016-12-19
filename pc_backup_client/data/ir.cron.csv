@@ -1,0 +1,2 @@
+id,name,model,function,interval_number,interval_type,numbercall,active
+"daily_remote_backup","Daily Remote Backup",backup.server,backup_now,1,days,-1,true

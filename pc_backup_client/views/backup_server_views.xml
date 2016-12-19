@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+      <record id="backup_server_view_form" model="ir.ui.view">
+          <field name="name">backup.server.form.view</field>
+          <field name="model">backup.server</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <header>
+      	              <button name="test_backup_server" type="object" string="Test Backup Server"/>
+      	          </header>
+      	          <sheet>    
+      	              <group>
+                          <field name="name"/>
+                          <field name="host"/>
+                          <field name="database_name"/>
+                          <field name="username"/>
+                          <field name="password" password="1"/>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="backup_server_view_tree" model="ir.ui.view">
+          <field name="name">backup.server.tree.view</field>
+          <field name="model">backup.server</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	          <field name="host"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="backup_server_backup_view_form" model="ir.ui.view">
+          <field name="name">backup.server.backup.form.view</field>
+          <field name="model">backup.server.backup</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <sheet>    
+      	              <group>
+      	                  <field name="backup_server_id"/>
+                          <field name="create_date" string="Backup Date"/>
+                          <field name="name"/>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="backup_server_backup_view_tree" model="ir.ui.view">
+          <field name="name">backup.server.backup.tree.view</field>
+          <field name="model">backup.server.backup</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="backup_server_id"/>
+                  <field name="create_date" string="Backup Date"/>
+                  <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="backup_server_action" model="ir.actions.act_window">
+          <field name="name">Backup Servers</field>
+	  <field name="res_model">backup.server</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+	      <p>
+	          No Backup Servers
+	      </p>
+          </field>
+      </record>
+
+      <record id="backup_server_backup_action" model="ir.actions.act_window">
+          <field name="name">Odoo Database Backup</field>
+	  <field name="res_model">backup.server.backup</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+	      <p>
+	          No Odoo Database Backups
+	      </p>
+          </field>
+      </record>
+
+      <menuitem id="backup_parent_menu" name="Backup" parent="base.menu_administration" sequence="90"/>
+      <menuitem id="backup_server_menu" name="Backup Servers" parent="backup_parent_menu" action="backup_server_action" sequence="10"/>
+      <!--<menuitem id="backup_server_backup_menu" name="Database Backups" parent="backup_parent_menu" action="backup_server_backup_action" sequence="20"/>-->
+      
+</odoo>

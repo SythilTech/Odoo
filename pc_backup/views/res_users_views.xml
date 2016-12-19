@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+      <record id="res_users_backup_view_form" model="ir.ui.view">
+          <field name="name">Remote Backup User Form View</field>
+          <field name="model">res.users</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <sheet>    
+      	              <group>
+      	                  <field name="name" required="1"/>
+      	                  <field name="login" required="1"/>
+      	                  <field name="password" password="True" required="1"/>
+      	                  <field name="backup_user"/>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="res_users_backup_view_tree" model="ir.ui.view">
+          <field name="name">Remote Backup User Tree View</field>
+          <field name="model">res.users</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+      
+</odoo>
