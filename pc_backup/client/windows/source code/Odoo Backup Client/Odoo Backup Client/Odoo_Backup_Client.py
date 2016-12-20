@@ -120,46 +120,20 @@ class MyForm(Form):
         computer_name = System.Environment.MachineName
         computer_username = System.Security.Principal.WindowsIdentity.GetCurrent().Name
         
-        backup = models.execute_kw(db, uid, password,'backup.computer', 'search_read',[[('user_id', '=', uid), ('username','=',computer_username), ('computer_name', '=', computer_name)]])
-
-        #If this is the first backup then create the backup placeholder
-        if backup.Count == 0:
-            backup_id = models.execute_kw(db, uid, password, 'backup.computer', 'create', [{
-                'user_id': uid,
-                'username': computer_username,
-                'computer_name': computer_name,
-            }])
-        else:
-            backup_id = backup[0]['id']
-
-
+        #Register a change
+        backup_change_id = models.execute_kw(db, uid, password,'backup.computer.change', 'register_change',[computer_username, computer_name])
+        
         backup_file_count = 0
         #Backup all files in the backup directory
         for (root, dirs, files) in walk(backup_directory):
             for filename in files:
                 file_path = os.path.join(root, filename)
 
-                backup_file = models.execute_kw(db, uid, password,'backup.computer.file', 'search_read',[[('bc_id', '=', backup_id), ('backup_path','=',file_path)]])
-               
-                #If this file has not been backup up yet then create a backup file placeholder
-                if backup_file.Count == 0:
-                    backup_file_id = models.execute_kw(db, uid, password, 'backup.computer.file', 'create', [{
-                        'bc_id': backup_id,
-                        'file_name': filename,
-                        'backup_path': file_path,
-                    }])
-                else:
-                    backup_file_id = backup_file[0]['id']
-
                 #Encode each file into base64 and create as a file revision
                 with open(file_path, "rb") as local_backup_file:
                     encoded_string = base64.b64encode(local_backup_file.read())
-                    id = models.execute_kw(db, uid, password, 'backup.computer.file.revision', 'create', [{
-                        'bcf_id': backup_file_id,
-                        'backup_data': encoded_string,
-                    }])
-
-                backup_file_count += 1
+                    backup_file_revision_id = models.execute_kw(db, uid, password,'backup.computer.change', 'backup_file',[backup_change_id, file_path, encoded_string])
+                    backup_file_count += 1
                 
         MessageBox.Show(backup_file_count.ToString() + " Files Backed Up")   
 

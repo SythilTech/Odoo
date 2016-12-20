@@ -16,8 +16,9 @@
     <OutputPath>.</OutputPath>
     <Name>Odoo Backup Client</Name>
     <RootNamespace>Odoo Backup Client</RootNamespace>
-    <DebugStdLib>False</DebugStdLib>
+    <DebugStdLib>True</DebugStdLib>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <PublishUrl>C:\Users\Odoo9\Documents\</PublishUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
