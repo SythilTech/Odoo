@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Website POS Online Menu",
-    'version': "1.1",
+    'version': "1.1.1",
     'author': "Sythil Tech",
     'category': "Point of Sale",
     'summary': "Keep your website menu in sync with the POS prices and products",

@@ -20,6 +20,7 @@
                                 <div class="panel-heading"><h2><t t-esc="category.name"/></h2></div>
                                 <div class="panel-body">
                                     <t t-foreach="category.product_ids" t-as="product">
+                                        <div style="clear:both;">
                                         <a t-attf-name="product_#{product.id}"/>
                                         <div id="pos_product_details">
                                             <span class="pull-right">$<t t-esc="product.lst_price"/></span>                                            
@@ -29,7 +30,8 @@
                                             <i>No Description</i>
                                         </t>
                                         <t t-esc="product.description_sale"/>
-                                        <hr/>
+                                        
+                                        </div>
                                     </t>
                                 </div>
                             </div>
