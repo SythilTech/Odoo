@@ -15,7 +15,7 @@ class WebsiteSupportTicketInheritTimesheets(models.Model):
         self.state = invoiced_state
  
         invoice_account = self.env['account.account'].search([('user_type_id', '=', self.env.ref('account.data_account_type_receivable').id)], limit=1).id
-        new_invoice = self.env['account.invoice'].create({'name': '', 'type': 'out_invoice', 'partner_id': self.partner_id.id, 'account_id': invoice_account})
+        new_invoice = self.env['account.invoice'].create({'name': '', 'type': 'out_invoice', 'partner_id': self.partner_id.id, 'account_id': invoice_account, 'comment': 'Support Ticket #' + str(self.id) + " " + self.subject.encode("UTF-8") })
         
         for timesheet in self.timesheet_ids:
             time_string = ""
