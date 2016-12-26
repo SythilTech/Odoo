@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework",
-    'version': "1.0.7",
+    'version': "1.0.8",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary':'Allows you to send and receive smses from multiple gateways',

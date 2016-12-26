@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import logging
+_logger = logging.getLogger(__name__)
+
 from openerp import api, fields, models
 
 class SmsMessage(models.Model):
@@ -19,6 +22,7 @@ class SmsMessage(models.Model):
     sms_gateway_message_id = fields.Char(string="SMS Gateway Message ID", readonly=True)
     direction = fields.Selection((("I","INBOUND"),("O","OUTBOUND")), string="Direction", readonly=True)
     message_date = fields.Datetime(string="Send/Receive Date", readonly=True, help="The date and time the sms is received or sent")
+    media_id = fields.Binary(string="Media(MMS)")
     
     @api.one
     @api.depends('to_mobile', 'model_id', 'record_id')
@@ -40,3 +44,21 @@ class SmsMessage(models.Model):
     	    return {'record_id': partner_id[0], 'target_model': "res.partner"}
     	else:
     	    return {'record_id': 0, 'target_model': ""}
+
+    @api.model
+    def process_sms_queue(self, queue_limit):
+        #queue_limit = self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').args
+        for queued_sms in self.env['sms.message'].search([('status_code','=','queued')], limit=queue_limit):
+            gateway_model = queued_sms.account_id.account_gateway_id.gateway_model_name
+            my_sms = queued_sms.account_id.send_message(queued_sms.from_mobile, queued_sms.to_mobile, queued_sms.sms_content.encode('utf-8'), queued_sms.model_id.model, queued_sms.record_id, queued_sms.media_id)
+
+            #Mark it as sent to avoid it being sent again
+            queued_sms.status_code = my_sms.delivary_state
+            
+            #record the message in the communication log
+	    self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(body=queued_sms.sms_content.encode('utf-8'), subject="SMS")
+
+
+        #Turn the queue manager off if we are out of queued smses
+        if ( self.env['sms.message'].search_count([('status_code','=','queued')]) ) == 0:
+            self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').active = False

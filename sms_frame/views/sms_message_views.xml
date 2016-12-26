@@ -21,6 +21,7 @@
       	              <field name="status_string"/>
       	              <field name="status_code"/>
       	              <field name="sms_content"/>
+      	              <field name="media_id"/>
       	          </group>
       	      </form>
       	  </field>
