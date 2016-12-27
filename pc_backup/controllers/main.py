@@ -6,9 +6,15 @@ import openerp
 import tempfile
 import zipfile
 import os
+import string
+import random
+import ntpath
 
 import openerp.http as http
 from openerp.http import request
+
+import logging
+_logger = logging.getLogger(__name__)
 
 from openerp.addons.website.models.website import slug
 
@@ -36,8 +42,18 @@ class BackupController(http.Controller):
             #Write the crential file to the zip
             cred_string = ""
             cred_string += "url=" + request.httprequest.host_url[:-1] + "\n"
-            cred_string += "login=" + request.env.user.login + "\n"
             cred_string += "db=" + request.env.cr.dbname + "\n"
+
+            api_key = ""
+            
+            if request.env.user.backup_key:
+                api_key = request.env.user.backup_key
+            else:
+                #Generate a random API key
+                api_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
+                request.env.user.backup_key = api_key
+                
+            cred_string += "key=" + api_key
 
             zf.writestr('creds.sec', cred_string)
 
@@ -97,3 +113,42 @@ class BackupController(http.Controller):
 
         else:
             return "Not your File!!!"
+
+    @http.route('/backup/client/register/change', type='http', auth="public", methods=['GET'], csrf=False)        
+    def backup_client_register_change(self, key, computer_username, computer_name):
+        backup_user = request.env['res.users'].sudo().search([('backup_key', '=', key)])[0]
+        computer_backup = request.env['backup.computer'].sudo().search([('username','=',computer_username), ('computer_name','=',computer_name) ])
+        
+        if len(computer_backup) == 0:
+            #This computer has not been backed up before so add it to the list
+            computer_backup = request.env['backup.computer'].sudo().create({'user_id': backup_user.id, 'username':computer_username, 'computer_name': computer_name })
+        elif len(computer_backup) == 1:
+            computer_backup = computer_backup[0]
+        
+        backup_change = request.env['backup.computer.change'].sudo().create({'bc_id': computer_backup.id})
+        
+        return str(backup_change.id)
+
+    @http.route('/backup/client/file/upload', type='http', auth="public", methods=['POST'], csrf=False)
+    def backup_client_backup_file(self, key, change_id, file_path, encoded_string):
+
+        backup_user = request.env['res.users'].sudo().search([('backup_key', '=', key)])[0]
+        backup_change = request.env['backup.computer.change'].sudo().browse( int(change_id) )
+
+        if backup_change.bc_id.user_id.id == backup_user.id:
+            backup_file = request.env['backup.computer.file'].sudo().search([('bc_id', '=', backup_change.bc_id.id), ('backup_path','=',file_path)])
+
+            if len(backup_file) == 0:
+                #This file has not been backed up before so create a record for it
+                backup_file = request.env['backup.computer.file'].sudo().create({'change_id': backup_change.id, 'bc_id': backup_change.bc_id.id, 'backup_path': file_path, 'file_name': ntpath.basename(file_path) })
+            elif len(backup_file) == 1:
+                backup_file = backup_file[0]
+
+            #Create a new file revision
+            backup_file_revision = request.env['backup.computer.file.revision'].sudo().create({'bcf_id': backup_file.id, 'backup_data': encoded_string})
+
+            return str(backup_file_revision.id)
+
+        else:
+            #Trying to backup to someone elses computer?!?
+            return "Error incorrect account"

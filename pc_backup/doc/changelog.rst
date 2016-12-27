@@ -1,3 +1,7 @@
+v0.2.9
+======
+* Backup client can now do mutiple directories
+
 v0.2.8
 ======
 * Move most of the code from the client to the server

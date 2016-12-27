@@ -28,38 +28,6 @@ class BackupComputerChange(models.Model):
     new_files = fields.Integer(string="New Files")
     changed_files = fields.Integer(string="Changed Files")    
     removed_files = fields.Integer(string="Removed Files")
-
-    @api.model
-    def register_change(self, computer_username, computer_name):
-        computer_backup = self.env['backup.computer'].search([('username','=',computer_username), ('computer_name','=',computer_name) ])
-        
-        if len(computer_backup) == 0:
-            #This computer has not been backed up before so add it to the list
-            computer_backup = self.env['backup.computer'].create({'user_id': self.env.user.id, 'username':computer_username, 'computer_name': computer_name })
-        elif len(computer_backup) == 1:
-            computer_backup = computer_backup[0]
-        
-        backup_change = self.env['backup.computer.change'].create({'bc_id': computer_backup.id})
-        
-        return backup_change.id
-        
-    @api.model
-    def backup_file(self, change_id, file_path, file_data):
-
-        backup_change = self.env['backup.computer.change'].browse(change_id)
-        
-        backup_file = self.env['backup.computer.file'].search([('bc_id', '=', backup_change.bc_id.id), ('backup_path','=',file_path)])
-
-        if len(backup_file) == 0:
-            #This file has not been backed up before so create a record for it
-            backup_file = self.env['backup.computer.file'].create({'change_id': backup_change.id, 'bc_id': backup_change.bc_id.id, 'backup_path': file_path, 'file_name': ntpath.basename(file_path) })
-        elif len(backup_file) == 1:
-            backup_file = backup_file[0]
-
-        #Create a new file revision
-        backup_file_revision = self.env['backup.computer.file.revision'].create({'bcf_id': backup_file.id, 'backup_data': file_data})
-
-        return backup_file_revision.id
         
 class BackupComputerFile(models.Model):
 
