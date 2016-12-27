@@ -15,8 +15,15 @@ class etq_results(models.Model):
     
     exam_id = fields.Many2one('etq.exam', string="Exam", readonly=True)
     user_id = fields.Many2one('res.users', string="User")
+    score = fields.Char(string="Score", compute="_compute_score")
     results = fields.One2many('etq.result.question', 'result_id', string="Results", readonly=True)
     
+    @api.depends('results')
+    def _compute_score(self):
+         num_questions = self.env['etq.result.question'].search_count([('result_id', '=', self.id)])
+         correct_questions = self.env['etq.result.question'].search_count([('result_id', '=', self.id), ('correct', '=', True)])
+         self.score = str(correct_questions) + "/" + str(correct_questions) + " " + str( (num_questions / correct_questions) * 100) + "%"
+         
 class etq_result_question(models.Model):
 
     _name = "etq.result.question"

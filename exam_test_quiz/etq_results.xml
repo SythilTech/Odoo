@@ -10,6 +10,7 @@
       	          <group>
       	              <field name="exam_id"/>
       	              <field name="user_id"/>
+      	              <field name="score"/>
       	              <field name="results">
       	                  <tree>
       	                      <field name="question_name"/>
