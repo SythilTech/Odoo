@@ -1,3 +1,7 @@
+v1.1
+====
+* Call is now within system rather then a new tab
+
 v1.0
 ====
 * Converted sdp and ice exchange to longpolling to increase reliabilty

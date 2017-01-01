@@ -33,11 +33,17 @@ class ResUsersVoip(models.Model):
         if len(rintones) > 0:
             ringtone = "/voip/ringtone/1/ringtone.mp3"
         
-        notification = {'call_id': voip_call.id, 'ringtone': ringtone, 'from_name': self.env.user.partner_id.name}
+        #Send notification to callee
+        notification = {'call_id': voip_call.id, 'ringtone': ringtone, 'from_name': self.env.user.partner_id.name, 'caller_partner_id': self.env.user.partner_id.id, 'direction': 'incoming'}
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', self.partner_id.id), notification)  
 
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'url': "/voip/window?call=" + str(voip_call.id)
-        }
+        #Also send one to yourself so we get the countdown
+        notification = {'call_id': voip_call.id, 'to_name': self.partner_id.name, 'callee_partner_id': self.partner_id.id, 'direction': 'outgoing'}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', self.env.user.partner_id.id), notification)
+
+        return "Hi"
+        #return {
+        #    'type': 'ir.actions.act_url',
+        #    'target': 'new',
+        #    'url': "/voip/window?call=" + str(voip_call.id)
+        #}
