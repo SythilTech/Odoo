@@ -1,3 +1,8 @@
+v0.3.1
+======
+* Only backs up files that have changed
+* Change log in restore portal
+
 v0.2.9
 ======
 * Backup client can now do mutiple directories

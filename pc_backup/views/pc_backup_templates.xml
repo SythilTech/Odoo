@@ -16,6 +16,12 @@
             <t t-foreach="user_machine.backup_file_ids" t-as="backup_file">
                 <a t-attf-href="/backup/client/machines/#{user_machine.id}/#{backup_file.id}"><t t-esc="backup_file.backup_path"/></a><br/>
             </t>
+            <h2>Change Log</h2>
+            <t t-foreach="changelog" t-as="changelog_entry">
+                <t t-if="changelog_entry.new_files > 0 or changelog_entry.changed_files > 0 or changelog_entry.removed_files > 0">
+                    <p><a t-attf-href="/backup/client/changelog/#{changelog_entry.id}"><t t-esc="changelog_entry.create_date"/> - <t t-esc="changelog_entry.new_files"/> new,  <t t-esc="changelog_entry.changed_files"/> changed, <t t-esc="changelog_entry.removed_files"/> removed</a></p>
+                </t>
+            </t>
         </template>
 
         <template id="list_revisions" name="List the revisions of the file">
@@ -25,4 +31,11 @@
             </t>
         </template>
 
+        <template id="changelog" name="Backup Changelog">
+            <h1><t t-esc="changelog.create_date"/></h1>
+            <t t-foreach="changelog.change_revision_ids" t-as="change_revision">
+                <t t-esc="change_revision.backup_data_filename"/><br/>
+            </t>
+        </template>
+        
 </odoo>

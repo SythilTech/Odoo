@@ -28,6 +28,7 @@ class BackupComputerChange(models.Model):
     new_files = fields.Integer(string="New Files")
     changed_files = fields.Integer(string="Changed Files")    
     removed_files = fields.Integer(string="Removed Files")
+    change_revision_ids = fields.One2many('backup.computer.file.revision', 'change_id', string="Changed File")
         
 class BackupComputerFile(models.Model):
 
@@ -49,4 +50,6 @@ class BackupComputerFileRevision(models.Model):
     bcf_id = fields.Many2one('backup.computer.file', string="Computer Backup File")
     backup_data = fields.Binary(string="Backup Data")
     backup_data_filename = fields.Char(string="Backup Data Filename", related="bcf_id.file_name")
+    change_id = fields.Many2one('backup.computer.change', string="Backup Change")
+    md5_hash = fields.Char(string="MD5 Hash")
     type = fields.Selection([('creation','Creation'),('change','Change'),('deletion','Deletion') ] , string="Type", default="creation")

@@ -9,6 +9,7 @@ import os
 import string
 import random
 import ntpath
+import hashlib
 
 import openerp.http as http
 from openerp.http import request
@@ -79,7 +80,19 @@ class BackupController(http.Controller):
         
         #Check if the machine is owned by the user
         if user_machine.user_id.id == request.env.user.id:
-            return http.request.render('pc_backup.list_files', {'user_machine': user_machine})
+            changelog = request.env['backup.computer.change'].sudo().search([('bc_id', '=', user_machine.id)], order="create_date desc")
+            return http.request.render('pc_backup.list_files', {'user_machine': user_machine, 'changelog': changelog})
+        else:
+            return "Not your machine!!!"
+
+    @http.route('/backup/client/changelog/<change_id>', type="http", auth="user")
+    def backup_client_changelog(self, change_id, **kw):
+        """Displays the files that where changed during this change entry"""
+        change_id = request.env['backup.computer.change'].browse( int(change_id) )
+        
+        #Check if the change is owned by the user
+        if change_id.bc_id.user_id.id == request.env.user.id:
+            return http.request.render('pc_backup.changelog', {'changelog': change_id})
         else:
             return "Not your machine!!!"
             
@@ -144,11 +157,33 @@ class BackupController(http.Controller):
             elif len(backup_file) == 1:
                 backup_file = backup_file[0]
 
-            #Create a new file revision
-            backup_file_revision = request.env['backup.computer.file.revision'].sudo().create({'bcf_id': backup_file.id, 'backup_data': encoded_string})
+            #Only create a revision if the file has changed
+            md5_hash = hashlib.md5(encoded_string).hexdigest()
+            
+            if request.env['backup.computer.file.revision'].sudo().search_count([('bcf_id', '=', backup_file.id)]) > 0:
+                last_revision = request.env['backup.computer.file.revision'].sudo().search([('bcf_id', '=', backup_file.id)], order="create_date desc", limit=1)
 
-            return str(backup_file_revision.id)
+                if md5_hash != last_revision.md5_hash: 
+                    #The file has changed so create a new revision
+                    backup_file_revision = request.env['backup.computer.file.revision'].sudo().create({'change_id': backup_change.id, 'bcf_id': backup_file.id, 'backup_data': encoded_string, 'md5_hash': md5_hash})
 
+                    backup_change.changed_files += 1
+                
+                    return str(backup_file_revision.id)
+                else:
+                    #File hasn't changed so don't write a revision to save space
+                    return 0
+            else:
+                #File has not been backed up before so crate the first revision
+                backup_file_revision = request.env['backup.computer.file.revision'].sudo().create({'change_id': backup_change.id, 'bcf_id': backup_file.id, 'backup_data': encoded_string, 'md5_hash': md5_hash})
+
+                backup_change.new_files += 1
+
+                return str(backup_file_revision.id)
+                
+
+
+            
         else:
             #Trying to backup to someone elses computer?!?
             return "Error incorrect account"
