@@ -1,3 +1,7 @@
+v1.8
+====
+* Create support ticket directly from new email
+
 v1.7.14
 =======
 * Anti spam for support ticket form

@@ -2,7 +2,7 @@
 from openerp import api, fields, models
 from openerp import tools
 from HTMLParser import HTMLParser
-
+from random import randint
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class WebsiteSupportTicket(models.Model):
     partner_id = fields.Many2one('res.partner', string="Partner")
     person_name = fields.Char(required=True, string='Person Name')
     email = fields.Char(string="Email")
-    category = fields.Many2one('website.support.ticket.categories', string="Category", required=True, track_visibility='onchange')
+    category = fields.Many2one('website.support.ticket.categories', string="Category", track_visibility='onchange')
     subject = fields.Char(string="Subject", readonly=True)
     description = fields.Text(string="Description", readonly=True)
     state = fields.Many2one('website.support.ticket.states', required=True, readonly=True, default=_default_state, string="State")
@@ -43,6 +43,14 @@ class WebsiteSupportTicket(models.Model):
     unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
 
+    def message_new(self, msg, custom_values=None):
+        """ Create new support ticket upon receiving new email"""
+
+        portal_access_key = randint(1000000000,2000000000)
+        defaults = {'person_name': msg.get('from'), 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': msg.get('body'), 'portal_access_key': portal_access_key}
+        
+        return super(WebsiteSupportTicket, self).message_new(msg, custom_values=defaults)
+        
     def message_update(self, msg_dict, update_vals=None):
         """ Override to update the support ticket according to the email. """
 
@@ -52,7 +60,7 @@ class WebsiteSupportTicket(models.Model):
         #s.feed(body_short)
         #body_short = s.get_data()
                 
-        #(Depreciated) Add to message history field for back compatablity
+        #Add to message history field for back compatablity
         self.conversation_history.create({'ticket_id': self.id, 'content': body_short })
 
 	customer_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
