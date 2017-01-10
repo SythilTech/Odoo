@@ -9,6 +9,7 @@
       	      <tree editable="top">
       	          <field name="sequence" widget="handle"/>
       	          <field name="name"/>
+      	          <field name="color"/>
       	      </tree>
       	  </field>
       </record>

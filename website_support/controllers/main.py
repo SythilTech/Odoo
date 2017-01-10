@@ -88,7 +88,7 @@ class SupportTicketController(http.Controller):
         
         if http.request.env.user.name != "Public user":
             portal_access_key = randint(1000000000,2000000000)
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
+            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key, 'ticket_number': request.website.company_id.next_support_ticket_number})
             
             partner = http.request.env.user.partner_id
             
@@ -100,11 +100,15 @@ class SupportTicketController(http.Controller):
 
             if len(search_partner) > 0:
                 portal_access_key = randint(1000000000,2000000000)
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key})
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key, 'ticket_number': request.website.company_id.next_support_ticket_number})
             else:
                 portal_access_key = randint(1000000000,2000000000)
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key, 'ticket_number': request.website.company_id.next_support_ticket_number})
 
+
+        #Add one to the next ticket number
+        request.website.company_id.next_support_ticket_number += 1
+        
         #Send autoreply back to customer
         new_ticket_email_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_new')
         new_ticket_email_template.email_from = request.website.company_id.email

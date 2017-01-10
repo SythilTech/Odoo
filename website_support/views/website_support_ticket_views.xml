@@ -13,6 +13,7 @@
                   </header>
       	          <sheet>  
       	              <group>
+      	                  <field name="ticket_number"/>
       	                  <field name="priority_id"/>
       	                  <field name="partner_id"/>
           	          <field name="person_name"/>
@@ -42,8 +43,9 @@
           <field name="name">website.support.ticket.tree.view</field>
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
-      	      <tree>
-      	          <field name="id" string="Ticket Number"/>
+      	      <tree colors="black:ticket_color==False">
+      	          <field name="ticket_color" invisible="1"/>
+      	          <field name="ticket_number_display" string="Ticket Number"/>
       	          <field name="priority_id"/>
       	          <field name="person_name"/>
       	          <field name="category"/>

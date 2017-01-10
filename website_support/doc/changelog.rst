@@ -1,3 +1,8 @@
+v1.9
+====
+* Fake ticket numbers to hide company size
+* Color code priorities
+
 v1.8
 ====
 * Create support ticket directly from new email

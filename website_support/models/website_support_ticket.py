@@ -42,6 +42,9 @@ class WebsiteSupportTicket(models.Model):
     attachment_filename = fields.Char(string="Attachment Filename")
     unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
+    ticket_number = fields.Integer(string="Ticket Number")
+    ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
+    ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
 
     def message_new(self, msg, custom_values=None):
         """ Create new support ticket upon receiving new email"""
@@ -69,6 +72,14 @@ class WebsiteSupportTicket(models.Model):
         super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
 
         return True
+
+    @api.one
+    @api.depends('ticket_number')
+    def _compute_ticket_number_display(self):
+        if self.ticket_number:
+            self.ticket_number_display = str(self.id) + " / " + "{:,}".format( self.ticket_number )
+        else:
+            self.ticket_number_display = self.id
 
     @api.depends('state')
     def _compute_unattend(self):
@@ -138,6 +149,7 @@ class WebsiteSupportTicketPriority(models.Model):
 
     sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string="Priority Name")
+    color = fields.Char(string="Color")
 
     @api.model
     def create(self, values):
