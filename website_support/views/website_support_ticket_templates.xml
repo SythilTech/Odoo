@@ -30,7 +30,7 @@
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been updated and is now in the category '${object.category.name}' </p>
                 <hr/>
-                <b>Ticket Number:</b> ${object.id}<br/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> ${object.category.name}<br/>
                 <b>Ticket Description:</b><br/>
                 ${object.description}
@@ -50,7 +50,7 @@
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been closed by our staff</p>
                 <hr/>
-                <b>Ticket Number:</b> ${object.id}<br/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> ${object.category.name}<br/>
                 <b>Ticket Description:</b><br/>
                 ${object.description}
@@ -69,7 +69,7 @@
                 <p>Dear ${object.person_name},</p>
                 <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
                 <hr/>
-                <b>Ticket Number:</b> ${object.id}<br/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> ${object.category.name}<br/>
                 <b>Ticket Description:</b><br/>
                 ${object.description}
@@ -165,6 +165,12 @@
 <template id="assets_editor" inherit_id="website.assets_editor" name="Website Support Editor">
     <xpath expr="." position="inside">
         <script type="text/javascript" src="/website_support/static/src/js/website_support.editor.js"></script>
+    </xpath>
+</template>
+
+<template id="assets_backend" inherit_id="web.assets_backend" name="website support ticket backend assets">
+    <xpath expr="." position="inside">
+        <script type="text/javascript" src="/website_support/static/src/js/website_support.backend.js"></script>
     </xpath>
 </template>
 

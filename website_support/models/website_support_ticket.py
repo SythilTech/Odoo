@@ -2,7 +2,7 @@
 from openerp import api, fields, models
 from openerp import tools
 from HTMLParser import HTMLParser
-
+from random import randint
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -42,6 +42,17 @@ class WebsiteSupportTicket(models.Model):
     attachment_filename = fields.Char(string="Attachment Filename")
     unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
+    ticket_number = fields.Integer(string="Ticket Number")
+    ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
+    ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
+    
+    def message_new(self, msg, custom_values=None):
+        """ Create new support ticket upon receiving new email"""
+
+        portal_access_key = randint(1000000000,2000000000)
+        defaults = {'person_name': msg.get('from'), 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': msg.get('body'), 'portal_access_key': portal_access_key}
+        
+        return super(WebsiteSupportTicket, self).message_new(msg, custom_values=defaults)
 
     def message_update(self, msg_dict, update_vals=None):
         """ Override to update the support ticket according to the email. """
@@ -62,6 +73,14 @@ class WebsiteSupportTicket(models.Model):
 
         return True
 
+    @api.one
+    @api.depends('ticket_number')
+    def _compute_ticket_number_display(self):
+        if self.ticket_number:
+            self.ticket_number_display = str(self.id) + " / " + "{:,}".format( self.ticket_number )
+        else:
+            self.ticket_number_display = self.id
+            
     @api.depends('state')
     def _compute_unattend(self):
         opened_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
@@ -130,7 +149,8 @@ class WebsiteSupportTicketPriority(models.Model):
 
     sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string="Priority Name")
-
+    color = fields.Char(string="Color")
+    
     @api.model
     def create(self, values):
         sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.priority')
