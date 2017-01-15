@@ -9,6 +9,8 @@ import werkzeug.wrappers
 import urllib2
 import werkzeug
 import base64
+import socket
+from ast import literal_eval
 
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools import ustr
@@ -40,22 +42,12 @@ class VoipController(http.Controller):
         #Assign yourself as the to partner
         voip_call.partner_id = request.env.user.partner_id.id
         
-        #Mark your yourself as joined
-        #self_client = request.env['voip.call.client'].sudo().search([('partner_id','=', request.env.user.partner_id.id), ('vc_id','=', voip_call.id)])
-        #self_client.state = 'joined'
-
-        #Send the notiofication to everyone including yourself that you have joined the room
-        #for voip_client in voip_call.client_ids:
-        #    notification = {'call_id': voip_call.id, 'client_name': request.env.user.partner_id.name}
-        #    request.env['bus.bus'].sendone((request._cr.dbname, 'voip.join', voip_client.partner_id.id), notification)
-
         #Notify caller and callee that the call was accepted
         for voip_client in voip_call.client_ids:
-            notification = {'call_id': voip_call.id, 'status': 'accepted'}
+            notification = {'call_id': voip_call.id, 'status': 'accepted', 'type': voip_call.type}
             request.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
 
         return True
-        #return werkzeug.utils.redirect("/voip/window?call=" + str(call) )
 
     @http.route('/voip/reject/<call>', type="json", auth="user")
     def voip_reject(self, call):
@@ -113,13 +105,9 @@ class VoipController(http.Controller):
         #The client has accepted media access
         voip_client.state = "media_access"
 
-        _logger.error(request.env.user.partner_id.name)
 
         #If both clients have accepted media access we start the call
         if request.env['voip.call.client'].sudo().search_count([('vc_id','=', voip_call.id), ('state', '=', "media_access") ]) == 2:        
-            #voip_call.start_time = datetime.datetime.now() 
-            
-            _logger.error("Time to start!!!")
             
             #Send a notification to the caller to signal the start of the call
             notification = {'call_id': voip_call.id}
@@ -150,17 +138,38 @@ class VoipController(http.Controller):
 
         voip_call = request.env['voip.call'].browse( int(values['call']) )
         
-        _logger.error("voip SDP")
         sdp_json = values['sdp']
+        sdp_data = json.loads(sdp_json)['sdp']
+
         
-        for voip_client in voip_call.client_ids:
-            if voip_client.partner_id.id == request.env.user.partner_id.id:
-                _logger.error("self sdp")
-                voip_client.sdp = sdp_json
-            else:
-                _logger.error("other sdp")
-                notification = {'call_id': voip_call.id, 'sdp': sdp_json }
-                request.env['bus.bus'].sendone((request._cr.dbname, 'voip.sdp', voip_client.partner_id.id), notification)
+        if voip_call.type == "internal":
+            for voip_client in voip_call.client_ids:
+                if voip_client.partner_id.id == request.env.user.partner_id.id:
+                    voip_client.sdp = sdp_json
+                else:
+                    notification = {'call_id': voip_call.id, 'sdp': sdp_json }
+                    request.env['bus.bus'].sendone((request._cr.dbname, 'voip.sdp', voip_client.partner_id.id), notification)
+                    
+        elif voip_call.type == "external":
+            #Send the 200 OK repsonse with SDP information
+
+            from_client = request.env['voip.call.client'].search([('vc_id', '=', voip_call.id), ('partner_id', '=', voip_call.from_partner_id.id) ])
+            sip_dict = request.env['voip.voip'].sip_read_message(from_client.sip_invite)
+            reply = ""
+            reply += "SIP/2.0 200 OK\r\n"
+            reply += "From: " + sip_dict['From'].strip() + "\r\n"
+            reply += "To: " + sip_dict['To'].strip() + ";tag=" + str(voip_call.sip_tag) + "\r\n"
+            reply += "CSeq: " + sip_dict['CSeq'].strip() + "\r\n"
+            reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
+            reply += "Content-Type: application/sdp\r\n"
+            reply += "Content-Disposition: session\r\n"
+            reply += "\r\n"
+            reply += sdp_data['sdp']
+                
+            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            serversocket.sendto(reply, literal_eval(from_client.sip_addr) )
+
+            _logger.error("200 OK: " + reply )
         
         return "Hello"
 
@@ -174,15 +183,12 @@ class VoipController(http.Controller):
 
         voip_call = request.env['voip.call'].browse( int(values['call']) )
         
-        _logger.error("voip ICE")
         ice_json = values['ice']
         
         for voip_client in voip_call.client_ids:
             if voip_client.partner_id.id == request.env.user.partner_id.id:
-                _logger.error("self ice")
                 voip_client.sdp = ice_json
             else:
-                _logger.error("other ice")
                 notification = {'call_id': voip_call.id, 'ice': ice_json }
                 request.env['bus.bus'].sendone((request._cr.dbname, 'voip.ice', voip_client.partner_id.id), notification)
         

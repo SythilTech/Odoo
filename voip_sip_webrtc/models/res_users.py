@@ -14,7 +14,7 @@ class ResUsersVoip(models.Model):
         self.ensure_one()
 
         #The call is created now so we can update it as a missed / rejected call or accepted, the timer for the call starts after being accepted though
-        voip_call = request.env['voip.call'].create({})
+        voip_call = request.env['voip.call'].create({'type': 'internal'})
         
         #Add the current user is the call owner
         voip_call.from_partner_id = self.env.user.partner_id.id

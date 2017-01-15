@@ -95,6 +95,14 @@ WebClient.include({
 					}
                 } else if (notification[0][1] === 'voip.response') {
 					var status = notification[1].status;
+					var type = notification[1].type;
+                    var media_access;
+
+                    if (type == "internal") {
+					    media_access = {audio: true, video: true}
+					} else if (type == "external") {
+					    media_access = {audio: true}
+					}
 
 					//Destroy the notifcation because the call was accepted or rejected, no need to wait until timeout
 					if (typeof outgoingNotification !== "undefined") {
@@ -104,9 +112,10 @@ WebClient.include({
 					if (status == "accepted") {
                         $(".s_voip_manager").css("opacity","1");
 
+
                         //Ask for media access
                         if (navigator.getUserMedia) {
-                            navigator.getUserMedia({audio: true, video: true}, getUserMediaSuccess, getUserMediaError);
+                            navigator.getUserMedia( media_access, getUserMediaSuccess, getUserMediaError);
                         }
 			    	}
 			    } else if (notification[0][1] === 'voip.start') {

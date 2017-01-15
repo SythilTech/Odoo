@@ -16,6 +16,13 @@
       	            <field name="duration"/>
       	            <field name="transcription"/>
       	            <field name="notes"/>
+      	            <field name="client_ids">
+      	                <tree>
+      	                    <field name="partner_id"/>
+      	                    <field name="sip_invite"/>
+      	                    <field name="sip_addr"/>
+      	                </tree>
+      	            </field>
       	        </group>
       	    </form>
         </field>

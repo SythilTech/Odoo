@@ -16,6 +16,8 @@ class VoipCall(models.Model):
     transcription = fields.Text(string="Transcription", help="Automatic transcription of the call")
     notes = fields.Text(string="Notes", help="Additional comments outside the transcription")
     client_ids = fields.One2many('voip.call.client', 'vc_id', string="Client List")
+    type = fields.Selection([('internal','Internal'),('external','External')], string="Type")
+    sip_tag = fields.Char(string="SIP Tag")
 
 class VoipCallClient(models.Model):
 
@@ -25,4 +27,5 @@ class VoipCallClient(models.Model):
     partner_id = fields.Many2one('res.partner', string="Partner")
     name = fields.Char(string="Name", help="Can be a number if the client is from outside the system")
     state = fields.Selection([('invited','Invited'),('joined','joined'),('media_access','Media Access')], string="State", default="invited")
-    sdp = fields.Text(string="SDP")
+    sip_invite = fields.Char(string="SIP INVITE Message")
+    sip_addr = fields.Char(string="Address")

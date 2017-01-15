@@ -11,6 +11,8 @@
         'views/res_users_views.xml',
         'views/voip_call_views.xml',
         'views/voip_ringtone_views.xml',
+        'views/voip_settings_views.xml',
+        'views/res_partner_views.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],

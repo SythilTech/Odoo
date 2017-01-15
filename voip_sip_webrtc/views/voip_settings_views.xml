@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_settings_view_form" model="ir.ui.view">
+        <field name="name">voip.settings.view.form</field>
+        <field name="model">voip.settings</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <button type="object" name="start_sip_server" string="Start SIP Server"/>
+      	        <button type="object" name="stop_sip_server" string="Stop SIP Server"/>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_settings_action" model="ir.actions.act_window">
+        <field name="name">VOIP Settings</field>
+	<field name="res_model">voip.settings</field>
+	<field name="view_mode">form</field>
+    </record>
+
+    <menuitem id="voip_settings_menu" name="Settings" parent="voip_parent_menu" action="voip_settings_action" sequence="30"/>
+
+</odoo>
