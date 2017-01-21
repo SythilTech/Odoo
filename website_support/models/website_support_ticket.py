@@ -96,6 +96,36 @@ class WebsiteSupportTicket(models.Model):
         custom_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
         return ['|',('state', '=', open_state.id ), ('state', '=', custom_replied_state.id)]
 
+    @api.model
+    def create(self, vals):
+        new_id = super(WebsiteSupportTicket, self).create(vals)
+
+        new_id.ticket_number = new_id.company_id.next_support_ticket_number
+
+        #Add one to the next ticket number
+        new_id.company_id.next_support_ticket_number += 1
+        
+        #Send autoreply back to customer
+        new_ticket_email_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_new')
+        values = new_ticket_email_template.generate_email([new_id.id])[new_id.id]
+        values['email_to'] = values['email_to'].replace("&lt;","<").replace("&gt;",">")
+        send_mail = self.env['mail.mail'].create(values)
+        send_mail.send(True)
+        
+        #send an email out to everyone in the category
+        notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
+        support_ticket_menu = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
+        support_ticket_action = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
+        
+        for my_user in new_id.category.cat_user_ids:
+            values = notification_template.generate_email([new_id.id])[new_id.id]
+            values['body_html'] = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+            values['email_to'] = my_user.partner_id.email
+            send_mail = self.env['mail.mail'].create(values)
+            send_mail.send(True)
+            
+        return new_id
+        
     @api.multi
     def write(self, values, context=None):
 

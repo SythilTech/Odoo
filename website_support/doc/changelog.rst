@@ -1,3 +1,7 @@
+v1.9.4
+======
+* Move ticket setup code to create method so new tickets received via mail send out auto reply and category users
+
 v1.9.3
 ======
 * New ticket and new ticket in cateogry email template can now be modified
