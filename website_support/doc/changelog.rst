@@ -1,3 +1,7 @@
+v1.9.1
+======
+* Prevent manual creation of tickets since the setup is done via the controller
+
 v1.9
 ====
 * Fake ticket numbers to hide company size
