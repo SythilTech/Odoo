@@ -4,6 +4,7 @@
     'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "A directory of local companies",
     'license':'LGPL-3',
     'data': [

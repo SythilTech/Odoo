@@ -3,6 +3,7 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Website",
+    'support': "steven@sythiltech.com.au",
     'summary': "Define custom css color codes to style your website",
     'description': "Define custom css color codes to style your website",
     'license':'LGPL-3',

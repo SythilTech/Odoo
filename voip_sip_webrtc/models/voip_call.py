@@ -18,6 +18,7 @@ class VoipCall(models.Model):
     client_ids = fields.One2many('voip.call.client', 'vc_id', string="Client List")
     type = fields.Selection([('internal','Internal'),('external','External')], string="Type")
     sip_tag = fields.Char(string="SIP Tag")
+    direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
 
 class VoipCallClient(models.Model):
 

@@ -30,6 +30,14 @@ class VoipVoip(models.Model):
         return sip_dict
 
     @api.model
+    def start_sip_call(self, to_partner):
+        voip_call = self.env['voip.call'].create({'from_partner_id': self.env.user.partner_id.id, 'partner_id': to_partner, 'type': 'external', 'direction': 'outgoing'})
+        
+        #Start at the call accepted stage
+        notification = {'call_id': voip_call.id, 'status': 'accepted', 'type': voip_call.type}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.response', self.env.user.partner_id.id), notification) 
+            
+    @api.model
     def start_incoming_sip_call(self, sip_invite, addr, sip_tag):
 
         sip_dict = self.sip_read_message(sip_invite)

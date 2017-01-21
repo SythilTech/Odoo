@@ -163,6 +163,18 @@ class SmsGatewayTwilio(models.Model):
 
                 #Create the sms record in history
                 history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id), 'by_partner_id': my_record.id})
+            elif target['target_model'] == "crm.lead":
+                model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
+
+                my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, message_type="comment")
+
+                #Notify followers of this lead who are listenings to the 'discussions' subtype
+                for notify_partner in self.env['mail.followers'].search([('res_model','=','crm.lead'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
+                    my_message.needaction_partner_ids = [(4,notify_partner.partner_id.id)]
+
+                #Create the sms record in history
+                history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
             else:
                 #Create the sms record in history without the model or record_id 
                 history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})                

@@ -151,25 +151,44 @@ class VoipController(http.Controller):
                     request.env['bus.bus'].sendone((request._cr.dbname, 'voip.sdp', voip_client.partner_id.id), notification)
                     
         elif voip_call.type == "external":
-            #Send the 200 OK repsonse with SDP information
-
-            from_client = request.env['voip.call.client'].search([('vc_id', '=', voip_call.id), ('partner_id', '=', voip_call.from_partner_id.id) ])
-            sip_dict = request.env['voip.voip'].sip_read_message(from_client.sip_invite)
-            reply = ""
-            reply += "SIP/2.0 200 OK\r\n"
-            reply += "From: " + sip_dict['From'].strip() + "\r\n"
-            reply += "To: " + sip_dict['To'].strip() + ";tag=" + str(voip_call.sip_tag) + "\r\n"
-            reply += "CSeq: " + sip_dict['CSeq'].strip() + "\r\n"
-            reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
-            reply += "Content-Type: application/sdp\r\n"
-            reply += "Content-Disposition: session\r\n"
-            reply += "\r\n"
-            reply += sdp_data['sdp']
+            if voip_call.direction == "incoming":
+                #Send the 200 OK repsonse with SDP information
+                from_client = request.env['voip.call.client'].search([('vc_id', '=', voip_call.id), ('partner_id', '=', voip_call.from_partner_id.id) ])
+                sip_dict = request.env['voip.voip'].sip_read_message(from_client.sip_invite)
+                reply = ""
+                reply += "SIP/2.0 200 OK\r\n"
+                reply += "From: " + sip_dict['From'].strip() + "\r\n"
+                reply += "To: " + sip_dict['To'].strip() + ";tag=" + str(voip_call.sip_tag) + "\r\n"
+                reply += "CSeq: " + sip_dict['CSeq'].strip() + "\r\n"
+                reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
+                reply += "Content-Type: application/sdp\r\n"
+                reply += "Content-Disposition: session\r\n"
+                reply += "\r\n"
+                reply += sdp_data['sdp']
                 
-            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            serversocket.sendto(reply, literal_eval(from_client.sip_addr) )
+                serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                serversocket.sendto(reply, literal_eval(from_client.sip_addr) )
 
-            _logger.error("200 OK: " + reply )
+                _logger.error("200 OK: " + reply )
+            elif voip_call.direction == "outgoing":
+                #Send the INVITE
+                from_sip = request.env.user.partner_id.sip_address.strip()
+                to_sip = voip_call.partner_id.sip_address.strip()
+                reply = ""
+                reply += "INVITE " + to_sip + " SIP/2.0\r\n"
+                reply += "From: " + request.env.user.partner_id.name + "<sip:" + from_sip + ">;tag=odfgjh\r\n"
+                reply += "To: " + voip_call.partner_id.name.strip + "<sip:" + voip_call.partner_id.sip_address + ">\r\n"
+                reply += "CSeq: 1 INVITE\r\n"
+                reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
+                reply += "Content-Type: application/sdp\r\n"
+                reply += "Content-Disposition: session\r\n"
+                reply += "\r\n"
+                reply += sdp_data['sdp']
+                
+                serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                serversocket.sendto(reply, ('91.121.209.194', 5060) )
+
+                _logger.error("INVITE: " + reply )
         
         return "Hello"
 

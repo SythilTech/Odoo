@@ -4,6 +4,7 @@
     'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Make video calls with other users",
     'license':'LGPL-3',
     'data': [
