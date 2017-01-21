@@ -1,3 +1,7 @@
+v1.9.2
+======
+* Change ticket seq number in company form view
+
 v1.9.1
 ======
 * Prevent manual creation of tickets since the setup is done via the controller
