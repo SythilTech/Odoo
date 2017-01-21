@@ -5,6 +5,7 @@
         <record id="new_support_ticket_category" model="mail.template">
             <field name="name">Support Ticket New Ticket (Category)</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
             <field name="subject">New Support Ticket for your category</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
@@ -62,6 +63,7 @@
         <record id="support_ticket_new" model="mail.template">
             <field name="name">Support Ticket New</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
             <field name="email_to">${object.email}</field>
             <field name="subject">We have received your support ticket '${object.description}' and will get back to you shortly</field>
             <field name="auto_delete" eval="False"/>

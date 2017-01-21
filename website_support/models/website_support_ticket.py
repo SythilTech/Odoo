@@ -45,6 +45,7 @@ class WebsiteSupportTicket(models.Model):
     ticket_number = fields.Integer(string="Ticket Number")
     ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
     ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
+    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
 
     def message_new(self, msg, custom_values=None):
         """ Create new support ticket upon receiving new email"""

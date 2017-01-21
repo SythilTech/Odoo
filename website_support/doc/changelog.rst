@@ -1,3 +1,7 @@
+v1.9.3
+======
+* New ticket and new ticket in cateogry email template can now be modified
+
 v1.9.2
 ======
 * Change ticket seq number in company form view
