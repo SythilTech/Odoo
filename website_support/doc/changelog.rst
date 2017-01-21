@@ -1,3 +1,7 @@
+v1.9.5
+======
+* Fix permission issue with public users submitting reply via website
+
 v1.9.4
 ======
 * Move ticket setup code to create method so new tickets received via mail send out auto reply and category users
