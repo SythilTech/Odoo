@@ -65,7 +65,7 @@
             <field name="model_id" ref="model_website_support_ticket"></field>
             <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
             <field name="email_to">${object.email}</field>
-            <field name="subject">We have received your support ticket '${object.description}' and will get back to you shortly</field>
+            <field name="subject">We have received your support ticket '${object.subject}' and will get back to you shortly</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>

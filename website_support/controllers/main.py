@@ -88,7 +88,7 @@ class SupportTicketController(http.Controller):
         
         if http.request.env.user.name != "Public user":
             portal_access_key = randint(1000000000,2000000000)
-            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key, 'ticket_number': request.website.company_id.next_support_ticket_number})
+            new_ticket_id = request.env['website.support.ticket'].create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
             
             partner = http.request.env.user.partner_id
             
@@ -100,32 +100,11 @@ class SupportTicketController(http.Controller):
 
             if len(search_partner) > 0:
                 portal_access_key = randint(1000000000,2000000000)
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key, 'ticket_number': request.website.company_id.next_support_ticket_number})
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key})
             else:
                 portal_access_key = randint(1000000000,2000000000)
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key, 'ticket_number': request.website.company_id.next_support_ticket_number})
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
 
-        #Add one to the next ticket number
-        request.website.company_id.next_support_ticket_number += 1
-        
-        #Send autoreply back to customer
-        new_ticket_email_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_new')
-        new_ticket_email_template.send_mail(new_ticket_id.id, True)
-
-        #send an email out to everyone in the category
-        notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
-        support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
-        support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
-       	
-        category = request.env['website.support.ticket.categories'].sudo().browse(int(values['category']))
-        
-        for my_user in category.cat_user_ids:
-            values = notification_template.generate_email([new_ticket_id.id])[new_ticket_id.id]
-            values['body_html'] = notification_template.body_html.replace("_ticket_url_", "web#id=" + str(new_ticket_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
-            values['email_to'] = my_user.partner_id.email
-            send_mail = request.env['mail.mail'].create(values)
-            send_mail.send(True)
-        
         return werkzeug.utils.redirect("/support/ticket/thanks")
         
         
