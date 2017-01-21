@@ -18,6 +18,7 @@
         'views/website_support_help_groups_views.xml',
         'views/website_support_help_page_views.xml',
         'views/website_support_ticket_priority_views.xml',
+        'views/res_company_views.xml',
         'data/website.support.ticket.states.csv',
         'data/website.support.ticket.categories.csv',
         'data/website.menu.csv',
