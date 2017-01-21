@@ -1,3 +1,7 @@
+v1.2
+====
+* Transfer revamp changes from v9
+
 v1.1
 ====
 * Transfer ticket number and priority coloring from v9
