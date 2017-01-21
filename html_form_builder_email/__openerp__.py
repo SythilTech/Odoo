@@ -1,20 +1,21 @@
 {
     'name': "HTML Form Builder - Send Email",
-    'version': "1.0.1",
+    'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'website':'http://sythiltech.com.au',
+    'support': "steven@sythiltech.com.au",
     'summary': "Email the form submit data to someone",
     'description': "Email the form submit data to someone",
     'license':'LGPL-3',
     'data': [
         'views/html_form_action.xml',
+        'views/snippets.xml',
         'data/html.form.action.type.csv',
     ],
     'demo': [],
     'images':[
         'static/description/1.jpg',
     ],
-    'depends': ['html_form_builder','mail'],
+    'depends': ['html_form_builder', 'html_form_builder_snippets','mail'],
     'installable': True,
 }

@@ -3,7 +3,7 @@
     'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
-    'website':'http://sythiltech.com.au',
+    'support': "steven@sythiltech.com.au",
     'summary': "Enter people that sign up to your forms on a marketing campaign",
     'description': "Enter people that sign up to your forms on a marketing campaign",
     'license':'LGPL-3',

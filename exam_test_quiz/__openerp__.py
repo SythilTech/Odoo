@@ -3,6 +3,7 @@
     'version': "1.1.1",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Informal Online Exam / Test / Quiz",
     'license':'GPL-3',
     'data': [

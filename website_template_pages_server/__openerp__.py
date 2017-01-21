@@ -3,6 +3,7 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Central storage of webpage templates",
     'description': "Central storage of webpage templates",
     'license':'LGPL-3',

@@ -127,9 +127,9 @@ class HtmlFormController(http.Controller):
  	        
  	        if not action:
  		    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
- 	
+ 	        
  	        #Call the submit action, passing the action settings and the history object
-                action(sa, new_history)
+                action(sa, new_history, values)
  
             if 'is_ajax_post' in values:
                 return json.JSONEncoder().encode({'status': 'success', 'redirect_url':entity_form.return_url})
@@ -223,7 +223,7 @@ class HtmlFormController(http.Controller):
  		    raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
  	
  	        #Call the submit action, passing the action settings and the history object
-                action(sa, new_history)
+                action(sa, new_history, values)
  
             return werkzeug.utils.redirect(entity_form.return_url)
 

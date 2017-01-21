@@ -2,8 +2,8 @@
     'name': "Custom App Store",
     'version': "0.5.2",
     'author': "Sythil Tech",
-    'website':'http://sythiltech.com.au',
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Create your own app store",
     'license':'LGPL-3',
     'data': [

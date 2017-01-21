@@ -3,6 +3,7 @@
     'version': "1.1.1",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Save webpages as templates to reuse on new pages / websites",
     'description': "Save webpages as templates to reuse on new pages / websites",
     'license':'LGPL-3',

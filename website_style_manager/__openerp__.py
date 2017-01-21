@@ -2,6 +2,7 @@
     'name': "Website Color Palettes",
     'version': "1.3.1",
     'author': "Sythil Tech",
+    'support': "steven@sythiltech.com.au",
     'category': "Website",
     'summary': "Define custom css color codes to style your website",
     'description': "Define custom css color codes to style your website",

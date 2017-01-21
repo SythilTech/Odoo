@@ -3,6 +3,7 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Preview images with the 'image' widget by clicking on them",
     'license':'LGPL-3',
     'data': [

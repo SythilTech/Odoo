@@ -3,6 +3,7 @@
     'version': "1.8.14",
     'author': "Sythil Tech",
     'category': "Tools",
+    'support': "steven@sythiltech.com.au",
     'summary': "Generates bootstrap forms and add extra fields by dragging snippets",
     'description': "Generates bootstrap forms and add extra fields by dragging snippets",
     'license':'LGPL-3',

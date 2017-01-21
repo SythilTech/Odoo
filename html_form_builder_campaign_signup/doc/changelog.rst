@@ -1,10 +1,6 @@
-v1.8.9
+v1.0.1
 ======
-* Pass submit data to submit actions
-
-v1.8.8
-======
-* Fix issue with input group and selection sub field
+* support values passing to submit action
 
 v1.8.7
 ======

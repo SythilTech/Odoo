@@ -9,7 +9,7 @@ import json
 
 class HtmlFormControllerActionEmail(openerp.addons.html_form_builder.controllers.main.HtmlFormController):
 
-    def _html_action_campaign_signup(self, submit_action, history_data):
+    def _html_action_campaign_signup(self, submit_action, history_data, values):
         
         #Add the new partner to a campaign
         for act in submit_action.campaign_campaign_id.activity_ids:
