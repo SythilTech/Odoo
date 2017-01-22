@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="dating_suggestions_email" model="mail.template">
+        <field name="name">Dating Suggestions</field>
+        <field name="model_id" ref="model_res_partner"></field>
+        <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+        <field name="email_to">${object.email}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="subject">Dating Suggestions</field>
+            <field name="body_html"><![CDATA[
+                <p>Hello ${object.name},</p>
+                <p>Here are todays dating suggestions</p>
+                <p>_dating_suggestions_</p>
+            ]]>
+        </field>
+    </record>
+
+    <template id="my_dating_list" name="Browse Dating Profiles" page="True">
+        <t t-call="website.layout">
+            <div class="container">      
+                <t t-if="my_dates_count > 0"> 
+                    <t t-foreach="my_dates" t-as="my_date">
+                        <div class="col-md-4 mt16 mb16">
+                            <div class="well" style="max-width:240px;min-height:400px;">
+                                <div class="text-center">
+                                    <img t-att-src="website.image_url(my_date, 'image_medium')" class="img-rounded mb8" t-attf-alt="#{my_date.first_name} dating profile"/><br/>
+                                </div>
+                                <t t-esc="my_date.first_name"/> (<t t-esc="my_date.age"/> <t t-esc="my_date.gender_id.letter"/>)<br/><t t-esc="my_date.city_id.name"/>, <t t-esc="my_date.state_id.name"/>, <t t-esc="my_date.country_id.name"/><br/>
+                                <br/>
+                                <t t-esc="my_date.profile_micro"/>                            			                        
+		            </div>
+		        </div>
+                    </t>
+                </t>
+            </div>
+            
+        </t>
+    </template>
+
+    <template id="dating_second_menu" name="Dating Profile" page="True">
+        <div class="navbar navbar-default navbar-static-top mb16">
+            <div class="container">
+                <div class="collapse navbar-collapse navbar-top-collapse">
+                    <ul class="nav navbar-nav navbar-right" id="second_menu">
+    	                <li><a href="/dating/profiles">Browse Profiles</a></li>
+                        <li><a href="/dating/account/create">Create Account</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="my_dating_register" name="Dating Register Account" page="True">
+        <t t-call="website.layout">
+            <div class="container mt16 mb16">
+                <div class="col-md-12">
+                    <div id="main" class="well">
+                        <h1>Register your Profile</h1>
+                        <form method="POST" action="/dating/profile/register/process" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="form-group">
+                                <label for="first_name">First Name</label>
+                                <input type="text" name="first_name" class="form-control" required="True"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" required="True"/>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label for="birth_date">Date of Birth</label>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="sr-only" for="birth_date_day">Date of Birth (Day)</label>
+                                    <input type="text" name="birth_date_day" class="form-control" placeholder="Day" required="True"/>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="sr-only" for="birth_date_month">Date of Birth (Month)</label>
+                                    <select name="birth_date_month" class="form-control" required="True">
+                                        <option value="">Month</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="sr-only" for="birth_date_year">Date of Birth (Year)</label>
+                                    <input type="text" name="birth_date_year" class="form-control" placeholder="Year" required="True"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="text" name="email" class="form-control" required="True"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select name="gender" class="form-control" required="True">
+                                    <option value="">Select Gender</option>
+                                    <t t-foreach="genders" t-as="gender">
+                                        <option t-attf-value="#{gender.id}"><t t-esc="gender.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <select name="country" class="form-control" required="True">
+                                    <option value="">Select a Country</option>
+                                    <t t-foreach="countries" t-as="country">
+                                        <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <select name="state" class="form-control" required="True">
+                                    <option value="">Select a State</option>
+                                    <t t-foreach="states" t-as="state">
+                                        <option t-attf-value="#{state.id}"><t t-esc="state.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <select name="city" class="form-control" required="True">
+                                    <option value="">Select a City</option>
+                                    <t t-foreach="cities" t-as="city">
+                                        <option t-attf-value="#{city.id}"><t t-esc="city.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" class="form-control" required="True"/>
+                            </div>
+                            <div name="file_container" t-attf-class="form-group #{error and 'file' in error and 'has-error' or ''}">
+                                <label class="control-label" for="file">Profile Image</label>
+    	                        <div class="btn btn-default btn-file col-md-12"><input name="file" id="files" type="file" /></div>
+                            </div>
+    <style>
+      .thumb {
+        height: 200px;
+        width: 200px;
+        border: 1px solid #000;
+        margin: 10px 5px 0 0;
+      }
+    </style>
+
+    <output id="list"></output>
+
+    <script>
+      function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+    
+          f = files[0];
+          // Only process image files.
+          if (!f.type.match('image.*')) {
+            alert("Please choose an image file");
+            return;
+          }
+    
+          var reader = new FileReader();
+    
+          // Closure to capture the file information.
+          reader.onload = (function(theFile) {
+            return function(e) {
+              // Render thumbnail.
+              document.getElementById('list').innerHTML = ['<img class="thumb" src="', e.target.result,
+                                '" title="', escape(theFile.name), '"/>'].join('');
+            };
+          })(f);
+    
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+        }
+    
+      document.getElementById('files').addEventListener('change', handleFileSelect, false);
+    </script>
+
+                            <div class="form-group">
+                                <label for="self_description">Short Self Description</label>
+                                <textarea name="self_description" class="form-control" required="True"/>
+                            </div>
+                            <button t-attf-class="btn btn-primary btn-lg">Register Profile</button>
+                        </form>
+                
+                    </div>
+                </div>
+                
+            </div>
+            
+        </t>
+    </template>
+
+</odoo>
