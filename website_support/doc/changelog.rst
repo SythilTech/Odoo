@@ -1,3 +1,7 @@
+v1.2.2
+======
+* category email not replacing placeholders
+
 v1.2.1
 ======
 * non employee user permission fix
