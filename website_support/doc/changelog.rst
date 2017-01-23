@@ -1,3 +1,7 @@
+v1.9.6
+======
+* non employee user permission fix
+
 v1.9.5
 ======
 * Fix permission issue with public users submitting reply via website
