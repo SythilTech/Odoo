@@ -1,3 +1,7 @@
+v1.2.1
+======
+* non employee user permission fix
+
 v1.2
 ====
 * Transfer revamp changes from v9
