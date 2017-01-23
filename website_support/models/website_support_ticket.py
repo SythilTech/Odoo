@@ -50,8 +50,10 @@ class WebsiteSupportTicket(models.Model):
     def message_new(self, msg, custom_values=None):
         """ Create new support ticket upon receiving new email"""
 
+        body_short = tools.html_email_clean(msg.get('body'), shorten=True, remove=True)
+        body_short = body_short.replace("<pre>","").replace("</pre>","") #Crude hack to get rid of warpping pre tag
         portal_access_key = randint(1000000000,2000000000)
-        defaults = {'person_name': msg.get('from'), 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': msg.get('body'), 'portal_access_key': portal_access_key}
+        defaults = {'person_name': msg.get('from'), 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
         
         return super(WebsiteSupportTicket, self).message_new(msg, custom_values=defaults)
         

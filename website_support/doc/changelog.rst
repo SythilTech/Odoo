@@ -1,3 +1,7 @@
+v1.9.8
+======
+* Attempt to remove email client wrapping
+
 v1.9.7
 ======
 * Category email not replacing palceholders issue
