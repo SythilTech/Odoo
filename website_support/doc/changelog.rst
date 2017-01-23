@@ -1,3 +1,7 @@
+v1.9.7
+======
+* Category email not replacing palceholders issue
+
 v1.9.6
 ======
 * non employee user permission fix
