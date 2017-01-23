@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="website_form_builder_options" name="Form Builder Options" inherit_id="website.snippet_options">
+            <xpath expr="//div" position="after">
+                <div data-js='html_form_builder_field_attachment'
+		    data-selector=".hff_attachment"
+		    data-drop-in="#html_field_placeholder, #html_fields">
+                </div>
+            </xpath>
+        </template>
+
+        <template id="html_navbar" inherit_id="html_form_builder.html_navbar" name="HTML Forms Navbar">
+            <xpath expr="//div[@id='snippet_form']/div[@class='o_panel_body']" position="inside">
+                <t t-snippet="html_form_builder_email.s_attachment" t-thumbnail="/html_form_builder_email/static/src/img/ui/snippet_thumb_field_attachment.jpg"/>
+            </xpath>
+        </template>
+
+        <template id="s_attachment" name="Attachment">
+            <div class="hff hff_attachment form-group" data-form-type="attachment">
+                <label class="control-label" for="html_form_mail_attachment">Add attachment</label>
+                <input name="html_form_mail_attachment" type="file"/>
+            </div>
+        </template>
+
+    </data>
+</openerp>

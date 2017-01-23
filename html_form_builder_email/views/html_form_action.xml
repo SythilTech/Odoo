@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="html_form_action_view_form_inherit_html_form_builder_email" model="ir.ui.view">
+          <field name="name">html.form.action.view.form</field>
+          <field name="model">html.form.action</field>
+          <field name="inherit_id" ref="html_form_builder.html_form_action_view_form"/>
+          <field name="arch" type="xml">
+      	      <xpath expr="//h2[@id='formactionhook']" position="after">
+      	          <div attrs="{'invisible': [('setting_name', '!=', 'send_email')]}">
+		      <group>
+	                  <field name="from_email"/>
+                          <field name="to_email"/>
+                      </group>
+    	          </div>
+      	      </xpath>
+      	  </field>
+      </record>
+
+  </data>
+</openerp>

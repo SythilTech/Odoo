@@ -1,3 +1,7 @@
+v1.0.4
+======
+* pass values to server action
+
 v1.0.3
 ======
 * Fix public csrf form submit issue
