@@ -1,3 +1,7 @@
+v1.9.9
+======
+* Automatically find partner when someone sends a ticket in via email
+
 v1.9.8
 ======
 * Attempt to remove email client wrapping
