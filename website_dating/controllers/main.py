@@ -2,6 +2,8 @@
 import werkzeug
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from random import randint
+
 import json
 import math
 import base64
@@ -49,7 +51,7 @@ class WebsiteDatingController(http.Controller):
         date_of_birth = values['birth_date_year'] + "/" + values['birth_date_month'] + "/" + values['birth_date_day']
         
         #Modify the users partner record
-	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'birth_date': date_of_birth, 'gender_id': values['gender'], 'profile_micro': values['self_description'], 'country_id': values['country'], 'state_id': values['state'], 'city_id': city_id.id, 'city': city_id.name, 'image': base64.encodestring(values['file'].read()) })
+	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'birth_date': date_of_birth, 'gender_id': values['gender'], 'profile_micro': values['self_description'], 'country_id': values['country'], 'state_id': values['state'], 'city_id': city_id.id, 'city': city_id.name, 'image': base64.encodestring(values['file'].read()), 'privacy_setting': 'private' })
 
         d1 = datetime.strptime(new_user.birth_date, "%Y-%m-%d").date()
         d2 = date.today()
@@ -61,6 +63,15 @@ class WebsiteDatingController(http.Controller):
 
         #Redirect them to the profile listing
         return werkzeug.utils.redirect("/dating/profiles")
+
+    @http.route('/dating/local', type="http", auth="public", website=True)
+    def dating_local_search(self):
+        return http.request.render('website_dating.dating_search', {} )
+
+    @http.route('/dating/local/<model("res.country.state"):state>/<model("res.country.state.city"):city>', type="http", auth="public", website=True)
+    def dating_local(self, state, city):
+        my_dates = request.env['res.partner'].sudo().search([('dating','=',True), ('state_id','=',state.id), ('city_id','=',city.id), ('privacy_setting','=','public')], limit=20, order="create_date desc")
+        return http.request.render('website_dating.local_profile_list', {'my_dates': my_dates, 'state': state, 'city': city, 'my_dates_count': len(my_dates) } )
         
     @http.route('/dating/profiles', type="http", auth="user", website=True)
     def dating_list(self, **kwargs):
@@ -69,46 +80,34 @@ class WebsiteDatingController(http.Controller):
 	for field_name, field_value in kwargs.items():
 	    values[field_name] = field_value 
  
-        search_list = []
-        return_dict = {}
-        
-        #only dating members
-        search_list.append(('dating','=','True'))
-
-        #exclude yourself from the list
-        search_list.append(('id','!=', request.env.user.id))
-
-        #opposite gender only
-	male_gender = request.env['ir.model.data'].get_object('website_dating', 'website_dating_male')
-        female_gender = request.env['ir.model.data'].get_object('website_dating', 'website_dating_female')
-        if request.env.user.partner_id.gender_id.id == male_gender.id:
-            search_list.append(('gender_id','=', female_gender.id))
-        elif request.env.user.partner_id.gender_id.id == female_gender.id:
-            search_list.append(('gender_id','=', male_gender.id))    
-        
-        #min age preference
-        min_age = request.env.user.partner_id.age - 5
-        search_list.append(('age','>=', min_age))
-        
-        #max age preference
-        max_age = request.env.user.partner_id.age + 5
-        search_list.append(('age','<=', max_age))
-        
-        #Within 50km
-        distance = 50
-	mylon = float(request.env.user.partner_id.city_id.longitude)
-	mylat = float(request.env.user.partner_id.city_id.latitude)
-	dist = float(distance) * 0.621371
-	lon_min = mylon-dist/abs(math.cos(math.radians(mylat))*69);
-	lon_max = mylon+dist/abs(math.cos(math.radians(mylat))*69);
-	lat_min = mylat-(dist/69);
-	lat_max = mylat+(dist/69);
-        search_list.append(('city_id.longitude','>=',lon_min))
-        search_list.append(('city_id.longitude','<=',lon_max))
-        search_list.append(('city_id.latitude','<=',lat_min))
-        search_list.append(('city_id.latitude','>=',lat_max))
-            
-        my_dates = http.request.env['res.partner'].sudo().search(search_list, limit=15)
+        my_dates = request.env.user.partner_id.get_dating_suggestions()
         my_dates_count = len(my_dates)
+ 
+        dating_suggestions = []
+        for i in range(0, 20):
+            rand_date = randint(1, len(my_dates) -1 )
+            my_date =  my_dates[rand_date]
+            dating_suggestions.append(my_date)
+                
+        return http.request.render('website_dating.my_dating_list', {'my_dates': dating_suggestions, 'my_dates_count': my_dates_count} )
         
-        return http.request.render('website_dating.my_dating_list', {'my_dates': my_dates, 'my_dates_count': my_dates_count} )
+    @http.route('/dating/auto-complete', auth="public", website=True, type='http')
+    def dating_autocomplete(self, **kw):
+        """Provides an autocomplete list of suburbs"""
+        
+        values = {}
+        for field_name, field_value in kw.items():
+            values[field_name] = field_value
+        
+        return_string = ""
+        
+        my_return = []
+        
+        #Get all businesses that match the search term
+        suburbs = request.env['res.country.state.city'].sudo().search([('name','=ilike',"%" + values['term'] + "%")],limit=5)
+        
+        for suburb in suburbs:
+            return_item = {"label": suburb.name + "<br/><sub>" + suburb.state_id.name + ", " + suburb.state_id.country_id.name + "</sub>","value": "/dating/local/" + suburb.state_id.name.encode("UTF-8") + "-" + str(suburb.state_id.id) + "/" + suburb.name.encode("UTF-8") + "-" + str(suburb.id) }
+            my_return.append(return_item)
+        
+        return json.JSONEncoder().encode(my_return)

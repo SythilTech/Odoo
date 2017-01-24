@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="dating_micro_profile_starsign" name="Dating Micro Profile Star Sign"  inherit_id="website_dating.dating_micro_profile">
+         <xpath expr="//span[@id='profile_addon_text']" position="inside">
+             <div>Star Sign: <t t-esc="my_date.starsign"/></div>
+         </xpath>
+    </template>
+    
+</odoo>
