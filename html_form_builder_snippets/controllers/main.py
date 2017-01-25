@@ -354,7 +354,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string = ""
         form_string += "  <div class=\"container mt16 mb16\">\n"
         form_string += "    <h2>" + html_form.name + "</h2>\n"
-        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\" enctype=\"multipart/form-data\">\n"
         form_string += "      <div class=\"oe_structure\" id=\"html_fields\">\n"
             
         for form_field in html_form.fields_ids:
@@ -399,7 +399,7 @@ class HtmlFormControllerSnippets(openerp.addons.html_form_builder.controllers.ma
         form_string = ""
         form_string += "  <div class=\"container mt16 mb16\">\n"
         form_string += "    <h2>" + html_form.name + "</h2>\n"
-        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\">\n"
+        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\" enctype=\"multipart/form-data\">\n"
         form_string += "      <div class=\"oe_structure\" id=\"html_fields\"/>\n"
         form_string += "      <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
 	form_string += "      <input type=\"hidden\" name=\"csrf_token\"/>\n"

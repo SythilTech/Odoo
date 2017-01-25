@@ -1,6 +1,6 @@
 {
     'name': "HTML Form Builder - Website Snippets",
-    'version': "1.8.14",
+    'version': "1.8.15",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

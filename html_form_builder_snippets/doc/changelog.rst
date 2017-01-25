@@ -1,3 +1,7 @@
+v.1.8.15
+========
+* Binary issue with public users
+
 v.1.8.14
 ========
 * Fix issue character encoding with field modal config
