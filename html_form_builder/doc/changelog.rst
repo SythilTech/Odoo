@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Fix issue with binary files and public users
+
 v1.0.4
 ======
 * pass values to server action
