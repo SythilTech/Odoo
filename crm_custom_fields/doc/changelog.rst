@@ -1,3 +1,7 @@
+v1.3
+====
+* Permission fix
+
 v1.2
 ====
 * Add selection dropbox
