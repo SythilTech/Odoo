@@ -1,6 +1,6 @@
 {
     'name': "Website Dating (Beta)",
-    'version': "0.2",
+    'version': "0.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

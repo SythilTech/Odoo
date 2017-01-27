@@ -1,0 +1,2 @@
+"id","name","model","function","interval_number","interval_type","numbercall","active"
+"dating_events_cron","Dating Auto Create Events","event.event","dating_events_create",1,"days",-1,"false"

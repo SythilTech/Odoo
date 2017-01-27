@@ -181,7 +181,7 @@ class ResPartnerWebsiteDating(models.Model):
             values = notification_template.generate_email(rec.id)
             values['body_html'] = values['body_html'].replace("_dating_suggestions_", dating_suggestions_html)
             send_mail = self.env['mail.mail'].create(values)
-            #send_mail.send(True)
+            #send_mail.send(True)        
    
 class ResPartnerWebsiteDatingGender(models.Model):
 
@@ -190,3 +190,30 @@ class ResPartnerWebsiteDatingGender(models.Model):
     
     name = fields.Char(string="Gender")
     letter = fields.Char(string="Letter")
+    
+class ResPartnerWebsiteDatingLikes(models.Model):
+
+    _name = "res.partner.like"
+    _description = "Partner Like"
+    
+    partner_id = fields.Many2one('res.partner', string="Partner")
+    like_partner_id = fields.Many2one('res.partner', string="Like Partner")
+
+class ResPartnerWebsiteDatingBlock(models.Model):
+
+    _name = "res.partner.block"
+    _description = "Partner Block"
+    
+    partner_id = fields.Many2one('res.partner', string="Partner")
+    block_partner_id = fields.Many2one('res.partner', string="Block Partner")
+    
+class ResPartnerWebsiteDatingMessage(models.Model):
+
+    _name = "res.partner.message"
+    _description = "Partner Dating Message"
+    
+    partner_id = fields.Many2one('res.partner', string="Partner")
+    to_partner_id = fields.Many2one('res.partner', string="To Partner")
+    type = fields.Selection([('like','Like')], string="Type")
+    content = fields.Text(string="Content")
+    read = fields.Boolean(string="Read")

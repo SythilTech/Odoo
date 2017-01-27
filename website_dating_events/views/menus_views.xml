@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+
+   <record id="res_partner_dating_events_action" model="ir.actions.act_window">
+       <field name="name">Dating Events</field>
+       <field name="res_model">event.event</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="context" eval="{'default_dating':True, 'default_event_mail_ids': [(0,0, {'template_id': ref('website_dating_events.dating_event_likes_email'), 'interval_nbr':1, 'interval_unit': 'days', 'interval_type': 'after_event'} )]}"/>
+       <field name="domain">[('dating','=',True)]</field>
+    </record>
+
+   <record id="res_partner_dating_events_venue_action" model="ir.actions.act_window">
+       <field name="name">Dating Event Venues</field>
+       <field name="res_model">res.partner</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="context">{'default_dating_event_location':True, 'default_company_type':'company'}</field>
+       <field name="domain">[('dating_event_location','=',True)]</field>
+    </record>
+       
+    <menuitem id="res_partner_dating_events_parent_menu" name="Singles Events" parent="website_dating.res_dating_parent_menu" sequence="40"/>       
+    <menuitem id="res_partner_dating_events_menu" name="Events" parent="res_partner_dating_events_parent_menu" action="res_partner_dating_events_action" sequence="10"/>
+    <menuitem id="res_partner_dating_events_locations_menu" name="Event Venues" parent="res_partner_dating_events_parent_menu" action="res_partner_dating_events_venue_action" sequence="20"/>      
+
+</odoo>
