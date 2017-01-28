@@ -1,3 +1,7 @@
+v1.9.10
+=======
+* Category email is now user language
+
 v1.9.9
 ======
 * Automatically find partner when someone sends a ticket in via email

@@ -135,6 +135,7 @@ class WebsiteSupportTicket(models.Model):
         support_ticket_action = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
         
         for my_user in new_id.category.cat_user_ids:
+            notification_template.lang = my_user.lang
             values = notification_template.generate_email([new_id.id])[new_id.id]
             values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(new_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
             values['email_to'] = my_user.partner_id.email
