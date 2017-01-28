@@ -5,7 +5,6 @@ class ResPartnerSms(models.Model):
 
     _inherit = "res.partner"
     
-    @api.one
     @api.onchange('country_id','mobile')
     def _onchange_mobile(self):
         """Tries to convert a local number to e.164 format based on the partners country, don't change if already in e164 format"""
