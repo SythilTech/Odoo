@@ -91,16 +91,16 @@ class HtmlFormController(http.Controller):
         html_output += "  <script>\n"
 	html_output += "  $( function() {\n"
 	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).removeClass(\"hasDatepicker\");\n"
-	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).datetimepicker({pickTime: false, "
+	html_output += "    $( \"#" + field.html_name.encode("utf-8") + "\" ).datetimepicker({pickTime: false"
 	
 	if field.setting_date_format == "years":
-	    html_output += "format: 'YYYY-01-01', minViewMode: 'years' });\n"
-
-	if field.setting_date_format == "months":
-	    html_output += "format: 'YYYY-MM-01', minViewMode: 'months' });\n"
-
-	if field.setting_date_format == "days":
-	    html_output += "format: 'YYYY-MM-DD', minViewMode: 'days' });\n"
+	    html_output += ", format: 'YYYY-01-01', minViewMode: 'years' });\n"
+        elif field.setting_date_format == "months":
+	    html_output += ", format: 'YYYY-MM-01', minViewMode: 'months' });\n"
+	elif field.setting_date_format == "days":
+	    html_output += ", format: 'YYYY-MM-DD', minViewMode: 'days' });\n"
+	else:
+	    html_output += ", format: 'YYYY-MM-DD', minViewMode: 'days' });\n"
 	
 	html_output += "  } );\n"
         html_output += "  </script>\n"
@@ -344,7 +344,7 @@ class HtmlFormController(http.Controller):
 
         if field.field_id.ttype == "selection":
     
-    	    selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
+    	    selection_list = dict(request.env[field.field_id.model_id.model]._fields[field.field_id.name].selection)
     	        
     	    for selection_value,selection_label in selection_list.items():
     	        html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
@@ -758,7 +758,7 @@ class HtmlFormController(http.Controller):
         if field.field_id.ttype == "selection":
     
             #ensure that the user isn't trying to inject data that is not in the selection
-    	    selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
+    	    selection_list = dict(request.env[field.field_id.model_id.model]._fields[field.field_id.name].selection)
     	        
     	    for selection_value,selection_label in selection_list.items():
     	        if field_data == selection_value:

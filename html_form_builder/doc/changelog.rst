@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Fix issue with dropbox(selection/m2o) and date field when generated from backend
+
 v1.0.5
 ======
 * Fix issue with binary files and public users
