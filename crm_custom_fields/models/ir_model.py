@@ -34,7 +34,7 @@ class IrModelCRMFields(models.Model):
             
             custom_form_fields_string += "/>"
         
-        custom_form_fields_string += "            <button name=\"open_custom_field_form\" type=\"object\" groups=\"base.group_sale_manager\"  string=\"Add Custom Field\"/>\n"
+        custom_form_fields_string += "            <button name=\"open_custom_field_form\" type=\"object\" groups=\"sales_team.group_sale_manager\"  string=\"Add Custom Field\"/>\n"
         custom_form_fields_string += "        </group>\n"
         custom_form_fields_string += "    </page>\n"
         custom_form_fields_string += "</notebook>"

@@ -1,6 +1,6 @@
 {
     'name': "CRM Custom Fields",
-    'version': "1.3",
+    'version': "1.3.1",
     'author': "Sythil Tech",
     'category': "CRM",
     'support': "steven@sythiltech.com.au",

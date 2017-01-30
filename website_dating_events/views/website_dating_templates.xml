@@ -16,7 +16,7 @@
             ]]>
         </field>
     </record>
-
+    
     <template id="dating_events_feedback" name="Dating Event Feedback" page="True">
         <t t-call="website.layout">
             <div class="container">

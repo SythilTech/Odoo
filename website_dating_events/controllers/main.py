@@ -73,14 +73,14 @@ class WebsiteDatingEventsController(http.Controller):
                     if affinity == "Like":
 
                         #Create the like
-                        request.env['res.partner.like'].sudo().create({'event_id': reg.event_id.id, 'partner_id': request.env.user.partner_id.id, 'like_partner_id': single.partner_id.id})
+                        request.env['res.partner.dating.like'].sudo().create({'event_id': reg.event_id.id, 'partner_id': request.env.user.partner_id.id, 'like_partner_id': single.partner_id.id})
   
-                        #Send the messageing saying you are liked
-                        request.env['res.partner.message'].sudo().create({'type': 'like', 'partner_id': request.env.user.company_id.id, 'to_partner_id': single.partner_id.id, 'content': request.env.user.partner_id.first_name.encode("UTF-8") + " likes you"})
+                        #Create a notification about the like
+                        request.env['res.partner.dating.notification'].sudo().create({'has_read': False, 'partner_id': single.partner_id.id, 'content': request.env.user.partner_id.first_name.encode("UTF-8") + " likes you", 'ref_url': '/dating/profile/' + str(single.partner_id.id) })
 
                     elif affinity == "Dislike":
                         #Create Block
-                        request.env['res.partner.block'].sudo().create({'partner_id': request.env.user.partner_id.id, 'block_partner_id': single.partner_id.id})
+                        request.env['res.partner.dating.block'].sudo().create({'partner_id': request.env.user.partner_id.id, 'block_partner_id': single.partner_id.id})
                     
                 return werkzeug.utils.redirect("/")
             else:

@@ -23,6 +23,13 @@ class ResPartnerWebsiteDating(models.Model):
     profile_micro = fields.Char(size=100, string="Profile Micro Summary")
     setting_email_suggestion = fields.Boolean(string="Email Suggestions", default="True")
     privacy_setting = fields.Selection([('public','Public'), ('private','Private')], string="Privacy Setting")    
+    unread_dating_notifications = fields.Integer(string="Unread Dating Notifications", compute="_compute_unread_dating_notifications", store=True)
+    dating_notif_ids = fields.One2many('res.partner.dating.notification', 'partner_id', string="Dating Notifaction")
+
+    @api.one
+    @api.depends('dating_notif_ids', 'dating_notif_ids.has_read')
+    def _compute_unread_dating_notifications(self):
+        self.unread_dating_notifications = self.env['res.partner.dating.notification'].sudo().search_count([('partner_id','=', self.id), ('has_read','=',False) ])
         
     @api.onchange('birth_date')
     def _onchange_birth_date(self):
@@ -190,30 +197,3 @@ class ResPartnerWebsiteDatingGender(models.Model):
     
     name = fields.Char(string="Gender")
     letter = fields.Char(string="Letter")
-    
-class ResPartnerWebsiteDatingLikes(models.Model):
-
-    _name = "res.partner.like"
-    _description = "Partner Like"
-    
-    partner_id = fields.Many2one('res.partner', string="Partner")
-    like_partner_id = fields.Many2one('res.partner', string="Like Partner")
-
-class ResPartnerWebsiteDatingBlock(models.Model):
-
-    _name = "res.partner.block"
-    _description = "Partner Block"
-    
-    partner_id = fields.Many2one('res.partner', string="Partner")
-    block_partner_id = fields.Many2one('res.partner', string="Block Partner")
-    
-class ResPartnerWebsiteDatingMessage(models.Model):
-
-    _name = "res.partner.message"
-    _description = "Partner Dating Message"
-    
-    partner_id = fields.Many2one('res.partner', string="Partner")
-    to_partner_id = fields.Many2one('res.partner', string="To Partner")
-    type = fields.Selection([('like','Like')], string="Type")
-    content = fields.Text(string="Content")
-    read = fields.Boolean(string="Read")

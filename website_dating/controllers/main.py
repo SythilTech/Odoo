@@ -15,6 +15,20 @@ from openerp.http import request
 
 class WebsiteDatingController(http.Controller):
 
+    @http.route('/dating/notification/<notif>', type="http", auth="user", website=True)
+    def dating_notification(self, notif, **kwargs):
+        """Mark the notifaction as read and redirect"""
+        
+        notif = request.env['res.partner.dating.notification'].sudo().browse( int(notif) )
+        
+        #Stop them messing with other people's notifacations
+        if request.env.user.partner_id.id == notif.partner_id.id:
+            notif.has_read = True
+            return werkzeug.utils.redirect(notif.ref_url)
+        else:
+            return "You do not own this notification"
+        
+
     @http.route('/dating/profile/register', type="http", auth="public", website=True)
     def dating_profile_register(self, **kwargs):
         genders = request.env['res.partner.gender'].search([])

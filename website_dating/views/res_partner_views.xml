@@ -17,6 +17,8 @@
       	                    <field name="birth_date"/>
 			    <field name="age"/>
 			    <field name="gender_id"/>
+			    <field name="unread_dating_notifications"/>
+			    <field name="dating_notif_ids"/>
 			    <field name="setting_email_suggestion"/>
       	                </group>
       	            </page>

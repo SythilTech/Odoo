@@ -6,7 +6,7 @@ class IrModelFieldsCRMFields(models.Model):
     _inherit = "ir.model.fields"
     
     custom_model_id = fields.Many2one('ir.model', string="Custom Model")
-    crm_limited_types = fields.Selection([('char','Single Line Textbox'), ('text','Multi Line Textbox'), ('date','Date'), ('selection', 'Static Dropdown')], default="char", string="Field Type")
+    crm_limited_types = fields.Selection([('char','Single Line Textbox'), ('text','Multi Line Textbox'), ('date','Date'), ('datetime','Date Time'), ('selection', 'Static Dropdown')], default="char", string="Field Type")
     crm_custom_name = fields.Char(string="Field Name")
     crm_custom_field = fields.Boolean(string="Custom CRM Field")
     crm_custom_field_widget = fields.Many2one('crm.custom.fields.widget', string="Widget")

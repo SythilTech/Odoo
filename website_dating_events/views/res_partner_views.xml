@@ -9,7 +9,6 @@
 	        <field name="setting_email_suggestion" position="after">
 	            <field name="dating_event_location"/>
 	            <field name="venue_feedback_ids"/>
-	            <field name="dating_feedback_ids"/>
 	        </field>
       	    </field>
         </record>

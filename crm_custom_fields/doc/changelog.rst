@@ -1,3 +1,7 @@
+v1.3.1
+======
+* Add datetime field and fix permission with add field button
+
 v1.3
 ====
 * Permission fix

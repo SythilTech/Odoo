@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <template id="dating_frontend_assets" name="Dating Assets" inherit_id="web.assets_frontend">
+       <xpath expr="." position="inside">
+           <script type="text/javascript" src="/website_dating/static/src/js/notification.js"></script>
+           <link rel="stylesheet" href="/website_dating/static/src/css/notification.css"/>
+       </xpath>
+    </template>
+    
     <record id="dating_suggestions_email" model="mail.template">
         <field name="name">Dating Suggestions</field>
         <field name="model_id" ref="model_res_partner"></field>
@@ -16,6 +23,21 @@
             ]]>
         </field>
     </record>
+
+    <template id="dating_notifications" name="Dating Notifications" inherit_id="website.layout">
+        <xpath expr="//li[@class='dropdown']" position="after">
+            <li class="divider"></li>
+            <li><a id="dating_notif_link" href="#"><span><t t-esc="request.env.user.partner_id.unread_dating_notifications"/> Mail</span></a></li>
+            <div id="dating_notifications">
+                <t t-foreach="request.env.user.partner_id.dating_notif_ids" t-as="notif">
+                    <a t-attf-href="/dating/notification/#{notif.id}">
+                        <t t-esc="notif.create_date"/><br/>
+                        <t t-esc="notif.content"/>
+                    </a>
+                </t>
+            </div>
+        </xpath>
+    </template>
 
     <record id="dating_suggestions_profile_email" model="mail.template">
         <field name="name">Dating Suggestions Profile</field>

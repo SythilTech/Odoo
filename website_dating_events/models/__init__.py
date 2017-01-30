@@ -1,1 +1,1 @@
-import res_partner_like, res_dating_event_feedback, res_partner, event_event
+import res_partner_dating_like, res_dating_event_feedback, res_partner, event_event
