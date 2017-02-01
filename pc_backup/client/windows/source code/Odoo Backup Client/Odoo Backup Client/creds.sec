@@ -1,4 +1,0 @@
-url=http://192.168.56.101:8069
-login=admin
-db=backup_manager
-backup=C:\backuptest

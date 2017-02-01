@@ -44,6 +44,8 @@ class BackupController(http.Controller):
             cred_string = ""
             cred_string += "url=" + request.httprequest.host_url[:-1] + "\n"
             cred_string += "db=" + request.env.cr.dbname + "\n"
+            cred_string += "last-backup-time=1970-01-01 01:01:01\n"
+            cred_string += "directories=C:\backup1,C:\backup2\n"
 
             api_key = ""
             

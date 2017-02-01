@@ -237,10 +237,10 @@ function gotRemoteStream(event) {
     remoteVideo.srcObject = event.streams[0];
     remoteStream = event.streams[0];
 
-    callSeconds = 0;
+    callSeconds = 0.5;
     var interval = setInterval(function() {
         $("#voip_text").html(callSeconds + " seconds");
-        callSeconds++;
+        callSeconds += 0.5;
     }, 1000);
 
     $.ajax({
