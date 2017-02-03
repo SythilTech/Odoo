@@ -19,6 +19,9 @@ class EventEventDating(models.Model):
     max_age = fields.Integer(string="Max Age")
     dating_description = fields.Text(string="Website Description")
     event_feedback_ids = fields.One2many('res.dating.event.feedback', 'event_id', string="Event Feedback")
+    dating_price = fields.Float(String="D Price")
+    max_attendee_distance = fields.Integer(default="40075", string="Max Attendee Distance (km)", help="Members can not attend the event if they live too far away")
+    dating_filter_ids = fields.Many2many('ir.filters', domain=[('model_id','=','res.partner')], string="Dating Event Filters")
 
     @api.model
     def dating_events_create(self):

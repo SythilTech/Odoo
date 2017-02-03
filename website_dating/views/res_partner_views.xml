@@ -7,6 +7,9 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <field name="city" position="replace">
+                    <field name="city_id" placeholder="City"/>
+                </field>
       	        <notebook position="inside">
       	            <page string="Dating">
       	                <group>

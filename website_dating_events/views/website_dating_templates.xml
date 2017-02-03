@@ -52,17 +52,40 @@
             </div>
         </t>
     </template>
-   
-    
-    <template id="dating_events" name="Dating Profiles" page="True">
-        <title>Singles Events in <t t-esc="state_name"/></title>
+
+    <template id="dating_events_personal" name="Dating Events Personal" page="True">
         <t t-call="website.layout">
             <div class="container">
                 <h1 class="text-center">Single Events</h1>
                 <t t-foreach="dating_events" t-as="dating_event">
                     <div class="panel panel-default"><div class="panel-body">
                         <t t-esc="dating_event.name"/><br/>
-                        Age: <t t-esc="dating_event.min_age"/> - <t t-esc="dating_event.max_age"/><br/>
+                        <t t-foreach="dating_event.dating_filter_ids" t-as="dating_filter">
+                           <t t-esc="dating_filter.name"/><br/>
+                        </t>
+                        Location: <t t-esc="dating_event.address_id.name"/> <t t-esc="dating_event.address_id.street"/>, <t t-esc="dating_event.address_id.city"/>, <t t-esc="dating_event.address_id.state_id.name"/>, <t t-esc="dating_event.address_id.country_id.name"/><br/>
+                        Time: <span itemprop="startDate" t-field="dating_event.with_context(tz=dating_event.date_tz).date_begin" t-options='{"hide_seconds":"True"}'> </span> <i>to</i> <span itemprop="endDate" t-field="dating_event.with_context(tz=dating_event.date_tz).date_end" t-options='{"hide_seconds":"True"}'> </span><br/>
+                        Male: <t t-esc="dating_event.current_males"/> / <t t-esc="dating_event.max_males"/><br/>
+                        Female: <t t-esc="dating_event.current_females"/> / <t t-esc="dating_event.max_females"/><br/>
+                        <t t-esc="dating_event.dating_description"/><br/>
+                        <a t-attf-href="/dating/events/register/#{slug(dating_event)}"><button type="button" class="btn btn-default">Register</button></a>
+                    </div></div>
+                </t>
+            </div>
+        </t>
+    </template>   
+    
+    <template id="dating_events" name="Dating Events State" page="True">
+        <title>Singles Events in <t t-esc="state_name"/></title>
+        <t t-call="website.layout">
+            <div class="container">
+                <h1 class="text-center">Single Events in <t t-esc="state_name"/></h1>
+                <t t-foreach="dating_events" t-as="dating_event">
+                    <div class="panel panel-default"><div class="panel-body">
+                        <t t-esc="dating_event.name"/><br/>
+                        <t t-foreach="dating_event.dating_filter_ids" t-as="dating_filter">
+                           <t t-esc="dating_filter.name"/><br/>
+                        </t>
                         Location: <t t-esc="dating_event.address_id.name"/> <t t-esc="dating_event.address_id.street"/>, <t t-esc="dating_event.address_id.city"/>, <t t-esc="dating_event.address_id.state_id.name"/>, <t t-esc="dating_event.address_id.country_id.name"/><br/>
                         Time: <t t-esc="dating_event.date_begin"/> - <t t-esc="dating_event.date_end"/><br/>
                         Male: <t t-esc="dating_event.current_males"/> / <t t-esc="dating_event.max_males"/><br/>
@@ -74,5 +97,18 @@
             </div>
         </t>
     </template>
-    
+
+    <template id="dating_events_list" name="Dating Events List" page="True">
+        <t t-call="website.layout">
+            <div class="container">
+                <t t-foreach="countries" t-as="country">
+                    <t t-esc="country.name"/><br/>
+                    <t t-foreach="country.state_ids" t-as="state">
+                        <a t-attf-href="/dating/events/local/#{slug(state)}"><t t-esc="state.name"/></a><br/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+  
 </odoo>

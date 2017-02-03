@@ -32,6 +32,9 @@ class VoipVoip(models.Model):
     @api.model
     def start_sip_call(self, to_partner):
         voip_call = self.env['voip.call'].create({'from_partner_id': self.env.user.partner_id.id, 'partner_id': to_partner, 'type': 'external', 'direction': 'outgoing'})
+
+        client = self.env['voip.call.client'].sudo().create({'vc_id': voip_call.id, 'partner_id': self.env.user.partner_id.id })
+        to_client = self.env['voip.call.client'].sudo().create({'vc_id': voip_call.id, 'partner_id': to_partner,  'state': "media_access"})
         
         #Start at the call accepted stage
         notification = {'call_id': voip_call.id, 'status': 'accepted', 'type': voip_call.type}

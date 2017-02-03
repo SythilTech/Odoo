@@ -102,6 +102,7 @@ WebClient.include({
 					    media_access = {audio: true, video: true}
 					} else if (type == "external") {
 					    media_access = {audio: true}
+					    call_id = notification[1].call_id;
 					}
 
 					//Destroy the notifcation because the call was accepted or rejected, no need to wait until timeout

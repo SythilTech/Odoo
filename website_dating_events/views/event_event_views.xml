@@ -17,10 +17,15 @@
       	                    <field name="max_males"/>
                             <field name="current_males"/>
       	                    <field name="max_females"/>
-      	                    <field name="min_age"/>
-      	                    <field name="max_age"/>
       	                    <field name="dating_description"/>
       	                    <field name="event_feedback_ids"/>
+      	                    <field name="max_attendee_distance"/>
+      	                    <field name="dating_filter_ids">
+      	                        <tree>
+      	                            <field name="name"/>
+      	                            <field name="domain"/>
+      	                        </tree>
+      	                    </field>
       	                </group>
       	            </page>
       	        </notebook>

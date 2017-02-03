@@ -7,9 +7,10 @@ from odoo.addons.website.models.website import slug
 import json
 import math
 import base64
+import ast
 import logging
 _logger = logging.getLogger(__name__)
-
+from math import radians, cos, sin, asin, sqrt
 import openerp.http as http
 from openerp.http import request
 
@@ -88,15 +89,75 @@ class WebsiteDatingEventsController(http.Controller):
         else:
             return "Invalid feedback link"        
 
-    @http.route('/dating/events/local', type="http", auth="user", website=True)
+    @http.route('/dating/events/local', type="http", auth="public", website=True)
     def dating_events_local(self, **kwargs):
-        """Redirect to events in thier local state"""
-        return werkzeug.utils.redirect("/dating/events/" + slug(request.env.user.partner_id.state_id) )
+        """GeoIP there state and redirect them"""
         
-    @http.route('/dating/events/<model("res.country.state"):state>', type="http", auth="public", website=True)
+        country_code = request.session['geoip'].get('country_code')
+        _logger.error(country_code)
+        for key in request.session['geoip'].keys():
+            _logger.error(key)        
+        
+        return "last"
+        #return werkzeug.utils.redirect("/")
+
+    @http.route('/dating/events/suggested', type="http", auth="user", website=True)
+    def dating_events_suggested(self, **kwargs):
+        """Dating Events they can attend"""
+
+        logged_partner = request.env.user.partner_id
+        
+        #Go through all the current dating events
+        dating_events = request.env['event.event'].search([('dating','=',True), ('state','=','confirm')])
+        
+        suitable_events = []
+        
+        for event in dating_events:
+            can_go = True
+            for filter in event.dating_filter_ids:
+                if logged_partner not in request.env['res.partner'].sudo().search( ast.literal_eval(filter.domain) ):
+                    #Exclude them from this event because they don't fulfil the criteria
+                    can_go = False
+                    break
+                    
+            if can_go:
+
+                #Check that the member is close enough to the venue locations
+                km = haversine(logged_partner.city_id.longitude, logged_partner.city_id.latitude, event.address_id.city_id.longitude, event.address_id.city_id.latitude)
+                
+		if km < event.max_attendee_distance:
+                    suitable_events.append(event)
+        
+        return http.request.render('website_dating_events.dating_events_personal', {'dating_events': suitable_events} )
+
+    def haversine(lon1, lat1, lon2, lat2):
+        """
+        Calculate the great circle distance between two points 
+        on the earth (specified in decimal degrees)
+        """
+                
+        #convert decimal degrees to radians 
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+                
+        #haversine formula 
+        dlon = lon2 - lon1 
+        dlat = lat2 - lat1 
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a)) 
+        km = 6367 * c
+        return km
+    
+    @http.route('/dating/events', type="http", auth="user", website=True)
+    def dating_events_list(self, **kwargs):
+        """Gives lists of states with events"""
+        countries = request.env['res.country'].search([])
+        
+        return http.request.render('website_dating_events.dating_events_list', {'countries':countries} )
+        
+    @http.route('/dating/events/local/<model("res.country.state"):state>', type="http", auth="public", website=True)
     def dating_events_local_state(self, state, **kwargs):
         """Events in there state"""
-        dating_events = request.env['event.event'].search([('dating','=',True), ('state','=','confirm')])
+        dating_events = request.env['event.event'].search([('dating','=',True), ('state','=','confirm'), ('address_id.state_id','=', state.id)])
         
         return http.request.render('website_dating_events.dating_events', {'dating_events': dating_events, 'state_name': state.name} )
 
@@ -105,11 +166,16 @@ class WebsiteDatingEventsController(http.Controller):
     def dating_events_register(self, event, **kwargs):
         """Register the user into the event"""
 
-        if request.env.user.partner_id.age < event.min_age:
-            return "Not older enough"
-            
-        if request.env.user.partner_id.age > event.max_age:
-            return "Too old"
+        for filter in event.dating_filter_ids:
+            if request.env.user.partner_id not in request.env['res.partner'].sudo().search( ast.literal_eval(filter.domain) ):
+                #Exclude them from this event because they don't fulfil the criteria
+                return "Can not register for event"
+
+        #Check that the member is close enough to the venue location
+        km = haversine(request.env.user.partner_id.city_id.longitude, request.env.user.partner_id.city_id.latitude, event.address_id.city_id.longitude, event.address_id.city_id.latitude)
+                
+	if km > event.max_attendee_distance:
+            return "Too far away"
 
         male_gender = request.env['ir.model.data'].get_object('website_dating', 'website_dating_male')
         female_gender = request.env['ir.model.data'].get_object('website_dating', 'website_dating_female')
