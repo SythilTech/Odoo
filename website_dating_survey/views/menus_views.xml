@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="res_dating_survey_parent_menu" name="Surveys" parent="website_dating.res_dating_parent_menu" sequence="30"/>
+    <menuitem id="res_dating_survey_menu" name="Surveys" parent="res_dating_survey_parent_menu" action="res_dating_survey_action" sequence="10"/>
+    <menuitem id="res_dating_survey_answer_menu" name="Survey Answers" parent="res_dating_survey_parent_menu" action="res_dating_survey_answer_action" sequence="20"/>
+
+</odoo>

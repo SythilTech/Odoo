@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_dating_survey,access res.dating.questionnaire,model_res_dating_survey,,1,0,0,0
+access_res_dating_survey_question,access res.dating.survey.question,model_res_dating_survey_question,,1,0,0,0
+access_res_dating_survey_question_option,access res.dating.survey.question.option,model_res_dating_survey_question_option,,1,0,0,0
+access_res_dating_survey_answer,access res.dating.survey.answer,model_res_dating_survey_answer,,0,0,1,0
+access_res_dating_survey_answer_question,access res.dating.survey.answer.question,model_res_dating_survey_answer_question,,0,0,1,0
