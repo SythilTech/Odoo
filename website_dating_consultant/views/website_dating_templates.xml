@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <template id="booking_calendar_frontend" inherit_id="website.assets_frontend" name="Booking Calendar CSS">
+        <xpath expr="/t" position="inside">
+            <link rel="stylesheet" href="/website_dating_consultant/static/src/css/fullcalendar.css"/>
+            <link rel="stylesheet" href="/website_dating_consultant/static/src/css/website_calendar_booking.css"/>
+            <script type="text/javascript" src="/web/static/lib/moment/moment.js"></script>
+            <script type="text/javascript" src="/website_dating_consultant/static/src/js/fullcalendar.js" />
+            <script type="text/javascript" src="/website_dating_consultant/static/src/js/booking_website.js" />
+        </xpath>
+    </template>
+
+    <template id="dating_consultants" name="Dating Consultants" page="True">
+        <t t-call="website.layout">
+            <div class="container mt16 mb16">
+                <div class="col-md-12">
+                    <div id="main" class="well">
+                        <h1 class="text-center">Local Consultants</h1>
+                        <t t-foreach="consultants" t-as="consultant">
+                            <t t-esc="consultant.name"/><br/>
+                            <t t-esc="consultant.address_id.state_id.name"/><br/>
+                            <a t-attf-href="/dating/consultant/#{slug(consultant)}"><button type="button" class="btn btn-default">Book</button></a><br/>
+                            <br/>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="dating_consultant_booking" name="Dating Consultant Booking" page="True">
+        <t t-call="website.layout">
+            <div class="container mt16 mb16">
+                <h1 class="text-center"><t t-esc="consultant.name"/> Booking</h1>
+                
+                <div style="border: black 1px solid;padding:5px;margin-bottom:10px;width:200px;">
+                    <div style="background-color: #FFFFFF;width:15px;height:15px;float:left;border: black 1px solid;"></div><span style="margin-left:5px;">Non booking hours</span><br/>
+                    <div style="background-color: #DDF5DA;width:15px;height:15px;float:left;border: black 1px solid;"></div><span style="margin-left:5px;">Available booking time</span><br/>
+                    <div style="background-color: #DDC0A4;width:15px;height:15px;float:left;border: black 1px solid;"></div><span style="margin-left:5px;">Taken booking time</span><br/>
+                </div>
+                
+	        <input type="hidden" id="consultant_id" t-attf-value="#{consultant.id}"/>
+	        <input type="hidden" id="calendar_slot_duration" t-attf-value="#{booking_duration}"/>
+	        <div id='booking_calendar'></div>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,30 @@
+<templates id="template" xml:space="preserve">
+    <t t-name="website_dating_consultant.calendar_booking_modal">
+        <div class="modal fade" id="oe_website_calendar_modal">
+            <div class="modal-dialog modal-content">
+                <div class="modal-header alert alert-info mb0">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <h4 class="modal-title">Enter Booking Details</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="GET" action="/dating/booking/create">
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input name="phone" type="text" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment">Comment</label>
+                            <textarea name="comment" class="form-control"/>
+                        </div>
+                        <input type="hidden" name="start" id="booking_form_start" />
+                        <input type="hidden" name="consultant_id" id="booking_form_consultant_id" />
+                        <input type="submit" class="btn btn-primary btn-lg" value="Create Booking"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
