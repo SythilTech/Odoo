@@ -142,22 +142,43 @@
     <template id="my_dating_register" name="Dating Register Account" page="True">
         <t t-call="website.layout">
             <div class="container mt16 mb16">
-                <div class="col-md-12">
-                    <div id="main" class="well">
-                        <h1>Register your Profile</h1>
+
+                        <div class="col-md-9">
+                        <h1 class="page-header">Register your Profile</h1>
                         <form method="POST" action="/dating/profile/register/process" enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <div class="row">
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
                                     <label for="first_name">First Name</label>
                                     <input type="text" name="first_name" class="form-control" required="True"/>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
                                     <label for="last_name">Last Name</label>
                                     <input type="text" name="last_name" class="form-control" required="True"/>
                                 </div>
+                                <div class="form-group col-md-4">
+                                <label for="gender">Gender</label>
+                                <select name="gender" class="form-control" required="True">
+                                    <option value="">Select Gender</option>
+                                    <t t-foreach="genders" t-as="gender">
+                                        <option t-attf-value="#{gender.id}"><t t-esc="gender.name"/></option>
+                                    </t>
+                                </select>
+                                </div>
                             </div>
 
+                            <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="email">Email / Username</label>
+                                <input type="text" name="email" class="form-control" required="True"/>
+                            </div>
+                            
+                            <div class="form-group col-md-6">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" class="form-control" required="True"/>
+                            </div>
+                            </div>
+                            
                             <div class="row">
                                 <div class="col-md-12">
                                     <label for="birth_date">Date of Birth</label>
@@ -189,29 +210,10 @@
                                     <input type="text" name="birth_date_year" class="form-control" placeholder="Year" required="True"/>
                                 </div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="gender">Gender</label>
-                                <select name="gender" class="form-control" required="True">
-                                    <option value="">Select Gender</option>
-                                    <t t-foreach="genders" t-as="gender">
-                                        <option t-attf-value="#{gender.id}"><t t-esc="gender.name"/></option>
-                                    </t>
-                                </select>
-                            </div>
 
                             <div class="row">
-                            <div class="form-group col-md-4">
-                                <label for="country">Country</label>
-                                <select name="country" class="form-control" required="True">
-                                    <option value="">Select a Country</option>
-                                    <t t-foreach="countries" t-as="country">
-                                        <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
-                                    </t>
-                                </select>
-                            </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-6">
                                 <label for="state">State</label>
                                 <select name="state" class="form-control" required="True">
                                     <option value="">Select a State</option>
@@ -221,32 +223,17 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-6">
                                 <label for="city">City</label>
-                                <select name="city" class="form-control" required="True">
-                                    <option value="">Select a City</option>
-                                    <t t-foreach="cities" t-as="city">
-                                        <option t-attf-value="#{city.id}"><t t-esc="city.name"/></option>
-                                    </t>
-                                </select>
+                                <input type="text" name="city" class="form-control" required="True"/>
                             </div>
                             </div>
-
+                            
                             <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="email">Email / Username</label>
-                                <input type="text" name="email" class="form-control" required="True"/>
-                            </div>
-                            
-                            <div class="form-group col-md-6">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" class="form-control" required="True"/>
-                            </div>
-                            </div>
-                            
-                            <div name="file_container" t-attf-class="form-group #{error and 'file' in error and 'has-error' or ''}">
+                            <div name="file_container" class="form-group col-md-12">
                                 <label class="control-label" for="file">Profile Image</label>
-    	                        <div class="btn btn-default btn-file col-md-12"><input name="file" id="files" type="file" /></div>
+    	                        <div class="btn btn-default btn-file col-md-12"><input name="file" id="files" type="file"/></div>
+                            </div>
                             </div>
                             
                             <style>
@@ -258,7 +245,7 @@
                               }
                             </style>
 
-                            <output id="list"></output>
+                            <output id="list"/>
 
                             <script>
                               function handleFileSelect(evt) {
@@ -294,9 +281,10 @@
                             </div>
                             <button t-attf-class="btn btn-primary btn-lg">Register Profile</button>
                         </form>
+                        </div>
+                        <div class="col-md-3"/>
+                            
                 
-                    </div>
-                </div>
                 
             </div>
             

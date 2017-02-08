@@ -33,10 +33,10 @@ class WebsiteDatingController(http.Controller):
     def dating_profile_register(self, **kwargs):
         genders = request.env['res.partner.gender'].search([])
         countries = request.env['res.country'].search([])
-        states = request.env['res.country.state'].search([], order="name asc")
-        cities = request.env['res.country.state.city'].search([])
+        states = request.env['res.country.state'].search([('country_id','=', request.env.user.company_id.country_id.id)], order="name asc")
+        #cities = request.env['res.country.state.city'].search([('state_id.country_id','=', request.env.user.company_id.country_id.id)])
         
-        return http.request.render('website_dating.my_dating_register', {'genders': genders, 'countries': countries, 'states': states, 'cities': cities} )
+        return http.request.render('website_dating.my_dating_register', {'genders': genders, 'countries': countries, 'states': states} )
 
     @http.route('/dating/profile/register/process', type="http", auth="public", website=True)
     def dating_profile_register_process(self, **kwargs):
@@ -45,7 +45,23 @@ class WebsiteDatingController(http.Controller):
 	for field_name, field_value in kwargs.items():
 	    values[field_name] = field_value
 	    
-	city_id = request.env['res.country.state.city'].sudo().browse( int(values['city']) ) 
+        date_of_birth = values['birth_date_year'] + "/" + values['birth_date_month'] + "/" + values['birth_date_day']
+
+        d1 = datetime.strptime(date_of_birth, "%Y/%m/%d").date()
+        d2 = date.today()
+        age = relativedelta(d2, d1).years
+	
+	if age < request.env.user.company_id.min_dating_age:
+	    return str(request.env.user.company_id.min_dating_age) + "+ Only"
+
+	city = request.env['res.country.state.city'].sudo().search( [('state_id','=', int(values['state']) ), ('name','=ilike', values['city'] ) ] )
+	
+	if len(city) == 1:
+	    city_id = city[0]
+	else:
+	    return str(len(city)) + " Can not find city with that name"
+	    
+	#city_id = request.env['res.country.state.city'].sudo().browse( int(values['city']) ) 
 	
 	#Create the new user
 	new_user = request.env['res.users'].sudo().create({'name': values['first_name'] + " " + values['last_name'], 'login': values['email'], 'email': values['email'], 'password': values['password'] })
@@ -61,15 +77,9 @@ class WebsiteDatingController(http.Controller):
         #Also remove them as an employee
 	human_resources_group = request.env['ir.model.data'].sudo().get_object('base', 'group_user')
         human_resources_group.users = [(3,new_user.id)]
-
-        date_of_birth = values['birth_date_year'] + "/" + values['birth_date_month'] + "/" + values['birth_date_day']
         
         #Modify the users partner record
-	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'birth_date': date_of_birth, 'gender_id': values['gender'], 'profile_micro': values['self_description'], 'country_id': values['country'], 'state_id': values['state'], 'city_id': city_id.id, 'city': city_id.name, 'image': base64.encodestring(values['file'].read()), 'privacy_setting': 'private' })
-
-        d1 = datetime.strptime(new_user.birth_date, "%Y-%m-%d").date()
-        d2 = date.today()
-        new_user.age = relativedelta(d2, d1).years
+	new_user.partner_id.write({'dating': True, 'first_name': values['first_name'], 'last_name': values['last_name'], 'birth_date': date_of_birth, 'gender_id': values['gender'], 'profile_micro': values['self_description'], 'country_id': request.env.user.company_id.country_id.id, 'state_id': values['state'], 'city_id': city_id.id, 'city': city_id.name, 'image': base64.encodestring(values['file'].read()), 'privacy_setting': 'private', 'age': age })
             
         #Automatically sign the new user in
         request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
@@ -98,10 +108,11 @@ class WebsiteDatingController(http.Controller):
         my_dates_count = len(my_dates)
  
         dating_suggestions = []
-        for i in range(0, 20):
-            rand_date = randint(1, len(my_dates) -1 )
-            my_date =  my_dates[rand_date]
-            dating_suggestions.append(my_date)
+        if my_dates_count > 0:
+            for i in range(0, 20):
+                rand_date = randint(1, len(my_dates) -1 )
+                my_date =  my_dates[rand_date]
+                dating_suggestions.append(my_date)
                 
         return http.request.render('website_dating.my_dating_list', {'my_dates': dating_suggestions, 'my_dates_count': my_dates_count} )
         

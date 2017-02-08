@@ -11,6 +11,8 @@
         <menuitem id="res_dating_localisation_parent_menu" name="Localisation" parent="res_dating_parent_menu" sequence="30"/>
         <menuitem id="res_country_state_city_import_menu" name="Import From Geonames" parent="res_dating_localisation_parent_menu" action="res_country_state_city_import_action" sequence="10"/>
         <menuitem id="res_country_state_city_menu" name="Cities" parent="res_dating_localisation_parent_menu" action="res_country_state_city_action" sequence="20"/>
-       
+
+        <menuitem id="res_dating_settings_menu" name="Settings" parent="res_dating_parent_menu" action="res_dating_settings_action" sequence="200"/>
+        
     </data>
 </openerp>

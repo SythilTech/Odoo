@@ -7,6 +7,7 @@
     'summary': "A directory of single people",
     'license':'LGPL-3',
     'data': [
+        'views/res_dating_settings_views.xml',
         'views/res_dating_views.xml',
         'views/res_partner_views.xml',
         'views/res_country_state_city.xml',

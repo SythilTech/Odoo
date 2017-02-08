@@ -175,8 +175,8 @@ class VoipController(http.Controller):
                 from_sip = request.env.user.partner_id.sip_address.strip()
                 to_sip = voip_call.partner_id.sip_address.strip()
                 reply = ""
-                reply += "INVITE " + to_sip + " SIP/2.0\r\n"
-                reply += "From: " + request.env.user.partner_id.name + "<sip:" + from_sip + ">;tag=odfgjh\r\n"
+                reply += "INVITE sip:" + to_sip + " SIP/2.0\r\n"
+                reply += "From: " + request.env.user.partner_id.name + "<sip:" + from_sip + ">; tag = odfgjh\r\n"
                 reply += "To: " + voip_call.partner_id.name.strip + "<sip:" + voip_call.partner_id.sip_address + ">\r\n"
                 reply += "CSeq: 1 INVITE\r\n"
                 reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
