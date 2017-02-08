@@ -18,11 +18,12 @@ class etq_results(models.Model):
     score = fields.Char(string="Score", compute="_compute_score")
     results = fields.One2many('etq.result.question', 'result_id', string="Results", readonly=True)
     
+    @api.one
     @api.depends('results')
     def _compute_score(self):
          num_questions = self.env['etq.result.question'].search_count([('result_id', '=', self.id)])
          correct_questions = self.env['etq.result.question'].search_count([('result_id', '=', self.id), ('correct', '=', True)])
-         self.score = str(correct_questions) + "/" + str(correct_questions) + " " + str( (num_questions / correct_questions) * 100) + "%"
+         self.score = str(correct_questions) + "/" + str(num_questions) + " " + str( float( float(correct_questions) / float(num_questions) ) * 100) + "%"
          
 class etq_result_question(models.Model):
 

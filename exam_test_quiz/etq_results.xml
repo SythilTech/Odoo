@@ -8,6 +8,7 @@
           <field name="arch" type="xml">
       	      <form>
       	          <group>
+      	              <field name="create_date" string="Finish Time"/>
       	              <field name="exam_id"/>
       	              <field name="user_id"/>
       	              <field name="score"/>
@@ -48,8 +49,10 @@
           <field name="model">etq.result</field>
           <field name="arch" type="xml">
       	      <tree>
+      	          <field name="create_date" string="Finish Time"/>
       	          <field name="exam_id"/>
       	          <field name="user_id"/>
+      	          <field name="score"/>
       	      </tree>
       	  </field>
       </record>
