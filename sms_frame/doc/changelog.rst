@@ -1,3 +1,7 @@
+v1.0.4
+======
+* utf-8 encoding for sms body
+
 v1.0.3
 ======
 * fix issue with onchange of mobile number
