@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">326688204428-fjb9lolui4k7ca82kmmogdk7qov89gi3.apps.googleusercontent.com</string>
+    <string name="firebase_database_url" translatable="false">https://odoo-cloud-tasks.firebaseio.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">326688204428</string>
+    <string name="google_api_key" translatable="false">AIzaSyC2D4MigZej3BzkomjR4e2BKs2AnpXIP3g</string>
+    <string name="google_app_id" translatable="false">1:326688204428:android:68c54f3bac6564c6</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyC2D4MigZej3BzkomjR4e2BKs2AnpXIP3g</string>
+    <string name="google_storage_bucket" translatable="false">odoo-cloud-tasks.appspot.com</string>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+      <record id="project_task_cloud_category_view_form" model="ir.ui.view">
+          <field name="name">project.task.cloud.category.form.view</field>
+          <field name="model">project.task.cloud.category</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <header>
+      	              <button type="object" name="test_push_notif" string="Test Push Notification"/>
+      	          </header>
+      	          <sheet>    
+      	              <group>
+      	                  <field name="name"/>
+          	      </group>
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="project_task_cloud_category_view_tree" model="ir.ui.view">
+          <field name="name">project.task.cloud.category.tree.view</field>
+          <field name="model">project.task.cloud.category</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="project_task_cloud_category_action" model="ir.actions.act_window">
+          <field name="name">Cloud Task Categoris</field>
+	  <field name="res_model">project.task.cloud.category</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+	      <p>
+	          No Project Task Categories
+	      </p>
+          </field>
+      </record>
+
+      <menuitem id="project_task_cloud_category_menu" name="Cloud Task Categories" parent="project.menu_project_management" action="project_task_cloud_category_action" sequence="20"/>
+      
+</odoo>
