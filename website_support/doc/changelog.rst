@@ -1,3 +1,7 @@
+v1.9.11
+=======
+* Translate help pages fix
+
 v1.9.10
 =======
 * Category email is now user language
