@@ -1,3 +1,7 @@
+v1.2.3
+======
+* translate help pages fix
+
 v1.2.2
 ======
 * category email not replacing placeholders
