@@ -12,7 +12,7 @@ class WebsiteSupportHelpGroups(models.Model):
 
     _name = "website.support.help.groups"
     
-    name = fields.Char(string="Help Group")
+    name = fields.Char(string="Help Group", translate=True)
     page_ids = fields.One2many('website.support.help.page','group_id',string="Pages")
     page_count = fields.Integer(string="Number of Pages", computed='_page_count')
     
@@ -27,7 +27,7 @@ class WebsiteSupportHelpPage(models.Model):
     _name = "website.support.help.page"
     _order = "name asc"
     
-    name = fields.Char(string='Page Name')
+    name = fields.Char(string='Page Name', translate=True)
     url = fields.Char(string="Page URL")
     url_generated = fields.Char(string="URL", compute='_compute_url_generated')
     group_id = fields.Many2one('website.support.help.groups', string="Group")
