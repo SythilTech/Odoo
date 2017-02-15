@@ -1,3 +1,7 @@
+v1.9.12
+=======
+* Translate help pages name fix 
+
 v1.9.11
 =======
 * Translate help pages fix
