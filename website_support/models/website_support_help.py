@@ -31,7 +31,7 @@ class WebsiteSupportHelpPage(models.Model):
     url = fields.Char(string="Page URL")
     url_generated = fields.Char(string="URL", compute='_compute_url_generated')
     group_id = fields.Many2one('website.support.help.groups', string="Group")
-    content = fields.Html(sanatize=False, string='Content', translate=True)
+    content = fields.Html(sanitize=False, string='Content', translate=True)
     feedback_ids = fields.One2many('website.support.help.page.feedback', 'hp_id', string="Feedback")
     feedback_average = fields.Float(string="Feedback Average Rating", compute="_compute_feedback_average")
     feedback_count = fields.Integer(string="Feedback Count", compute="_compute_feedback_count")

@@ -1,3 +1,7 @@
+v1.9.13
+=======
+* Help page Sanitize fix 
+
 v1.9.12
 =======
 * Translate help pages name fix 
