@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Recaptcha and telephone
+
 v1.0.6
 ======
 * Fix issue with dropbox(selection/m2o) and date field when generated from backend
