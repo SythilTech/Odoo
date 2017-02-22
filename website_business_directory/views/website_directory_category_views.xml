@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="website_directory_category_view_form" model="ir.ui.view">
+        <field name="name">website.directory.category form view</field>
+        <field name="model">res.partner.directory.category</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="parent_category"/>
+      	            <field name="children_category_ids"/>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+    <record id="website_directory_category_action" model="ir.actions.act_window">
+        <field name="name">Business Directory Categories</field>
+        <field name="res_model">res.partner.directory.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

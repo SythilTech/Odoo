@@ -195,7 +195,7 @@ $(document).ready(function() {
         <div class="container">
             <h1>My Listings</h1>
             <t t-foreach="businesses" t-as="business">
-                <t t-esc="business.name"/> <a t-attf-href="/directory/account/business/edit/#{ slug(business) }">Edit</a><br/>
+                <t t-esc="business.name"/> <a t-attf-href="/directory/account/business/edit/#{ slug(business) }">Edit</a> <a t-attf-href="/directory/account/business/upgrade/#{ slug(business) }">Change Plan</a><br/>
             </t>
             <a href="/directory/account/business/add">Add Business</a>
         </div>
@@ -314,6 +314,22 @@ $(document).ready(function() {
 		  <label><input type="checkbox" name="allow_restaurant_booking"/> Allow Restaurant Bookings</label>
                 </div>
                 <button t-attf-class="btn btn-primary btn-lg">Add Business</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<template id="directory_account_business_upgrade" name="Directory Business Upgrade" page="True">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1>Change Listing Plan</h1>
+            <form method="POST" action="/directory/account/business/upgrade/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-att-value="directory_company.id"/>
+                <!--<t t-foreach="plan_levels" t-as="plan_level">
+                    <input type="radio" name"plan_level" t-att-value="plan_level.id"/> <t t-esc="plan_level.name"/><br/>
+                </t>-->
+                <button t-attf-class="btn btn-primary btn-lg">Change Listing Plan</button>
             </form>
         </div>
     </t>

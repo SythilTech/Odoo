@@ -10,6 +10,8 @@
       	        <page string="Business Directory">
       	            <group>
       	                <field name="in_directory"/>
+      	                <field name="listing_level"/>
+      	                <field name="business_owner"/>
       	                <field name="directory_description"/>
       	                <field name="company_category_ids"/>
                         <field name="directory_monday_start"/>
@@ -18,7 +20,6 @@
                         <field name="directory_tuesday_end"/>
                         <field name="directory_wednesday_start"/>
                         <field name="directory_wednesday_end"/>
-                        <field name="directory_thursday_start"/><field name="directory_thursday_end"/>
                         <field name="directory_thursday_start"/>
                         <field name="directory_thursday_end"/>
                         <field name="directory_friday_start"/>

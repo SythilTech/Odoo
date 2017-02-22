@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="website_directory_billingplan_view_form" model="ir.ui.view">
+        <field name="name">website.directory.billingplan form view</field>
+        <field name="model">website.directory.billingplan</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+                    <field name="name"/>
+                    <field name="frequency"/>
+                    <field name="amount"/>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+    <record id="website_directory_billingplan_view_tree" model="ir.ui.view">
+        <field name="name">website.directory.billingplan tree view</field>
+        <field name="model">website.directory.billingplan</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="frequency"/>
+                <field name="amount"/>
+      	    </tree>
+      	</field>
+    </record>
+
+    <record id="website_directory_billingplan_action" model="ir.actions.act_window">
+        <field name="name">Business Directory Billing Plan</field>
+        <field name="res_model">website.directory.billingplan</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

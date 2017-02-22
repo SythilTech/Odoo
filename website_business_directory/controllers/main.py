@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import requests
 import werkzeug
 from datetime import datetime
 import json
@@ -55,41 +56,11 @@ class WebsiteBusinessDiretoryController(http.Controller):
         businesses = request.env['res.partner'].sudo().search([('in_directory','=', True), ('business_owner','=', request.env.user.id)])
         return http.request.render('website_business_directory.directory_account', {'businesses': businesses} )
 
-
-
-    @http.route('/directory/account/business/edit/<model("res.partner"):directory_company>', type='http', auth="user", website=True)
-    def directory_account_business_edit(self, directory_company, **kwargs):
-        if directory_company.in_directory and directory_company.business_owner.id == request.env.user.id:
-            countries = request.env['res.country'].search([])
-            states = request.env['res.country.state'].search([])
-            return http.request.render('website_business_directory.directory_account_business_edit', {'directory_company': directory_company, 'countries': countries,'states': states} )
-        else:
-            return "ACCESS DENIED"
-
     @http.route('/directory/account/business/add', type='http', auth="user", website=True)
     def directory_account_business_add(self, **kwargs):
         countries = request.env['res.country'].search([])
         states = request.env['res.country.state'].search([])
         return http.request.render('website_business_directory.directory_account_business_add', {'countries': countries,'states': states} )
-
-    @http.route('/directory/account/business/edit/process', type='http', auth="user", website=True)
-    def directory_account_business_edit_process(self, **kwargs):
-
-        values = {}
-	for field_name, field_value in kwargs.items():
-	    values[field_name] = field_value
-
-        business_logo = base64.encodestring(values['logo'].read() )
-
-        existing_record = request.env['res.partner'].browse( int(values['business_id'] ) )
-        
-        if existing_record.in_directory and existing_record.business_owner.id == request.env.user.id:
-            updated_listing = existing_record.sudo().write({'name': values['name'], 'email': values['email'], 'street': values['street'], 'city': values['city'], 'state_id': values['state'], 'country_id': values['country'], 'zip': values['zip'], 'directory_description': values['description'], 'directory_monday_start': values['directory_monday_start'], 'directory_monday_end': values['directory_monday_end'], 'directory_tuesday_start': values['directory_tuesday_start'], 'directory_tuesday_end': values['directory_tuesday_end'], 'directory_wednbesday_start': values['directory_wednesday_start'], 'directory_wednbesday_end': values['directory_wednesday_end'], 'directory_thursday_start': values['directory_thursday_start'], 'directory_thursday_end': values['directory_thursday_end'], 'directory_friday_start': values['directory_friday_start'], 'directory_friday_end': values['directory_friday_end'], 'directory_saturday_start': values['directory_saturday_start'], 'directory_saturday_end': values['directory_saturday_end'], 'directory_sunday_start': values['directory_sunday_start'], 'directory_sunday_end': values['directory_sunday_end'], 'allow_restaurant_booking': values['allow_restaurant_booking'], 'image': business_logo })
-
-            #Redirect them to thier account page
-            return werkzeug.utils.redirect("/directory/account")
-        else:
-            return "Permission Denied"
 
     @http.route('/directory/account/business/add/process', type='http', auth="user", website=True)
     def directory_account_business_add_process(self, **kwargs):
@@ -130,6 +101,64 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
         #Redirect them to thier account page
         return werkzeug.utils.redirect("/directory/account")
+
+    @http.route('/directory/account/business/edit/<model("res.partner"):directory_company>', type='http', auth="user", website=True)
+    def directory_account_business_edit(self, directory_company, **kwargs):
+        if directory_company.in_directory and directory_company.business_owner.id == request.env.user.id:
+            countries = request.env['res.country'].search([])
+            states = request.env['res.country.state'].search([])
+            return http.request.render('website_business_directory.directory_account_business_edit', {'directory_company': directory_company, 'countries': countries,'states': states} )
+        else:
+            return "ACCESS DENIED"
+
+    @http.route('/directory/account/business/edit/process', type='http', auth="user", website=True)
+    def directory_account_business_edit_process(self, **kwargs):
+
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+
+        business_logo = base64.encodestring(values['logo'].read() )
+
+        existing_record = request.env['res.partner'].browse( int(values['business_id'] ) )
+        
+        if existing_record.in_directory and existing_record.business_owner.id == request.env.user.id:
+            updated_listing = existing_record.sudo().write({'name': values['name'], 'email': values['email'], 'street': values['street'], 'city': values['city'], 'state_id': values['state'], 'country_id': values['country'], 'zip': values['zip'], 'directory_description': values['description'], 'directory_monday_start': values['directory_monday_start'], 'directory_monday_end': values['directory_monday_end'], 'directory_tuesday_start': values['directory_tuesday_start'], 'directory_tuesday_end': values['directory_tuesday_end'], 'directory_wednbesday_start': values['directory_wednesday_start'], 'directory_wednbesday_end': values['directory_wednesday_end'], 'directory_thursday_start': values['directory_thursday_start'], 'directory_thursday_end': values['directory_thursday_end'], 'directory_friday_start': values['directory_friday_start'], 'directory_friday_end': values['directory_friday_end'], 'directory_saturday_start': values['directory_saturday_start'], 'directory_saturday_end': values['directory_saturday_end'], 'directory_sunday_start': values['directory_sunday_start'], 'directory_sunday_end': values['directory_sunday_end'], 'allow_restaurant_booking': values['allow_restaurant_booking'], 'image': business_logo })
+
+            #Redirect them to thier account page
+            return werkzeug.utils.redirect("/directory/account")
+        else:
+            return "Permission Denied"
+
+
+    @http.route('/directory/account/business/upgrade/<model("res.partner"):directory_company>', type='http', auth="user", website=True)
+    def directory_account_business_upgrade(self, directory_company, **kwargs):
+        if directory_company.in_directory and directory_company.business_owner.id == request.env.user.id:
+            plan_levels = request.env['website.directory.level'].search([('id','!=', directory_company.listing_level.id)])
+            return http.request.render('website_business_directory.directory_account_business_upgrade', {'directory_company': directory_company, 'plan_levels': plan_levels} )
+        else:
+            return "ACCESS DENIED"
+
+
+    @http.route('/directory/account/business/upgrade/process', type='http', auth="user", website=True)
+    def directory_account_business_upgrade_process(self, **kwargs):
+
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+
+        existing_record = request.env['res.partner'].browse( int(values['business_id'] ) )
+
+        if existing_record.in_directory and existing_record.business_owner.id == request.env.user.id:
+
+            #paypal_url = "https://api-3t.paypal.com/nvp?"
+            paypal_url = "https://api-3t.sandbox.paypal.com/nvp?"
+
+            #Submit details to paypal
+            return werkzeug.utils.redirect(paypal_url)
+        else:
+            return "Permission Denied"
+
 
     @http.route('/directory/review/process', type='http', auth="public", website=True)
     def directory_review_process(self, **kwargs):
