@@ -14,12 +14,12 @@ class WebsiteSupportHelpGroups(models.Model):
     
     name = fields.Char(string="Help Group", translate=True)
     page_ids = fields.One2many('website.support.help.page','group_id',string="Pages")
-    page_count = fields.Integer(string="Number of Pages", computed='_page_count')
+    page_count = fields.Integer(string="Number of Pages", compute='_page_count')
     
     @api.one
     @api.depends('page_ids')
     def _page_count(self):
-        """"Amount of help pages in a help group"""
+        """Amount of help pages in a help group"""
         self.page_count = self.env['website.support.help.page'].search_count([('group_id','=',self.id)])
     
 class WebsiteSupportHelpPage(models.Model):

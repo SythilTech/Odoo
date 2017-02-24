@@ -32,7 +32,7 @@
       </record>
 
       <record id="website_support_help_groups_action" model="ir.actions.act_window">
-          <field name="name">website.support.help.groups.action</field>
+          <field name="name">Website Help Groups</field>
       	  <field name="res_model">website.support.help.groups</field>
       	  <field name="view_type">form</field>
       	  <field name="view_mode">tree,form</field>
@@ -41,7 +41,7 @@
 	  </field>
       </record>
 
-      <menuitem id="website_support_help_groups_menu" name="Help Pages" parent="website_support_config_parent_menu" action="website_support_help_groups_action" sequence="50"/>
+      <menuitem id="website_support_help_groups_menu" name="Help Groups" parent="website_support_config_parent_menu" action="website_support_help_groups_action" sequence="50"/>
 
     </data>
 </openerp>

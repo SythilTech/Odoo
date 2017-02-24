@@ -1,3 +1,7 @@
+v1.2.5
+======
+* Added help page menu and help page count fix
+
 v1.2.4
 ======
 * translate help pages name fix
