@@ -150,6 +150,24 @@ $(document).ready(function() {
     </t>
 </template>
 
+<template id="directory_account_business_stats" name="Directory Company Page" page="True">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <table class="table table-striped">
+                <thead>
+                    <tr><th>Referer URL</th><th>Time</th><th>Location</th></tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="stats" t-as="stat">
+                        <tr><td><t t-esc="stat.ref"/></td><td><t t-esc="stat.create_date"/></td><td><t t-esc="stat.location"/></td></tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </t>
+</template>
+
+
 <template id="directory_company_menu" name="Directory Company Page" page="True">
     <t t-call="website.layout">
         <div class="container">
@@ -172,7 +190,7 @@ $(document).ready(function() {
         <div class="container">
             <h1>My Listings</h1>
             <t t-foreach="businesses" t-as="business">
-                <t t-esc="business.name"/> <a t-attf-href="/directory/account/business/edit/#{ slug(business) }">Edit</a><br/>
+                <t t-esc="business.name"/> <a t-attf-href="/directory/account/business/edit/#{ slug(business) }">Edit</a> <a t-attf-href="/directory/account/business/stats/#{ slug(business) }">Stats</a><br/>
             </t>
             <a href="/directory/account/business/add">Add Business</a>
         </div>

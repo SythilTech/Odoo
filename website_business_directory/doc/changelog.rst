@@ -1,3 +1,7 @@
+v0.7.1
+======
+* Basic business view stats
+
 v0.7.0
 ======
 * Private directory feature and overall revamp

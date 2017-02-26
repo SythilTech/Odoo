@@ -73,6 +73,14 @@ class WebsiteBusinessDiretoryController(http.Controller):
         else:
             return "ACCESS DENIED"
 
+    @http.route('/directory/account/business/stats/<model("res.partner"):directory_company>', type='http', auth="user", website=True)
+    def directory_account_business_stats(self, directory_company, **kwargs):
+        if directory_company.in_directory and directory_company.business_owner.id == request.env.user.id:
+            stats = request.env['website.directory.stat'].sudo().search([('listing_id', '=', directory_company.id)])
+            return http.request.render('website_business_directory.directory_account_business_stats', {'stats': stats} )
+        else:
+            return "ACCESS DENIED"
+
     @http.route('/directory/account/business/add', type='http', auth="user", website=True)
     def directory_account_business_add(self, **kwargs):
         countries = request.env['res.country'].search([])
@@ -162,6 +170,12 @@ class WebsiteBusinessDiretoryController(http.Controller):
 	    return werkzeug.utils.redirect("/directory/register")
         else:
             if directory_company.in_directory:
+            
+            	if "Referer" in request.httprequest.headers:
+	    	    ref = request.httprequest.headers['Referer']
+
+                isocountry = request.session.geoip and request.session.geoip.get('country_code') or False
+                request.env['website.directory.stat'].sudo().create({'listing_id': directory_company.id, 'ref':ref, 'ip': request.httprequest.remote_addr, 'location': isocountry})
                 return http.request.render('website_business_directory.directory_company_page', {'directory_company': directory_company} )
             else:
                 return "ACCESS DENIED"
