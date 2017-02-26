@@ -41,6 +41,16 @@
       	        </notebook>
       	    </field>
         </record>
+
+    <record id="business_directory_action" model="ir.actions.act_window">
+        <field name="name">Business Directory Listings</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('in_directory','=',True)]</field>
+        <field name="context">{'default_in_directory':1}</field>
+    </record>
+
         
     </data>
 </openerp>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+ 
+        <record id="website_directory_settings_form_view" model="ir.ui.view">
+            <field name="name">website.directory.settings form view</field>
+            <field name="model">website.directory.settings</field>
+            <field name="arch" type="xml">
+                <form class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <group>
+                        <field name="privacy_mode"/>
+                    </group>
+      	        </form>
+      	    </field>
+        </record>
+
+        <record id="website_directory_settings_action" model="ir.actions.act_window">
+            <field name="name">Website Directory Settings</field>
+            <field name="res_model">website.directory.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+        
+    </data>
+</openerp>

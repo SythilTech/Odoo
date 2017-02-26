@@ -15,7 +15,14 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
     @http.route('/directory', type="http", auth="public", website=True)
     def directory_search(self, **kwargs):
-        return http.request.render('website_business_directory.directory_search', {} )
+        privacy_mode = request.env['ir.values'].get_default('website.directory.settings', 'privacy_mode')
+        
+        if privacy_mode == "private":
+            return werkzeug.utils.redirect("/directory/register")
+        else:
+            listings = request.env['res.partner'].sudo().search([('in_directory','=', True)])
+            return http.request.render('website_business_directory.directory_search', {'listings':listings} )
+        
 
     @http.route('/directory/register', type="http", auth="public", website=True)
     def directory_register(self, **kwargs):
@@ -99,8 +106,34 @@ class WebsiteBusinessDiretoryController(http.Controller):
 	    values[field_name] = field_value
 
         business_logo = base64.encodestring(values['logo'].read() )
+                
+        insert_values = {'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name']}
 
-        new_listing = request.env['res.partner'].sudo().create({'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name'], 'email': values['email'], 'street': values['street'], 'city': values['city'], 'state_id': values['state'], 'country_id': values['country'], 'zip': values['zip'], 'directory_description': values['description'], 'directory_monday_start': values['directory_monday_start'], 'directory_monday_end': values['directory_monday_end'], 'directory_tuesday_start': values['directory_tuesday_start'], 'directory_tuesday_end': values['directory_tuesday_end'], 'directory_wednbesday_start': values['directory_wednesday_start'], 'directory_wednbesday_end': values['directory_wednesday_end'], 'directory_thursday_start': values['directory_thursday_start'], 'directory_thursday_end': values['directory_thursday_end'], 'directory_friday_start': values['directory_friday_start'], 'directory_friday_end': values['directory_friday_end'], 'directory_saturday_start': values['directory_saturday_start'], 'directory_saturday_end': values['directory_saturday_end'], 'directory_sunday_start': values['directory_sunday_start'], 'directory_sunday_end': values['directory_sunday_end'], 'allow_restaurant_booking': values['allow_restaurant_booking'], 'image': business_logo })
+        if 'email' in values: insert_values['email'] = values['email']
+        if 'street' in values: insert_values['street'] = values['street']
+        if 'city' in values: insert_values['city'] = values['city']
+        if 'state_id' in values: insert_values['state_id'] = values['state_id']
+        if 'country_id' in values: insert_values['country_id'] = values['country_id']
+        if 'zip' in values: insert_values['zip'] = values['zip']
+        if 'directory_description' in values: insert_values['directory_description'] = values['directory_description']
+        if 'directory_monday_start' in values: insert_values['directory_monday_start'] = values['directory_monday_start']
+        if 'directory_monday_end' in values: insert_values['directory_monday_end'] = values['directory_monday_end']
+        if 'directory_tuesday_start' in values: insert_values['directory_tuesday_start'] = values['directory_tuesday_start']
+        if 'directory_tuesday_end' in values: insert_values['directory_tuesday_end'] = values['directory_tuesday_end']
+        if 'directory_wednbesday_start' in values: insert_values['directory_wednbesday_start'] = values['directory_wednesday_start']
+        if 'directory_wednbesday_end' in values: insert_values['directory_wednbesday_end'] = values['directory_wednesday_end']
+        if 'directory_thursday_start' in values: insert_values['directory_thursday_start'] = values['directory_thursday_start']
+        if 'directory_thursday_end' in values: insert_values['directory_thursday_end'] = values['directory_thursday_end']
+        if 'directory_friday_start' in values: insert_values['directory_friday_start'] = values['directory_friday_start']
+        if 'directory_friday_end' in values: insert_values['directory_friday_end'] = values['directory_friday_end']
+        if 'directory_saturday_start' in values: insert_values['directory_saturday_start'] = values['directory_saturday_start']
+        if 'directory_saturday_end' in values: insert_values['directory_saturday_end'] = values['directory_saturday_end']
+        if 'directory_sunday_start' in values: insert_values['directory_sunday_start'] = values['directory_sunday_start']
+        if 'directory_sunday_end' in values: insert_values['directory_sunday_end'] = values['directory_sunday_end']
+        if 'allow_restaurant_booking' in values: insert_values['allow_restaurant_booking'] = True
+        insert_values['image'] =  business_logo
+        
+        new_listing = request.env['res.partner'].sudo().create(insert_values)
 
         #Redirect them to thier account page
         return werkzeug.utils.redirect("/directory/account")
@@ -123,10 +156,15 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
     @http.route('/directory/company/<model("res.partner"):directory_company>', type='http', auth="public", website=True)
     def directory_company_page(self, directory_company, **kwargs):
-        if directory_company.in_directory:
-            return http.request.render('website_business_directory.directory_company_page', {'directory_company': directory_company} )
+        privacy_mode = request.env['ir.values'].get_default('website.directory.settings', 'privacy_mode')
+        
+        if privacy_mode == "private":
+	    return werkzeug.utils.redirect("/directory/register")
         else:
-            return "ACCESS DENIED"
+            if directory_company.in_directory:
+                return http.request.render('website_business_directory.directory_company_page', {'directory_company': directory_company} )
+            else:
+                return "ACCESS DENIED"
 
     @http.route('/directory/company/<model("res.partner"):directory_company>/booking', type='http', auth="public", website=True)
     def directory_company_booking(self, directory_company, **kwargs):
@@ -165,13 +203,23 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
     @http.route('/directory/search/<search_string>', type="http", auth="public", website=True)
     def directory_search_results(self, search_string, **kwargs):
-        directory_companies = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string) ])
-        return http.request.render('website_business_directory.directory_search_results', {'directory_companies': directory_companies} )
+        privacy_mode = request.env['ir.values'].get_default('website.directory.settings', 'privacy_mode')
+        
+        if privacy_mode == "private":
+            return werkzeug.utils.redirect("/directory/register")
+        else:
+            directory_companies = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string) ])
+            return http.request.render('website_business_directory.directory_search_results', {'directory_companies': directory_companies} )
 
     @http.route('/directory/categories', type="http", auth="public", website=True)
     def directory_categories(self, **kwargs):
-        directory_categories = request.env['res.partner.directory.category'].sudo().search([('parent_category','=',False)])
-        return http.request.render('website_business_directory.directory_categories', {'directory_categories': directory_categories} )
+        privacy_mode = request.env['ir.values'].get_default('website.directory.settings', 'privacy_mode')
+        
+        if privacy_mode == "private":
+            return werkzeug.utils.redirect("/directory/register")
+        else:
+            directory_categories = request.env['res.partner.directory.category'].sudo().search([('parent_category','=',False)])
+            return http.request.render('website_business_directory.directory_categories', {'directory_categories': directory_categories} )
         
     @http.route('/directory/auto-complete',auth="public", website=True, type='http')
     def directory_autocomplete(self, **kw):

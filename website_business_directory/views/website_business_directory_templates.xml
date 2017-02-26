@@ -60,7 +60,11 @@ $(document).ready(function() {
                         <input type="search" class="form-control" id="search_business_directory" name="search" placeholder="Business name or type"/>
                     </div>
                     <div class="col-md-3"></div>
-                </div>     
+                </div>
+                <h1>Listings</h1>
+                <t t-foreach="listings" t-as="listing">
+                    <a t-attf-href="/directory/company/#{ slug(listing) }"><t t-esc="listing.name"/></a>
+                </t>
             </div>
         </div>
     </t>
@@ -103,8 +107,13 @@ $(document).ready(function() {
 <template id="directory_company_page" name="Directory Company Page" page="True">
     <t t-call="website.layout">
         <div class="container mt32 mb32">
+            <div class="pull-right">
+                <img t-att-src="website.image_url(directory_company, 'image_medium')" class="img-rounded mb8" t-attf-alt="#{directory_company.name} directory page"/><br/>
+            </div>
             <h1><t t-esc="directory_company.name"/></h1>
-            <t t-esc="directory_company.directory_description"/>
+            <t t-esc="directory_company.directory_description"/><br/>
+            Address: <t t-esc="directory_company.street"/> <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.country_id.name"/>
+            <hr/>
             <h2>Reviews</h2>
             <t t-foreach="directory_company.directory_review_ids" t-as="review">
                 <span t-field="review.name"/><br/>
@@ -190,7 +199,7 @@ $(document).ready(function() {
                 </div>
                 <div class="form-group">
                     <label for="country">Country*</label>
-                    <select name="country" class="form-control" required="True">
+                    <select name="country_id" class="form-control" required="True">
                         <option value="">Select Country</option>
                         <t t-foreach="countries" t-as="country">
                             <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
@@ -199,7 +208,7 @@ $(document).ready(function() {
                 </div>
                 <div class="form-group">
                     <label for="state">State*</label>
-                    <select name="state" class="form-control" required="True">
+                    <select name="state_id" class="form-control" required="True">
                         <option value="">Select State</option>
                         <t t-foreach="states" t-as="state">
                             <option t-attf-value="#{state.id}"><t t-esc="state.name"/></option>
@@ -219,8 +228,8 @@ $(document).ready(function() {
                     <input type="text" name="zip" class="form-control" required="True"/>
                 </div>
                 <div class="form-group">
-                    <label for="description">Business Description</label>
-                    <textarea name="description" class="form-control"/>
+                    <label for="directory_description">Business Description</label>
+                    <textarea name="directory_description" class="form-control"/>
                 </div>
                 <div class="form-group">
                     <label for="directory_monday_start">Monday Start Time</label>

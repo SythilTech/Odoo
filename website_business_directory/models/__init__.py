@@ -1,1 +1,1 @@
-import res_partner, website_directory_booking
+import website_directory_settings, res_partner, website_directory_booking
