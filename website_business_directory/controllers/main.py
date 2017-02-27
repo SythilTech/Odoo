@@ -171,6 +171,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         else:
             if directory_company.in_directory:
             
+                ref = ""
             	if "Referer" in request.httprequest.headers:
 	    	    ref = request.httprequest.headers['Referer']
 
