@@ -29,6 +29,36 @@ class ResPartnerDirectory(models.Model):
     display_online_menu = fields.Boolean(string="Display Online Menu")
     menu = fields.One2many('res.partner.directory.department', 'restaurant_id', string="Menu")
     directory_review_ids = fields.One2many('res.partner.directory.review', 'business_id', string=" Reviews")
+    directory_images = fields.One2many('website.directory.image', 'listing_id', string="Images")
+    directory_listing_open_hours = fields.One2many('website.directory.timeslot', 'business_id', string="Open Times")
+    directory_listing_monday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=','0')], string="Monday Open Times")
+    directory_listing_tuesday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',1)], string="Tuesday Open Times")
+    directory_listing_wednesday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',2)], string="Wednesday Open Times")
+    directory_listing_thursday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',3)], string="Thursday Open Times")
+    directory_listing_friday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',4)], string="Friday Open Times")
+    directory_listing_saturday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',5)], string="Saturday Open Times")
+    directory_listing_sunday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',6)], string="Sunday Open Times")
+    
+class WebsiteDirectoryTimeslot(models.Model):
+
+    _name = "website.directory.timeslot"
+
+    business_id = fields.Many2one('res.partner', string="Business")
+    day = fields.Selection([('0','Monday'), ('1','Tuesday'), ('2','Wednesday'), ('3','Thursday'), ('4','Friday'), ('5','Saturday'), ('6','Sunday')], string="Day")
+    start_time = fields.Float(string="Start Time")
+    start_time_string = fields.Char(compute='_compute_start_time_string', store=True, string="Start Time String")
+    end_time = fields.Float(string="End Time")
+    end_time_string = fields.Char(compute='_compute_end_time_string', store=True, string="End Time String")
+
+    @api.one
+    @api.depends('start_time')
+    def _compute_start_time_string(self):
+        self.start_time_string = '%02d:%02d' % divmod(self.start_time * 60, 60)
+
+    @api.one    
+    @api.depends('end_time')
+    def _compute_end_time_string(self):
+        self.end_time_string = '%02d:%02d' % divmod(self.end_time * 60, 60)
     
 class ResPartnerDirectoryReview(models.Model):
 

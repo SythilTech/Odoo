@@ -1,3 +1,7 @@
+v0.7.2
+======
+* Images and split timeslots
+
 v0.7.1
 ======
 * Basic business view stats

@@ -30,9 +30,22 @@
                             <field name="directory_sunday_end"/>
                             <field name="allow_restaurant_booking"/>
                             <field name="display_online_menu"/>
+                            <field name="directory_listing_open_hours">
+                                <tree editable="bottom">
+                                    <field name="day"/>
+                                    <field name="start_time" widget="float_time"/>
+                                    <field name="end_time" widget="float_time"/>
+                                </tree>
+                            </field>
                             <field name="menu">
                                 <tree>
                                     <field name="name"/>
+                                    <field name="description"/>
+                                </tree>
+                            </field>
+                            <field name="directory_images">
+                                <tree editable="bottom">
+                                    <field name="data"/>
                                     <field name="description"/>
                                 </tree>
                             </field>

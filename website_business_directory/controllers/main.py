@@ -176,7 +176,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
                 isocountry = request.session.geoip and request.session.geoip.get('country_code') or False
                 request.env['website.directory.stat'].sudo().create({'listing_id': directory_company.id, 'ref':ref, 'ip': request.httprequest.remote_addr, 'location': isocountry})
-                return http.request.render('website_business_directory.directory_company_page', {'directory_company': directory_company} )
+                return http.request.render('website_business_directory.directory_company_page', {'directory_company': directory_company, 'image_count': len(directory_company.directory_images) } )
             else:
                 return "ACCESS DENIED"
 

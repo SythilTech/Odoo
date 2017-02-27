@@ -63,7 +63,7 @@ $(document).ready(function() {
                 </div>
                 <h1>Listings</h1>
                 <t t-foreach="listings" t-as="listing">
-                    <a t-attf-href="/directory/company/#{ slug(listing) }"><t t-esc="listing.name"/></a>
+                    <a t-attf-href="/directory/company/#{ slug(listing) }"><t t-esc="listing.name"/></a><br/>
                 </t>
             </div>
         </div>
@@ -112,8 +112,19 @@ $(document).ready(function() {
             </div>
             <h1><t t-esc="directory_company.name"/></h1>
             <t t-esc="directory_company.directory_description"/><br/>
-            Address: <t t-esc="directory_company.street"/> <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.country_id.name"/>
+            Address: <t t-esc="directory_company.street"/> <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.country_id.name"/><br/>
+            <br/>
             <hr/>
+
+            <div class="col-md-9">
+            <t t-if="len(directory_company.directory_images) > 0">
+                <h2>Images</h2>
+                <section class="o_gallery s_image_gallery o_nomode o_spc-medium" t-attf-data-columns="#{image_count}" style="overflow: hidden;">
+                    <t t-foreach="directory_company.directory_images" t-as="image">
+                        <div class="col-md-3"><img t-att-src="website.image_url(image, 'data')" class="img img-responsive mb8 mt8 img-thumbnail" data-index="0"/></div>
+                    </t>
+                </section>      
+            </t>
             <h2>Reviews</h2>
             <t t-foreach="directory_company.directory_review_ids" t-as="review">
                 <span t-field="review.name"/><br/>
@@ -121,6 +132,7 @@ $(document).ready(function() {
                 <span t-field="review.description"/><br/>
                 <hr/>
             </t>
+
             <h2>Write Review</h2>
             <form method="POST" action="/directory/review/process" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
@@ -144,8 +156,59 @@ $(document).ready(function() {
 
                 <button t-attf-class="btn btn-primary btn-lg">Submit Review</button>
             </form>
-
-
+            </div>
+            <div class="col-md-3">
+                <h2 class="text-center">Times Open</h2><br/>
+                <strong>Monday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_monday_open_hours)==0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_monday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                </t>
+                <strong>Tuesday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_tuesday_open_hours) == 0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_tuesday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                </t> 
+                <strong>Wednesday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_wednesday_open_hours) == 0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_wednesday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                </t>                
+                <strong>Thursday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_thursday_open_hours) == 0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_thursday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                </t>                
+                <strong>Friday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_friday_open_hours) == 0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_friday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                </t>                
+                <strong>Saturday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_saturday_open_hours) == 0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_saturday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                </t>
+                <strong>Sunday</strong><br/>
+                <t t-if="len(directory_company.directory_listing_sunday_open_hours) == 0">
+                    Closed<br/>
+                </t>
+                <t t-foreach="directory_company.directory_listing_sunday_open_hours" t-as="open_hour">
+                    <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
+                 </t>
+            </div>
         </div>
     </t>
 </template>
