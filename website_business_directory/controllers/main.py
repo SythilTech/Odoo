@@ -21,12 +21,15 @@ class WebsiteBusinessDiretoryController(http.Controller):
             return werkzeug.utils.redirect("/directory/register")
         else:
             listings = request.env['res.partner'].sudo().search([('in_directory','=', True)])
-            return http.request.render('website_business_directory.directory_search', {'listings':listings} )
-        
+            categories = request.env['res.partner.directory.category'].sudo().search([])
+            return http.request.render('website_business_directory.directory_search', {'listings':listings, 'categories':categories} )        
 
     @http.route('/directory/register', type="http", auth="public", website=True)
     def directory_register(self, **kwargs):
-        return http.request.render('website_business_directory.directory_register', {} )
+        if request.env.user == request.website.user_id:
+            return http.request.render('website_business_directory.directory_register', {} )
+        else:
+            return werkzeug.utils.redirect("/directory/account")            
 
     @http.route('/directory/register/process', type="http", auth="public", website=True)
     def directory_register_process(self, **kwargs):
@@ -62,14 +65,13 @@ class WebsiteBusinessDiretoryController(http.Controller):
         businesses = request.env['res.partner'].sudo().search([('in_directory','=', True), ('business_owner','=', request.env.user.id)])
         return http.request.render('website_business_directory.directory_account', {'businesses': businesses} )
 
-
-
     @http.route('/directory/account/business/edit/<model("res.partner"):directory_company>', type='http', auth="user", website=True)
     def directory_account_business_edit(self, directory_company, **kwargs):
         if directory_company.in_directory and directory_company.business_owner.id == request.env.user.id:
             countries = request.env['res.country'].search([])
             states = request.env['res.country.state'].search([])
-            return http.request.render('website_business_directory.directory_account_business_edit', {'directory_company': directory_company, 'countries': countries,'states': states} )
+            directory_categories = request.env['res.partner.directory.category'].sudo().search([('parent_category','=',False)])
+            return http.request.render('website_business_directory.directory_account_business_edit', {'directory_company': directory_company, 'countries': countries,'states': states, 'directory_categories': directory_categories} )
         else:
             return "ACCESS DENIED"
 
@@ -85,7 +87,57 @@ class WebsiteBusinessDiretoryController(http.Controller):
     def directory_account_business_add(self, **kwargs):
         countries = request.env['res.country'].search([])
         states = request.env['res.country.state'].search([])
-        return http.request.render('website_business_directory.directory_account_business_add', {'countries': countries,'states': states} )
+        directory_categories = request.env['res.partner.directory.category'].sudo().search([('parent_category','=',False)])
+        
+        form_string = ""
+        
+        for extra_field in request.env['website.directory.field'].sudo().search([]):
+            method = '_generate_html_%s' % (extra_field.field_type.internal_type,)
+	    action = getattr(self, method, None)
+	    	        
+	    if not action:
+	        raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+	                
+	    form_string += action(extra_field)
+                
+        return http.request.render('website_business_directory.directory_account_business_add', {'countries': countries,'states': states, 'directory_categories':directory_categories, 'form_string':form_string} )
+
+    @http.route('/directory/account/business/add/process', type='http', auth="user", website=True)
+    def directory_account_business_add_process(self, **kwargs):
+
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+
+        business_logo = base64.encodestring(values['logo'].read() )                
+        
+        insert_values = {'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name']}
+
+        #Only add fields in allowed field list
+        for extra_field in request.env['website.directory.field'].sudo().search([]):
+            if extra_field.field_id.name in values:
+                insert_values[extra_field.field_id.name] = values[extra_field.field_id.name]
+
+        categories = []
+        for category in request.env['res.partner.directory.category'].sudo().search([]):
+            if "category_" + str(category.id) in values:
+                categories.append(category.id)
+                
+        insert_values['company_category_ids'] = [(6, 0, categories)]
+        if 'email' in values: insert_values['email'] = values['email']
+        if 'street' in values: insert_values['street'] = values['street']
+        if 'city' in values: insert_values['city'] = values['city']
+        if 'state_id' in values: insert_values['state_id'] = values['state_id']
+        if 'country_id' in values: insert_values['country_id'] = values['country_id']
+        if 'zip' in values: insert_values['zip'] = values['zip']
+        if 'directory_description' in values: insert_values['directory_description'] = values['directory_description']
+        if 'allow_restaurant_booking' in values: insert_values['allow_restaurant_booking'] = True
+        insert_values['image'] =  business_logo
+        
+        new_listing = request.env['res.partner'].sudo().create(insert_values)
+
+        #Redirect them to thier account page
+        return werkzeug.utils.redirect("/directory/account")
 
     @http.route('/directory/account/business/edit/process', type='http', auth="user", website=True)
     def directory_account_business_edit_process(self, **kwargs):
@@ -105,46 +157,6 @@ class WebsiteBusinessDiretoryController(http.Controller):
             return werkzeug.utils.redirect("/directory/account")
         else:
             return "Permission Denied"
-
-    @http.route('/directory/account/business/add/process', type='http', auth="user", website=True)
-    def directory_account_business_add_process(self, **kwargs):
-
-        values = {}
-	for field_name, field_value in kwargs.items():
-	    values[field_name] = field_value
-
-        business_logo = base64.encodestring(values['logo'].read() )
-                
-        insert_values = {'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name']}
-
-        if 'email' in values: insert_values['email'] = values['email']
-        if 'street' in values: insert_values['street'] = values['street']
-        if 'city' in values: insert_values['city'] = values['city']
-        if 'state_id' in values: insert_values['state_id'] = values['state_id']
-        if 'country_id' in values: insert_values['country_id'] = values['country_id']
-        if 'zip' in values: insert_values['zip'] = values['zip']
-        if 'directory_description' in values: insert_values['directory_description'] = values['directory_description']
-        if 'directory_monday_start' in values: insert_values['directory_monday_start'] = values['directory_monday_start']
-        if 'directory_monday_end' in values: insert_values['directory_monday_end'] = values['directory_monday_end']
-        if 'directory_tuesday_start' in values: insert_values['directory_tuesday_start'] = values['directory_tuesday_start']
-        if 'directory_tuesday_end' in values: insert_values['directory_tuesday_end'] = values['directory_tuesday_end']
-        if 'directory_wednbesday_start' in values: insert_values['directory_wednbesday_start'] = values['directory_wednesday_start']
-        if 'directory_wednbesday_end' in values: insert_values['directory_wednbesday_end'] = values['directory_wednesday_end']
-        if 'directory_thursday_start' in values: insert_values['directory_thursday_start'] = values['directory_thursday_start']
-        if 'directory_thursday_end' in values: insert_values['directory_thursday_end'] = values['directory_thursday_end']
-        if 'directory_friday_start' in values: insert_values['directory_friday_start'] = values['directory_friday_start']
-        if 'directory_friday_end' in values: insert_values['directory_friday_end'] = values['directory_friday_end']
-        if 'directory_saturday_start' in values: insert_values['directory_saturday_start'] = values['directory_saturday_start']
-        if 'directory_saturday_end' in values: insert_values['directory_saturday_end'] = values['directory_saturday_end']
-        if 'directory_sunday_start' in values: insert_values['directory_sunday_start'] = values['directory_sunday_start']
-        if 'directory_sunday_end' in values: insert_values['directory_sunday_end'] = values['directory_sunday_end']
-        if 'allow_restaurant_booking' in values: insert_values['allow_restaurant_booking'] = True
-        insert_values['image'] =  business_logo
-        
-        new_listing = request.env['res.partner'].sudo().create(insert_values)
-
-        #Redirect them to thier account page
-        return werkzeug.utils.redirect("/directory/account")
 
     @http.route('/directory/review/process', type='http', auth="public", website=True)
     def directory_review_process(self, **kwargs):
@@ -223,7 +235,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         if privacy_mode == "private":
             return werkzeug.utils.redirect("/directory/register")
         else:
-            directory_companies = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string) ])
+            directory_companies = request.env['res.partner'].sudo().search([('in_directory','=', True), '|', ('name','ilike', search_string), ('company_category_ids','=', search_string) ])
             return http.request.render('website_business_directory.directory_search_results', {'directory_companies': directory_companies} )
 
     @http.route('/directory/categories', type="http", auth="public", website=True)
@@ -239,6 +251,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
     @http.route('/directory/auto-complete',auth="public", website=True, type='http')
     def directory_autocomplete(self, **kw):
         """Provides an autocomplete list of businesses and typs in the directory"""
+        
         values = {}
         for field_name, field_value in kw.items():
             values[field_name] = field_value
@@ -251,14 +264,32 @@ class WebsiteBusinessDiretoryController(http.Controller):
         directory_partners = request.env['res.partner'].sudo().search([('in_directory','=',True), ('name','=ilike',"%" + values['term'] + "%")],limit=5)
         
         for directory_partner in directory_partners:
-            return_item = {"label": directory_partner.name + "<br/><sub>" + directory_partner.street + "</sub>","value": "/directory/search/" + str(values['term'])}
+            return_item = {"label": directory_partner.name + "<br/><sub>" + directory_partner.street + "</sub>","value": "/directory/search/" + directory_partner.name}
             my_return.append(return_item)
 
         #Get all business types that match the search term
         directory_categories = request.env['res.partner.directory.category'].sudo().search([('name','=ilike',"%" + values['term'] + "%")],limit=5)
         
         for directory_category in directory_categories:
-            return_item = {"label": directory_category.name,"value": "/directory/search/" + str(values['term']) }
+            return_item = {"label": directory_category.name,"value": "/directory/search/" + directory_category.name }
             my_return.append(return_item)
         
         return json.JSONEncoder().encode(my_return)
+
+    def _generate_html_textbox(self, field):
+        """Generate textbox HTML"""
+        html_output = ""        
+        html_output += "<div class=\"form-group\">\n"
+	html_output += "  <label class=\"control-label\" for=\"" + field.field_id.name.encode("utf-8") + "\">" + field.field_id.field_description.encode("utf-8") + "</label>\n"	    
+	html_output += "  <input type=\"text\" class=\"form-control\" name=\"" + field.field_id.name.encode("utf-8") + "\""
+		                                    
+	if field.field_id.required == True:
+	    html_output += " required=\"required\""
+		
+	if field.field_id.size > 0:
+	    html_output += ' maxlength="' + str(field.field_id.size) + '"'
+	
+	html_output += "/>\n"
+	html_output += "</div>\n"
+	
+	return html_output

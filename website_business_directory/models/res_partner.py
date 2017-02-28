@@ -93,4 +93,5 @@ class ResPartnerDirectoryCategory(models.Model):
 
     parent_category = fields.Many2one('res.partner.directory.category', string="Parent Category")
     children_category_ids = fields.One2many('res.partner.directory.category', 'parent_category', string="Child Categories")
+    listing_ids = fields.Many2many('res.partner', string="Listings")
     name = fields.Char(string="Category Name")

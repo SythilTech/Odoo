@@ -1,3 +1,5 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_res_partner_directory","directory access res.partner","base.model_res_partner","",1,0,0,0
+"access_res_partner","directory access res.partner","model_res_partner","directory_group",1,0,0,0
 "access_website_directory_review","directory access website.directory.review","model_res_partner_directory_review","",1,0,0,0
+"access_website_directory_image","directory access website.directory.image","model_website_directory_image","",1,0,0,0
+"access_website_directory_timeslot","directory access website.directory.timeslot","model_website_directory_timeslot","",1,0,0,0

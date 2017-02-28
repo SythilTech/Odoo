@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="website_directory_field_view_tree" model="ir.ui.view">
+        <field name="name">website.directory.field tree view</field>
+        <field name="model">website.directory.field</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+      	        <field name="field_id"/>
+      	        <field name="field_type"/>
+      	    </tree>
+      	</field>
+    </record>
+    
+    <record id="website_directory_field_action" model="ir.actions.act_window">
+        <field name="name">Extra Listing Fields</field>
+        <field name="res_model">website.directory.field</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

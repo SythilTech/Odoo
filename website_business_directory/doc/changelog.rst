@@ -1,3 +1,7 @@
+v0.8.0
+======
+* Custom listing fields
+
 v0.7.2
 ======
 * Images and split timeslots

@@ -10,6 +10,7 @@
       	            <field name="name"/>
       	            <field name="parent_category"/>
       	            <field name="children_category_ids"/>
+      	            <field name="listing_ids"/>
       	        </group>
       	    </form>
       	</field>

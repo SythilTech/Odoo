@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Admin and ERP manager have access to planner -->
+    <record id="allow_directory_partner_access" model="ir.rule">
+        <field name="name">"res_partner: portal/public: read access for directory listings"</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>        
+        <field name="perm_unlink" eval="0"/>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="domain_force">[('in_directory', '=', True)]</field>
+        <field name="groups" eval="[(4, [ref('base.group_public'), ref('base.group_portal')] )]"/>
+    </record>
+</odoo>

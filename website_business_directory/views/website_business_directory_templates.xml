@@ -61,10 +61,17 @@ $(document).ready(function() {
                     </div>
                     <div class="col-md-3"></div>
                 </div>
-                <h1>Listings</h1>
-                <t t-foreach="listings" t-as="listing">
-                    <a t-attf-href="/directory/company/#{ slug(listing) }"><t t-esc="listing.name"/></a><br/>
+                <h1 class="text-center">Listings</h1>
+                <t t-foreach="categories" t-as="category">
+                    <div class="col-md-4">
+                        <h2><t t-esc="category.name"/></h2>
+                        <t t-foreach="category.listing_ids" t-as="listing">
+                            <a t-attf-href="/directory/company/#{ slug(listing) }"><t t-esc="listing.name"/></a><br/>
+                        </t>                        
+                    </div>
                 </t>
+                
+
             </div>
         </div>
     </t>
@@ -86,10 +93,13 @@ $(document).ready(function() {
             <t t-foreach="directory_companies" t-as="directory_company">
                 <div class="panel panel-default">
 	            <div class="panel-body">
-	                <a t-attf-href="/directory/company/#{ slug(directory_company) }">
-	                    <img t-att-src="website.image_url(directory_company, 'image')" class="img-rounded" t-attf-alt="#{directory_company.name} Logo" width="100" height="100"/>
-	                    <span t-field="directory_company.name"/>
-	                </a><br/>
+	                <div>
+	                    <div class="pull-left"><a t-attf-href="/directory/company/#{ slug(directory_company) }"><img t-att-src="website.image_url(directory_company, 'image_medium')" class="img-rounded" t-attf-alt="#{directory_company.name} Logo"/></a></div>
+	                    <a t-attf-href="/directory/company/#{ slug(directory_company) }"><span t-field="directory_company.name"/></a><br/>
+	                    <t t-foreach="directory_company.company_category_ids" t-as="category">
+	                        <t t-esc="category.name"/>, 
+	                    </t>                
+	                </div>
 	                <span t-field="directory_company.street"/>, <span t-field="directory_company.city"/>, <span t-field="directory_company.state_id.name"/>, <span t-field="directory_company.zip"/>
 	                <t t-if="directory_company.allow_restaurant_booking">
 	                    <a t-attf-href="/directory/company/#{ slug(directory_company) }/booking">Make Booking</a>
@@ -107,15 +117,18 @@ $(document).ready(function() {
 <template id="directory_company_page" name="Directory Company Page" page="True">
     <t t-call="website.layout">
         <div class="container mt32 mb32">
-            <div class="pull-right">
-                <img t-att-src="website.image_url(directory_company, 'image_medium')" class="img-rounded mb8" t-attf-alt="#{directory_company.name} directory page"/><br/>
+            <div class="row">
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <img t-att-src="website.image_url(directory_company, 'image_medium')" class="img-rounded mb8" t-attf-alt="#{directory_company.name} directory page"/><br/>
+                </div>
+                <h1><t t-esc="directory_company.name"/></h1>
+                <t t-esc="directory_company.directory_description"/><br/>
+                Address: <t t-esc="directory_company.street"/>, <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.country_id.name"/><br/>                
             </div>
-            <h1><t t-esc="directory_company.name"/></h1>
-            <t t-esc="directory_company.directory_description"/><br/>
-            Address: <t t-esc="directory_company.street"/> <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.country_id.name"/><br/>
-            <br/>
+            </div>
             <hr/>
-
+            <div class="row">
             <div class="col-md-9">
             <t t-if="len(directory_company.directory_images) > 0">
                 <h2>Images</h2>
@@ -126,6 +139,9 @@ $(document).ready(function() {
                 </section>      
             </t>
             <h2>Reviews</h2>
+            <t t-if="len(directory_company.directory_review_ids) == 0">
+                No reviews for this listing yet, please consider writing one
+            </t>
             <t t-foreach="directory_company.directory_review_ids" t-as="review">
                 <span t-field="review.name"/><br/>
                 <span t-field="review.rating"/><br/>
@@ -158,6 +174,7 @@ $(document).ready(function() {
             </form>
             </div>
             <div class="col-md-3">
+                <iframe width="100%" height="250px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" t-attf-src="https://maps.google.com/maps?q=#{directory_company.street}, #{directory_company.city}, #{directory_company.state_id.name}, #{directory_company.country_id.name}&amp;output=embed&amp;z=8"></iframe>
                 <h2 class="text-center">Times Open</h2><br/>
                 <strong>Monday</strong><br/>
                 <t t-if="len(directory_company.directory_listing_monday_open_hours)==0">
@@ -207,7 +224,8 @@ $(document).ready(function() {
                 </t>
                 <t t-foreach="directory_company.directory_listing_sunday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
-                 </t>
+                </t>
+            </div>
             </div>
         </div>
     </t>
@@ -312,65 +330,13 @@ $(document).ready(function() {
                     <label for="directory_description">Business Description</label>
                     <textarea name="directory_description" class="form-control"/>
                 </div>
-                <div class="form-group">
-                    <label for="directory_monday_start">Monday Start Time</label>
-                    <input type="text" name="directory_monday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_monday_end">Monday End Time</label>
-                    <input type="text" name="directory_monday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_start">Tuesday Start Time</label>
-                    <input type="text" name="directory_tuesday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_end">Tuesday End Time</label>
-                    <input type="text" name="directory_tuesday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_wednesday_start">Wednesday Start Time</label>
-                    <input type="text" name="directory_wednesday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_wednesday_end">Wednesday End Time</label>
-                    <input type="text" name="directory_wednesday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_thursday_start">Thursday Start Time</label>
-                    <input type="text" name="directory_thursday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_thursday_end">Tuesday End Time</label>
-                    <input type="text" name="directory_thursday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_friday_start">Friday Start Time</label>
-                    <input type="text" name="directory_friday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_friday_end">Friday End Time</label>
-                    <input type="text" name="directory_friday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_saturday_start">Saturday Start Time</label>
-                    <input type="text" name="directory_saturday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_saturday_end">Saturday End Time</label>
-                    <input type="text" name="directory_saturday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_sunday_start">Sunday Start Time</label>
-                    <input type="text" name="directory_sunday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_sunday_end">Sunday End Time</label>
-                    <input type="text" name="directory_sunday_end" class="form-control"/>
-                </div>
-                <div class="checkbox">
-		  <label><input type="checkbox" name="allow_restaurant_booking"/> Allow Restaurant Bookings</label>
-                </div>
+                <strong>Categories</strong>
+                <t t-foreach="directory_categories" t-as="directory_category">
+                    <div class="checkbox">
+                        <label><input type="checkbox" t-attf-name="category_#{directory_category.id}" t-attf-value="#{directory_category.id}"/><t t-esc="directory_category.name"/></label>
+                    </div>
+                </t>
+                <t t-raw="form_string"/>
                 <button t-attf-class="btn btn-primary btn-lg">Add Business</button>
             </form>
         </div>
@@ -429,62 +395,6 @@ $(document).ready(function() {
                 <div class="form-group">
                     <label for="description">Business Description</label>
                     <textarea name="description" class="form-control"><t t-esc="directory_company.directory_description"/></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="directory_monday_start">Monday Start Time</label>
-                    <input type="text" name="directory_monday_start" class="form-control" t-att-value="directory_company.directory_monday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_monday_end">Monday End Time</label>
-                    <input type="text" name="directory_monday_end" class="form-control" t-att-value="directory_company.directory_monday_end"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_start">Tuesday Start Time</label>
-                    <input type="text" name="directory_tuesday_start" class="form-control" t-att-value="directory_company.directory_tuesday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_end">Tuesday End Time</label>
-                    <input type="text" name="directory_tuesday_end" class="form-control" t-att-value="directory_company.directory_tuesday_end"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_wednesday_start">Wednesday Start Time</label>
-                    <input type="text" name="directory_wednesday_start" class="form-control" t-att-value="directory_company.directory_wednesday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_wednesday_end">Wednesday End Time</label>
-                    <input type="text" name="directory_wednesday_end" class="form-control" t-att-value="directory_company.directory_wednesday_end"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_thursday_start">Thursday Start Time</label>
-                    <input type="text" name="directory_thursday_start" class="form-control" t-att-value="directory_company.directory_thursday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_thursday_end">Tuesday End Time</label>
-                    <input type="text" name="directory_thursday_end" class="form-control" t-att-value="directory_company.directory_thursday_end"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_friday_start">Friday Start Time</label>
-                    <input type="text" name="directory_friday_start" class="form-control" t-att-value="directory_company.directory_friday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_friday_end">Friday End Time</label>
-                    <input type="text" name="directory_friday_end" class="form-control" t-att-value="directory_company.directory_friday_end"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_saturday_start">Saturday Start Time</label>
-                    <input type="text" name="directory_saturday_start" class="form-control" t-att-value="directory_company.directory_saturday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_saturday_end">Saturday End Time</label>
-                    <input type="text" name="directory_saturday_end" class="form-control" t-att-value="directory_company.directory_saturday_end"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_sunday_start">Sunday Start Time</label>
-                    <input type="text" name="directory_sunday_start" class="form-control" t-att-value="directory_company.directory_sunday_start"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_sunday_end">Sunday End Time</label>
-                    <input type="text" name="directory_sunday_end" class="form-control" t-att-value="directory_company.directory_sunday_end"/>
                 </div>
                 <div class="checkbox">
 		  <label><input type="checkbox" name="allow_restaurant_booking" t-att-checked="directory_company.allow_restaurant_booking"/> Allow Restaurant Bookings</label>
@@ -570,7 +480,7 @@ $(document).ready(function() {
     </t>
 </template>
 
-<template id="directory_categories" name="Directory Search" page="True">
+<template id="directory_categories" name="Directory Categories" page="True">
     <t t-call="website.layout">
         <div class="container">
             <div class="mt16 mb16">
@@ -589,7 +499,7 @@ $(document).ready(function() {
     </t>
 </template>
 
-<template id="directory_categories_reoccursive" name="Directory Search Reoccusive" page="True">
+<template id="directory_categories_reoccursive" name="Directory Categories Reoccusive" page="True">
   <li>      
       <a href="#" t-field="cat.name"/>
       <ul t-if="cat.children_category_ids" class="nav nav-pills nav-stacked nav-hierarchy">

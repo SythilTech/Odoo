@@ -6,5 +6,6 @@
     <menuitem id="biz_directory_listing_menu" parent="biz_directory_parent_menu" name="Listings" action="business_directory_action" sequence="20"/>
     <menuitem id="business_directory_category_menu" parent="biz_directory_parent_menu" name="Categories" action="website_directory_category_action" sequence="30"/>
     <menuitem id="business_directory_settings_menu" parent="biz_directory_parent_menu" name="Settings" action="website_directory_settings_action" sequence="40"/>
+    <menuitem id="website_directory_field_menu" parent="biz_directory_parent_menu" name="Extra Fields" action="website_directory_field_action" sequence="50"/>
 
 </odoo>

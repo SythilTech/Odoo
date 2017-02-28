@@ -13,21 +13,6 @@
       	                    <field name="in_directory"/>
       	                    <field name="directory_description"/>
       	                    <field name="company_category_ids"/>
-                            <field name="directory_monday_start"/>
-                            <field name="directory_monday_end"/>
-                            <field name="directory_tuesday_start"/>
-                            <field name="directory_tuesday_end"/>
-                            <field name="directory_wednesday_start"/>
-                            <field name="directory_wednesday_end"/>
-                            <field name="directory_thursday_start"/><field name="directory_thursday_end"/>
-                            <field name="directory_thursday_start"/>
-                            <field name="directory_thursday_end"/>
-                            <field name="directory_friday_start"/>
-                            <field name="directory_friday_end"/>
-                            <field name="directory_saturday_start"/>
-                            <field name="directory_saturday_end"/>
-                            <field name="directory_sunday_start"/>
-                            <field name="directory_sunday_end"/>
                             <field name="allow_restaurant_booking"/>
                             <field name="display_online_menu"/>
                             <field name="directory_listing_open_hours">
