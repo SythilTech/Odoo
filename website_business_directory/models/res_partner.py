@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import re
+import urllib2
+
 from openerp import api, fields, models
 
 class ResPartnerDirectory(models.Model):
@@ -38,6 +41,15 @@ class ResPartnerDirectory(models.Model):
     directory_listing_friday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',4)], string="Friday Open Times")
     directory_listing_saturday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',5)], string="Saturday Open Times")
     directory_listing_sunday_open_hours = fields.One2many('website.directory.timeslot', 'business_id', domain=[('day','=',6)], string="Sunday Open Times")
+    directory_video_url = fields.Char(string="Directory Video URL")
+    directory_video_id = fields.Char(string="Directory Video ID")
+
+    @api.onchange('directory_video_url')
+    def _onchange_directory_video_url(self):
+        if self.directory_video_url:
+            expr = re.compile(r'^.*((youtu.be/)|(v/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*')
+            arg = expr.match(self.directory_video_url)
+            self.directory_video_id = arg and arg.group(7) or False
     
 class WebsiteDirectoryTimeslot(models.Model):
 

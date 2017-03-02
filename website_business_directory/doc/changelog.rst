@@ -1,3 +1,7 @@
+v0.8.1
+======
+* Video demo for listings
+
 v0.8.0
 ======
 * Custom listing fields

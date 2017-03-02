@@ -130,6 +130,11 @@ $(document).ready(function() {
             <hr/>
             <div class="row">
             <div class="col-md-9">
+            <t t-if="directory_company.directory_video_id">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" t-attf-src="//www.youtube.com/embed/#{directory_company.directory_video_id}?theme=light" allowFullScreen="true" frameborder="0"></iframe>
+                </div>
+            </t>            
             <t t-if="len(directory_company.directory_images) > 0">
                 <h2>Images</h2>
                 <section class="o_gallery s_image_gallery o_nomode o_spc-medium" t-attf-data-columns="#{image_count}" style="overflow: hidden;">
