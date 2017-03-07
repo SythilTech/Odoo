@@ -277,7 +277,7 @@ class HtmlFormDefaults(models.Model):
     model_id = fields.Many2one('ir.model', string="Model", readonly=True)
     model = fields.Char(related="model_id.model", string="Model Name", readonly=True)
     field_id = fields.Many2one('ir.model.fields', string="Form Fields")
-    default_value = fields.Char(string="Default Value")
+    default_value = fields.Char(string="Default Value", help="use 'user_id' to get the current website user, 'partner_id' for the user partner record")
 
 class HtmlFormFieldType(models.Model):
 

@@ -1,3 +1,7 @@
+v1.0.8
+======
+* User and partner access in default values
+
 v1.0.7
 ======
 * Recaptcha and telephone
