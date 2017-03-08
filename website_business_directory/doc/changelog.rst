@@ -1,3 +1,7 @@
+v0.8.2
+======
+* Add timeslots from website frontend
+
 v0.8.1
 ======
 * Video demo for listings

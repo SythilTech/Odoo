@@ -1,6 +1,6 @@
 {
     'name': "Website Business Directory",
-    'version': "0.8.1",
+    'version': "0.8.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

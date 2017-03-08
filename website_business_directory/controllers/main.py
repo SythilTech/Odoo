@@ -133,8 +133,43 @@ class WebsiteBusinessDiretoryController(http.Controller):
         if 'directory_description' in values: insert_values['directory_description'] = values['directory_description']
         if 'allow_restaurant_booking' in values: insert_values['allow_restaurant_booking'] = True
         insert_values['image'] =  business_logo
-        
+            
         new_listing = request.env['res.partner'].sudo().create(insert_values)
+
+        if 'monday_start' in values and 'monday_end' in values:
+            start_time = values['monday_start']
+            end_time = values['monday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '0', 'start_time': start_time, 'end_time': end_time})
+
+        if 'tuesday_start' in values and 'tuesday_end' in values:
+            start_time = values['tuesday_start']
+            end_time = values['tuesday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '1', 'start_time': start_time, 'end_time': end_time})
+
+        if 'wednesday_start' in values and 'wednesday_end' in values:
+            start_time = values['wednesday_start']
+            end_time = values['wednesday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '2', 'start_time': start_time, 'end_time': end_time})
+
+        if 'thursday_start' in values and 'thursday_end' in values:
+            start_time = values['thursday_start']
+            end_time = values['thursday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '3', 'start_time': start_time, 'end_time': end_time})
+
+        if 'friday_start' in values and 'friday_end' in values:
+            start_time = values['friday_start']
+            end_time = values['friday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '4', 'start_time': start_time, 'end_time': end_time})
+
+        if 'saturday_start' in values and 'saturday_end' in values:
+            start_time = values['saturday_start']
+            end_time = values['saturday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '5', 'start_time': start_time, 'end_time': end_time})
+
+        if 'sunday_start' in values and 'sunday_end' in values:
+            start_time = values['sunday_start']
+            end_time = values['sunday_end']
+            request.env['website.directory.timeslot'].sudo().create({'business_id': new_listing.id, 'day': '6', 'start_time': start_time, 'end_time': end_time})
 
         #Redirect them to thier account page
         return werkzeug.utils.redirect("/directory/account")
@@ -168,8 +203,13 @@ class WebsiteBusinessDiretoryController(http.Controller):
         directory_company = request.env['res.partner'].sudo().browse( int(values['business_id']) )        
         
         if directory_company.in_directory:
-            if int(values['rating']) >= 1 and int(values['rating']) <= 5:
-                request.env['res.partner.directory.review'].sudo().create({'business_id': values['business_id'], 'name': values['name'], 'description': values['description'], 'rating': values['rating'] })
+            if int(values['rating']) >= 1 and int(values['rating']) <= 5:            
+                new_review = request.env['res.partner.directory.review'].sudo().create({'business_id': values['business_id'], 'name': values['name'], 'description': values['description'], 'rating': values['rating'] })
+
+                #Send email
+                notification_template = request.env['ir.model.data'].sudo().get_object('website_business_directory', 'review_submitted')
+                notification_template.send_mail(new_review.id, True)
+
                 return werkzeug.utils.redirect("/directory/company/" + slug(directory_company) )
         else:
             return "ACCESS DENIED"

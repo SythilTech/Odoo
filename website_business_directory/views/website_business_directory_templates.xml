@@ -24,6 +24,25 @@
             </field>
         </record>
 
+        <record id="review_submitted" model="mail.template">
+            <field name="name">Directory Review Submitted</field>
+            <field name="model_id" ref="model_res_partner_directory_review"></field>
+            <field name="email_from"><![CDATA[${object.business_id.company_id.name} <${object.business_id.company_id.email}>]]></field>            
+            <field name="email_to">${object.business_id.email}</field>
+            <field name="subject">New ${object.business_id.company_id.name} Review</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.business_id.name},</p>
+                <p>A new review has been submitted for your listing, here are the details,</p>
+                <hr/>
+                <b>Name:</b> ${object.name}<br/>
+                <b>Rating:</b> ${object.rating} Stars<br/>
+                <b>Description:</b><br/>
+                ${object.description}
+            ]]>
+            </field>
+        </record>
+        
 <!--<template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front Directory Editor">
     <xpath expr="." position="inside">
         <script type="text/javascript" src="/website_business_directory/static/src/js/website_business_directory.editor.front.js"></script>
@@ -181,49 +200,49 @@ $(document).ready(function() {
             <div class="col-md-3">
                 <iframe width="100%" height="250px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" t-attf-src="https://maps.google.com/maps?q=#{directory_company.street}, #{directory_company.city}, #{directory_company.state_id.name}, #{directory_company.country_id.name}&amp;output=embed&amp;z=8"></iframe>
                 <h2 class="text-center">Times Open</h2><br/>
-                <strong>Monday</strong><br/>
+                <label style="width:90px;">Monday</label>
                 <t t-if="len(directory_company.directory_listing_monday_open_hours)==0">
                     Closed<br/>
                 </t>
                 <t t-foreach="directory_company.directory_listing_monday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
                 </t>
-                <strong>Tuesday</strong><br/>
+                <label style="width:90px;">Tuesday</label>
                 <t t-if="len(directory_company.directory_listing_tuesday_open_hours) == 0">
                     Closed<br/>
                 </t>
                 <t t-foreach="directory_company.directory_listing_tuesday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
                 </t> 
-                <strong>Wednesday</strong><br/>
+                <label style="width:90px;">Wednesday</label>
                 <t t-if="len(directory_company.directory_listing_wednesday_open_hours) == 0">
                     Closed<br/>
                 </t>
                 <t t-foreach="directory_company.directory_listing_wednesday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
                 </t>                
-                <strong>Thursday</strong><br/>
+                <label style="width:90px;">Thursday</label>
                 <t t-if="len(directory_company.directory_listing_thursday_open_hours) == 0">
                     Closed<br/>
                 </t>
                 <t t-foreach="directory_company.directory_listing_thursday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
                 </t>                
-                <strong>Friday</strong><br/>
+                <label style="width:90px;">Friday</label>
                 <t t-if="len(directory_company.directory_listing_friday_open_hours) == 0">
                     Closed<br/>
                 </t>
                 <t t-foreach="directory_company.directory_listing_friday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
                 </t>                
-                <strong>Saturday</strong><br/>
+                <label style="width:90px;">Saturday</label>
                 <t t-if="len(directory_company.directory_listing_saturday_open_hours) == 0">
                     Closed<br/>
                 </t>
                 <t t-foreach="directory_company.directory_listing_saturday_open_hours" t-as="open_hour">
                     <t t-esc="open_hour.start_time_string"/> - <t t-esc="open_hour.end_time_string"/><br/>
                 </t>
-                <strong>Sunday</strong><br/>
+                <label style="width:90px;">Sunday</label>
                 <t t-if="len(directory_company.directory_listing_sunday_open_hours) == 0">
                     Closed<br/>
                 </t>
@@ -335,6 +354,119 @@ $(document).ready(function() {
                     <label for="directory_description">Business Description</label>
                     <textarea name="directory_description" class="form-control"/>
                 </div>
+                
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Monday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="monday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="monday_end"/>
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Tuesday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="tuesday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="tuesday_end"/>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Wednesday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="wednesday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="wednesday_end"/>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Thursday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="thursday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="thursday_end"/>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Friday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="friday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="friday_end"/>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Saturday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="saturday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="saturday_end"/>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label>Sunday</label>
+                    </div>
+                    <div class="col-md-3">
+                        Open
+                        <input type="checkbox"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Start Time" name="sunday_start"/>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Close Time" name="sunday_end"/>
+                    </div>
+                </div>
+                
                 <strong>Categories</strong>
                 <t t-foreach="directory_categories" t-as="directory_category">
                     <div class="checkbox">
