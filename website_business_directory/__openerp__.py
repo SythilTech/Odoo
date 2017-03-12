@@ -1,6 +1,6 @@
 {
     'name': "Website Business Directory",
-    'version': "0.8.2",
+    'version': "0.8.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -13,6 +13,10 @@
         'views/website_directory_category_views.xml',
         'views/website_directory_settings_views.xml',
         'views/website_directory_field_views.xml',
+        'views/payment_method_views.xml',
+        'views/payment_method_token_wizard_views.xml',
+        'views/payment_acquirer_views.xml',
+        'views/payment_method_token_charge_views.xml',
         'views/menus.xml',
         'data/website.menu.csv',
         'data/res.groups.csv',
@@ -22,7 +26,7 @@
         'security/ir.rule.xml',
     ],
     'demo': [],
-    'depends': ['mail','website'],
+    'depends': ['mail','website','payment_paypal'],
     'images':[
         'static/description/1.jpg',
     ],

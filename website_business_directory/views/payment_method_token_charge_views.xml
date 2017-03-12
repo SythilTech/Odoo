@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="payment_method__charge_token_wizard_form_view" model="ir.ui.view">
+        <field name="name">payment.method.charge.token.wizard form view</field>
+        <field name="model">payment.method.charge.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="payment_method_id" invisible="True"/>
+      	            <field name="amount"/>
+      	            <field name="description"/>
+      	        </group>
+      	        <button name="charge_card" type="object" string="Charge Card"/>
+      	    </form>
+      	</field>
+    </record>
+
+</odoo>

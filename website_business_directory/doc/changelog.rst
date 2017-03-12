@@ -1,3 +1,7 @@
+v0.8.3
+======
+* Paypal token system which will ultimately be used by PPC advertising
+
 v0.8.2
 ======
 * Add timeslots from website frontend

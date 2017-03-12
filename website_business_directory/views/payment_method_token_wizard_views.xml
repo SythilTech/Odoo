@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="payment_method_token_wizard_form_view" model="ir.ui.view">
+        <field name="name">payment.method.token.wizard form view</field>
+        <field name="model">payment.method.token.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="payment_method_id" invisible="True"/>
+      	            <field name="type"/>
+      	            <field name="number"/>
+      	            <field name="expire_month" placeholder="MM"/>
+      	            <field name="expire_year" placeholder="YYYY"/>
+      	            <field name="cvv"/>
+      	        </group>
+      	        <button name="fetch_token" type="object" string="Fetch Token"/>
+      	    </form>
+      	</field>
+    </record>
+
+</odoo>

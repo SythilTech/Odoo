@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+ 
+        <record id="payment_method_tokenise_form_view" model="ir.ui.view">
+            <field name="name">Payment Method Tokise Form View</field>
+            <field name="model">payment.method</field>
+            <field name="inherit_id" ref="payment.payment_method_form_view"/>
+            <field name="arch" type="xml">
+      	        <form position="inside">
+      	            <header>
+      	                <button name="open_payment_token_wizard" type="object" string="Get Payment Token"/>
+                        <!--<button name="open_token_charge_wizard" type="object" string="Charge Card"/>-->
+      	            </header>
+      	        </form>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>
