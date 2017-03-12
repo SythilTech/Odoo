@@ -1,6 +1,6 @@
 {
     'name': "Website Color Palettes",
-    'version': "1.0",
+    'version': "1.1",
     'author': "Sythil Tech",
     'category': "Website",
     'support': "steven@sythiltech.com.au",
@@ -14,6 +14,7 @@
         'data/website.style.profile.less.csv',
         'views/website.xml',
         'views/website_templates.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [],
     'images':[
