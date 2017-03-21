@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+ 
+        <record id="payment_acquirer_paypal_oauth_form_view" model="ir.ui.view">
+            <field name="name">Payment Aquirer Paypal OAuth Form View</field>
+            <field name="model">payment.acquirer</field>
+            <field name="inherit_id" ref="payment_paypal.acquirer_form_paypal"/>
+            <field name="arch" type="xml">
+      	        <field name="paypal_email_account" position="before">
+      	            <field name="paypal_client_id"/>
+      	            <field name="paypal_secret"/>
+      	        </field>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>

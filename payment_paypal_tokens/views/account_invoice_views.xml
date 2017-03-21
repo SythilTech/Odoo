@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+ 
+        <record id="account_invoice_tokens_form_view" model="ir.ui.view">
+            <field name="name">Account Invoice Tokens Form View</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+      	        <field name="state" position="before">
+      	            <button name="%(payment_payment_token_charge_action)d" type="action" string="Charge Card" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" groups="account.group_account_invoice" class="oe_highlight" />
+      	        </field>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>

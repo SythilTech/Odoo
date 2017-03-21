@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <act_window
+            id="act_send_sms_partner_menu"
+            name="Register Token"
+            res_model="payment.method.token.wizard"
+            src_model="res.partner"
+            view_mode="form" target="new" 
+            limit="1"
+            view_type="form"
+            context="{'default_partner_id':active_id}"
+         />
+        
+    </data>
+</openerp>
