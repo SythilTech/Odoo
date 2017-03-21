@@ -15,7 +15,7 @@
                             <field name="state" invisible="1"/>
                             <group>
                                 <field name="journal_id" widget="selection"/>
-                                <field name="token_card_id"/>
+                                <field name="token_card_id" domain="[('partner_id','=',partner_id)]"/>
                                 <field name="hide_payment_method" invisible="1"/>
                                 <field name="payment_method_id" widget="radio" attrs="{'invisible': [('hide_payment_method', '=', True)]}"/>
                                 <field name="payment_method_code" invisible="1"/>
