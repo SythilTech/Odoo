@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="html_builder_editor" inherit_id="website.assets_editor" name="Youtube Snippet Resources">
+            <xpath expr="/t" position="inside">
+                <script type="text/javascript" src="/website_youtube_snippet/static/src/js/website.youtube.snippet.editor.js" />
+            </xpath>
+        </template>
+
+        <template id="website_youtube_options" name="Youtube Snippet Options" inherit_id="website.snippet_options">
+            <xpath expr="//div" position="after">
+                <div data-js='youtube_embed'
+                    data-selector=".embed-responsive"
+                    data-drop-in=".oe_structure, [data-oe-type=html]">
+                </div>
+            </xpath>
+        </template>
+
+
+        <template id="youtube_navbar" inherit_id="website.snippets" name="Youtube Snippet Navbar">
+            <xpath expr="//div[@id='snippet_structure']/div[@class='o_panel_body']" position="inside">
+                <t t-snippet="website_youtube_snippet.s_youtube_embed" t-thumbnail="/website_youtube_snippet/static/src/img/ui/snippet_thumb_youtube.jpg"/>
+            </xpath>    
+        </template>
+
+
+        <template id="s_youtube_embed" name="Youtube Embed Snippet">
+            <section class="container">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <!--<iframe class="embed-responsive-item" t-attf-src="//www.youtube.com/embed/embed_code?theme=light" allowFullScreen="true" frameborder="0"/>-->
+                    video
+                </div>
+            </section>
+        </template>
+
+    </data>
+</openerp>

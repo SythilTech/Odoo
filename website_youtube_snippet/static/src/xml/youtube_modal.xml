@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+
+<t t-name="website_youtube_snippet.youtube_embed">
+  <div class="modal fade" id="youtubeEmbedModal" contenteditable="False" contentEditable="false" backdrop="false" tabindex="1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:2001">
+  
+    <div class="modal-dialog">
+      <div class="modal-content gard_modal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close</span>
+          </button>
+          <h4 class="modal-title">Enter Embed Code</h4>
+        </div>
+          
+        <div class="modal-body" contenteditable="false">
+            
+            <div class="form-group">
+                <label for="youtube_embed_code" class="control-label">Youtube Embed Code</label>
+                <input type="text" id="youtube_embed_code" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label for="youtube_aspect_ratio" class="control-label">Aspect Ratio</label>
+                <select id="youtube_aspect_ratio" class="form-control">
+                    <option values="16by9">16x9</option>
+                </select>
+            </div>
+
+        </div> <!-- modal-body -->
+
+        <div class="modal-footer">
+          <button id="cancel" data-dismiss="modal" class="btn btn-primary">Cancel</button>
+          <button id="save_youtube_embed"  class="btn btn-danger">Save</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- / .modal -->
+</t>
+
+</templates>
