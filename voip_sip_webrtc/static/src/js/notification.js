@@ -16,7 +16,7 @@ var _t = core._t;
 var qweb = core.qweb;
 
 var mySound = "";
-var countdown = "30";
+var countdown;
 var secondsLeft;
 var callSeconds;
 var call_id = "";
@@ -70,6 +70,8 @@ WebClient.include({
 
                         var notif_text = from_name + " is calling";
 
+                        countdown = notification[1].ring_duration
+
                         var incomingNotification = new VoipCallIncomingNotification(self.notification_manager, "Incoming Call", notif_text, call_id);
 	                    self.notification_manager.display(incomingNotification);
 	                    mySound = new Audio(ringtone);
@@ -86,6 +88,7 @@ WebClient.include({
                         var notif_text = "Calling " + to_name;
                         var callee_partner_id = notification[1].callee_partner_id
 
+                        countdown = notification[1].ring_duration
 
                         outgoingNotification = new VoipCallOutgoingNotification(self.notification_manager, "Outgoing Call", notif_text, call_id);
 	                    self.notification_manager.display(outgoingNotification);
@@ -238,8 +241,9 @@ function gotRemoteStream(event) {
     remoteVideo.srcObject = event.streams[0];
     remoteStream = event.streams[0];
 
+    //FIXME interval gets called twice, half a second increment is a hack solution
     callSeconds = 0.5;
-    var interval = setInterval(function() {
+    var call_interval = setInterval(function() {
         $("#voip_text").html(callSeconds + " seconds");
         callSeconds += 0.5;
     }, 1000);
@@ -279,10 +283,11 @@ var VoipCallOutgoingNotification = Notification.extend({
         secondsLeft = countdown;
         $("#callsecondsoutgoingleft").html(secondsLeft);
 
-        var interval = setInterval(function() {
+        var outgoing_ring_interval = setInterval(function() {
             $("#callsecondsoutgoingleft").html(secondsLeft);
             if (secondsLeft == 0) {
 				myNotif.rpc("/voip/missed/" + call_id);
+				clearInterval(outgoing_ring_interval);
                 myNotif.destroy(true);
             }
 
@@ -321,13 +326,13 @@ var VoipCallIncomingNotification = Notification.extend({
         secondsLeft = countdown;
         $("#callsecondsincomingleft").html(secondsLeft);
 
-        var interval = setInterval(function() {
+        var incoming_ring_interval = setInterval(function() {
             $("#callsecondsincomingleft").html(secondsLeft);
             if (secondsLeft == 0) {
 				myNotif.rpc("/voip/missed/" + call_id);
                 mySound.pause();
                 mySound.currentTime = 0;
-                clearInterval(interval);
+                clearInterval(incoming_ring_interval);
                 myNotif.destroy(true);
             }
 

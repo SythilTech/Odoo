@@ -1,3 +1,7 @@
+v1.2
+====
+* Move ringtone into settings and move most controllers to voip.call model
+
 v1.1
 ====
 * Call is now within system rather then a new tab

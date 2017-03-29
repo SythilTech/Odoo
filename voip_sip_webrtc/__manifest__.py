@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication (BETA)",
-    'version': "1.1",
+    'version': "1.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -11,10 +11,11 @@
         'views/voip_sip_webrtc_templates.xml',
         'views/res_users_views.xml',
         'views/voip_call_views.xml',
-        'views/voip_ringtone_views.xml',
+        #'views/voip_ringtone_views.xml',
         'views/voip_settings_views.xml',
         'views/res_partner_views.xml',
         'security/ir.model.access.csv',
+        'data/voip_settings.xml',
     ],
     'demo': [],
     'depends': ['web','crm','bus'],

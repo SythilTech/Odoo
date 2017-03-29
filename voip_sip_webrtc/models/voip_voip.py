@@ -56,10 +56,7 @@ class VoipVoip(models.Model):
 
             _logger.error("INVITE: " + str(sip_invite) )
 
-            rintones = self.env['voip.ringtone'].search([])
-            ringtone = "/voip_sip_webrtc/static/src/audio/ringtone.mp3"
-            if len(rintones) > 0:
-                ringtone = "/voip/ringtone/1/ringtone.mp3"
+            ringtone = "/voip/ringtone/ringtone.mp3"
 
             #The call is created now so we can update it as a missed / rejected call or accepted, the timer for the call starts after being accepted though
             voip_call = self.env['voip.call'].create({'type': 'external', 'sip_tag': sip_tag})

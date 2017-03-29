@@ -19,14 +19,14 @@ from openerp.http import request
 
 class VoipController(http.Controller):         
    
-    @http.route('/voip/ringtone/<ringtone>/<filename>', type="http", auth="user")
-    def voip_ringtone(self, ringtone, filename):
+    @http.route('/voip/ringtone/<filename>', type="http", auth="user")
+    def voip_ringtone(self, filename):
         """Return the ringtone file to be used by javascript"""
         
-        voip_ringtone = request.env['voip.ringtone'].browse( int(ringtone) )
+        voip_ringtone = request.env['ir.values'].get_default('voip.settings', 'ringtone')
 
         headers = []
-        ringtone_base64 = base64.b64decode(voip_ringtone.media)
+        ringtone_base64 = base64.b64decode(voip_ringtone)
         headers.append(('Content-Length', len(ringtone_base64)))
         response = request.make_response(ringtone_base64, headers)
 
@@ -37,15 +37,7 @@ class VoipController(http.Controller):
         """Mark the call as accepted, and open the VOIP window"""
         
         voip_call = request.env['voip.call'].browse( int(call) )
-        #voip_call.start_time = datetime.datetime.now()
-        
-        #Assign yourself as the to partner
-        voip_call.partner_id = request.env.user.partner_id.id
-        
-        #Notify caller and callee that the call was accepted
-        for voip_client in voip_call.client_ids:
-            notification = {'call_id': voip_call.id, 'status': 'accepted', 'type': voip_call.type}
-            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
+        voip_call.accept_call()
 
         return True
 
@@ -54,15 +46,8 @@ class VoipController(http.Controller):
         """Mark the call as rejected"""
         
         voip_call = request.env['voip.call'].browse( int(call) )
-        
-        if voip_call.status == "pending":
-            voip_call.status = "rejected"
-        
-        #Notify caller and callee that the call was rejected
-        for voip_client in voip_call.client_ids:
-            notification = {'call_id': voip_call.id, 'status': 'rejected'}
-            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
-        
+        voip_call.reject_call()
+                
         return True
 
     @http.route('/voip/missed/<call>', type="json", auth="user")
@@ -70,25 +55,9 @@ class VoipController(http.Controller):
         """Mark the call as missed"""
         
         voip_call = request.env['voip.call'].browse( int(call) )
-        voip_call.status = "missed"
+        voip_call.miss_call()
+                    
         return True
-            
-    @http.route('/voip/window', type="http", auth="user")
-    def voip_window(self, **kwargs):
-        """Window for video calls which can be dragged around"""
-
-        values = {}
-        for field_name, field_value in kwargs.items():
-            values[field_name] = field_value
-        
-        voip_call = request.env['voip.call'].browse( int(values['call']) )
-
-        request.uid = request.session.uid
-        context = request.env['ir.http'].webclient_rendering_context()
-
-        context['voip_call'] = voip_call
-        
-        return http.request.render('voip_sip_webrtc.voip_window', qcontext=context)
 
     @http.route('/voip/call/connect', type="http", auth="user")
     def voip_call_connect(self, **kwargs):
@@ -105,13 +74,12 @@ class VoipController(http.Controller):
         #The client has accepted media access
         voip_client.state = "media_access"
 
-
         #If both clients have accepted media access we start the call
         if request.env['voip.call.client'].sudo().search_count([('vc_id','=', voip_call.id), ('state', '=', "media_access") ]) == 2:        
             
             #Send a notification to the caller to signal the start of the call
             notification = {'call_id': voip_call.id}
-            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.start', request.env.user.partner_id.id), notification)
+            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.start', voip_call.from_partner_id.id), notification)
 
         return "hi"
 
@@ -124,10 +92,24 @@ class VoipController(http.Controller):
             values[field_name] = field_value
             
         voip_call = request.env['voip.call'].browse( int(values['call']) )
-        voip_call.start_time = datetime.datetime.now() 
+        voip_call.begin_call()
         
         return "hi"
 
+
+    @http.route('/voip/call/end', type="http", auth="user")
+    def voip_call_end(self, **kwargs):
+        """Call ends when person clicks the the end call button"""
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+
+        voip_call = request.env['voip.call'].browse( int(values['call']) )
+        voip_call.end_call()
+                
+        return "Bye"
+        
     @http.route('/voip/call/sdp', type="http", auth="user")
     def voip_call_sdp(self, **kwargs):
         """Store the description and send it to everyone else"""
@@ -213,23 +195,3 @@ class VoipController(http.Controller):
         
         return "Hello"
         
-    @http.route('/voip/call/end', type="http", auth="user")
-    def voip_call_end(self, **kwargs):
-        """Call ends when person clicks the the end call button"""
-
-        values = {}
-        for field_name, field_value in kwargs.items():
-            values[field_name] = field_value
-
-        voip_call = request.env['voip.call'].browse( int(values['call']) )
-        voip_call.status = 'over'
-        voip_call.end_time = datetime.datetime.now()
-        diff_time = datetime.datetime.strptime(voip_call.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(voip_call.start_time, DEFAULT_SERVER_DATETIME_FORMAT)
-        voip_call.duration = str(diff_time.seconds) + " Seconds"
-
-        #Notify both caller and callee that the call is ended
-        for voip_client in voip_call.client_ids:
-            notification = {'call_id': voip_call.id}
-            request.env['bus.bus'].sendone((request._cr.dbname, 'voip.end', voip_client.partner_id.id), notification)
-        
-        return "Bye"

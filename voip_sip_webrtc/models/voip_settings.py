@@ -13,9 +13,56 @@ from openerp import api, fields, models
 class VoipSettings(models.Model):
 
     _name = "voip.settings"
-
+    _inherit = 'res.config.settings'            
+            
     missed_call_action = fields.Selection([('nothing', 'Nothing')], string="Missed Call Action", help="What action is taken when the call is missed")
+    ringtone = fields.Binary(string="Default Ringtone")
+    ringtone_filename = fields.Char("Ringtone Filename")
+    ring_duration = fields.Integer(string="Ring Duration (Seconds)")
+    sip_running = fields.Boolean(string="SIP Running", compute="_compute_sip_running")
     sip_listening = False
+
+    def _compute_sip_running(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex(('127.0.0.1',80))
+        if result == 0:
+            self.sip_running = False
+        else:
+            self.sip_running = True
+
+    #-----Ringtone-----
+
+    @api.multi
+    def get_default_ringtone(self, fields):
+        return {'ringtone': self.env['ir.values'].get_default('voip.settings', 'ringtone')}
+
+    @api.multi
+    def set_default_ringtone(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'ringtone', record.ringtone)
+
+    #-----Ringtone Filename-----
+
+    @api.multi
+    def get_default_ringtone_filename(self, fields):
+        return {'ringtone_filename': self.env['ir.values'].get_default('voip.settings', 'ringtone_filename')}
+
+    @api.multi
+    def set_default_ringtone_filename(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'ringtone_filename', record.ringtone_filename)
+
+    #-----Ring Duration-----
+
+    @api.multi
+    def get_default_ring_duration(self, fields):
+        return {'ring_duration': self.env['ir.values'].get_default('voip.settings', 'ring_duration')}
+
+    @api.multi
+    def set_default_ring_duration(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'ring_duration', record.ring_duration)
+
 
     def sip_server(self):
         _logger.error("Start SIP Listening")
