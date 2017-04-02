@@ -19,16 +19,20 @@ class VoipSettings(models.Model):
     ringtone = fields.Binary(string="Default Ringtone")
     ringtone_filename = fields.Char("Ringtone Filename")
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
-    sip_running = fields.Boolean(string="SIP Running", compute="_compute_sip_running")
+    sip_running = fields.Boolean(string="SIP Running")
     sip_listening = False
 
-    def _compute_sip_running(self):
+    @api.multi
+    def get_default_sip_running(self, fields):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         result = sock.connect_ex(('127.0.0.1',80))
+        sip_running = ""
         if result == 0:
-            self.sip_running = False
+            sip_running = False
         else:
-            self.sip_running = True
+            sip_running = True
+    
+        return {'sip_running': sip_running}
 
     #-----Ringtone-----
 
@@ -118,6 +122,11 @@ class VoipSettings(models.Model):
                     self.env['voip.voip'].start_incoming_sip_call(data, addr, sip_tag)
                     self._cr.close()
         
+        #Close the socket
+        _logger.error("SIP Shutdown")
+        serversocket.shutdown(socket.SHUT_RDWR)
+        serversocket.close()
+        
     def start_sip_server(self):
         #Start a new thread so you don't block the main Odoo thread
         sip_socket_thread = threading.Thread(target=self.sip_server, args=())
@@ -126,3 +135,4 @@ class VoipSettings(models.Model):
     def stop_sip_server(self):
         _logger.error("Stop SIP Server")
         sip_listening = False
+        self.sip_running = False

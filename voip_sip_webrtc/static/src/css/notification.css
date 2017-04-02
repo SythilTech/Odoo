@@ -1,18 +1,33 @@
-.s_voip_manager {
+.s-voip-manager {
     width: 300px;
-    max-width: 100%;
+    height: auto;
     z-index: 1100;
     position:absolute;
     bottom:10px;
-    right:0px;
+    right:10px;
+    resize: both;
     opacity:0;
-    background-color: #FCFBEA;
-    box-shadwo: 0px 0px 5px 1px #4c4c4c;
-    padding:10px;
+    border: black 1px solid;
+    overflow: auto;
+    background-color: #EEEEEE;
+    box-shadow: 0px 0px 5px 1px #4c4c4c;
 }
 
-.voip_call_image {
+.voip-call-image {
     width:100px;
     height:100px;
     margin-bottom:10px;
+}
+
+.voip-controls-panel {
+    float:right;
+    width:100px;
+}
+
+.voip-video-container {
+    margin-right:110px;
+    margin-left:10px;
+    margin-top:10px;
+    margin-bottom:10px;
+    text-align:center;
 }

@@ -1,3 +1,7 @@
+v1.2.1
+======
+* Revamp UI and fullscreen feature
+
 v1.2
 ====
 * Move ringtone into settings and move most controllers to voip.call model

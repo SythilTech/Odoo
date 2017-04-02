@@ -12,8 +12,11 @@ var bus = require('bus.bus').bus;
 var Notification = require('web.notification').Notification;
 var WebClient = require('web.WebClient');
 
+
 var _t = core._t;
 var qweb = core.qweb;
+
+ajax.loadXML('/voip_sip_webrtc/static/src/xml/voip_window2.xml', qweb);
 
 var mySound = "";
 var countdown;
@@ -44,16 +47,9 @@ WebClient.include({
 
     show_application: function() {
 
+        $('body').append(qweb.render('voip_sip_webrtc.VoipWindow', {}));
 
-
-        var voip_manager = "";
-        voip_manager += "<div class=\"s_voip_manager\">\n";
-        voip_manager += "    <video id=\"remoteVideo\" autoplay=\"autoplay\" style=\"width:100px;height:100px;\"/>";
-        voip_manager += "    <video id=\"localVideo\" autoplay=\"autoplay\" muted=\"muted\" style=\"width:100px;height:100px\"/>";
-        voip_manager += "    <button id=\"voip_end_call\" type=\"button\">End Call</button>\n";
-        voip_manager += "    <span id=\"voip_text\">Starting Call...</span>\n";
-        voip_manager += "</div>";
-        $('body').append(voip_manager);
+        $(".s-voip-manager").draggable();
 
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
@@ -114,7 +110,7 @@ WebClient.include({
 					}
 
 					if (status == "accepted") {
-                        $(".s_voip_manager").css("opacity","1");
+                        $(".s-voip-manager").css("opacity","1");
 
 
                         //Ask for media access
@@ -158,7 +154,7 @@ WebClient.include({
                     remoteStream.getAudioTracks()[0].stop();
                     remoteStream.getVideoTracks()[0].stop();
 
-                    $(".s_voip_manager").css("opacity","0");
+                    $(".s-voip-manager").css("opacity","0");
 				}
 
 
@@ -269,6 +265,16 @@ $(document).on('click', '#voip_end_call', function(){
         }
     });
 
+});
+
+$(document).on('click', '#voip_full_screen', function(){
+    $(".s-voip-manager").css("width","calc(100vw - 20px)");
+    $(".s-voip-manager").css("height","calc(100vh - 20px)");
+    $(".s-voip-manager").css("left","0px");
+    $(".s-voip-manager").css("top","0px");
+    $(".s-voip-manager").css("margin","10px");
+    $(".s-voip-manager").css("resize","none");
+    $("#remoteVideo").css("width","auto");
 });
 
 var VoipCallOutgoingNotification = Notification.extend({
