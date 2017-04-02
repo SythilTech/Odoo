@@ -156,21 +156,39 @@ class VoipController(http.Controller):
                 #Send the INVITE
                 from_sip = request.env.user.partner_id.sip_address.strip()
                 to_sip = voip_call.partner_id.sip_address.strip()
-                reply = ""
-                reply += "INVITE sip:" + to_sip + " SIP/2.0\r\n"
-                reply += "From: " + request.env.user.partner_id.name + "<sip:" + from_sip + ">; tag = odfgjh\r\n"
-                reply += "To: " + voip_call.partner_id.name.strip + "<sip:" + voip_call.partner_id.sip_address + ">\r\n"
-                reply += "CSeq: 1 INVITE\r\n"
-                reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
-                reply += "Content-Type: application/sdp\r\n"
-                reply += "Content-Disposition: session\r\n"
-                reply += "\r\n"
-                reply += sdp_data['sdp']
-                
-                serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                serversocket.sendto(reply, ('91.121.209.194', 5060) )
+                reg_from = from_sip("@")[1]
+                reg_to = to_sip.split("@")[1]
 
-                _logger.error("INVITE: " + reply )
+                register_string = ""
+                register_string += "REGISTER sip:" + reg_to + " SIP/2.0\r\n"
+                register_string += "Via: SIP/2.0/UDP " + reg_from + "\r\n"
+                register_string += "From: sip:" + from_sip + "\r\n"
+                register_string += "To: sip:" + to_sip + "\r\n"
+                register_string += "Call-ID: " + "17320@" + reg_to + "\r\n"
+                register_string += "CSeq: 1 REGISTER\r\n"
+                register_string += "Expires: 7200\r\n"
+                register_string += "Contact: " + request.env.user.partner_id.name + "\r\n"
+
+                serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                serversocket.sendto(register_string, ('91.121.209.194', 5060) )
+
+                _logger.error("REHISTER: " + register_string)
+
+                #reply = ""
+                #reply += "INVITE sip:" + to_sip + " SIP/2.0\r\n"
+                #reply += "From: " + request.env.user.partner_id.name + "<sip:" + from_sip + ">; tag = odfgjh\r\n"
+                #reply += "To: " + voip_call.partner_id.name.strip + "<sip:" + voip_call.partner_id.sip_address + ">\r\n"
+                #reply += "CSeq: 1 INVITE\r\n"
+                #reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
+                #reply += "Content-Type: application/sdp\r\n"
+                #reply += "Content-Disposition: session\r\n"
+                #reply += "\r\n"
+                #reply += sdp_data['sdp']
+                
+                #serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                #serversocket.sendto(reply, ('91.121.209.194', 5060) )
+
+                #_logger.error("INVITE: " + reply )
         
         return "Hello"
 
