@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_import_odbc_table_form_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc.table form view</field>
+        <field name="model">migration.import.odbc.table</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+      	            <button type="object" name="import_table_data_wrapper" string="Import Table Data"/>
+      	        </header>
+      	        <group>
+      	            <field name="import_id"/>
+      	            <field name="name"/>
+      	            <field name="model_id"/>
+      	            <field name="db_field_ids">
+      	                <tree create="false" editable="bottom">
+      	                    <field name="name"/>
+      	                    <field name="orm_type" invisible="True"/>
+      	                    <field name="orm_name" invisible="True"/>
+      	                    <field name="model_id" invisible="True"/>
+      	                    <field name="is_key" invisible="True"/>
+      	                    <field name="field_id" attrs="{'readonly': [('is_key', '=', True)]}" domain="[('model_id','=',model_id)]" context="{'default_ttype':orm_type, 'default_name': orm_name, 'default_field_description':name, 'default_model_id':model_id}"/>
+      	                    <button type="object" name="auto_create_field" string="Auto Create Field"/>
+      	                </tree>
+      	            </field>
+                    <field name="default_value_ids" context="{'default_model_id':model_id}">
+                        <tree editable="bottom">
+                            <field name="model_id" invisible="True"/>
+                            <field name="field_id" domain="[('model_id','=',model_id)]"/>
+                            <field name="value"/>
+                        </tree>
+                    </field>
+      	            <field name="select_sql"/>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+</odoo>

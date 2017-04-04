@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="migration_top_menu" name="Migration" sequence="80"/>        
+    <menuitem id="migration_parent_menu" parent="migration_top_menu" name="Migration" sequence="10"/>
+    <menuitem id="odbc_import_menu" parent="migration_parent_menu" name="ODBC Import" action="migration_import_odbc_action" sequence="10"/>
+    <menuitem id="import_log_menu" parent="migration_parent_menu" name="Import Log" action="migration_import_odbc_log_action" sequence="20"/>
+    
+</odoo>

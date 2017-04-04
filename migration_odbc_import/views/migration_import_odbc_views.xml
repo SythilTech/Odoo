@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_import_odbc_form_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc form view</field>
+        <field name="model">migration.import.odbc</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button type="object" name="check_data_sources" string="Check Data Sources"/>
+                    <button type="object" name="test_connection" string="Test Connection"/>
+      	            <button type="object" name="analyse_database" string="Analyse Databae"/>
+      	            <button type="object" name="import_all_data" string="Import All Data"/>
+      	            <button type="object" name="create_scheduled_import" string="Create Scheduled Import"/>
+      	        </header>
+      	        <group>
+      	            <field name="name"/>
+                    <field name="dsn_id"/>
+                    <field name="connection_string_template"/>
+                    <field name="connection_string"/>
+                </group>
+                See <a href="https://www.connectionstrings.com">https://www.connectionstrings.com</a> if you want to manually create your own connection string
+                <group>
+      	            <field name="db_table_ids">
+      	                <tree create="false" edit="false">
+      	                    <field name="name"/>
+      	                    <field name="model_id"/>
+      	                    <field name="field_count"/>
+      	                    <button type="object" name="open_line" string="Edit Table"/>
+      	                    <!--<field name="db_field_ids"/>-->
+      	                </tree>
+      	            </field>
+      	            <field name="import_log_ids">
+      	                <tree>
+      	                    <field name="create_date"/>
+      	                    <field name="state"/>
+      	                </tree>
+      	            </field>
+                </group>
+      	    </form>
+      	</field>
+    </record>
+
+    <record id="migration_import_odbc_action" model="ir.actions.act_window">
+        <field name="name">ODBC Import</field>
+        <field name="res_model">migration.import.odbc</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

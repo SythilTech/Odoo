@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_import_odbc_table_field_form_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc.table.field form view</field>
+        <field name="model">migration.import.odbc.table.field</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="orm_type" invisible="True"/>
+      	            <field name="orm_name" invisible="True"/>
+      	            <field name="model_id" invisible="True"/>
+      	            <field name="field_id"/>
+      	            <button type="object" name="auto_create_field" string="Auto Create Field"/>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+</odoo>

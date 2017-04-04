@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_import_odbc_log_form_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc.log form view</field>
+        <field name="model">migration.import.odbc.log</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="create_date"/>
+      	            <field name="import_id"/>
+                    <field name="state"/>
+                    <field name="table_ids">
+                        <tree>
+                            <field name="table_id"/>
+                            <field name="imported_records"/>
+                            <field name="total_records"/>
+                        </tree>
+                    </field>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+    <record id="migration_import_odbc_log_tree_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc.log tree view</field>
+        <field name="model">migration.import.odbc.log</field>
+        <field name="arch" type="xml">
+            <tree>
+      	        <field name="create_date"/>
+      	        <field name="import_id"/>
+                <field name="state"/>
+      	    </tree>
+      	</field>
+    </record>
+    
+    <record id="migration_import_odbc_log_action" model="ir.actions.act_window">
+        <field name="name">ODBC Import Log</field>
+        <field name="res_model">migration.import.odbc.log</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+</odoo>

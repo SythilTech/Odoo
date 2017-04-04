@@ -1,0 +1,53 @@
+<div class="container">
+<h2>Description</h2>
+<p>A series of tools designed to assist in migration/synchronisation of external data</p>
+<p>for those interested in synchronising data from popular 3rd party apps such as Goolge Contacts, Quickbooks Online or Mailchimp it is best to download the individual module designed for that purpose.</p>
+<p><b>*NOTE*</b> You will need to install the python package 'pyodbc' and the odbc database driver for your database to operate this module</p>
+
+<hr/>
+
+<div class="row">
+<div class="col-md-6">
+<img src="1.jpg" class="img-responsive"/>
+</div>
+<div class="col-md-6">
+<h2>Import via ODBC</h2>
+<p>Import data from external databases such as MySQL, Microsoft Access or even dsv files</p>
+<p>You can also import the data on a schedule if the external database is in production and constantly gets new data</p>
+<h3>Instructions</h3>
+<ol>
+<li>Install the odbc driver for the database you intent to conect to</li>
+<li>Allow remote access to the database if neccassary</li>
+<li>Go to Migration->Migration->ODBC Import and create a new record</li>
+<li>Click "Check Data Sources" to get a list of available driver then select a connection string template</li>
+<li>Edit the connection string with details about the database such as address, name, username, password</li>
+<li>Test the connection and when successful analyse the database</li>
+<li>Map the database tables to ORM model and the table columns to ORM fields</li>
+</ol>
+</div>
+</div>
+
+<hr/>
+
+<div class="row">
+<div class="col-md-6">
+<h2>Auto create fields</h2>
+<p>Automatically create fields on the fly</p>
+<p>Transform data before you import it by modifying the Select SQL, e.g. select concat(firstname,' ',lastname) as name from members</p>
+<h3>Instructions</h3>
+<ol>
+<li>Hit edit table link on the main import wizard from</li>
+<li>You can manually create new fields using the "create and edit" option or use the auto create field link</li>
+<li>Fields are automatically selected if they have the same name as the field in the model e.g. members fax->crm.lead fax</li>
+</ol>
+</div>
+<div class="col-md-6">
+<img src="2.jpg" class="img-responsive"/>
+</div>
+</div>
+
+<hr/>
+
+<br/>
+Find a bug? feature idea? send an email to <a href="mailto:steven@sythiltech.com.au">steven@sythiltech.com.au</a><br>
+</div>
