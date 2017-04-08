@@ -1,2 +1,0 @@
-"id","name","perm_read","perm_write","perm_create","perm_unlink","model_id","domain_force","groups"
-"hide_dating_register","Hide Register Dating Profile from non-public users","1","0","0","0","website.menu","[('url','not like','%/dating/profile/register%')]","Dating"
