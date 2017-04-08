@@ -16,37 +16,56 @@ var contentMenu = require('website.contentMenu');
 var websiteAce = require('website.ace');
 var qweb = core.qweb;
 
-ajax.loadXML('/website_style_manager/static/src/xml/website_style_templates4.xml', qweb);
+ajax.loadXML('/website_style_manager/static/src/xml/website_style_templates3.xml', qweb);
 
-    contentMenu.TopBar.include({
-        CustomCSSView: function() {
+var CustomCSSEditor = Widget.extend({
+    template: 'website_style_manager.custom_css',
+    events: {
+		'click a[data-action=CustomCSSView]': 'launchCSS',
+    },
+    launchCSS: function (e) {
+        var self = this;
 
-    		var self = this;
+    	this.template = 'website_style_manager.custom_css';
+    	self.$modal = $( qweb.render(this.template, {}) );
+    	$('body').append(self.$modal);
+        self.$modal.removeClass('oe_ccsse_closed').addClass('oe_ccsse_open');
+	    session.rpc('/style/load', {}).then(function(result) {
+		    $("#website-custom-css").html(result.css_string);
+        });
 
-    		this.template = 'website_style_manager.custom_css_modal';
-    		self.$modal = $( qweb.render(this.template, {}) );
 
-    		$('body').append(self.$modal);
 
-			session.rpc('/style/load', {}).then(function(result) {
-			    self.$modal.find("#css_tags_tab").html(result.html_string)
-			    self.$modal.find("#custom_css_text").val(result.custom_css)
-            });
-
-            $('#oe_webpage_custom_css_modal').modal('show');
-
-            $('body').on('click', '#submit_custom_css', function() {
-			    var page_template = $(this).data('template');
-			    var page_name = $("#sythil_page_name").val();
-				session.rpc('/styles/save', {'template_id': page_template, 'page_name': page_name}).then(function(result) {
-				    //redirect to new page
-					window.location.href = "/page/" + result.page_name;
-				});
-
-            });
-
-        },
+    $("#saveCSS").click(function() {
+	    session.rpc('/style/save', {'css': $("#website-custom-css").val() }).then(function(result) {
+			alert("Save Complete");
+		    $("#custom_css_header").html(result.css_string);
+        });
     });
 
+    $("#formatCSS").click(function() {
+         alert("Format CSS");
+    });
+
+    $("#closeCSS").click(function() {
+         $("#myCSSEditor").removeClass('oe_ccsse_open').addClass('oe_ccsse_closed');
+    });
+
+    $("#website-custom-css").on('change keyup paste', function() {
+        $("#custom_css_header").html( $("#website-custom-css").val() );
+    });
+
+    },
+});
+
+website.TopBar.include({
+    start: function () {
+        this.ccsse = new CustomCSSEditor();
+        return $.when(
+            this._super.apply(this, arguments),
+            this.ccsse.attachTo($('#sythil_custom_css'))
+        );
+    },
+});
 
 });

@@ -11,9 +11,11 @@
       	            <field name="wordpress_page_ids">
       	                <tree>
       	                    <field name="name"/>
+      	                    <field name="view_id"/>
       	                    <field name="url" widget="url"/>
       	                </tree>
       	            </field>
+      	            <field name="wordpress_imported_media"/>
       	        </group>
                 <button type="object" name="import_media" string="Import Media"/>
                 <button type="object" name="import_pages" string="Import Pages"/>

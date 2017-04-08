@@ -3,6 +3,7 @@ import openerp.http as http
 import odoo
 from odoo.http import request
 import base64
+import werkzeug
 
 def binary_content(xmlid=None, model='ir.attachment', id=None, field='datas', unique=False, filename=None, filename_field='datas_fname', download=False, mimetype=None, default_mimetype='application/octet-stream', env=None):
     return request.registry['ir.http'].binary_content(

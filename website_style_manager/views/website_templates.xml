@@ -12,6 +12,8 @@
             <xpath expr="//t[@t-set='head_website']" position="inside">
                 <style>
                     <t t-raw="website.css_text"/>
+                </style>
+                <style id="custom_css_header">
                     <t t-raw="website.custom_css"/>
                 </style>
             </xpath>
@@ -20,15 +22,16 @@
         <template id="style_override" name="Style Override" inherit_id="website.assets_frontend" priority="666">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/less/override.less'/>
-                <!--<link rel="stylesheet" type="text/less" href='http://192.168.56.109:8069/style/override.less'/>-->
+                <link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/css/editor.css'/>
+                <!--<link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/css/custom.css'/>-->
             </xpath>
         </template>
 
-        <!--<template id="custom_css_user_navbar" inherit_id="website.user_navbar">
-            <xpath expr="//ul[@id='oe_systray']/li/ul[@class='dropdown-menu oe_content_menu']" position="inside">
+        <template id="custom_css_user_navbar" inherit_id="website.user_navbar">
+            <xpath expr="//li[@id='theme_customize']" position="after">
                 <li id="sythil_custom_css"><a href="#" data-action="CustomCSSView">Custom CSS</a></li>
             </xpath>
-        </template>-->
+        </template>
 
     </data>
 </openerp>

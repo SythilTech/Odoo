@@ -7,6 +7,8 @@ from openerp import api, fields, models
 from odoo.exceptions import ValidationError, UserError
 import base64
 from lxml import html, etree
+from openerp.http import request
+
 
 class MigrationImportWordpress(models.Model):
 
@@ -14,49 +16,90 @@ class MigrationImportWordpress(models.Model):
 
     wordpress_url = fields.Char(string="Wordpress URL")    
     wordpress_page_ids = fields.One2many('migration.import.wordpress.page', 'wordpress_id', string="Wordpress Pages")
-    
-    @api.multi
-    def import_content(self):
-        self.ensure_one()
-        for import_content in self.import_content_ids:
-            method = '_import_%s' % (import_content.internal_name,)
-	    action = getattr(self, method, None)
-	    	        
-	    if not action:
-	        raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
-	                
-	    action()
-	    
-        #return {
-        #    'type': 'ir.actions.act_url',
-        #    'target': 'self',
-        #    'url': '/'
-        #}
+    wordpress_imported_media = fields.Many2many('ir.attachment', string="Imported Media")
 
+    def transfer_media(self, media_json):
+        """ Media can be imported from many palce such as when importing pages, media library, blog posts or posts of any type """
+        url = media_json['guid']['rendered'].replace("localhost","10.0.0.68")
+
+        filename = media_json['media_details']['sizes']['full']['file']
+        
+        external_identifier = "import_media_" + str(media_json['id'])
+
+        #Create an external ID so we don't reimport the same media again
+        media_attachment = self.env['ir.model.data'].xmlid_to_object('wordpress_import.' + external_identifier)
+        if media_attachment:
+            #For now we don't reimport media to conserve bandwidth and speed up reimports
+            _logger.error("Media already exists")        
+        else:
+            #Download the image and creat a public attachment
+            image_data = base64.b64encode( requests.get(url).content )
+            media_attachment = self.env['ir.attachment'].create({'name':filename, 'type':'binary', 'datas':image_data, 'datas_fname': filename, 'res_model': 'ir.ui.view', 'public': True})        
+
+            #We need to keep track of any imported media
+            self.wordpress_imported_media = [(4,media_attachment.id)]
+
+            self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'ir.attachment', 'res_id': media_attachment.id })        
+
+        return media_attachment
+    
+    def transform_post_content(self, content):
+        """ Changes Wordpress content of any post type(page, blog, custom) to better fit in with the Odoo CMS, includes localising hyperlinks and media """
+
+        #Also get media since we will be importing the images in the post
+        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
+        media_json_data = json.loads(response_string.text)
+
+        root = html.fromstring(content)
+        image_tags = root.xpath("//img")
+	if len(image_tags) != 0:
+	    for image_tag in image_tags:
+
+                #Get the full size image by looping through all media until you find the one with this url
+                for media_json in media_json_data:
+                    for key, value in media_json['media_details']['sizes'].iteritems():
+                        if value['source_url'] == image_tag.attrib['src']:
+                            media_attachment = self.transfer_media(media_json)
+                                
+	        image_tag.attrib['src'] = "/web/image2/" + str(media_attachment.id) + "/" + image_tag.attrib['width'] + "x" + image_tag.attrib['height'] + "/" + str(media_attachment.name)
+
+                #Reimplement image resposiveness the Odoo way
+	        image_tag.attrib['class'] = "img-responsive " + image_tag.attrib['class']
+	            
+                #This gets moved into the src
+	        image_tag.attrib.pop("width")
+	        image_tag.attrib.pop("height")
+	            
+                #We only import the original image, not all size variants so this is meaningless
+	        image_tag.attrib.pop("srcset")
+	        image_tag.attrib.pop("sizes")
+            
+        #Modify anchor tags and map pages to the new url
+        anchor_tags = root.xpath("//a")
+	if len(anchor_tags) != 0:
+	    for anchor_tag in anchor_tags:
+	        #Only modify local links
+	        if self.wordpress_url in anchor_tag.attrib['href']:
+	            page_slug = anchor_tag.attrib['href'].split("/")[-2]
+	            anchor_tag.attrib['href'] = "/page/" + page_slug
+           
+        transformed_content = etree.tostring(root, pretty_print=True)
+        
+        return transformed_content
+    
     def import_media(self):
         
         response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
         json_data = json.loads(response_string.text)
             
         for media_json in json_data:
-            url = media_json['guid']['rendered']
-            filename = url.split("/")[-1]
-            image_data = base64.b64encode( requests.get(url).content )
-            
-            #Don't import the same image twice
-            if self.env['ir.attachment'].search_count([('name','=',filename)]) == 0:
-                self.env['ir.attachment'].create({'name':filename, 'type':'binary', 'datas':image_data, 'datas_fname': filename, 'res_model': 'ir.ui.view', 'public': True})
+            self.transfer_media(media_json)
   
     def import_pages(self):
-        _logger.error("Import Pages")
 
         #Get Pages
         response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/pages")
         page_json_data = json.loads(response_string.text)
-
-        #Also get media since we will be importing the images in the page
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
-        media_json_data = json.loads(response_string.text)
         
         for page_json in page_json_data:
             title = page_json['title']['rendered']
@@ -73,67 +116,26 @@ class MigrationImportWordpress(models.Model):
             wraped_content += "  </t>\n"
             wraped_content += "</t>"
 
-            root = etree.fromstring(wraped_content)
-            image_tags = root.xpath("//img")
-	    if len(image_tags) != 0:
-	        for image_tag in image_tags:
+            transformed_content = "<?xml version=\"1.0\"?>\n" + self.transform_post_content(wraped_content)
 
-                    #Get the full size image by looping through all media until the find the one with this url
-                    for media_json in media_json_data:
-                        for key, value in media_json['media_details']['sizes'].iteritems():
-                            if value['source_url'] == image_tag.attrib['src']:
-                                image_url = media_json['guid']['rendered'].replace("localhost","10.0.0.45")
+            external_identifier = "import_post_" + str(page_json['id'])
 
-                                image_slug = media_json['slug']
-                                image_filename = image_url.split("/")[-1]
-            
-                                #Don't import the same image twice
-                                attachment = self.env['ir.attachment'].search([('name','=',image_filename)])
-
-                                if self.env['ir.attachment'].search_count([('name','=',image_filename)]) == 0:
-                                    image_data = base64.b64encode( requests.get(image_url).content )
-                                    attachment = self.env['ir.attachment'].create({'name':image_filename, 'type':'binary', 'datas':image_data, 'datas_fname': image_filename, 'res_model': 'ir.ui.view', 'public': True})                            
-                        
-	            image_tag.attrib['src'] = "/web/image2/" + str(attachment.id) + "/" + image_tag.attrib['width'] + "x" + image_tag.attrib['height'] + "/" + image_slug
-
-                    #Reimplement image resposiveness the Odoo way
-	            image_tag.attrib['class'] = "img-responsive " + image_tag.attrib['class']
-	            
-                    #This gets moved into the src
-	            image_tag.attrib.pop("width")
-	            image_tag.attrib.pop("height")
-	            
-                    #We only import the original image, not all size variants so this is meaningless
-	            image_tag.attrib.pop("srcset")
-	            image_tag.attrib.pop("sizes")
-	            
-            
-            #Modify anchor tags and map pages to the new url
-            anchor_tags = root.xpath("//a")
-	    if len(anchor_tags) != 0:
-	        for anchor_tag in anchor_tags:
-	            #Only modify local links
-	            if self.wordpress_url in anchor_tag.attrib['href']:
-	                page_slug = anchor_tag.attrib['href'].split("/")[-2]
-	                anchor_tag.attrib['href'] = "/page/" + page_slug
-            
-            transformed_content = etree.tostring(root, pretty_print=True)
-
-            transformed_content = "<?xml version=\"1.0\"?>\n" + transformed_content
-            
-            page_view = self.env['ir.ui.view'].search([('key','=','website.' + slug)])
+            #Create an external ID so we don't reimport the same page again
+            page_view = self.env['ir.model.data'].xmlid_to_object('wordpress_import.' + external_identifier)
             if page_view:
-                #Update the page
+                #If the page has already been all we do is update it
                 page_view.arch_base = transformed_content
             else:
-                #Create the view if it does not exist
-                self.env['ir.ui.view'].create({'name':slug, 'key':'website.' + slug, 'type': 'qweb', 'arch_base': transformed_content})
-                self.env['migration.import.wordpress.page'].create({'wordpress_id': self.id, 'name': title, 'url': '/page/' + slug})
+                new_page = self.env['ir.ui.view'].create({'name':slug, 'key':'website.' + slug, 'type': 'qweb', 'arch_base': transformed_content})
+                self.env['migration.import.wordpress.page'].create({'wordpress_id': self.id, 'name': title, 'view_id': new_page.id, 'url': request.httprequest.host_url + 'page/' + slug})
 
+                self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'ir.ui.view', 'res_id': new_page.id })
+            
 class MigrationImportWordpressPage(models.Model):
 
     _name = "migration.import.wordpress.page"
 
     wordpress_id = fields.Many2one('migration.import.wordpress', string="Wordpress Import")
     name = fields.Char(string="Name")
+    view_id = fields.Many2one('ir.ui.view', string="View")
     url = fields.Char(string="URL")

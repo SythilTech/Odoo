@@ -1,11 +1,11 @@
 {
-    'name': "Website Color Palettes",
+    'name': "Website Custom CSS/LESS",
     'version': "1.1",
     'author': "Sythil Tech",
     'category': "Website",
     'support': "steven@sythiltech.com.au",
-    'summary': "Define custom css color codes to style your website",
-    'description': "Define custom css color codes to style your website",
+    'summary': "Add site wide CSS styles and see the change in real time",
+    'description': "Add site wide CSS styles and see the change in real time",
     'license':'LGPL-3',
     'data': [
         'data/website.style.fontfamily.csv',
@@ -14,7 +14,6 @@
         'data/website.style.profile.less.csv',
         'views/website.xml',
         'views/website_templates.xml',
-        'security/ir.model.access.csv',
     ],
     'demo': [],
     'images':[

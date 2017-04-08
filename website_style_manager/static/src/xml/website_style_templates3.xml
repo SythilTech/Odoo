@@ -1,0 +1,16 @@
+<templates id="template" xml:space="preserve">
+
+<t t-name="website_style_manager.custom_css">
+    <div id="myCSSEditor" class="o_ace_view_css oe_ccsse_closed" style="width:360px;">
+        <div class="form-inline">
+            <div class="o_button_section">
+                <button id="saveCSS" type="button" class="btn btn-sm btn-primary">Save</button>
+                <!--<button data-action="format" id="formatCSS" type="button" class="btn btn-sm btn-default">Format</button>-->
+                <button id="closeCSS" type="button" class="btn btn-sm btn-default">Close</button>
+            </div>
+        </div>
+        <textarea id="website-custom-css"/>
+    </div>
+</t>
+
+</templates>
