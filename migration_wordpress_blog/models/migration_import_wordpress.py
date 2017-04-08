@@ -47,12 +47,12 @@ class MigrationImportWordpressBlog(models.Model):
 
             #Create an external ID so we don't reimport the same post again
             blog_post = self.env['ir.model.data'].xmlid_to_object('wordpress_import.' + external_identifier)
-            if  blog_post == False:
+            if blog_post:
+                #Update the blog post
+                blog_post.content = transformed_content
+            else:
                 #Create the blog post if it does not exist
                 blog_post = self.env['blog.post'].create({'blog_id':1, 'name':title, 'content': transformed_content, 'website_published': published})
                 
                 self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'ir.ui.view', 'res_id': blog_post.id })
                 self.blog_post_ids = [(4,blog_post.id)]
-            else:
-                #Update the blog post
-                blog_post.content = transformed_content

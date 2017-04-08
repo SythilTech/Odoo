@@ -1,3 +1,0 @@
-"id","name","model","function","interval_number","interval_type","numbercall","active"
-"dba_update","Partner Age Update","res.partner","update_ages",1,"days",-1,"true"
-"dating_suggestions_cron","Dating Suggestion Email","res.partner","dating_suggestion_email",1,"days",-1,"false"

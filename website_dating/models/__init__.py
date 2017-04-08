@@ -1,1 +1,0 @@
-import res_company, res_dating_settings, res_partner_dating_block, res_partner_dating_like, dating_notif, res_dating_matching, res_country_state, res_country_state_city, res_country_state_city_import, res_dating, res_partner, res_dating_fake_first, res_dating_fake_last
