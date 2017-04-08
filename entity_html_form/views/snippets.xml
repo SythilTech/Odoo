@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <template id="ehtml_editor" inherit_id="website.assets_editor" name="eHTML Resources">
+        <xpath expr="/t" position="inside">
+            <script type="text/javascript" src="/entity_html_form/static/src/js/ehtml_editor.js" />
+        </xpath>
+    </template>
+
+<template id="ehtml" inherit_id="website.snippets" name="eHTML Forms Snippet">
+  <xpath expr="//div[@id='snippet_structure']" position="inside">
+ 
+     <div>
+         <div class="oe_snippet_thumbnail">
+             <img class="oe_snippet_thumbnail_img" src="/entity_html_form/static/src/img/ui/snippet_thumb_form.jpg"/>
+             <span class="oe_snippet_thumbnail_title">HTML Form(Alpha)</span>
+         </div>
+ 
+         <section class="oe_snippet_body ehtml_form">
+             <div class="container">
+                 <div class="row">
+                     My Form
+                     <form method="POST" action="/form/myinsert">
+                         <div id="ehtml_fields" class="oe_structure">
+                         
+                         </div>
+                         <input type="submit" class="btn btn-primary btn-lg" value="Send"/>
+                     </form>
+                 </div>
+             </div>
+         </section>
+    </div>
+
+    
+    
+  </xpath>
+
+
+    <xpath expr="//div[@id='snippet_options']" position="inside">
+        <div data-snippet-option-id='ehtml'
+            data-selector=".ehtml_form"
+            data-selector-siblings="p, h1, h2, h3, blockquote, .well, .panel"
+           >
+            <li>
+                <a href="#" class="button">Change Form Settings</a>
+            </li>
+        </div>
+    </xpath>
+    
+</template>
+
+
+<template id="ehtml_field" inherit_id="website.snippets" name="eHTML Field Snippet">
+  <xpath expr="//div[@id='snippet_structure']" position="inside">
+ 
+     <div>
+         <div class="oe_snippet_thumbnail">
+             <img class="oe_snippet_thumbnail_img" src="/entity_html_form/static/src/img/ui/snippet_thumb_field.jpg"/>
+             <span class="oe_snippet_thumbnail_title">HTML Form Field Snippet(Alpha)</span>
+         </div>
+ 
+         <section class="oe_snippet_body ehtml_form_field">
+             <div class="form-group">
+	         <label for="field1">Field 1</label>
+                 <input type="text" class="form-control" id="field1" name="field1"/>
+             </div>
+         </section>
+    </div>
+
+  </xpath>
+  
+  
+      <xpath expr="//div[@id='snippet_options']" position="inside">
+          <div data-snippet-option-id='ehtml_field'
+              data-selector=".ehtml_form_field"
+              data-selector-siblings="form"
+             >
+              <li>
+                  <a href="#" class="button">Change Field Settings</a>
+              </li>
+          </div>
+    </xpath>
+    
+</template>
+
+
+  </data>
+</openerp>

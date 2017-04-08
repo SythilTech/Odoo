@@ -1,0 +1,6 @@
+"id","name"
+"website_ticket_state_open","Open"
+"website_ticket_state_staff_replied","Staff Replied"
+"website_ticket_state_customer_replied","Customer Replied"
+"website_ticket_state_customer_closed","Customer Closed"
+"website_ticket_state_staff_closed","Staff Closed"

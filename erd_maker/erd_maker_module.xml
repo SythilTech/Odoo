@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record model="ir.ui.view" id="erdm_module_wizard">
+          <field name="name">erdm Module Wizard</field>
+          <field name="model">erd.maker.module</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="my_module"/>
+                     <field name="omit_builtin_fields"/>
+                  </group>
+                  <field name="output_text"/>
+                  <footer>
+                      <button type="object" name="make_erd_html" string="Make ERD(html)"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="erdm_module_wizard_action">
+          <field name="name">Make ERD (Module)</field>
+          <field name="res_model">erd.maker.module</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">current</field>
+      </record>
+        
+     <menuitem id="erdm_module_menu" name="Create ERD (Module)" parent="erdm_migrate_menu" action="erdm_module_wizard_action" sequence="20"/>        
+        
+  </data>
+</openerp>

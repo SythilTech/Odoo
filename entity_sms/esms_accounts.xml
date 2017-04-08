@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="esms_accounts_form_view">
+          <field name="name">eSMS Gateway Accounts</field>
+          <field name="model">esms.accounts</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="account_gateway" widget="selection"/>
+      	              <field name="priority"/>
+      	              <field name="gateway_model" invisible="1"/>
+      	          </group>
+      	          <h2 id="gatewayhook">Gateway Settings</h2>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="esms_accounts_tree_view">
+          <field name="name">eSMS Gateway Accounts</field>
+          <field name="model">esms.accounts</field>
+          <field name="arch" type="xml">
+              
+      	      <tree>
+      	      
+      	          <field name="priority"/>
+      	          <field name="name"/>
+      	          <field name="account_gateway"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="esms_action">
+          <field name="name">eSMS Gateway Accounts</field>
+      	  <field name="res_model">esms.accounts</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Add SMS Gateway Accounts</p>
+	  </field>
+      </record>      
+
+      <menuitem id="esms_accounts_menu" name="Accounts" parent="esms_gateway_config_menu" action="esms_action" sequence="90"/>
+
+    </data>
+</openerp>

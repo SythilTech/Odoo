@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="smsglobal_accounts_form_view">
+          <field name="name">esms accounts form view</field>
+          <field name="model">esms.accounts</field>
+          <field name="inherit_id" ref="entity_sms.esms_accounts_form_view"/>
+          <field name="arch" type="xml">
+      	      <xpath expr="//h2[@id='gatewayhook']" position="after">
+      	          <div attrs="{'invisible': [('gateway_model', '!=', 'esms.smsglobal')]}">
+		      <group>
+		          <field name="smsglobal_username" groups="base.group_erp_manager,base.group_system"/>
+	                  <field name="smsglobal_password" groups="base.group_erp_manager,base.group_system"/>
+	              </group>
+    	          </div>
+      	      </xpath>
+      	  </field>
+      </record>
+  </data>
+</openerp>

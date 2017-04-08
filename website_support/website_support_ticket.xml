@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+      <record model="ir.ui.view" id="whdst_form_view">
+          <field name="name">whdst Form View</field>
+          <field name="model">website.support.ticket</field>
+          <field name="arch" type="xml">
+      	      <form create="false">
+      	          <group>
+      	              <field name="partner_id"/>
+      	              <field name="person_name"/>
+      	              <field name="email"/>
+      	              <field name="category"/>
+      	              <field name="state"/>
+      	              <field name="subject"/>
+      	              <field name="attachment" filename="attachment_filename"/>
+      	              <field name="attachment_filename" invisible="True"/>
+      	              <field name="description"/>      	              
+      	              <field name="conversation_history" context="{'ticket_id':active_id}">
+      	                  <tree editable="bottom">
+      	                       <field name="content"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="whdst_tree_view">
+          <field name="name">whdst Tree View</field>
+          <field name="model">website.support.ticket</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="id" string="Ticket Number"/>
+      	          <field name="person_name"/>
+      	          <field name="category"/>
+      	          <field name="state"/>
+      	          <field name="email"/>
+      	          <field name="description"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="action_view_support_ticket" model="ir.actions.act_window">
+          <field name="name">Support Tickets</field>
+	  <field name="res_model">website.support.ticket</field>
+	  <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+	      <p>
+	          No Support Tickets found
+	      </p>
+          </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="whdst_action">
+          <field name="name">Support Tickets</field>
+      	  <field name="res_model">website.support.ticket</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">No Support Tickets</p>
+	  </field>
+      </record>
+
+    <record id="support_ticket_search" model="ir.ui.view">
+      <field name="model">website.support.ticket</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="partner_id"/>
+          <field name="subject"/>
+        </search>
+      </field>
+    </record>
+
+      <menuitem id="whdst_customer_support" name="Customer Support" parent="base.menu_base_partner" sequence="90"/>
+      <menuitem id="whdst_customer_support_tickets" name="Support Tickets" parent="whdst_customer_support" action="whdst_action" sequence="10"/>
+      <menuitem id="whdst_customer_support_tickets_config" name="Support Tickets" parent="base.menu_base_config" sequence="80"/>
+ 
+    </data>
+</openerp>

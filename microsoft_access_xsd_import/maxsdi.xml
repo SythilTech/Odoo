@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+
+
+
+
+      <record model="ir.ui.view" id="maxsdi_wizard">
+          <field name="name">maxsdi Wizard</field>
+          <field name="model">maxsdi.wizard</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="my_model"/>
+                     <field name="filename" readonly="1" invisible="1"/>
+                     <field name="load_file" filename="filename"/>
+                  </group>
+                  <footer>
+                      <button type="object" name="read_xsd" string="Read XSD"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+      
+      <record model="ir.ui.view" id="maxsdi_form">
+          <field name="name">maxsdi Form</field>
+          <field name="model">maxsdi</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="my_model"/>
+                     <field name="filename" readonly="1" invisible="1"/>
+                     <field name="load_file" filename="filename"/>               
+                     <field name="field_ids">
+                         <tree>
+                             <field name="name"/>
+                             <field name="ttype"/>
+                         </tree>
+                     </field>
+                  </group>
+                  <footer>
+                      <button type="object" name="add_fields" string="Add Fields"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+
+
+      <record model="ir.ui.view" id="maxsdi_tree">
+          <field name="name">maxsdi Wizard</field>
+          <field name="model">maxsdi</field>
+          <field name="arch" type="xml">
+             <tree>
+             <field name="my_model"/>
+             </tree>
+          </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="maxsdi_action">
+      	            <field name="name">maxsdi action</field>
+      	            <field name="res_model">maxsdi</field>
+      	            <field name="view_type">form</field>
+      	            <field name="view_mode">tree,form</field>
+      	                      <field name="help" type="html">
+		                  <p class="oe_view_nocontent_create">Create only one</p>
+		              </field>
+
+      </record>
+      
+      
+      <record model="ir.actions.act_window" id="maxsdi_wizard_action">
+            	            <field name="name">maxsdi wizard action</field>
+            	            <field name="res_model">maxsdi.wizard</field>
+            	            <field name="view_type">form</field>
+            	            <field name="view_mode">form</field>
+            	            <field name="targer">_blank</field>
+      
+      </record>
+        
+      <menuitem id="tag_migrate_menu" name="Migration" parent="base.menu_custom" sequence="80"/>
+      <menuitem id="maxsdi_menu" name="Import XSD" parent="tag_migrate_menu" action="maxsdi_wizard_action" sequence="90"/>
+      <menuitem id="maxsdi_menu_wizard" name="Add Fields XSD " parent="tag_migrate_menu" action="maxsdi_action" sequence="100"/>
+        
+  </data>
+</openerp>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+      <record model="ir.ui.view" id="art_gf_form_view">
+         <field name="name">art fg form</field>
+         <field name="model">art.gf</field>
+         <field name="arch" type="xml">
+             <form>
+                  <sheet>
+                      <group>
+                          <field name="gf_id"/>
+                          <field name="user_id"/>
+                      </group>
+                  </sheet>
+              </form>
+          </field>
+      </record>          
+
+      <record model="ir.ui.view" id="art_gf_tree_view">
+         <field name="name">art gf Tree</field>
+         <field name="model">art.gf</field>
+         <field name="arch" type="xml">
+             <tree>
+                 <field name="gf_id"/>
+                 <field name="user_id"/>
+             </tree>
+          </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="art_gf_action">
+          <field name="name">Artificial Girlfriends</field>
+          <field name="res_model">art.gf</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+              <p class="oe_view_nocontent_create">Create an artificial girlfriend</p>
+          </field>
+      </record>
+        
+      <menuitem id="art_gf_ai_menu" name="AI" parent="base.menu_custom" sequence="160"/>
+      <menuitem id="art_gf_menu" name="Artificial Girlfriends" parent="art_gf_ai_menu" action="art_gf_action" sequence="10"/>
+        
+  </data>
+</openerp>

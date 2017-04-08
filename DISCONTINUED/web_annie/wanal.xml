@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.ui.view" id="wanal_form_view">
+          <field name="name">wanal form view</field>
+          <field name="model">wanal.request</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+                      <field name="write_date" string="Request Time"/>
+                      <field name="ref_url"/>
+                      <field name="target_url"/>
+                      <field name="ip"/>
+                      <field name="user_agent"/>
+                      <field name="keyword"/>
+                      <field name="header"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="wanal_tree_view">
+          <field name="name">wanal tree view</field>
+          <field name="model">wanal.request</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="write_date" string="Request Time"/>
+      	          <field name="ref_url"/>
+		  <field name="target_url"/>
+		  <field name="ip"/>
+      	      </tree>
+      	  </field>
+      </record>      
+
+      <record model="ir.actions.act_window" id="wanal_keywords_action">
+          <field name="name">Keywords</field>
+          <field name="res_model">wanal.request</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p>
+                    This list contains keywords that lead to your page.
+                </p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="wanal_traffic_action">
+          <field name="name">Traffic Source</field>
+          <field name="res_model">wanal.request</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p>
+                    This list contains source of web traffic.
+                </p>
+      	  </field>
+      </record>
+
+      <menuitem id="wanal_stats" name="Web Stats" parent="base.menu_custom" sequence="80"/>
+      <menuitem id="wanal_ref" name="Trafic Source" parent="wanal_stats" action="wanal_traffic_action" sequence="10"/>        
+      <menuitem id="wanal_keywords" name="Keyword" parent="wanal_stats" action="wanal_keywords_action" sequence="20"/>
+      
+   </data>
+</openerp>

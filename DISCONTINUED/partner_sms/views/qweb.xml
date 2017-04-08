@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <template id="psms_qweb" name="psms asserts"
+                  inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/partner_sms/static/src/js/psms_widget.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>

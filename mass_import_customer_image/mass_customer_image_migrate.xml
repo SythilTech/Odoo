@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+      <record model="ir.ui.view" id="mass_customer_image_migrate_form">
+         <field name="name">MCIM Form</field>
+         <field name="model">crm.migrate.image</field>
+         <field name="arch" type="xml">
+             <form>
+                  <sheet>
+                      <group>
+                          <field name="map_field"/>
+                          <field name="import_history">
+                              <tree>
+                                   <field name="filename"/>
+                                   <field name="state"/>
+                                   <field name="note"/>
+                              </tree>
+                          </field>
+                      </group>
+                  </sheet>
+              </form>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="mass_customer_image_migrate_tree">
+         <field name="name">MCIM tree</field>
+         <field name="model">crm.migrate.image</field>
+         <field name="arch" type="xml">
+             <tree>
+                 <field name="create_date"/>
+             </tree>
+         </field>
+      </record>
+
+
+      <record model="ir.ui.view" id="mass_customer_image_migrate_wizard">
+          <field name="name">MCIM Wizard</field>
+          <field name="model">crm.migrate.image.wizard</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="zip_path"/>
+                     <field name="map_field"/>
+                  </group>
+                  <footer>
+                      <button type="object" name="import_images" string="Import Images"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="mass_customer_image_migrate_action">
+          <field name="name">MCIM</field>
+          <field name="res_model">crm.migrate.image</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+              <p class="oe_view_nocontent_create">Import History</p>
+          </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="mass_customer_image_migrate_wizard_action">
+          <field name="name">Mass Import Customer Images</field>
+          <field name="res_model">crm.migrate.image.wizard</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">new</field>
+      </record>
+   
+      <menuitem id="mcim_migrate" name="Migrate" parent="base.menu_administration" sequence="90"/>      
+      <menuitem id="mass_customer_image_migrate_wizard_menu" name="Import Partner Images" parent="mcim_migrate" action="mass_customer_image_migrate_wizard_action" sequence="90"/>
+      <menuitem id="mass_customer_image_migrate_menu" name="Import History" parent="mcim_migrate" action="mass_customer_image_migrate_action" sequence="100"/>
+      
+  </data>
+</openerp>

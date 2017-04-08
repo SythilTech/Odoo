@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <template id="esms_qweb" name="esms asserts"
+                  inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/entity_sms/static/src/js/esms_widget.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>

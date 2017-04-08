@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<templates id="psms_field" xml:space="preserve">
+<t t-name="FieldChar2">
+        <t t-if="! widget.get('effective_readonly')">
+            <input type="text"></input>
+        </t>
+</t>
+</templates>

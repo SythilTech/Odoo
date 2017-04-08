@@ -1,0 +1,7 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_html_form_system","Access html.form System","model_html_form","base.group_system",1,1,1,1
+"access_html_form_field_system","Access html.form.field System","model_html_form_field","base.group_system",1,1,1,1
+"access_html_form_defaults_system","Access html.form.defaults System","model_html_form_defaults","base.group_system",1,1,1,1
+"access_html_form_history_system","Access html.form.history System","model_html_form_history","base.group_system",1,0,0,0
+"access_html_form_history_field_system","Access html.form.history.field System","model_html_form_history_field","base.group_system",1,0,0,0
+"access_html_form_field_type_system","Access html.form.field.type System","model_html_form_field_type","",1,0,0,0

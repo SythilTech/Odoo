@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record model="ir.ui.view" id="osmer_view">
+          <field name="name">osmer view</field>
+          <field name="model">event.event</field>
+          <field name="inherit_id" ref="event.view_event_form" />
+      	  <field name="arch" type="xml">
+      	      <xpath expr="//form/header" position="inside">
+      	          <button name="open_map" type="object" string="Show Registrant Map"/>
+      	      </xpath>
+      	  </field>
+      </record>      
+      
+    </data>
+</openerp>

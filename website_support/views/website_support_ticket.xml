@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+        
+        <record id="new_support_ticket_category" model="email.template">
+            <field name="name">Suppport Ticket New Ticket (Category)</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from">${(user.email)|safe}</field>
+            <field name="subject">New Support Ticket for your category</field>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>A new support ticket has been create in a category that you follow</p>
+                <p>Person Name: ${object.person_name}</p>
+                <p>Category: ${object.category.name}</p>
+                <p>Subject: ${object.subject}</p>
+                <p>${object.description}</p>
+                <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
+            ]]>
+            </field>
+        </record>
+        
+        <record id="ticket_new_message" model="email.template">
+            <field name="name">Suppport Ticket New Message</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from">${(user.email)|safe}</field>
+            <field name="email_to">${(object.email)}</field>
+            <field name="auto_delete">False</field>
+            <field name="subject">New Support Ticket Message</field>
+                <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                
+            ]]>
+            </field>
+        </record>
+
+<template id="assets_editor" inherit_id="website.assets_editor" name="Website Support Editor" groups="base.group_website_publisher">
+    <xpath expr="." position="inside">
+        <script type="text/javascript" src="/website_support/static/src/js/website_support.editor.js"></script>
+    </xpath>
+</template>
+
+<template id="support_ticket_view_list" name="My Support Tickets" page="True">
+    <t t-call="website.layout">
+        <div class="container">
+
+
+            <div class="mt16 mb16">
+                <h1 class="text-center">My Support Tickets</h1>
+            </div>
+        
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <t t-if="ticket_count > 0"> 
+                    <table class="table table-striped table-bordered table-hover table-condensed">
+                        <tr><th>Subject</th><th>Category</th><th>State</th><th>Create Date</th></tr>
+                        <t t-foreach="support_tickets" t-as="support_ticket">
+                            <tr><td><a t-attf-href="/support/ticket/view/#{support_ticket.id}"><t t-esc="support_ticket.subject"/></a></td><td><t t-esc="support_ticket.category.name"/></td><td><t t-esc="support_ticket.state.name"/></td><td><t t-esc="support_ticket.create_date"/></td></tr>
+                        </t>
+                </table>
+                </t>
+                <t t-if="ticket_count == 0">
+                    <div class="mt16 mb16">
+		        <h2 class="text-center">You have no support tickets</h2>
+                    </div>
+                </t>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+        
+    </t>
+</template>
+
+<template id="help_page" name="Help Page" page="True">
+    <t t-call="website.layout">
+        
+        
+        <div class="container">
+                <div class="mt16 mb16">
+		    <h1 class="text-center" t-field="help_page.name"/>
+		    <div id="wrap" class="oe_structure oe_empty" t-field="help_page.content"/>
+		</div>
+        </div>
+        
+    </t>
+</template>
+
+<template id="support_ticket_view" name="Support Ticket" page="True">
+    <t t-call="website.layout">
+        <div class="container mt16 mb16">
+
+
+            <div class="mt16 mb16">
+                <h1 class="text-center"><t t-esc="support_ticket.subject"/></h1>
+            </div>
+        
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <b>Category</b> <t t-esc="support_ticket.category.name"/><br/>
+                <b>State</b> <t t-esc="support_ticket.state.name"/><br/>
+                <b>Description</b><br/><t t-esc="support_ticket.description"/><br/>
+                <br/>
+                <b>Conversation History</b><br/>
+                <table class="table table-striped table-bordered table-hover table-condensed">
+                    <tr><th>From</th><th>Message</th></tr>
+                    <t t-foreach="support_ticket.conversation_history" t-as="chat">
+                        <tr><td><t t-esc="chat.create_uid.name"/></td><td><t t-esc="chat.content"/></td></tr>
+                    </t>
+                </table>
+                
+                <form method="POST" action="/support/ticket/comment">
+                    <b>Add Comment</b><br/>
+                    <textarea  class="form-control" name="comment" style="min-height: 120px" required="True"></textarea>
+                    <br/>
+                    <input type="hidden" name="ticket_id" t-attf-value="#{support_ticket.id}"/>
+                    <button class="btn btn-primary btn-lg">Submit</button>
+		</form>
+		
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+        
+    </t>
+</template>
+
+<template id="support_help_pages" name="Support Help Pages" page="True">
+    <t t-call="website.layout">
+    
+        <div class="container">
+            <div class="col-md-12 mt16 mb16">
+                <div class="pull-right">
+                    <a href="/support/ticket/submit">Submit a Ticket</a>
+                    <t t-if="request.env.user.partner_id.name != 'Public user'">
+                        | <a href="/support/ticket/view">My Tickets</a>
+                    </t>
+                </div>
+            </div>
+            
+            <div class="mt16 mb16">
+                <h1 class="text-center">Help Pages</h1>
+                <!--<div name="search_from_container" t-attf-class="form-group">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <input type="search" class="form-control" id="search" name="search" placeholder="Search"/>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>-->                
+            </div>
+            
+            <div class="mt16 mb16 col-md-12">
+                <t t-foreach="help_groups" t-as="help_group">
+                    <div class="col-md-4">
+                        <h2 t-field="help_group.name"></h2>
+                        <t t-foreach="help_group.page_ids" t-as="help_page">
+                            <h3 class="mt8 mb8"><a t-attf-href="#{help_page.url_generated}" t-field="help_page.name"></a></h3>
+                        </t>
+                    </div>
+                </t>
+            </div>
+          
+        </div>
+    </t>
+</template>
+
+<template id="support_thank_you" name="Support Ticket Thank You" page="True">
+    <t t-call="website.layout">
+        <div id="wrap" class="oe_structure oe_empty">
+            <section>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1 class="text-center">Thank You</h1>
+                            <h3 class="text-muted text-center">We will get back to you shortly</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </t>
+</template>
+
+<!-- User Navbar -->
+<template id="content_new_helppage" inherit_id="website.user_navbar">
+    <xpath expr="//ul[@id='oe_systray']/li/ul[@class='dropdown-menu oe_content_menu']" position="inside">
+         <li><a href="#" data-action="new_help_group">New Help Group</a></li>
+         <li><a href="#" data-action="new_help_page">New Help Page</a></li>
+    </xpath>
+</template>
+
+<template id="support_submit_ticket" name="Submit Support Ticket" page="True">
+    <t t-call="website.layout">
+
+      <div id="wrap" class="oe_structure oe_empty">
+      <section>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <h1 class="text-center">Submit Support Ticket</h1>
+            </div>
+          </div>
+        </div>
+      </section>
+
+        <form action="/support/ticket/process" method="post" class="form-horizontal mt32" enctype="multipart/form-data">
+            <div t-attf-class="form-group #{error and 'person_name' in error and 'has-error' or ''}">
+                <label class="col-md-3 col-sm-4 control-label" for="person_name">Name</label>
+                <div class="col-md-7 col-sm-8">
+                    <input type="text" class="form-control" name="person_name" required="True" t-attf-value="#{person_name or ''}" t-attf-readonly="#{person_name and 'readonly'}"/>
+                </div>
+            </div>
+            <div name="email_from_container" t-attf-class="form-group #{error and 'email' in error and 'has-error' or ''}">
+                <label class="col-md-3 col-sm-4 control-label" for="email">Email</label>
+                <div class="col-md-7 col-sm-8">
+                    <input type="email" class="form-control" name="email" required="True" t-attf-value="#{email or ''}" t-attf-readonly="#{email and 'readonly'}"/>
+                </div>
+            </div>
+            <div t-attf-class="form-group #{error and 'category' in error and 'has-error' or ''}">
+                <label class="col-md-3 col-sm-4 control-label" for="name">Category</label>
+                <div class="col-md-7 col-sm-8">
+                    <select class="form-control" name="category">
+                        <t t-foreach="categories" t-as="category">
+		                <option t-attf-value="#{category.id}"><t t-esc="category.name"/></option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+            <div name="subject_container" t-attf-class="form-group #{error and 'subject' in error and 'has-error' or ''}">
+	        <label class="col-md-3 col-sm-4 control-label" for="subject">Subject</label>
+	        <div class="col-md-7 col-sm-8">
+	            <input type="subject" class="form-control" name="subject" required="True"/>
+	        </div>
+            </div>
+            <div name="file_container" t-attf-class="form-group #{error and 'file' in error and 'has-error' or ''}">
+                <label class="col-md-3 col-sm-4 control-label" for="file">Add Attachment</label>
+	        <div class="col-md-7 col-sm-8">
+                    <div class="btn btn-default btn-file col-md-12"><input name="file" type="file" /></div>
+                </div>
+            </div>
+            <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
+                <label class="col-md-3 col-sm-4 control-label" for="description">Description</label>
+                <div class="col-md-7 col-sm-8">
+                    <textarea  class="form-control" name="description" style="min-height: 120px" required="True"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                    <button class="btn btn-primary btn-lg">Submit Ticket</button>
+                </div>
+            </div>
+        </form>
+
+      </div>
+    </t>
+    
+</template>
+
+</data>
+</openerp>

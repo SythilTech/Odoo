@@ -1,0 +1,1 @@
+import mass_customer_image_migrate

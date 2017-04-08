@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <act_window name="SMS Lead"
+        res_model="esms.compose"
+        src_model="crm.lead"
+        key2="client_action_multi" 
+        view_mode="form" target="new" 
+        view_type="form"
+        context="{'default_field_id':'mobile','default_to_number':mobile_e164,'default_record_id':active_id,'default_model_id':active_model}"
+        id="act_send_sms_lead_menu" />
+
+        <record model="ir.ui.view" id="E164_mobile_placeholder_lead">
+            <field name="name">E.164 mobile placeholder</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+      	        <field name="mobile" position="replace">
+      	            <field name="mobile" placeholder="e.g. +61 427 671 760"/>
+      	            <field name="mobile_e164" invisible="True"/>
+      	        </field>
+      	    </field>
+        </record>
+    </data>
+</openerp>

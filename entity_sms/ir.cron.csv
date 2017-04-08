@@ -1,0 +1,3 @@
+id,name,model,function,interval_number,interval_type,numbercall,active
+"sms_check","SMS Check",esms.accounts,check_all_messages,1,hours,-1,true
+"sms_queue_check","SMS Queue Check","esms.mass.sms","process_sms_queue",1,minutes,-1,true

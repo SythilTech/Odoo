@@ -1,0 +1,52 @@
+<div style="margin-left:100px;margin-right:100px;">
+<h2>Description</h2>
+Allows you send SMS's using the smsglobal gateway<br>
+This module only sends smses, it does not yet recieve them<br>
+<br>
+consider checking out v2 since it supports muliple gateways<br>
+<br>
+<h2>Features</h2>
+<ul>
+<li>Configure multiple accounts for different from mobile number and credit management</li>
+<li>View SMS history</li>
+<li>Simple sending of smses for leads and partners</li>
+<li>Allows send of smses from any model, even ones with multiple mobile number fields</li>
+<li>Mass sending out to leads and partners</li>
+</ul>
+<h2>Using the module</h2>
+<h3>Initial Configuration</h3>
+1.  Create a smsglobal account and add credit<br>
+2.  Go to Settings->SMS Gateway Configuration->Accounts and enter the all the api settings<br>
+<br>
+<h3>Sending an SMS to partners / customers / suppliers and leads</h3>
+1.	Simply select Send SMS from the more menu and type in your message<br>
+<br>
+<h3>Sending an SMS to multiple leads / customers</h3>
+1.	In list view select SMS multiple partners<br>
+2.  Check your sms history for smses that failed to send<br>
+<br>
+<h3>Sending SMS from any model</h3>
+1.  Add widget="smsfield" to any field you wish treat as a mobile number<br>
+2.  Click on the field to open the SMS compose window<br>
+<br>
+<h3>View SMS Histroy</h3>
+1.  Go to Settings->SMS Gateway Configuration->SMS History<br>
+<br>
+<h3>Sending an SMS from code</h3>
+<pre>
+from_gateway = self.env['psms.conf'].search([('from_number','=',from_mobile_number)])<br>
+my_sms = self.env['esms.core'].send_sms(from_gateway.id, to_mobile_number, sms_content, model_name, record_id, field_name)<br>
+if my_sms == "SUCCESSFUL":<br>
+    #SMS successfuly sent<br>
+</pre>
+<br>
+<h2>Feature Ideas</h2>
+1.  SMS templates<br>
+2.  Inbound SMS<br>
+3.  Inbound MMS<br>
+4.  Oubound MMS<br>
+5.  Ability to use gateways other then smsglobal<br>
+6.  Import sms/mss history from mobile phones<br>
+<br>
+Find a bug? want a feature? send an email to sythiltech@gmail.com<br>
+</div>

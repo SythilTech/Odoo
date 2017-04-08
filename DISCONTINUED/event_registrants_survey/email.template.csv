@@ -1,0 +1,2 @@
+"id","name","subject","body_html","email_from","model_id/id","auto_delete"
+"event_survey_email","Event Survey Email","${object.event_id.name} Survey","Hello ${object.name},<br/>Thank you for attending the event ${object.event_id.name}<br/>We would like to get your feedback on your experience by taking <a href='${object.event_id.survey_id.public_url}'>our survey</a>","${(object.user_id.email or object.company_id.email or 'noreply@' + object.company_id.name + '.com')|safe}","event.model_event_registration","false"

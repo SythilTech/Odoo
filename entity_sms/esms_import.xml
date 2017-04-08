@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="esms_import">
+            <field name="name">SMS Import</field>
+            <field name="model">esms.import</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+	                 <button type="object" name="read_smsbackup" string="Read SMS Backup XML"/>
+	            </header>
+	            <group>
+      	                <field name="smsfile" />
+      	            </group>
+      	        </form>
+      	    </field>
+        </record>
+                
+        <record model="ir.actions.act_window" id="esms_import_action">
+            <field name="name">SMS Import</field>
+            <field name="res_model">esms.import</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+<!--        
+        <menuitem id="esms_import_menu" name="SMS Import" parent="esms_gateway_config_menu" action="esms_import_action" sequence="110"/>
+-->
+
+    </data>
+</openerp>

@@ -1,0 +1,2 @@
+"id","name","subject","body_html","email_from","email_to","model_id/id","auto_delete"
+"exam_share_email","Exam Share Exam","Take our quiz","<p>Hello,</p><p>We are conducting a quiz, and your participation would be appreciated.</p><p><a href='__URL__'>__EXAM__ quiz</a></p><p>Thanks for your participation!</p>","${(object.user_id.email or object.company_id.email or 'noreply@' + object.company_id.name + '.com')|safe}","${object.email|safe}","base.model_res_partner","false"

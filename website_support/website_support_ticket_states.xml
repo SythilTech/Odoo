@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="whdst_states_form_view">
+          <field name="name">whdst States Form View</field>
+          <field name="model">website.support.ticket.states</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="whdst_states_tree_view">
+          <field name="name">whdst States Tree View</field>
+          <field name="model">website.support.ticket.states</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="whdst_states_action">
+          <field name="name">Support Ticket States</field>
+      	  <field name="res_model">website.support.ticket.states</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Create support ticket state</p>
+	  </field>
+      </record>
+
+      <menuitem id="whdst_customer_support_tickets_states" name="States" parent="whdst_customer_support_tickets_config" action="whdst_states_action" sequence="40"/>
+
+    </data>
+</openerp>

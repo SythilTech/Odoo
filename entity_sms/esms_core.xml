@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+<template id="assets_backend" inherit_id="web.assets_backend" name="esms Kanban Assets" >
+<xpath expr="." position="inside">
+<link rel="stylesheet" href="/entity_sms/static/src/css/esms_kanban.css" />
+</xpath>
+</template>
+
+        <menuitem id="esms_gateway_config_menu" name="SMS Gateway Configuration" parent="base.menu_custom" sequence="80"/>
+    </data>
+</openerp>

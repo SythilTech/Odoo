@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_ehtml_formgen_system","Access ehtml.formgen System","model_ehtml_formgen","base.group_system",1,1,1,1
+"access_ehtml_fieldentry_system","Access ehtml.fieldentry System","model_ehtml_fieldentry","base.group_system",1,1,1,1
+"access_ehtml_fielddefault_system","Access ehtml.fielddefault System","model_ehtml_fielddefault","base.group_system",1,1,1,1
+"access_ehtml_history_system","Access ehtml.history System","model_ehtml_history","base.group_system",1,0,0,0
+"access_ehtml_fieldinsert_system","Access ehtml.fieldinsert System","model_ehtml_fieldinsert","base.group_system",1,0,0,0

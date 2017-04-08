@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.ui.view" id="esms_history_form_view">
+          <field name="name">esms history form view</field>
+          <field name="model">esms.history</field>
+          <field name="arch" type="xml">
+      	      <form create="false" edit="false">
+      	          <group>
+      	              <field name="my_date"/>
+      	              <field name="sms_gateway_message_id"/>
+      	              <field name="account_id" options="{'no_open': True}"/>
+      	              <field name="model_id" options="{'no_open': True}"/>
+      	              <field name="model_name"/>
+      	              <field name="field_id" options="{'no_open': True}"/>
+      	              <field name="record_id"/>
+      	              <field name="create_uid"/>
+      	              <field name="direction"/>
+      	              <field name="record_name"/>
+      	              <field name="from_mobile"/>
+      	              <field name="to_mobile"/>
+      	              <field name="status_string"/>
+      	              <field name="status_code"/>
+      	              <field name="delivary_error_string"/>
+      	              <field name="sms_content"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="esms_history_tree_view">
+          <field name="name">esms history tree view</field>
+          <field name="model">esms.history</field>
+          <field name="arch" type="xml">
+      	      <tree edit="false" create="false">
+      	          <field name="create_uid" string="By"/>
+      	          <field name="account_id"/>
+      	          <field name="record_name"/>
+      	          <field name="direction"/>
+      	          <field name="my_date"/>
+      	          <field name="from_mobile"/>
+      	          <field name="to_mobile"/>
+      	          <field name="status_code"/>
+      	          <field name="sms_content"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+        <record model="ir.ui.view" id="esms_history_kanban_view">
+            <field name="name">esms.history.kanban</field>
+            <field name="model">esms.history</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="record_name"/>
+                    <field name="sms_content"/>
+                    <field name="direction"/>
+                    <field name="record_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette oe_semantic_html_override esms_history_kanban">
+                                <a type="open">
+                                <!--
+                                    <t t-if="record.has_image.raw_value === true">
+                                        <img t-att-src="kanban_image('res.partner', 'image_small', record.id.value)" class="oe_kanban_image"/>
+                                    </t>
+                                    <t t-if="record.has_image.raw_value === false">
+                                        <t t-if="record.is_company.raw_value === true">
+                                            <img t-att-src='_s + "/base/static/src/img/company_image.png"' class="oe_kanban_image"/>
+                                        </t>
+                                        <t t-if="record.is_company.raw_value === false">
+                                            <img t-att-src='_s + "/base/static/src/img/avatar.png"' class="oe_kanban_image"/>
+                                        </t>
+                                    </t>
+                                    -->
+                                  <div t-if="record.direction.raw_value == 'I'" style="text-align:right;">
+                                      <span style="height:100%;float:right;margin-left:5px;">
+                                          <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                      </span>
+
+                                      <span class="oe_partner_heading"><field name="record_name"/></span><br/>
+				      <field name="sms_content"/>
+				      <br/><br/>
+				      <field name="create_uid"/> <field name="my_date"/>
+                                  </div>
+
+
+
+                                  <div t-if="record.direction.raw_value == 'O'" style="text-align:left;">
+                                      <span style="height:100%;float:left;margin-right:5px;">
+                                          <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                      </span>
+
+                                      <span class="oe_partner_heading"><field name="record_name"/></span><br/>
+				      <field name="sms_content"/>
+				      <br/><br/>
+				      <field name="create_uid"/> <field name="my_date"/>
+                                  </div>
+           
+                                </a>
+                                
+                                  
+                            </div>
+
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+      
+      <record model="ir.actions.act_window" id="esms_history_action">
+          <field name="name">SMS history</field>
+          <field name="res_model">esms.history</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="esms_history_failed_action">
+          <field name="name">SMS history</field>
+          <field name="res_model">esms.history</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'failed'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="esms_history_queued_action">
+          <field name="name">SMS history</field>
+          <field name="res_model">esms.history</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'queued'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="esms_history_sent_action">
+          <field name="name">SMS history</field>
+          <field name="res_model">esms.history</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'successful'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="esms_history_delivered_action">
+          <field name="name">SMS history</field>
+          <field name="res_model">esms.history</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'DELIVRD'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="esms_user_history_action">
+          <field name="name">SMS personal history</field>
+          <field name="res_model">esms.history</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="domain">[('create_uid', '=', uid)]</field>
+          <field name="help" type="html">
+		<p>
+                    This list contains SMS messages sent by you.
+                </p>
+      	  </field>
+      </record>
+
+      <menuitem id="esms_history_menu" name="SMS History" parent="esms_gateway_config_menu" action="esms_history_action" sequence="100"/>        
+      <menuitem id="esms_user_history_title" name="SMS" parent="mail.mail_feeds_main" groups="base.group_user"/>
+      <menuitem id="esms_user_history_menu" name="SMS History" parent="esms_user_history_title" action="esms_user_history_action" sequence="10"/>
+   
+   </data>
+</openerp>

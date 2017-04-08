@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="esms_settings_form_view">
+          <field name="name">eSMS Settings</field>
+          <field name="model">esms.settings</field>
+          <field name="arch" type="xml">
+      	      <form string="SMS Accounting" version="7.0" class="oe_form_configuration">
+                  <header>
+                      <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                      or
+                      <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                  </header>      	      
+      	          <group>
+      	              <field name="auto_e164"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="esms_settings_action">
+          <field name="name">eSMS Settings Accounts</field>
+      	  <field name="type">ir.actions.act_window</field>
+      	  <field name="res_model">esms.settings</field>
+      	  <field name="view_mode">form</field>
+      	  <field name="target">inline</field>
+      </record>
+
+
+    </data>
+</openerp>

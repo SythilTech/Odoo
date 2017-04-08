@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="whdst_help_groups_form_view">
+          <field name="name">whdst Help Groups Form View</field>
+          <field name="model">website.support.help.groups</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="page_ids" context="{'group_id':active_id}">
+      	                  <tree editable="bottom">
+      	                      <field name="name"/>
+      	                      <field name="url" widget="url"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="whdst_help_groups_tree_view">
+          <field name="name">whdst Help Groups Tree View</field>
+          <field name="model">website.support.help.groups</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	          <field name="page_count"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="whdst_groups_action">
+          <field name="name">Support Help Groups</field>
+      	  <field name="res_model">website.support.help.groups</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Create a help page group</p>
+	  </field>
+      </record>
+
+      <menuitem id="whdst_customer_support_help_groups" name="Help Pages" parent="whdst_customer_support_tickets_config" action="whdst_groups_action" sequence="50"/>
+
+    </data>
+</openerp>

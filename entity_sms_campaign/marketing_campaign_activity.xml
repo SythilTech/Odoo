@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="esms_marketing_campaign_activity">
+            <field name="name">eSMS Marketing Campaign Activity</field>
+            <field name="model">marketing.campaign.activity</field>
+            <field name="inherit_id" ref="marketing_campaign.view_marketing_campaign_activity_form"/>
+            <field name="arch" type="xml">
+      	        <field name="type" position="after">
+      	            <field name="sms_template_id" attrs="{'required':[('type','=','sms')], 'invisible':[('type','!=','sms')]}" context="{'default_model_id':object_id}"/>
+      	        </field>
+      	    </field>
+        </record>
+        
+        
+    </data>
+</openerp>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="whdst_categories_form_view">
+          <field name="name">whdst Categores Form View</field>
+          <field name="model">website.support.ticket.categories</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="cat_user_ids"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="whdst_categories_tree_view">
+          <field name="name">whdst Categories Tree View</field>
+          <field name="model">website.support.ticket.categories</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="whdst_categories_action">
+          <field name="name">Support Ticket Categories</field>
+      	  <field name="res_model">website.support.ticket.categories</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Create new categories</p>
+	  </field>
+      </record>
+
+      <menuitem id="whdst_customer_support_tickets_categories" name="Categories" parent="whdst_customer_support_tickets_config" action="whdst_categories_action" sequence="20"/>
+
+    </data>
+</openerp>

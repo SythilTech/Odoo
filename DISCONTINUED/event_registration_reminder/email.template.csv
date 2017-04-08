@@ -1,0 +1,2 @@
+"name","subject","body_html","email_from","model_id/id"
+"Event Registrants Reminder","Event is soon","This is a courtesy e-mail to remind you of your registration for ${object.event_id.name} at ${object.event_id.address_id.name} on ${object.date_for_email}<br>","${(object.user_id.email or object.company_id.email or 'noreply@' + object.company_id.name + '.com')|safe}","event.model_event_registration"
