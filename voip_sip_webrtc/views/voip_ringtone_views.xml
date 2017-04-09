@@ -7,7 +7,9 @@
         <field name="arch" type="xml">
       	    <form>
       	        <group>
-      	            <field name="media"/>
+      	            <field name="name"/>
+      	            <field name="media" filename="media_filename"/>
+      	            <field name="media_filename" invisible="1"/>
       	        </group>
       	    </form>
         </field>
@@ -18,6 +20,7 @@
         <field name="model">voip.ringtone</field>
         <field name="arch" type="xml">
       	    <tree>
+      	        <field name="name"/>
       	        <field name="media"/>
       	    </tree>
         </field>

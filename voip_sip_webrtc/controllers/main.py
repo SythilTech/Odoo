@@ -19,14 +19,22 @@ from openerp.http import request
 
 class VoipController(http.Controller):         
    
-    @http.route('/voip/ringtone/<filename>', type="http", auth="user")
-    def voip_ringtone(self, filename):
+    @http.route('/voip/ringtone/<voip_call_id>/<to_user_id>.mp3', type="http", auth="user")
+    def voip_ringtone(self, voip_call_id, to_user_id):
         """Return the ringtone file to be used by javascript"""
-        
-        voip_ringtone = request.env['ir.values'].get_default('voip.settings', 'ringtone')
+
+        #Check if the callee has a person ringtone set
+        to_user = request.env['res.users'].browse( int(to_user_id) )
+
+        if to_user.voip_ringtone:
+            ringtone_media = to_user.voip_ringtone
+        else:
+            voip_ringtone_id = request.env['ir.values'].get_default('voip.settings', 'ringtone_id')
+            voip_ringtone = request.env['voip.ringtone'].browse( voip_ringtone_id )
+            ringtone_media = voip_ringtone.media
 
         headers = []
-        ringtone_base64 = base64.b64decode(voip_ringtone)
+        ringtone_base64 = base64.b64decode(ringtone_media)
         headers.append(('Content-Length', len(ringtone_base64)))
         response = request.make_response(ringtone_base64, headers)
 

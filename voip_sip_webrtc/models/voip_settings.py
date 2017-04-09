@@ -13,9 +13,10 @@ from openerp import api, fields, models
 class VoipSettings(models.Model):
 
     _name = "voip.settings"
-    _inherit = 'res.config.settings'            
+    _inherit = 'res.config.settings'
             
     missed_call_action = fields.Selection([('nothing', 'Nothing')], string="Missed Call Action", help="What action is taken when the call is missed")
+    ringtone_id = fields.Many2one('voip.ringtone', string="Ringtone")
     ringtone = fields.Binary(string="Default Ringtone")
     ringtone_filename = fields.Char("Ringtone Filename")
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
@@ -25,7 +26,7 @@ class VoipSettings(models.Model):
     @api.multi
     def get_default_sip_running(self, fields):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex(('127.0.0.1',80))
+        result = sock.connect_ex(('127.0.0.1',5060))
         sip_running = ""
         if result == 0:
             sip_running = False
@@ -34,27 +35,16 @@ class VoipSettings(models.Model):
     
         return {'sip_running': sip_running}
 
-    #-----Ringtone-----
+    #-----Ringtone ID-----
 
     @api.multi
-    def get_default_ringtone(self, fields):
-        return {'ringtone': self.env['ir.values'].get_default('voip.settings', 'ringtone')}
+    def get_default_ringtone_id(self, fields):
+        return {'ringtone_id': self.env['ir.values'].get_default('voip.settings', 'ringtone_id')}
 
     @api.multi
-    def set_default_ringtone(self):
+    def set_default_ringtone_id(self):
         for record in self:
-            self.env['ir.values'].set_default('voip.settings', 'ringtone', record.ringtone)
-
-    #-----Ringtone Filename-----
-
-    @api.multi
-    def get_default_ringtone_filename(self, fields):
-        return {'ringtone_filename': self.env['ir.values'].get_default('voip.settings', 'ringtone_filename')}
-
-    @api.multi
-    def set_default_ringtone_filename(self):
-        for record in self:
-            self.env['ir.values'].set_default('voip.settings', 'ringtone_filename', record.ringtone_filename)
+            self.env['ir.values'].set_default('voip.settings', 'ringtone_id', record.ringtone_id.id)
 
     #-----Ring Duration-----
 

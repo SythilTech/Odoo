@@ -1,3 +1,9 @@
+v1.2.2
+======
+* Each user can have thier own ringtone now
+* Fix call timer bug
+* Ringtone list, later versions of the module will come with more then just the old school ringtone
+
 v1.2.1
 ======
 * Revamp UI and fullscreen feature

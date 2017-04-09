@@ -15,8 +15,9 @@
                 <group>
                     <!--<field name="missed_call_action"/>-->
                     <field name="sip_running"/>
-                    <field name="ringtone" filename="ringtone_filename"/>
-                    <field name="ringtone_filename" invisible="1"/>
+                    <field name="ringtone_id"/>
+                    <!--<field name="ringtone" filename="ringtone_filename"/>
+                    <field name="ringtone_filename" invisible="1"/>-->
                     <field name="ring_duration"/>
                 </group>
       	    </form>

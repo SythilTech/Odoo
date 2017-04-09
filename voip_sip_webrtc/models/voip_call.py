@@ -19,6 +19,7 @@ class VoipCall(models.Model):
     notes = fields.Text(string="Notes", help="Additional comments outside the transcription")
     client_ids = fields.One2many('voip.call.client', 'vc_id', string="Client List")
     type = fields.Selection([('internal','Internal'),('external','External')], string="Type")
+    mode = fields.Selection([('videocall','video call'), ('audiocall','audio call'), ('screensharing','screen sharing call')], string="Mode", help="This is only how the call starts, i.e a video call can turn into a screen sharing call mid way")
     sip_tag = fields.Char(string="SIP Tag")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
 
@@ -26,10 +27,22 @@ class VoipCall(models.Model):
 
         if self.status == "pending":
             self.status = "accepted"
+
+        #Which contraints we used are determined by the starting mode of call
+        constraints = {}
+        if self.mode == "videocall":
+            constraints = {'audio': True, 'video': True}
+        elif self.mode == "audiocall":
+            constraints = {'audio': True}
+        elif self.mode == "screensharing":
+            constraints = {'video': {
+                    'mediaSource': "screen"
+                }
+            }
         
         #Notify caller and callee that the call was accepted
         for voip_client in self.client_ids:
-            notification = {'call_id': self.id, 'status': 'accepted', 'type': self.type}
+            notification = {'call_id': self.id, 'status': 'accepted', 'type': self.type, 'constraints':  constraints}
             self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
 
     def reject_call(self):

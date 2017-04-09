@@ -33,7 +33,8 @@ var peerConnectionConfig = {
     ]
 };
 
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+//navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+navigator.mediaDevices.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia || navigator.msGetUserMedia;
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 window.RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
@@ -64,7 +65,7 @@ WebClient.include({
                         var ringtone = notification[1].ringtone;
                         var caller_partner_id = notification[1].caller_partner_id
 
-                        var notif_text = from_name + " is calling";
+                        var notif_text = from_name + " wants you to join a " + notification[1].mode;
 
                         countdown = notification[1].ring_duration
 
@@ -75,7 +76,7 @@ WebClient.include({
 	                    mySound.play();
 
 	                    //Display an image of the person who is calling
-	                    $("#voipcallincomingimage").attr('src', '/web/image/res.partner/' + caller_partner_id + '/image/image.jpg');
+	                    $("#voipcallincomingimage").attr('src', '/web/image/res.partner/' + caller_partner_id + '/image_medium/image.jpg');
 
 
 				    } else if (notification[1].direction == 'outgoing') {
@@ -90,19 +91,14 @@ WebClient.include({
 	                    self.notification_manager.display(outgoingNotification);
 
                         //Display an image of the person you are calling
-	                    $("#voipcalloutgoingimage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image/image.jpg');
+	                    $("#voipcalloutgoingimage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
 					}
                 } else if (notification[0][1] === 'voip.response') {
 					var status = notification[1].status;
 					var type = notification[1].type;
-                    var media_access;
+					var constraints = notification[1].constraints;
 
-                    if (type == "internal") {
-					    media_access = {audio: true, video: true}
-					} else if (type == "external") {
-					    media_access = {audio: true}
-					    call_id = notification[1].call_id;
-					}
+					call_id = notification[1].call_id;
 
 					//Destroy the notifcation because the call was accepted or rejected, no need to wait until timeout
 					if (typeof outgoingNotification !== "undefined") {
@@ -114,9 +110,11 @@ WebClient.include({
 
 
                         //Ask for media access
-                        if (navigator.getUserMedia) {
-                            navigator.getUserMedia( media_access, getUserMediaSuccess, getUserMediaError);
-                        }
+                        navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+                        /*if (navigator.mediaDevices.getUserMedia) {
+                            navigator.mediaDevices.getUserMedia( constraints, getUserMediaSuccess, getUserMediaError);
+
+                        }*/
 			    	}
 			    } else if (notification[0][1] === 'voip.start') {
 					console.log("Start Call");
@@ -237,11 +235,14 @@ function gotRemoteStream(event) {
     remoteVideo.srcObject = event.streams[0];
     remoteStream = event.streams[0];
 
-    //FIXME interval gets called twice, half a second increment is a hack solution
-    callSeconds = 0.5;
+    var startDate = new Date();
+
+    //For video calls (2 streams) this get called twice so we use time difference as a work around
     var call_interval = setInterval(function() {
-        $("#voip_text").html(callSeconds + " seconds");
-        callSeconds += 0.5;
+		var endDate   = new Date();
+		var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+
+        $("#voip_text").html( Math.round(seconds) + " seconds");
     }, 1000);
 
     $.ajax({

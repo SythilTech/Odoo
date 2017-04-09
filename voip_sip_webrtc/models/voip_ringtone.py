@@ -7,4 +7,6 @@ class VoipRingtone(models.Model):
 
     _name = "voip.ringtone"
 
+    name = fields.Char(string="Name")
     media = fields.Binary(string="Media File")
+    media_filename = fields.Char(string="Media Filename")
