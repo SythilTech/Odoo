@@ -24,6 +24,10 @@ class MigrationImportWordpressBlog(models.Model):
         #Also get media since we will be importing the images in the post
         response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
         media_json_data = json.loads(response_string.text)
+
+        #Get Posts
+        tax_response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/posts")
+        tax_json_data = json.loads(tax_response_string.text)
         
         for blog_json in blog_json_data:
             title = blog_json['title']['rendered']
@@ -51,8 +55,17 @@ class MigrationImportWordpressBlog(models.Model):
                 #Update the blog post
                 blog_post.content = transformed_content
             else:
+                #We also get the Wordpress user and import it if neccassary
+                wordpress_user = self.env['ir.model.data'].xmlid_to_object('wordpress_import.import_user_' + str(blog_json['author']) )
+                if wordpress_user:
+                    _logger.error("TODO implement reimport user code")
+                else:
+                    user_response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/users/" + str(blog_json['author']) )
+                    user_json = json.loads(user_response_string.text)
+                    wordpress_user = self.transfer_user(user_json)
+
                 #Create the blog post if it does not exist
-                blog_post = self.env['blog.post'].create({'blog_id':1, 'name':title, 'content': transformed_content, 'website_published': published})
+                blog_post = self.env['blog.post'].sudo(wordpress_user.id).create({'author_id': wordpress_user.partner_id.id, 'write_uid': wordpress_user.id, 'blog_id':1, 'name':title, 'content': transformed_content, 'website_published': published})
                 
-                self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'ir.ui.view', 'res_id': blog_post.id })
+                self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'blog.post', 'res_id': blog_post.id })
                 self.blog_post_ids = [(4,blog_post.id)]

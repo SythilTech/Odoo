@@ -8,6 +8,7 @@
             <form>
                 <group>
       	            <field name="wordpress_url"/>
+      	            <field name="wordpress_imported_user_ids"/>
       	            <field name="wordpress_page_ids">
       	                <tree>
       	                    <field name="name"/>

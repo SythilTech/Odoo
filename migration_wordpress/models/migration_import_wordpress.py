@@ -17,7 +17,29 @@ class MigrationImportWordpress(models.Model):
     wordpress_url = fields.Char(string="Wordpress URL")    
     wordpress_page_ids = fields.One2many('migration.import.wordpress.page', 'wordpress_id', string="Wordpress Pages")
     wordpress_imported_media = fields.Many2many('ir.attachment', string="Imported Media")
+    wordpress_imported_user_ids = fields.Many2many('res.users', string="Imported Users")
 
+    def transfer_user(self, user_json):
+        """ For now this is only used by the blog so we can credit the original author """
+
+        external_identifier = "import_user_" + str(user_json['id'])
+        
+        #Create an external ID so we don't reimport the same user again
+        wordpress_user = self.env['ir.model.data'].xmlid_to_object('wordpress_import.' + external_identifier)
+        if wordpress_user:
+            #For now we don't reimport the users
+            _logger.error("User already exists")        
+        else:
+            #Since we don't seem to get the username, email or password from the API we just create a stub user
+            wordpress_user = self.env['res.users'].create({'login': 'wordpress_' + str(user_json['id']), 'notify_email': 'none', 'email': 'wordpress_' + str(user_json['id']) + "@example.fake.au", 'name': user_json['name'], 'active':True})
+
+            #We need to keep track of any imported users
+            self.wordpress_imported_user_ids = [(4,wordpress_user.id)]
+
+            self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'res.users', 'res_id': wordpress_user.id })        
+            
+        return wordpress_user
+        
     def transfer_media(self, media_json):
         """ Media can be imported from many palce such as when importing pages, media library, blog posts or posts of any type """
         url = media_json['guid']['rendered'].replace("localhost","10.0.0.68")
