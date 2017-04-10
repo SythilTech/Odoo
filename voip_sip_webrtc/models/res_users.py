@@ -11,8 +11,10 @@ class ResUsersVoip(models.Model):
 
     _inherit = "res.users"
 
-    voip_ringtone = fields.Binary(string="VOIP Ringtone")
-    voip_ringtone_filename = fields.Char(string="VOIP Ringtone Filename")
+    voip_ringtone = fields.Binary(string="Ringtone")
+    voip_ringtone_filename = fields.Char(string="Ringtone Filename")
+    voip_missed_call = fields.Binary(string="Missed Call Message")
+    voip_missed_call_filename = fields.Char(string="Missed Call Message Filename")
 
     def create_video_voip_room(self):
         self.create_voip_room("videocall")

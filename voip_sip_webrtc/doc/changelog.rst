@@ -1,3 +1,7 @@
+v1.2.3
+======
+* Fix issue with audio only calls not ending
+
 v1.2.2
 ======
 * Each user can have thier own ringtone now

@@ -144,13 +144,10 @@ WebClient.include({
 					peerConnection.addIceCandidate(new RTCIceCandidate(ice)).catch(errorHandler);
 				} else if(notification[0][1] === 'voip.end') {
                     console.log("Call End");
-                    //localVideo.src = "";
-                    localStream.getAudioTracks()[0].stop();
-                    localStream.getVideoTracks()[0].stop();
-                    remoteVideo.srcObject = localStream;
-                    remoteStream.getAudioTracks()[0].enabled = false;
-                    remoteStream.getAudioTracks()[0].stop();
-                    remoteStream.getVideoTracks()[0].stop();
+
+                    //Stop all audio / video tracks
+                    localStream.getTracks().forEach(track => track.stop());
+                    remoteStream.getTracks().forEach(track => track.stop());
 
                     $(".s-voip-manager").css("opacity","0");
 				}
@@ -195,7 +192,7 @@ function getUserMediaSuccess(stream) {
 }
 
 function getUserMediaError(error) {
-    alert("Failed to access to camera");
+    alert("Failed to access to media: " + error);
 };
 
 function createdDescription(description) {
@@ -294,6 +291,13 @@ var VoipCallOutgoingNotification = Notification.extend({
             $("#callsecondsoutgoingleft").html(secondsLeft);
             if (secondsLeft == 0) {
 				myNotif.rpc("/voip/missed/" + call_id);
+
+				//Play the missed call audio
+				mySound = new Audio("/voip/miss/" + call_id + ".mp3");
+				mySound.play();
+
+				//myNotif.rpc("/voip/messagebank/" + call_id);
+
 				clearInterval(outgoing_ring_interval);
                 myNotif.destroy(true);
             }

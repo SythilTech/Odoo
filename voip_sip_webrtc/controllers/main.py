@@ -40,6 +40,35 @@ class VoipController(http.Controller):
 
         return response
 
+    @http.route('/voip/messagebank/<voip_call_id>', type="json", auth="user")
+    def voip_message_bank(self, voip_call_id):
+        _logger.error("Message Bank")
+        voip_call = request.env['voip.call'].browse( int(voip_call_id) )
+
+        server_sdp_dict = {'sdp': "test"}
+        server_sdp_json = json.dumps(server_sdp_dict)
+        
+        _logger.error(server_sdp_json)
+        notification = {'call_id': voip_call.id, 'sdp': server_sdp_json }
+        request.env['bus.bus'].sendone((request._cr.dbname, 'voip.sdp', voip_call.from_partner_id.id), notification)
+                    
+    @http.route('/voip/miss/<voip_call_id>.mp3', type="http", auth="user")
+    def voip_miss_message(self, voip_call_id):
+
+        voip_call = request.env['voip.call'].browse( int(voip_call_id) )
+        to_user = request.env['res.users'].search([('partner_id','=',voip_call.partner_id.id)])
+
+        if to_user.voip_missed_call:
+            missed_call_media = to_user.voip_missed_call
+
+            headers = []
+            missed_call_media_base64 = base64.b64decode(missed_call_media)
+            headers.append(('Content-Length', len(missed_call_media_base64)))
+            response = request.make_response(missed_call_media_base64, headers)
+        
+            return response
+
+
     @http.route('/voip/accept/<call>', type="json", auth="user")
     def voip_accept(self, call):
         """Mark the call as accepted, and open the VOIP window"""
@@ -64,8 +93,8 @@ class VoipController(http.Controller):
         
         voip_call = request.env['voip.call'].browse( int(call) )
         voip_call.miss_call()
-                    
-        return True
+
+        return "Bye"
 
     @http.route('/voip/call/connect', type="http", auth="user")
     def voip_call_connect(self, **kwargs):
@@ -127,7 +156,7 @@ class VoipController(http.Controller):
             values[field_name] = field_value
 
         voip_call = request.env['voip.call'].browse( int(values['call']) )
-        
+        _logger.error(values['sdp'])
         sdp_json = values['sdp']
         sdp_data = json.loads(sdp_json)['sdp']
 
