@@ -9,7 +9,8 @@
                 <p id="voip_text" style="text-align:center;">Starting Call...</p>
             </div>
             <div class="voip-video-container">
-                <video id="remoteVideo" autoplay="autoplay" style="height:100%;width:100%;"/>
+                <img id="toPartnerImage"/>
+                <video id="remoteVideo" autoplay="autoplay" style="height:100%;width:100%;display:none;"/>
                 <video id="localVideo" autoplay="autoplay" muted="muted" style="display:none;"/>
             </div>
         </div>

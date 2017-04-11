@@ -1,3 +1,7 @@
+v1.2.4
+======
+* Media access is requested before the call is started
+
 v1.2.3
 ======
 * Fix issue with audio only calls not ending

@@ -25,6 +25,9 @@ var callSeconds;
 var call_id = "";
 var myNotif = "";
 var outgoingNotification
+var role;
+var mode = false;
+var to_partner_id;
 
 var peerConnectionConfig = {
     'iceServers': [
@@ -56,18 +59,34 @@ WebClient.include({
             _.each(notifications, (function (notification) {
 
 
-                if (notification[0][1] === 'voip.notification') {
+                if (notification[0][1] === 'voip.permission') {
+					var self = this;
+					console.log("Ask Caller Permission");
+
+                    role = "caller";
+                    mode = notification[1].mode;
+                    var constraints = notification[1].constraints;
+                    to_partner_id = notification[1].to_partner_id
+
+                    //Ask for media access before we start the call
+                    navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+
+                } else if (notification[0][1] === 'voip.notification') {
 					var self = this;
 
-					call_id = notification[1].call_id;
+					call_id = notification[1].voip_call_id;
+
 					if (notification[1].direction == 'incoming') {
 				    	var from_name = notification[1].from_name;
                         var ringtone = notification[1].ringtone;
-                        var caller_partner_id = notification[1].caller_partner_id
+                        var caller_partner_id = notification[1].caller_partner_id;
 
-                        var notif_text = from_name + " wants you to join a " + notification[1].mode;
+                        role = "callee";
+                        mode = notification[1].mode;
 
-                        countdown = notification[1].ring_duration
+                        var notif_text = from_name + " wants you to join a " + mode;
+
+                        countdown = notification[1].ring_duration;
 
                         var incomingNotification = new VoipCallIncomingNotification(self.notification_manager, "Incoming Call", notif_text, call_id);
 	                    self.notification_manager.display(incomingNotification);
@@ -77,7 +96,7 @@ WebClient.include({
 
 	                    //Display an image of the person who is calling
 	                    $("#voipcallincomingimage").attr('src', '/web/image/res.partner/' + caller_partner_id + '/image_medium/image.jpg');
-
+                        $("#toPartnerImage").attr('src', '/web/image/res.partner/' + caller_partner_id + '/image_medium/image.jpg');
 
 				    } else if (notification[1].direction == 'outgoing') {
 					    var to_name = notification[1].to_name;
@@ -92,30 +111,23 @@ WebClient.include({
 
                         //Display an image of the person you are calling
 	                    $("#voipcalloutgoingimage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
+                        $("#toPartnerImage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
 					}
                 } else if (notification[0][1] === 'voip.response') {
+					console.log("Response");
 					var status = notification[1].status;
 					var type = notification[1].type;
-					var constraints = notification[1].constraints;
 
-					call_id = notification[1].call_id;
+					//call_id = notification[1].call_id;
 
 					//Destroy the notifcation because the call was accepted or rejected, no need to wait until timeout
 					if (typeof outgoingNotification !== "undefined") {
 					    outgoingNotification.destroy(true);
 					}
 
-					if (status == "accepted") {
+					/*if (status == "accepted") {
                         $(".s-voip-manager").css("opacity","1");
-
-
-                        //Ask for media access
-                        navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-                        /*if (navigator.mediaDevices.getUserMedia) {
-                            navigator.mediaDevices.getUserMedia( constraints, getUserMediaSuccess, getUserMediaError);
-
-                        }*/
-			    	}
+			    	}*/
 			    } else if (notification[0][1] === 'voip.start') {
 					console.log("Start Call");
 
@@ -166,17 +178,9 @@ function errorHandler(error) {
 }
 
 function getUserMediaSuccess(stream) {
-    console.log("Got Camera Access");
+    console.log("Got Media Access");
 
-
-    $.ajax({
-	    method: "GET",
-		url: "/voip/call/connect",
-		data: { call: call_id },
-            success: function(data) {
-
-        }
-    });
+    $(".s-voip-manager").css("opacity","1");
 
     localVideo = document.querySelector('#localVideo');
     remoteVideo = document.querySelector('#remoteVideo');
@@ -188,6 +192,27 @@ function getUserMediaSuccess(stream) {
     window.peerConnection.onicecandidate = gotIceCandidate;
     window.peerConnection.ontrack = gotRemoteStream;
     window.peerConnection.addStream(localStream);
+
+    if (role == "caller") {
+		//Show the VOIP Manager now because we may need it if wego to message bank
+        console.log("Notify Call");
+
+        $.ajax({
+	        method: "GET",
+	    	url: "/voip/call/notify",
+		    data: { mode: mode, to_partner_id: to_partner_id },
+            success: function(data) {
+
+            }
+        });
+    }
+
+    if (role == "callee") {
+		//Start sending out SDP now both caller and callee have granted media access
+		console.log("Start Call");
+		window.peerConnection.createOffer().then(createdDescription).catch(errorHandler);
+	}
+
 
 }
 
@@ -233,6 +258,10 @@ function gotRemoteStream(event) {
     remoteStream = event.streams[0];
 
     var startDate = new Date();
+
+    //Hide the image and replace it with the video stream
+    $("#toPartnerImage").css('display','none');
+    $("#remoteVideo").css('display','block');
 
     //For video calls (2 streams) this get called twice so we use time difference as a work around
     var call_interval = setInterval(function() {
@@ -296,8 +325,6 @@ var VoipCallOutgoingNotification = Notification.extend({
 				mySound = new Audio("/voip/miss/" + call_id + ".mp3");
 				mySound.play();
 
-				//myNotif.rpc("/voip/messagebank/" + call_id);
-
 				clearInterval(outgoing_ring_interval);
                 myNotif.destroy(true);
             }
@@ -317,13 +344,29 @@ var VoipCallIncomingNotification = Notification.extend({
 
         this.events = _.extend(this.events || {}, {
             'click .link2accept': function() {
+
                 this.rpc("/voip/accept/" + call_id);
                 mySound.pause();
                 mySound.currentTime = 0;
+
+                //Constraints are slightly different for the callee e.g. for calle we don't need screen sharing access only audio
+                var constraints = {};
+                if (mode == "videocall") {
+                    constraints = {audio: true, video: true};
+                } else if (mode == "audiocall") {
+                    constraints = {audio: true};
+                } else if (mode == "screensharing") {
+                    constraints = {audio: true};
+                }
+
+                //Ask for media access only if the call is accepted
+                navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+
                 this.destroy(true);
             },
 
             'click .link2reject': function() {
+
 				this.rpc("/voip/reject/" + call_id);
                 mySound.pause();
                 mySound.currentTime = 0;
@@ -340,7 +383,7 @@ var VoipCallIncomingNotification = Notification.extend({
         var incoming_ring_interval = setInterval(function() {
             $("#callsecondsincomingleft").html(secondsLeft);
             if (secondsLeft == 0) {
-				myNotif.rpc("/voip/missed/" + call_id);
+				//myNotif.rpc("/voip/missed/" + call_id);
                 mySound.pause();
                 mySound.currentTime = 0;
                 clearInterval(incoming_ring_interval);

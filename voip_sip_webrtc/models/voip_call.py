@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from openerp.http import request
 import datetime
+import logging
+_logger = logging.getLogger(__name__)
 
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp import api, fields, models
@@ -27,22 +29,10 @@ class VoipCall(models.Model):
 
         if self.status == "pending":
             self.status = "accepted"
-
-        #Which contraints we used are determined by the starting mode of call
-        constraints = {}
-        if self.mode == "videocall":
-            constraints = {'audio': True, 'video': True}
-        elif self.mode == "audiocall":
-            constraints = {'audio': True}
-        elif self.mode == "screensharing":
-            constraints = {'video': {
-                    'mediaSource': "screen"
-                }
-            }
         
         #Notify caller and callee that the call was accepted
         for voip_client in self.client_ids:
-            notification = {'call_id': self.id, 'status': 'accepted', 'type': self.type, 'constraints':  constraints}
+            notification = {'call_id': self.id, 'status': 'accepted', 'type': self.type}
             self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
 
     def reject_call(self):
