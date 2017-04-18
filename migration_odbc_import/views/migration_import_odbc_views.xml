@@ -9,17 +9,22 @@
                 <header>
                     <button type="object" name="check_data_sources" string="Check Data Sources"/>
                     <button type="object" name="test_connection" string="Test Connection"/>
-      	            <button type="object" name="analyse_database" string="Analyse Databae"/>
+      	            <button type="object" name="analyse_database" string="Analyse Database"/>
       	            <button type="object" name="import_all_data" string="Import All Data"/>
       	            <button type="object" name="create_scheduled_import" string="Create Scheduled Import"/>
       	        </header>
       	        <group>
       	            <field name="name"/>
-                    <field name="dsn_id"/>
                     <field name="connection_string_template"/>
+                    <field name="dsn_id"/>
+                    <field name="storage" invisible="1"/>
+                    <field name="connect_server" attrs="{'invisible': [('storage', '!=', 'online')]}"/>
+                    <field name="connect_database" attrs="{'invisible': [('storage', '!=', 'online')]}"/>
+                    <field name="connect_username" attrs="{'invisible': [('storage', '!=', 'online')]}"/>
+                    <field name="connect_password" attrs="{'invisible': [('storage', '!=', 'online')]}"/>
                     <field name="connection_string"/>
                 </group>
-                See <a href="https://www.connectionstrings.com">https://www.connectionstrings.com</a> if you want to manually create your own connection string
+                See <a target="_blank" href="https://www.connectionstrings.com">https://www.connectionstrings.com</a> if you want to manually create your own connection string
                 <group>
       	            <field name="db_table_ids">
       	                <tree create="false" edit="false">

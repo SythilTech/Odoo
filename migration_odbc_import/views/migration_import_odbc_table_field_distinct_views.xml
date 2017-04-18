@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_import_odbc_table_field_distinct_form_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc.table.field.distinct form view</field>
+        <field name="model">migration.import.odbc.table.field.distinct</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="name"/>
+                </group>
+                <field name="row_ids">
+                    <tree>
+                        <field name="dis_value"/>
+                        <field name="dis_count"/>
+                    </tree>
+                </field>
+      	    </form>
+      	</field>
+    </record>
+
+</odoo>

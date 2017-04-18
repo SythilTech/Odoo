@@ -11,12 +11,22 @@ class MigrationImportOdbc(models.Model):
     _name = "migration.import.odbc"
 
     name = fields.Char(string="Name", required="True")
-    dsn_id = fields.Many2one('migration.import.odbc.dsn', string="ODBC DSN List")
-    connection_string_template = fields.Many2one('migration.import.odbc.connect', string="CS Template")
-    connection_string = fields.Char(string="Connection String", required="True", help="See https://www.connectionstrings.com if you want a connection string other then MySQL")
+    dsn_id = fields.Many2one('migration.import.odbc.dsn', string="Driver")
+    connection_string_template = fields.Many2one('migration.import.odbc.connect', string="Connection Template")
+    connection_string = fields.Char(string="Connection String", help="See https://www.connectionstrings.com if you want a connection string other then MySQL")
     db_table_ids = fields.One2many('migration.import.odbc.table', 'import_id', string="Database Tables")
     import_log_ids = fields.One2many('migration.import.odbc.log', 'import_id', string="Import Log")
+    storage = fields.Selection(string="Storage", related="connection_string_template.storage")
+    connect_server = fields.Char(string="Server")
+    connect_database = fields.Char(string="Database")
+    connect_username = fields.Char(string="Username")
+    connect_password = fields.Char(string="Password")
 
+    @api.onchange('name')
+    def _onchange_name(self):
+        #Check the data sources now so the user doesn't have to click the button
+        self.check_data_sources()
+    
     @api.multi
     def create_scheduled_import(self):
         self.ensure_one()
@@ -43,11 +53,26 @@ class MigrationImportOdbc(models.Model):
                 db_table.import_table_data(import_log)
         import_log.state = "done"
     
-    @api.onchange('connection_string_template')
-    def _onchange_connection_string_template(self):
-        if self.connection_string_template:
-            connection_string = self.connection_string_template.connection_string.replace("$driver",self.dsn_id.driver)
-            self.connection_string = connection_string
+    @api.onchange('dsn_id','connect_server','connect_database','connect_username','connect_password')
+    def _onchange_dsn_id(self):
+        if self.dsn_id and self.dsn_id.connection_string:
+            cs = self.dsn_id.connection_string
+
+            cs = cs.replace("$driver", self.dsn_id.driver)
+            
+            if self.connect_server:
+                cs = cs.replace("$server", self.connect_server)
+            
+            if self.connect_database:
+                cs = cs.replace("$database", self.connect_database)
+            
+            if self.connect_username:
+                cs = cs.replace("$username", self.connect_username)
+            
+            if self.connect_password:
+                cs = cs.replace("$password", self.connect_password)
+
+            self.connection_string = cs
     
     def check_data_sources(self):
 	sources = pyodbc.dataSources()
@@ -56,6 +81,9 @@ class MigrationImportOdbc(models.Model):
 	for dsn in dsns:
 	    if self.env['migration.import.odbc.dsn'].search_count([('name','=',dsn)]) == 0:
 		self.env['migration.import.odbc.dsn'].create({'name': dsn, 'driver': sources[dsn]})
+
+        #for driver in pyodbc.drivers():
+        #    _logger.error(driver)
 	
     def test_connection(self):
         conn = pyodbc.connect(self.connection_string)
@@ -106,6 +134,8 @@ class MigrationImportOdbcDsn(models.Model):
 
     name = fields.Char(string="Name")
     driver = fields.Char(string="Driver")
+    connection_string = fields.Char(string="Connect String")
+    storage = fields.Selection([('file','File'),('online','Online')], string="Storage")
 
 class MigrationImportOdbcConnect(models.Model):
 
@@ -114,6 +144,7 @@ class MigrationImportOdbcConnect(models.Model):
     name = fields.Char(string="Name")
     driver = fields.Char(string="Driver")
     connection_string = fields.Char(string="Connect String")
+    storage = fields.Selection([('file','File'),('online','Online')], string="Storage")
     
 class MigrationImportOdbcLog(models.Model):
 
@@ -190,7 +221,8 @@ class MigrationImportOdbcTable(models.Model):
                 import_log_table.imported_records += 1
             else:
                 raise UserError("External ID is neccassary to import")
-            
+        
+     
     @api.multi
     def open_line(self):
         self.ensure_one()
@@ -235,7 +267,31 @@ class MigrationImportOdbcTable(models.Model):
                 orm_field = self.env['ir.model.fields'].search([('model_id','=',self.model_id.id), '|', ('name','=',column.name), ('name','=',column.orm_name)])
                 if orm_field:
                     column.field_id = orm_field[0].id
-            
+
+    def validate(self):
+        conn = pyodbc.connect(self.import_id.connection_string)
+        cursor = conn.cursor()
+        error_string = ""
+
+        #Go through each column that will be imported and validate it
+        for db_field in self.db_field_ids:
+            if db_field.field_id:
+                if db_field.field_id.ttype == "selection":
+                    #Get all distinct values and compare them to the internal values in the selection field
+                    cursor.execute("SELECT COUNT(*) AS dis_count, " + db_field.name + " AS dis_value FROM " + self.name + " GROUP BY " + db_field.name)
+
+                    columns = [column[0] for column in cursor.description]
+                    selection_list = dict(self.env[self.model_id.model]._fields[db_field.field_id.name].selection)
+
+                    for row in cursor.fetchall():
+                        #Convert to dictionary
+                        row_dict = dict(zip(columns, row))
+
+                        if str(row_dict['dis_value']) not in selection_list.keys():
+                            error_string += "The value " + str(row_dict['dis_value']) + " does not correspond to a option in the " + str(db_field.field_id.name) + " selection field (" + str(row_dict['dis_count']) + " occurrences)\n"
+
+        raise UserError(error_string)
+                        
 class MigrationImportOdbcTableField(models.Model):
 
     _name = "migration.import.odbc.table.field"
@@ -247,11 +303,54 @@ class MigrationImportOdbcTableField(models.Model):
     orm_name = fields.Char(string="ORM Name")
     field_id = fields.Many2one('ir.model.fields', string="Field", help="The ORM field that the data get imported into")
     is_key = fields.Boolean(string="is Primary Key")
-    
+
+    @api.multi
+    def find_distinct_values(self):
+        self.ensure_one()
+
+        conn = pyodbc.connect(self.table_id.import_id.connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) AS dis_count, " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+
+        columns = [column[0] for column in cursor.description]
+        results = []
+        
+        dist_rec = self.env['migration.import.odbc.table.field.distinct'].create({'name': self.name})
+        for row in cursor.fetchall():
+            
+            #There are only two columns but dictionaries are always a cool way to access data
+            row_dict = dict(zip(columns, row))
+            dist_rec.row_ids.create({'d_id': dist_rec.id, 'dis_value': row_dict['dis_value'], 'dis_count': row_dict['dis_count'] })
+            
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Distinct Field values", 
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'migration.import.odbc.table.field.distinct',
+            'res_id': dist_rec.id,
+            'target': 'new',
+        }
+            
     def auto_create_field(self):
         if is_key == False:
             new_field = self.env['ir.model.fields'].create({'ttype': self.orm_type, 'name': self.orm_name, 'field_description':self.name, 'model_id':self.table_id.model_id.id})
             self.field_id = new_field.id
+
+class MigrationImportOdbcTableFieldDistinct(models.Model):
+
+    _name = "migration.import.odbc.table.field.distinct"
+
+    name = fields.Char(string="Name")
+    row_ids = fields.One2many('migration.import.odbc.table.field.distinct.row','d_id', string="Rows")
+
+class MigrationImportOdbcTableFieldDistinctRow(models.TransientModel):
+
+    _name = "migration.import.odbc.table.field.distinct.row"
+
+    d_id = fields.Many2one('migration.import.odbc.table.field.distinct', string="Distinct Field")
+    dis_value = fields.Char(string="Distinct Value")
+    dis_count = fields.Char(string="Distinct Count")
     
 class MigrationImportOdbcTableDefault(models.Model):
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Migration Toolkit",
-    'version': "1.0",
+    'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -13,6 +13,7 @@
         'views/migration_import_odbc_log_views.xml',
         'views/migration_import_odbc_table_views.xml',
         'views/migration_import_odbc_table_field_views.xml',
+        'views/migration_import_odbc_table_field_distinct_views.xml',
         'views/menus.xml',
         'data/migration.import.odbc.connect.csv',
     ],
