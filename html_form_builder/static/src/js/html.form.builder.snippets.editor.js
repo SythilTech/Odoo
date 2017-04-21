@@ -1239,6 +1239,7 @@ options.registry.html_form_builder_captcha = options.Class.extend({
 
 			    session.rpc('/form/captcha/load', {'captcha_id': val, 'form_id': form_id, 'client_key': client_key, 'client_secret':client_secret}).then(function(result) {
 					self.$target.attr('data-captcha-id', val );
+					self.$target.attr('data-captcha-client-key', client_key );
 				    self.$target.html(result.html_string);
              	});
 
@@ -1251,16 +1252,12 @@ options.registry.html_form_builder_captcha = options.Class.extend({
         var self = this;
 
 		var captcha_id = this.$target.attr('data-captcha-id');
+		var captcha_client_key = this.$target.attr('data-captcha-client-key');
 
         var form_id = $(".html_form_captcha").parents().closest(".html_form").attr('data-form-id');
 
-	    session.rpc('/form/captcha/load', {'captcha_id': captcha_id, 'form_id': form_id}).done(function(result) {
-		    self.$target.attr('data-captcha-id', captcha_id );
-		    return_string = result.html_string;
-            $(".html_form_captcha").html(return_string);
-        });
-
-        alert("Recaptcha Regenerated"); //Hate to do this but can't get it to call sync rather then async...
+        //We can't use sync rpc, the page will refresh before it's got the data back, so just use the attribute data-captcha-client-key
+        return_string = "<div class=\"g-recaptcha\" data-sitekey=\"" + captcha_client_key + "\"></div>";
         $(".html_form_captcha").html(return_string);
 
     },

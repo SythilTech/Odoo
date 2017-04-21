@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Recode recapatcha javascript so it doesn't depend on rpc (not more alert dialog)
+
 v1.0.8
 ======
 * User and partner access in default values
