@@ -291,7 +291,7 @@ class MigrationImportOdbcTable(models.Model):
                             error_string += "The value " + str(row_dict['dis_value']) + " does not correspond to a option in the " + str(db_field.field_id.name) + " selection field (" + str(row_dict['dis_count']) + " occurrences)\n"
 
         raise UserError(error_string)
-                        
+    
 class MigrationImportOdbcTableField(models.Model):
 
     _name = "migration.import.odbc.table.field"
@@ -303,7 +303,9 @@ class MigrationImportOdbcTableField(models.Model):
     orm_name = fields.Char(string="ORM Name")
     field_id = fields.Many2one('ir.model.fields', string="Field", help="The ORM field that the data get imported into")
     is_key = fields.Boolean(string="is Primary Key")
-
+    alter_value_ids = fields.One2many('migration.import.odbc.table.field.alter', 'field_id', string="Alter Values")
+    valid = fields.Selection([('invalid','invalid'), ('valid','valid')], string="Valid")
+    
     @api.multi
     def find_distinct_values(self):
         self.ensure_one()
@@ -320,7 +322,7 @@ class MigrationImportOdbcTableField(models.Model):
             
             #There are only two columns but dictionaries are always a cool way to access data
             row_dict = dict(zip(columns, row))
-            dist_rec.row_ids.create({'d_id': dist_rec.id, 'dis_value': row_dict['dis_value'], 'dis_count': row_dict['dis_count'] })
+            dist_rec.row_ids.create({'d_id': dist_rec.id, 'dis_value': str(row_dict['dis_value']), 'dis_count': str(row_dict['dis_count']) })
             
         return {
             'type': 'ir.actions.act_window',
@@ -331,11 +333,74 @@ class MigrationImportOdbcTableField(models.Model):
             'res_id': dist_rec.id,
             'target': 'new',
         }
+
+
+    @api.multi
+    def open_line(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Import DB Table", 
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': self._name,
+            'res_id': self.id,
+            'target': 'new',
+        }
+
+    @api.onchange('field_id')
+    def _onchange_field_id(self):
+        "Validate the field"""
+                
+        if self.field_id:
+            conn = pyodbc.connect(self.table_id.import_id.connection_string)
+            cursor = conn.cursor()
             
+            #Valid until proven otherwise
+            valid = "valid"
+ 
+            if self.field_id.ttype == "selection":
+                #Get all distinct values and compare them to the internal values in the selection field
+                cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+
+                columns = [column[0] for column in cursor.description]
+                selection_list = dict(self.env[self.model_id.model]._fields[self.field_id.name].selection)
+
+                for row in cursor.fetchall():
+                    #Convert to dictionary
+                    row_dict = dict(zip(columns, row))
+
+                    if str(row_dict['dis_value']) not in selection_list.keys():
+                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self._origin.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
+                        valid = "invalid"
+                    else:
+                        #The value maps just fine so we don't need to alter it
+                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self._origin.id, 'old_value': str(row_dict['dis_value']), 'new_value': str(row_dict['dis_value'])})
+                
+                self.valid = valid
+            elif self.field_id.ttype == "char":
+               #Get all distinct values and compare them to the internal values in the selection field
+               cursor.execute("SELECT COUNT(" + self.name + ") FROM " + self.table_id.name + " WHERE LENGTH(" + self.name + ") > " + str(self.field_id.size) )
+
+               row_count = cursor.fetchone()[0]
+               if row_count > 0:
+                   raise UserError(str(row_count) + " rows exceed the size limit")
+        else:
+            #Reset it back to unknown if the field is cleared
+            self.valid = ""
+                
     def auto_create_field(self):
         if is_key == False:
             new_field = self.env['ir.model.fields'].create({'ttype': self.orm_type, 'name': self.orm_name, 'field_description':self.name, 'model_id':self.table_id.model_id.id})
             self.field_id = new_field.id
+
+class MigrationImportOdbcTableFieldAlter(models.Model):
+
+    _name = "migration.import.odbc.table.field.alter"
+
+    field_id = fields.Many2one('migration.import.odbc.table.field', string="Field")
+    old_value = fields.Char(string="Old Value")
+    new_value = fields.Char(string="New Value")
 
 class MigrationImportOdbcTableFieldDistinct(models.Model):
 

@@ -1,3 +1,8 @@
+v1.2
+====
+* Validate fields as you map them
+* Bug fix 0 blank distinct values
+
 v1.1
 ====
 * Simplify creation of connetion strings

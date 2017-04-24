@@ -15,7 +15,7 @@
       	            <field name="name"/>
       	            <field name="model_id"/>
       	            <field name="db_field_ids">
-      	                <tree create="false" editable="bottom">
+      	                <tree colors="red:valid=='invalid'" create="false" editable="bottom">
       	                    <field name="name"/>
       	                    <field name="orm_type" invisible="True"/>
       	                    <field name="orm_name" invisible="True"/>
@@ -24,6 +24,8 @@
       	                    <field name="field_id" attrs="{'readonly': [('is_key', '=', True)]}" domain="[('model_id','=',model_id)]" context="{'default_ttype':orm_type, 'default_name': orm_name, 'default_field_description':name, 'default_model_id':model_id}"/>
       	                    <button type="object" name="find_distinct_values" string="Distinct Values"/>
       	                    <button type="object" name="auto_create_field" string="Auto Create Field"/>
+      	                    <button type="object" name="open_line" string="Edit Field"/>
+      	                    <field name="valid"/>
       	                </tree>
       	            </field>
                     <field name="default_value_ids" context="{'default_model_id':model_id}">
