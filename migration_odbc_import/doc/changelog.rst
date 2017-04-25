@@ -1,3 +1,7 @@
+v1.2.1
+======
+* Many2one validation
+
 v1.2
 ====
 * Validate fields as you map them

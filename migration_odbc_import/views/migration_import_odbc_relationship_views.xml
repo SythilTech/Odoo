@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_import_odbc_relationship_form_view" model="ir.ui.view">
+        <field name="name">migration.import.odbc.relationship form view</field>
+        <field name="model">migration.import.odbc.relationship</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="import_id"/>
+      	            <field name="table1"/>
+                    <field name="table1_id_field"/>
+                    <field name="table2"/>
+                    <field name="table2_id_field" domain="[('table_id','=',table2)]"/>
+                    <field name="table2_name_field" domain="[('table_id','=',table2)]"/>
+                    <field name="relationship_type"/>
+                </group>
+      	    </form>
+      	</field>
+    </record>
+
+</odoo>

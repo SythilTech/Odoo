@@ -7,9 +7,10 @@
         <field name="arch" type="xml">
             <form>
       	        <group>
-      	            <field name="create_date"/>
       	            <field name="import_id"/>
                     <field name="state"/>
+                    <field name="create_date" string="Start Date"/>
+                    <field name="finish_date"/>
                     <field name="table_ids">
                         <tree>
                             <field name="table_id"/>

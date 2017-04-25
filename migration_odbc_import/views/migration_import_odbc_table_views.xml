@@ -22,6 +22,7 @@
       	                    <field name="model_id" invisible="True"/>
       	                    <field name="is_key" invisible="True"/>
       	                    <field name="field_id" attrs="{'readonly': [('is_key', '=', True)]}" domain="[('model_id','=',model_id)]" context="{'default_ttype':orm_type, 'default_name': orm_name, 'default_field_description':name, 'default_model_id':model_id}"/>
+      	                    <button type="object" name="define_relationship" string="Define Relationship"/>
       	                    <button type="object" name="find_distinct_values" string="Distinct Values"/>
       	                    <button type="object" name="auto_create_field" string="Auto Create Field"/>
       	                    <button type="object" name="open_line" string="Edit Field"/>
@@ -33,6 +34,15 @@
                             <field name="model_id" invisible="True"/>
                             <field name="field_id" domain="[('model_id','=',model_id)]"/>
                             <field name="value"/>
+                        </tree>
+                    </field>
+                    <field name="relationship_ids">
+                        <tree>
+                            <field name="table1_id_field"/>
+                            <field name="table2"/>
+                            <field name="table2_id_field"/>
+                            <field name="table2_name_field"/>
+                            <field name="relationship_type"/>
                         </tree>
                     </field>
       	            <field name="select_sql"/>

@@ -2,6 +2,7 @@
 import pyodbc
 import logging
 _logger = logging.getLogger(__name__)
+from datetime import datetime
 
 from openerp import api, fields, models
 from odoo.exceptions import ValidationError, UserError
@@ -128,6 +129,18 @@ class MigrationImportOdbc(models.Model):
                     
                     self.env['migration.import.odbc.table.field'].create({'table_id': import_table.id, 'name': column_name, 'orm_type': orm_type, 'orm_name': "x_" + column_name, 'is_key': is_key})
 
+class MigrationImportOdbcRelationship(models.Model):
+
+    _name = "migration.import.odbc.relationship"
+
+    import_id = fields.Many2one('migration.import.odbc', string="Import ID")
+    table1 = fields.Many2one('migration.import.odbc.table', string="Table")
+    table1_id_field = fields.Many2one('migration.import.odbc.table.field', string="Table Field")
+    table2 = fields.Many2one('migration.import.odbc.table', string="Other Table")
+    table2_id_field = fields.Many2one('migration.import.odbc.table.field', string="Other Table ID Field")
+    table2_name_field = fields.Many2one('migration.import.odbc.table.field', string="Other Table Name Field", help="The field in the other database which acts as the name field")
+    relationship_type = fields.Selection([('many2one','Many2One')], string="Relationship Type", help="The database relatioship between the 2 fields/tables")
+    
 class MigrationImportOdbcDsn(models.Model):
 
     _name = "migration.import.odbc.dsn"
@@ -153,6 +166,7 @@ class MigrationImportOdbcLog(models.Model):
     import_id = fields.Many2one('migration.import.odbc', string="Import ID")
     state = fields.Selection([('progress','In Progress'), ('failed','Failed'), ('done','Done')])
     table_ids = fields.One2many('migration.import.odbc.log.table', 'log_id', string="Tables")
+    finish_date = fields.Datetime(string="Finish Date")
 
 class MigrationImportOdbcLogTable(models.Model):
 
@@ -174,6 +188,7 @@ class MigrationImportOdbcTable(models.Model):
     db_field_ids = fields.One2many('migration.import.odbc.table.field', 'table_id', string="Database Fields")
     default_value_ids = fields.One2many('migration.import.odbc.table.default', 'table_id', string="Default Values", help="Set a value before importing into the record into the database")
     select_sql = fields.Char(string="Select SQL", help="Modify this if you want to perform sql transformations such as concat first and last name into name field")
+    relationship_ids = fields.One2many('migration.import.odbc.relationship', 'table1', string="Database Relatioships")
 
     @api.one
     @api.depends('db_field_ids')
@@ -185,6 +200,7 @@ class MigrationImportOdbcTable(models.Model):
         import_log = self.env['migration.import.odbc.log'].create({'import_id': self.import_id.id, 'state':'progress'})
         self.import_table_data(import_log)
         import_log.state = "done"
+        import_log.finish_date = datetime.utcnow()
         
     def import_table_data(self, import_log):
         conn = pyodbc.connect(self.import_id.connection_string)
@@ -213,15 +229,22 @@ class MigrationImportOdbcTable(models.Model):
 
                 #Create a new record if the external ID does not exist
                 if self.env['ir.model.data'].xmlid_to_res_id('odbc_import.' + external_identifier) == False:
+
+                    #Go through all fields that we are importing and alter thier values
+                    for import_field in self.env['migration.import.odbc.table.field'].search([('table_id','=', self.id), ('field_id','!=', False), ('alter_value_ids','!=', False)]):
+                        for alter_value in import_field.alter_value_ids:
+                            if merged_dict[import_field.field_id.name] == alter_value.old_value:
+                                merged_dict[import_field.field_id.name] = alter_value.new_value
+
                     new_rec = self.env[self.model_id.model].create(merged_dict)
+                                        
                     self.env['ir.model.data'].create({'module': "odbc_import", 'name': external_identifier, 'model': self.model_id.model, 'res_id': new_rec.id })
 
                 #TODO write update record code
 
                 import_log_table.imported_records += 1
             else:
-                raise UserError("External ID is neccassary to import")
-        
+                raise UserError("External ID is neccassary to import")        
      
     @api.multi
     def open_line(self):
@@ -348,25 +371,38 @@ class MigrationImportOdbcTableField(models.Model):
             'target': 'new',
         }
 
+    @api.multi
+    def define_relationship(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Define Database Relationship", 
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'migration.import.odbc.relationship',
+            'context': {'default_import_id': self.table_id.import_id.id, 'default_table1': self.table_id.id, 'default_table1_id_field': self.id},
+            'target': 'new',
+        }
+
     @api.onchange('field_id')
     def _onchange_field_id(self):
         "Validate the field"""
-                
+
         if self.field_id:
             conn = pyodbc.connect(self.table_id.import_id.connection_string)
-            cursor = conn.cursor()
+            odbc_cursor = conn.cursor()
             
             #Valid until proven otherwise
             valid = "valid"
  
             if self.field_id.ttype == "selection":
                 #Get all distinct values and compare them to the internal values in the selection field
-                cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+                odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
 
-                columns = [column[0] for column in cursor.description]
+                columns = [column[0] for column in odbc_cursor.description]
                 selection_list = dict(self.env[self.model_id.model]._fields[self.field_id.name].selection)
 
-                for row in cursor.fetchall():
+                for row in odbc_cursor.fetchall():
                     #Convert to dictionary
                     row_dict = dict(zip(columns, row))
 
@@ -380,14 +416,42 @@ class MigrationImportOdbcTableField(models.Model):
                 self.valid = valid
             elif self.field_id.ttype == "char":
                #Get all distinct values and compare them to the internal values in the selection field
-               cursor.execute("SELECT COUNT(" + self.name + ") FROM " + self.table_id.name + " WHERE LENGTH(" + self.name + ") > " + str(self.field_id.size) )
+               odbc_cursor.execute("SELECT COUNT(" + self.name + ") FROM " + self.table_id.name + " WHERE LENGTH(" + self.name + ") > " + str(self.field_id.size) )
 
-               row_count = cursor.fetchone()[0]
+               row_count = odbc_cursor.fetchone()[0]
                if row_count > 0:
                    raise UserError(str(row_count) + " rows exceed the size limit")
+            elif self.field_id.ttype == "many2one":
+                self.valid = self.validate_many2one(odbc_cursor)
         else:
             #Reset it back to unknown if the field is cleared
             self.valid = ""
+
+    def validate_many2one(self, odbc_cursor):
+        """Compare the value in the field to the name field"""
+
+        #valid until a record does not align
+        valid = "valid"
+
+        #Get all distinct values and compare them to the name value of the Odoo field
+        odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+
+        columns = [column[0] for column in odbc_cursor.description]
+
+        for row in odbc_cursor.fetchall():
+            #Convert to dictionary
+            row_dict = dict(zip(columns, row))
+
+            #We have to loop through each record to get the name
+            for rec in self.env[self.field_id.relation].search([]):
+                if rec.name_get()[0][1] == str(row_dict['dis_value']):   
+                    #The value maps just fine so we don't need to alter it
+                    self.env['migration.import.odbc.table.field.alter'].create({'field_id': self._origin.id, 'old_value': str(row_dict['dis_value']), 'new_value': rec.id })
+                else:
+                    self.env['migration.import.odbc.table.field.alter'].create({'field_id': self._origin.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
+                    valid = "invalid"
+
+        return valid
                 
     def auto_create_field(self):
         if is_key == False:
