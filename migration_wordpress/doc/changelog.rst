@@ -1,3 +1,7 @@
+v1.2
+====
+* Pagenation
+
 v1.1.1
 ======
 * Import users so blog posts are properly credited

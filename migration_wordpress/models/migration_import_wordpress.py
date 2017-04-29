@@ -42,9 +42,10 @@ class MigrationImportWordpress(models.Model):
         
     def transfer_media(self, media_json):
         """ Media can be imported from many palce such as when importing pages, media library, blog posts or posts of any type """
-        url = media_json['guid']['rendered'].replace("localhost","10.0.0.68")
+        _logger.error(media_json)
+        url = media_json['guid']['rendered']
 
-        filename = media_json['media_details']['sizes']['full']['file']
+        filename = url.split('/')[-1]
         
         external_identifier = "import_media_" + str(media_json['id'])
 
@@ -64,64 +65,110 @@ class MigrationImportWordpress(models.Model):
             self.env['ir.model.data'].create({'module': "wordpress_import", 'name': external_identifier, 'model': 'ir.attachment', 'res_id': media_attachment.id })        
 
         return media_attachment
+
+    def get_all_pages(self):
+        """Loops over multiple requests and combines it into a simple json"""
+        #Get Pages
+        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/pages?per_page=100&page=1")
+        page_json_data = json.loads(response_string.text)
+
+        total_pages = response_string.headers['X-WP-TotalPages']
+        _logger.error(total_pages)
+        combined_page_json_data = json.loads(response_string.text)
     
-    def transform_post_content(self, content):
+        if total_pages > 1:
+            for page in range(2, int(total_pages) + 1 ):
+                _logger.error(page)
+                response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/pages?per_page=100&page=" + str(page) )
+                combined_page_json_data = combined_page_json_data + json.loads(response_string.text)
+
+        return combined_page_json_data
+
+    def get_all_media(self):
+        """Loops over multiple requests and combines it into a simple json"""
+        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media?per_page=100&page=1")
+        total_pages = response_string.headers['X-WP-TotalPages']
+        _logger.error(total_pages)
+        combined_media_json_data = json.loads(response_string.text)
+    
+        if total_pages > 1:
+            for page in range(2, int(total_pages) + 1 ):
+                _logger.error(page)
+                response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media?per_page=100&page=" + str(page) )
+                combined_media_json_data = combined_media_json_data + json.loads(response_string.text)
+
+        return combined_media_json_data
+        
+    def transform_post_content(self, content, media_json_data):
         """ Changes Wordpress content of any post type(page, blog, custom) to better fit in with the Odoo CMS, includes localising hyperlinks and media """
-
-        #Also get media since we will be importing the images in the post
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
-        media_json_data = json.loads(response_string.text)
-
+        
         root = html.fromstring(content)
         image_tags = root.xpath("//img")
 	if len(image_tags) != 0:
 	    for image_tag in image_tags:
 
+                media_attachment = False
+
                 #Get the full size image by looping through all media until you find the one with this url
                 for media_json in media_json_data:
-                    for key, value in media_json['media_details']['sizes'].iteritems():
-                        if value['source_url'] == image_tag.attrib['src']:
+                    if 'sizes' in media_json['media_details']:
+                        for key, value in media_json['media_details']['sizes'].iteritems():
+                            if value['source_url'] == image_tag.attrib['src']:
+                                media_attachment = self.transfer_media(media_json)                                                    
+                    else:
+                        if media_json['guid']['rendered'] == image_tag.attrib['src']:
                             media_attachment = self.transfer_media(media_json)
                                 
-	        image_tag.attrib['src'] = "/web/image2/" + str(media_attachment.id) + "/" + image_tag.attrib['width'] + "x" + image_tag.attrib['height'] + "/" + str(media_attachment.name)
+                if media_attachment:
+	            image_tag.attrib['src'] = "/web/image2/" + str(media_attachment.id) + "/" + image_tag.attrib['width'] + "x" + image_tag.attrib['height'] + "/" + str(media_attachment.name)
 
                 #Reimplement image resposiveness the Odoo way
-	        image_tag.attrib['class'] = "img-responsive " + image_tag.attrib['class']
+                if "class" in image_tag.attrib:
+	            image_tag.attrib['class'] = "img-responsive " + image_tag.attrib['class']
+	        else:
+	            image_tag.attrib['class'] = "img-responsive"
 	            
                 #This gets moved into the src
-	        image_tag.attrib.pop("width")
-	        image_tag.attrib.pop("height")
+	        if "width" in image_tag.attrib:
+	            image_tag.attrib.pop("width")
+	        
+	        if "height" in image_tag.attrib:
+	            image_tag.attrib.pop("height")
 	            
                 #We only import the original image, not all size variants so this is meaningless
-	        image_tag.attrib.pop("srcset")
-	        image_tag.attrib.pop("sizes")
+	        if "srcset" in image_tag.attrib:
+	            image_tag.attrib.pop("srcset")
+	        
+	        if "sizes" in image_tag.attrib:
+	            image_tag.attrib.pop("sizes")
             
         #Modify anchor tags and map pages to the new url
         anchor_tags = root.xpath("//a")
 	if len(anchor_tags) != 0:
 	    for anchor_tag in anchor_tags:
 	        #Only modify local links
-	        if self.wordpress_url in anchor_tag.attrib['href']:
-	            page_slug = anchor_tag.attrib['href'].split("/")[-2]
-	            anchor_tag.attrib['href'] = "/page/" + page_slug
+	        if "href" in anchor_tag.attrib:
+	            if self.wordpress_url in anchor_tag.attrib['href']:
+	                page_slug = anchor_tag.attrib['href'].split("/")[-2]
+	                anchor_tag.attrib['href'] = "/page/" + page_slug
            
         transformed_content = etree.tostring(root, pretty_print=True)
         
         return transformed_content
     
     def import_media(self):
-        
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
-        json_data = json.loads(response_string.text)
+
+        media_json_data = self.get_all_media()
             
-        for media_json in json_data:
+        for media_json in media_json_data:
             self.transfer_media(media_json)
   
     def import_pages(self):
 
-        #Get Pages
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/pages")
-        page_json_data = json.loads(response_string.text)
+        page_json_data = self.get_all_pages()
+
+        #Also get media since we will be importing the images in the post
+        media_json_data = self.get_all_media()
         
         for page_json in page_json_data:
             title = page_json['title']['rendered']
@@ -138,7 +185,7 @@ class MigrationImportWordpress(models.Model):
             wraped_content += "  </t>\n"
             wraped_content += "</t>"
 
-            transformed_content = "<?xml version=\"1.0\"?>\n" + self.transform_post_content(wraped_content)
+            transformed_content = "<?xml version=\"1.0\"?>\n" + self.transform_post_content(wraped_content, media_json_data)
 
             external_identifier = "import_post_" + str(page_json['id'])
 
