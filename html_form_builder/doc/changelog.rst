@@ -1,3 +1,7 @@
+v1.0.10
+=======
+* Integer and float validation
+
 v1.0.9
 ======
 * Recode recapatcha javascript so it doesn't depend on rpc (not more alert dialog)

@@ -36,6 +36,8 @@
                     <option value="">None</option>
                     <option value="email">Email</option>
                     <option value="lettersonly">Letters Only</option>
+                    <option value="integer">Integer</option>
+                    <option value="number">Number</option>
                 </select>
             </div>
             

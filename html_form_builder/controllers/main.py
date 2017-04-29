@@ -168,6 +168,8 @@ class HtmlFormController(http.Controller):
 	
 	if field.validation_format == "email":
 	    html_output += "email"
+	elif field.validation_format == "number" or field.validation_format == "integer":
+	    html_output += "number"
 	else:
 	    html_output += "text"
 	
@@ -178,6 +180,9 @@ class HtmlFormController(http.Controller):
 	
 	if field.validation_format == "lettersonly":
 	    html_output +=  ' pattern="[a-zA-Z ]+" title="Letters Only"'
+
+	if field.validation_format == "integer":
+	    html_output +=  ' pattern="\d*" title="Whole Numbers Only" min="0" step="1"' 
 	
 	if field.character_limit > 0:
 	    html_output += ' maxlength="' + str(field.character_limit) + '"'

@@ -11,7 +11,7 @@ var return_string = ""; //Global because I can't change html in session.rpc func
 var ajax = require('web.ajax');
 var qweb = core.qweb;
 
-ajax.loadXML('/html_form_builder/static/src/xml/html_form_modal29.xml', qweb);
+ajax.loadXML('/html_form_builder/static/src/xml/html_form_modal30.xml', qweb);
 
 $(function() {
   $( ".html_form button.btn-lg" ).click(function(e) {
@@ -20,26 +20,37 @@ $(function() {
 
     var my_form = $(".html_form form");
 
+    $(".html_form form input").each(function( index ) {
+        pattern = $( this ).attr('pattern');
+		if (typeof pattern !== typeof undefined && pattern !== false) {
+		    var pattern = new RegExp( pattern );
+		    var valid = pattern.test( $( this ).val() );
+		    //Why does this always return true?!?
+		}
+
+	});
+
+
     // Prepare form inputs
     var form_data = my_form.serializeArray();
 
-     var form_values = {};
-            _.each(form_data, function(input) {
-                if (input.name in form_values) {
-                    // If a value already exists for this field,
-                    // we are facing a x2many field, so we store
-                    // the values in an array.
-                    if (Array.isArray(form_values[input.name])) {
-                        form_values[input.name].push(input.value);
-                    } else {
-                        form_values[input.name] = [form_values[input.name], input.value];
-                    }
-                } else {
-                    if (input.value != '') {
-                        form_values[input.name] = input.value;
-                    }
-                }
-            });
+    var form_values = {};
+    _.each(form_data, function(input) {
+        if (input.name in form_values) {
+            // If a value already exists for this field,
+            // we are facing a x2many field, so we store
+            // the values in an array.
+            if (Array.isArray(form_values[input.name])) {
+                form_values[input.name].push(input.value);
+            } else {
+                form_values[input.name] = [form_values[input.name], input.value];
+            }
+        } else {
+            if (input.value != '') {
+                form_values[input.name] = input.value;
+            }
+        }
+    });
 
     //Input groups are added differently
     var input_groups = my_form.find(".hff_input_group")
@@ -195,7 +206,7 @@ options.registry.html_form_builder_field_textbox = options.Class.extend({
         $('#htmlTextboxModal').remove();
 
     	$('body').append(self.$modal);
-    	var datatype_dict = ['char','int'];
+    	var datatype_dict = ['char','integer','float'];
         var form_model = this.$target.parents().closest(".html_form").attr('data-form-model')
         var form_id = this.$target.parents().closest(".html_form").attr('data-form-id')
 
