@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_ticket_view_form_inherit_task_att" model="ir.ui.view">
+          <field name="name">project.task support ticket inherit</field>
+          <field name="model">project.task</field>
+          <field name="inherit_id" ref="project.view_task_form2"/>
+          <field name="arch" type="xml">
+              <field name="user_id" position="after">
+                  <field name="support_ticket_attachment" filename="support_ticket_attachment_filename"/>
+                  <field name="support_ticket_attachment_filename" invisible="1"/>
+              </field>
+          </field>
+      </record>
+        
+  </data>
+</openerp>

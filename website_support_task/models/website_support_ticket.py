@@ -11,5 +11,5 @@ class WebsiteSupportTicketInheritTimesheets(models.Model):
     def create_task(self):
         self.ensure_one()
 
-        new_task = self.env['project.task'].create({'name': self.subject, 'partner_id': self.partner_id.id, 'description': self.description})
+        new_task = self.env['project.task'].create({'name': self.subject, 'partner_id': self.partner_id.id, 'description': self.description, 'support_ticket_attachment': self.attachment, 'support_ticket_attachment_filename': self.attachment_filename})
         self.task_id = new_task
