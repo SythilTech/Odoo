@@ -42,7 +42,7 @@ class MigrationImportWordpress(models.Model):
         
     def transfer_media(self, media_json):
         """ Media can be imported from many palce such as when importing pages, media library, blog posts or posts of any type """
-        _logger.error(media_json)
+
         url = media_json['guid']['rendered']
 
         filename = url.split('/')[-1]
@@ -53,11 +53,11 @@ class MigrationImportWordpress(models.Model):
         media_attachment = self.env['ir.model.data'].xmlid_to_object('wordpress_import.' + external_identifier)
         if media_attachment:
             #For now we don't reimport media to conserve bandwidth and speed up reimports
-            _logger.error("Media already exists")        
+            media_attachment.name = filename
         else:
             #Download the image and creat a public attachment
             image_data = base64.b64encode( requests.get(url).content )
-            media_attachment = self.env['ir.attachment'].create({'name':filename, 'type':'binary', 'datas':image_data, 'datas_fname': filename, 'res_model': 'ir.ui.view', 'public': True})        
+            media_attachment = self.env['ir.attachment'].create({'name':filename, 'type':'binary', 'datas':image_data, 'datas_fname': filename, 'res_model': 'ir.ui.view', 'public': True})
 
             #We need to keep track of any imported media
             self.wordpress_imported_media = [(4,media_attachment.id)]
@@ -66,38 +66,21 @@ class MigrationImportWordpress(models.Model):
 
         return media_attachment
 
-    def get_all_pages(self):
-        """Loops over multiple requests and combines it into a simple json"""
-        #Get Pages
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/pages?per_page=100&page=1")
-        page_json_data = json.loads(response_string.text)
+    def pagination_requests(self, url):
+        """Repeats the request multiple time until it has all pages"""
 
-        total_pages = response_string.headers['X-WP-TotalPages']
-        _logger.error(total_pages)
-        combined_page_json_data = json.loads(response_string.text)
-    
-        if total_pages > 1:
-            for page in range(2, int(total_pages) + 1 ):
-                _logger.error(page)
-                response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/pages?per_page=100&page=" + str(page) )
-                combined_page_json_data = combined_page_json_data + json.loads(response_string.text)
+        response_string = requests.get(url + "?per_page=100&page=1")
+        combined_json_data = json.loads(response_string.text)
 
-        return combined_page_json_data
+        if "X-WP-TotalPages" in response_string.headers:
+            total_pages = response_string.headers['X-WP-TotalPages']
+        
+            if total_pages > 1:
+                for page in range(2, int(total_pages) + 1 ):
+                    response_string = requests.get(url + "?per_page=100&page=" + str(page) )
+                    combined_json_data = combined_json_data + json.loads(response_string.text)
 
-    def get_all_media(self):
-        """Loops over multiple requests and combines it into a simple json"""
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media?per_page=100&page=1")
-        total_pages = response_string.headers['X-WP-TotalPages']
-        _logger.error(total_pages)
-        combined_media_json_data = json.loads(response_string.text)
-    
-        if total_pages > 1:
-            for page in range(2, int(total_pages) + 1 ):
-                _logger.error(page)
-                response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media?per_page=100&page=" + str(page) )
-                combined_media_json_data = combined_media_json_data + json.loads(response_string.text)
-
-        return combined_media_json_data
+        return combined_json_data
         
     def transform_post_content(self, content, media_json_data):
         """ Changes Wordpress content of any post type(page, blog, custom) to better fit in with the Odoo CMS, includes localising hyperlinks and media """
@@ -114,14 +97,17 @@ class MigrationImportWordpress(models.Model):
                     if 'sizes' in media_json['media_details']:
                         for key, value in media_json['media_details']['sizes'].iteritems():
                             if value['source_url'] == image_tag.attrib['src']:
-                                media_attachment = self.transfer_media(media_json)                                                    
+                                media_attachment = self.transfer_media(media_json)
                     else:
-                        if media_json['guid']['rendered'] == image_tag.attrib['src']:
+                        if media_json['guid']['rendered'] ==  image_tag.attrib['src']:
                             media_attachment = self.transfer_media(media_json)
-                                
-                if media_attachment:
-	            image_tag.attrib['src'] = "/web/image2/" + str(media_attachment.id) + "/" + image_tag.attrib['width'] + "x" + image_tag.attrib['height'] + "/" + str(media_attachment.name)
 
+                if media_attachment:
+	            if "width" in image_tag.attrib and "height" in image_tag.attrib:
+	                image_tag.attrib['src'] = "/web/image2/" + str(media_attachment.id) + "/" + image_tag.attrib['width'] + "x" + image_tag.attrib['height'] + "/" + str(media_attachment.name)
+                    else:
+	                image_tag.attrib['src'] = "/web/image/" + str(media_attachment.id)
+	            
                 #Reimplement image resposiveness the Odoo way
                 if "class" in image_tag.attrib:
 	            image_tag.attrib['class'] = "img-responsive " + image_tag.attrib['class']
@@ -158,19 +144,20 @@ class MigrationImportWordpress(models.Model):
     
     def import_media(self):
 
-        media_json_data = self.get_all_media()
+        media_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/media")
             
         for media_json in media_json_data:
             self.transfer_media(media_json)
   
     def import_pages(self):
 
-        page_json_data = self.get_all_pages()
+        page_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/pages")
 
         #Also get media since we will be importing the images in the post
-        media_json_data = self.get_all_media()
+        media_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/media")
         
         for page_json in page_json_data:
+            _logger.error(page_json)
             title = page_json['title']['rendered']
             slug = page_json['slug']
             content = page_json['content']['rendered']

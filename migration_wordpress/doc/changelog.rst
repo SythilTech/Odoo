@@ -1,6 +1,10 @@
+v1.2.1
+======
+* Pagination merged into a single function and optimise media get
+
 v1.2
 ====
-* Pagenation
+* Pagination
 
 v1.1.1
 ======
