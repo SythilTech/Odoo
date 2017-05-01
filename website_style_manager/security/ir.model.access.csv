@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_website_style,access website.style,model_website_style,website.group_website_designer,1,1,1,1
+access_website_style_profile,access website.style.profile,model_website_style_profile,website.group_website_designer,1,1,1,1
+access_website_style_profile_less,access website.style.profile.less,model_website_style_profile_less,website.group_website_designer,1,1,1,1
+access_website_style_less,access website.style.less,model_website_style_less,website.group_website_designer,1,1,1,1
+access_website_style_htmltag,access website.style.htmltag,model_website_style_htmltag,website.group_website_designer,1,1,1,1
+access_website_style_fontfamily,access website.style.fontfamily,model_website_style_fontfamily,website.group_website_designer,1,1,1,1
+access_website_style_fontsize,access website.style.fontsize,model_website_style_fontsize,website.group_website_designer,1,1,1,1
