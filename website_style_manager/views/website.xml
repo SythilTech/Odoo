@@ -40,7 +40,7 @@
       <field name="res_id" ref="website.default_website"/>
     </record>
 
-        <menuitem id="style_manager_menu" name="Style Manager" parent="website.menu_website_global_configuration" action="style_manager_action" sequence="20"/>
+        <menuitem id="style_manager_menu" name="Style Manager" parent="website.menu_website_configuration" action="style_manager_action" sequence="20"/>
 
     </data>
 </openerp>

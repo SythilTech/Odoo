@@ -1,6 +1,6 @@
 {
     'name': "Website Custom CSS/LESS",
-    'version': "1.1",
+    'version': "1.1.1",
     'author': "Sythil Tech",
     'category': "Website",
     'support': "steven@sythiltech.com.au",
@@ -12,6 +12,7 @@
         'data/website.style.htmltag.csv',
         'data/website.style.profile.csv',
         'data/website.style.profile.less.csv',
+        'security/ir.model.access.csv',
         'views/website.xml',
         'views/website_templates.xml',
     ],
