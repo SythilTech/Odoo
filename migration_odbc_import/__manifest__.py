@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Migration Toolkit",
-    'version': "1.2.1",
+    'version': "1.2.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -16,6 +16,7 @@
         'views/migration_import_odbc_table_field_distinct_views.xml',
         'views/migration_import_odbc_relationship_views.xml',
         'views/menus.xml',
+        'views/migration_odbc_import_templates.xml',
         'data/migration.import.odbc.connect.csv',
     ],
     'demo': [],
@@ -23,6 +24,9 @@
     'external_dependencies' : {
         'python' : ['pyodbc'],
     },
+    'qweb': [
+        'static/src/xml/widget.xml',
+    ],
     'images':[
         'static/description/1.jpg',
     ],

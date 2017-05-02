@@ -1,3 +1,7 @@
+v1.2.2
+======
+* Download files by URL
+
 v1.2.1
 ======
 * Many2one validation

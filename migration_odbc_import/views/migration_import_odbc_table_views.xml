@@ -8,6 +8,7 @@
             <form>
                 <header>
       	            <button type="object" name="import_table_data_wrapper" string="Import Table Data"/>
+      	            <button type="object" name="import_files" string="Download Files"/>
       	            <button type="object" name="validate" string="Validate"/>
       	        </header>
       	        <group>
@@ -34,6 +35,13 @@
                             <field name="model_id" invisible="True"/>
                             <field name="field_id" domain="[('model_id','=',model_id)]"/>
                             <field name="value"/>
+                        </tree>
+                    </field>
+                    <field name="file_download_ids" context="{'default_model_id':model_id}">
+                        <tree editable="bottom">
+                            <field name="model_id" invisible="True"/>
+                            <field name="field_id" domain="[('model_id','=',model_id)]"/>
+                            <field name="download_url"/>
                         </tree>
                     </field>
                     <field name="relationship_ids">
