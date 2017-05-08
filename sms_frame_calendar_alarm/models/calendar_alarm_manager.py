@@ -15,8 +15,79 @@ class CalendarAlarmManagerSms(models.Model):
     _inherit = "calendar.alarm_manager"
 
     @api.v7
+    def do_notif_reminder(self, cr, uid, alert, context=None):
+        _logger.error("do_notif_reminder")
+        alarm = self.pool['calendar.alarm'].browse(cr, uid, alert['alarm_id'], context=context)
+        event = self.pool['calendar.event'].browse(cr, uid, alert['event_id'], context=context)
+
+        if alarm.type == 'notification':
+            message = event.display_time
+
+            delta = alert['notify_at'] - datetime.now()
+            delta = delta.seconds + delta.days * 3600 * 24
+
+            return {
+                'event_id': event.id,
+                'title': event.name,
+                'message': message,
+                'timer': delta,
+                'notify_at': alert['notify_at'].strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+            }
+        elif alarm.type == 'sms':
+            _logger.error("do_notif_reminder sms")
+            message = event.display_time
+
+            delta = alert['notify_at'] - datetime.now()
+            delta = delta.seconds + delta.days * 3600 * 24
+
+            return {
+                'event_id': event.id,
+                'title': event.name,
+                'message': message,
+                'timer': delta,
+                'notify_at': alert['notify_at'].strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+            }
+
+    @api.v7
+    def get_next_notif(self, cr, uid, context=None):
+        _logger.error("get_next_notif")
+
+        ajax_check_every_seconds = 300
+        partner = self.pool['res.users'].read(cr, SUPERUSER_ID, uid, ['partner_id', 'calendar_last_notif_ack'], context=context)
+        all_notif = []
+
+        if not partner:
+            return []
+
+        all_events = self.get_next_potential_limit_alarm(cr, uid, ajax_check_every_seconds, partner_id=partner['partner_id'][0], mail=False, context=context)
+
+        for event in all_events:  # .values()
+            max_delta = all_events[event]['max_duration']
+            curEvent = self.pool.get('calendar.event').browse(cr, uid, event, context=context)
+            if curEvent.recurrency:
+                bFound = False
+                LastFound = False
+                for one_date in self.pool.get("calendar.event").get_recurrent_date_by_event(cr, uid, curEvent, context=context):
+                    in_date_format = one_date.replace(tzinfo=None)
+                    LastFound = self.do_check_alarm_for_one_date(cr, uid, in_date_format, curEvent, max_delta, ajax_check_every_seconds, after=partner['calendar_last_notif_ack'], mail=False, context=context)
+                    if LastFound:
+                        for alert in LastFound:
+                            all_notif.append(self.do_notif_reminder(cr, uid, alert, context=context))
+                        if not bFound:  # if it's the first alarm for this recurrent event
+                            bFound = True
+                    if bFound and not LastFound:  # if the precedent event had alarm but not this one, we can stop the search fot this event
+                        break
+            else:
+                in_date_format = datetime.strptime(curEvent.start, DEFAULT_SERVER_DATETIME_FORMAT)
+                LastFound = self.do_check_alarm_for_one_date(cr, uid, in_date_format, curEvent, max_delta, ajax_check_every_seconds, after=partner['calendar_last_notif_ack'], mail=False, context=context)
+                if LastFound:
+                    for alert in LastFound:
+                        all_notif.append(self.do_notif_reminder(cr, uid, alert, context=context))
+        return all_notif
+
+    @api.v7
     def get_next_mail(self, cr, uid, context=None):
-        _logger.error("next mail")
+        _logger.error("get_next_mail")
         now = openerp.fields.Datetime.to_string(datetime.now())
 
         icp = self.pool['ir.config_parameter']
@@ -64,7 +135,7 @@ class CalendarAlarmManagerSms(models.Model):
                 in_date_format = datetime.strptime(curEvent.start, DEFAULT_SERVER_DATETIME_FORMAT)
                 last_found = self.do_check_alarm_for_one_date(cr, uid, in_date_format, curEvent, max_delta, 0, after=last_notif_mail, notif=False, missing=True, context=context)
                 for alert in last_found:
-                    _logger.error("alrm")
+                    _logger.error("alarm")
                     self.do_mail_reminder(cr, uid, alert, context=context)
         icp.set_param(cr, SUPERUSER_ID, 'calendar.last_notif_mail', now)
 
@@ -89,13 +160,17 @@ class CalendarAlarmManagerSms(models.Model):
         if mail:
             alarm_type.append('email')
         if sms:
+            _logger.error("sms alarm type")
             alarm_type.append('sms')
 
         if one_date - timedelta(minutes=(missing and 0 or event_maxdelta)) < datetime.now() + timedelta(seconds=in_the_next_X_seconds):  # if an alarm is possible for this date
+            _logger.error("if alarm")
             for alarm in event.alarm_ids:
+                _logger.error(alarm.name)
                 if alarm.type in alarm_type and \
                     one_date - timedelta(minutes=(missing and 0 or alarm.duration_minutes)) < datetime.now() + timedelta(seconds=in_the_next_X_seconds) and \
                         (not after or one_date - timedelta(minutes=alarm.duration_minutes) > openerp.fields.Datetime.from_string(after)):
+                        _logger.error(alarm.type)
                         alert = {
                             'alarm_id': alarm.id,
                             'event_id': event.id,
@@ -106,6 +181,7 @@ class CalendarAlarmManagerSms(models.Model):
 
     @api.v7
     def get_next_potential_limit_alarm(self, cr, uid, seconds, notif=True, mail=True, partner_id=None, context=None, sms=True):
+        _logger.error("get_next_potential_limit_alarm")
         res = {}
         base_request = """
                     SELECT
@@ -183,10 +259,11 @@ class CalendarAlarmManagerSms(models.Model):
 
     @api.v7
     def do_mail_reminder(self, cr, uid, alert, context=None):
+        _logger.error("do_mail_reminder")
         if context is None:
             context = {}
         res = False
-        _logger.error("do mail")
+        
         event = self.pool['calendar.event'].browse(cr, uid, alert['event_id'], context=context)
         alarm = self.pool['calendar.alarm'].browse(cr, uid, alert['alarm_id'], context=context)
 
