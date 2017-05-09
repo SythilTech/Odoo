@@ -10,13 +10,15 @@
       	            <button type="object" name="import_table_data_wrapper" string="Import Table Data"/>
       	            <button type="object" name="import_files" string="Download Files"/>
       	            <button type="object" name="validate" string="Validate"/>
+      	            <!--<button type="object" name="get_table_relationships" string="Fetch FK"/>-->
       	        </header>
       	        <group>
       	            <field name="import_id"/>
       	            <field name="name"/>
       	            <field name="model_id"/>
-      	            <field name="db_field_ids">
-      	                <tree colors="red:valid=='invalid'" create="false" editable="bottom">
+      	            <field name="where_clause"/>
+      	            <field name="db_field_ids" context="{'default_model_id':model_id}">
+      	                <tree colors="red:valid=='invalid';green:valid=='valid'" editable="bottom">
       	                    <field name="name"/>
       	                    <field name="orm_type" invisible="True"/>
       	                    <field name="orm_name" invisible="True"/>

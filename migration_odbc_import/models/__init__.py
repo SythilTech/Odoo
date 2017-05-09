@@ -1,1 +1,1 @@
-import migration_import_odbc
+import migration_import_odbc, migration_import_odbc_relationship, migration_import_odbc_dsn, migration_import_odbc_log, migration_import_odbc_table

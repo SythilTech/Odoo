@@ -1,3 +1,8 @@
+v1.3
+====
+* Fix issue with no _origin.id by removing onchange validation
+* Fix issue with remap values being added twice
+
 v1.2.2
 ======
 * Download files by URL

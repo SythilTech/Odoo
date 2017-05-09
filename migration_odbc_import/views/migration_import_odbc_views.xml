@@ -12,6 +12,7 @@
       	            <button type="object" name="analyse_database" string="Analyse Database"/>
       	            <button type="object" name="import_all_data" string="Import All Data"/>
       	            <button type="object" name="create_scheduled_import" string="Create Scheduled Import"/>
+      	            <!--<button type="object" name="generate_erd" string="View ERD"/>-->
       	        </header>
       	        <group>
       	            <field name="name"/>
