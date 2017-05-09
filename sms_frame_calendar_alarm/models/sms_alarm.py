@@ -14,8 +14,12 @@ class SMSAlarm(models.Model):
     def send_sms_to_attendees(self,event):
         _logger.error("sms alarm")
         sms_template = self.env['ir.model.data'].get_object('sms_frame_calendar_alarm','sms_calendar_reminder')
+        sms_template_attendee = self.env['ir.model.data'].get_object('sms_frame_calendar_alarm','sms_calendar_reminder_attendee')
+        
+        #Uncomment in v10
+        #for attendee in event.attendee_ids:
+        #    self.env['sms.template'].send_sms(sms_template_attendee.id, attendee.id)
+            
         for attendee in event.partner_ids:
-            _logger.error(attendee.mobile)
-            _logger.error(sms_template.id)
             sms_template.sms_to = attendee.mobile
             self.env['sms.template'].send_sms(sms_template.id, event.id)
