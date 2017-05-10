@@ -18,9 +18,11 @@ class MigrationImportWordpressBlog(models.Model):
         _logger.error("Import Posts")
 
         #Get Posts
-        response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/posts")
-        blog_json_data = json.loads(response_string.text)
-
+        blog_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/posts")
+        
+        #Also get media since we will be importing the images in the post
+        media_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/media")
+        
         #Also get media since we will be importing the images in the post
         response_string = requests.get(self.wordpress_url + "/wp-json/wp/v2/media")
         media_json_data = json.loads(response_string.text)
@@ -40,7 +42,7 @@ class MigrationImportWordpressBlog(models.Model):
             wraped_content += content.strip()
             wraped_content += "</div>"
 
-            transformed_content = self.transform_post_content(wraped_content)
+            transformed_content = self.transform_post_content(wraped_content, media_json_data)
 
             #Translate Wordpress published status to the Odoo one
             published = False

@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Fix to work with latest version of core module
+
 v1.0.2
 ======
 * Import users so blog posts are properly credited
