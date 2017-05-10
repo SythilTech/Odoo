@@ -40,5 +40,5 @@ class ResUsersVoip(models.Model):
             }
 
         #Ask for media permission from the caller
-        notification = {'mode': mode, 'to_partner_id': self.partner_id.id, 'constraints':  constraints}
+        notification = {'mode': mode, 'to_partner_id': self.partner_id.id, 'constraints':  constraints, 'call_type': 'internal'}
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.permission', self.env.user.partner_id.id), notification)

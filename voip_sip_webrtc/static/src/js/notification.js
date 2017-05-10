@@ -27,6 +27,7 @@ var myNotif = "";
 var outgoingNotification
 var role;
 var mode = false;
+var call_type = ""
 var to_partner_id;
 
 var peerConnectionConfig = {
@@ -65,6 +66,7 @@ WebClient.include({
 
                     role = "caller";
                     mode = notification[1].mode;
+                    call_type = notification[1].call_type;
                     var constraints = notification[1].constraints;
                     to_partner_id = notification[1].to_partner_id
 
@@ -137,7 +139,7 @@ WebClient.include({
                     var sdp_json = notification[1].sdp;
                     var sdp = JSON.parse(sdp_json)['sdp'];
                     console.log("Got SDP");
-                    console.log(sdp_json);
+                    console.log(sdp);
 
                     window.peerConnection.setRemoteDescription(new RTCSessionDescription(sdp)).then(function() {
 						console.log("Set Remote Description");
@@ -200,7 +202,7 @@ function getUserMediaSuccess(stream) {
         $.ajax({
 	        method: "GET",
 	    	url: "/voip/call/notify",
-		    data: { mode: mode, to_partner_id: to_partner_id },
+		    data: { mode: mode, to_partner_id: to_partner_id, call_type: call_type },
             success: function(data) {
 
             }

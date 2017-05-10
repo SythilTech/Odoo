@@ -72,7 +72,7 @@ class VoipSettings(models.Model):
             if not data: 
                 break
         
-            _logger.error(data)
+            #_logger.error(data)
 
             #Read the body as a dictionary
             sip_dict = {}
@@ -90,7 +90,7 @@ class VoipSettings(models.Model):
                 _logger.error("ack")
             elif data.startswith("INVITE"):
                 _logger.error("invite")
-
+                _logger.error(data)
 
                 #Send 180 Ringing
                 reply = ""
@@ -101,8 +101,9 @@ class VoipSettings(models.Model):
                 reply += "Contact: " + sip_dict['Contact'].strip() + "\r\n"
                 reply += "Call-ID: " + sip_dict['Call-ID'].strip() + "\r\n"
                 reply += "CSeq: " + sip_dict['CSeq'].strip() + "\r\n"
-                reply += "Content-Length: 0\r\n"            
-                #_logger.error("180 RINGING: " + reply )    
+                reply += "Content-Length: 0\r\n"
+                #_logger.error("180 RINGING: " + reply )
+                _logger.error(addr)
                 serversocket.sendto(reply, addr)
 
                 with api.Environment.manage():

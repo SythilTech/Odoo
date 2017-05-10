@@ -31,15 +31,12 @@ class VoipVoip(models.Model):
 
     @api.model
     def start_sip_call(self, to_partner):
-        voip_call = self.env['voip.call'].create({'from_partner_id': self.env.user.partner_id.id, 'partner_id': to_partner, 'type': 'external', 'direction': 'outgoing'})
-
-        client = self.env['voip.call.client'].sudo().create({'vc_id': voip_call.id, 'partner_id': self.env.user.partner_id.id })
-        to_client = self.env['voip.call.client'].sudo().create({'vc_id': voip_call.id, 'partner_id': to_partner,  'state': "media_access"})
-        
-        #Start at the call accepted stage
-        notification = {'call_id': voip_call.id, 'status': 'accepted', 'type': voip_call.type}
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.response', self.env.user.partner_id.id), notification) 
-            
+        #Ask for media permission from the caller
+        mode = "audiocall"
+        constraints = {'audio': True}
+        notification = {'mode': mode, 'to_partner_id': to_partner, 'constraints':  constraints, 'call_type': 'external'}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.permission', self.env.user.partner_id.id), notification)
+                    
     @api.model
     def start_incoming_sip_call(self, sip_invite, addr, sip_tag):
 
@@ -52,15 +49,18 @@ class VoipVoip(models.Model):
         to_partner_id = self.env['res.partner'].sudo().search([('sip_address', '=', sip_dict['to_sip'] )])
             
         #SIP INVITE will continously send, only allow one call from this person at a time, as a future feature if multiple people call they are allowed to join the call with permission
-        if self.env['voip.call'].search_count([('status', '=', 'pending'), ('from_partner_id', '=', from_partner_id.id), ('partner_id', '=', to_partner_id.id)]) == 0:
+        if self.env['voip.call'].search_count([('status', '=', 'pending'), ('from_partner_id', '=', from_partner_id.id), ('partner_id', '=', to_partner_id.id)]) < 50:
 
             _logger.error("INVITE: " + str(sip_invite) )
-
-            ringtone = "/voip/ringtone/ringtone.mp3"
-
+            _logger.error("from partner:" + str(from_partner_id.name) )
+            _logger.error("to partner:" + str(to_partner_id.name) )
+            
             #The call is created now so we can update it as a missed / rejected call or accepted, the timer for the call starts after being accepted though
-            voip_call = self.env['voip.call'].create({'type': 'external', 'sip_tag': sip_tag})
+            voip_call = self.env['voip.call'].create({'type': 'external', 'direction': 'incoming', 'sip_tag': sip_tag})
 
+            ringtone = "/voip/ringtone/" + str(voip_call.id) + ".mp3"
+            ring_duration = self.env['ir.values'].get_default('voip.settings', 'ring_duration')
+            
             #Assign the caller and callee partner
             voip_call.from_partner_id = from_partner_id
             voip_call.partner_id = to_partner_id
@@ -72,8 +72,7 @@ class VoipVoip(models.Model):
             self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': from_partner_id.id, 'state':'media_access', 'name': from_partner_id.name, 'sip_invite': sip_invite, 'sip_addr': addr})
 
             #Send notification to callee
-            notifications = []
-            notification = {'call_id': voip_call.id, 'ringtone': ringtone, 'from_name': from_partner_id.name, 'caller_partner_id': from_partner_id.id, 'direction': 'incoming'}
+            notification = {'voip_call_id': voip_call.id, 'ringtone': ringtone, 'ring_duration': ring_duration, 'from_name': from_partner_id.name, 'caller_partner_id': from_partner_id.id, 'direction': 'incoming', 'mode': "audiocall"}
             self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', to_partner_id.id), notification)
         
         #Have to manually commit the new cursor?
