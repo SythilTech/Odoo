@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Website Business Directory",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Website link tracking
+
 v1.0.2
 ======
 * Web menus

@@ -94,6 +94,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         if 'directory_saturday_end' in values: insert_values['directory_saturday_end'] = values['directory_saturday_end']
         if 'directory_sunday_start' in values: insert_values['directory_sunday_start'] = values['directory_sunday_start']
         if 'directory_sunday_end' in values: insert_values['directory_sunday_end'] = values['directory_sunday_end']
+        if 'website' in values: insert_values['website'] = values['website']
         if 'allow_restaurant_booking' in values: insert_values['allow_restaurant_booking'] = True
         insert_values['image'] =  business_logo
         
@@ -173,6 +174,16 @@ class WebsiteBusinessDiretoryController(http.Controller):
             if int(values['rating']) >= 1 and int(values['rating']) <= 5:
                 request.env['res.partner.directory.review'].create({'business_id': values['business_id'], 'name': values['name'], 'description': values['description'], 'rating': values['rating'] })
                 return werkzeug.utils.redirect("/directory/company/" + slug(directory_company) )
+        else:
+            return "ACCESS DENIED"
+
+    @http.route('/directory/company/<model("res.partner"):directory_company>/website', type='http', auth="public", website=True)
+    def directory_company_page_website(self, directory_company, **kwargs):
+        if directory_company.in_directory:
+            #isocountry = request.session.geoip and request.session.geoip.get('country_code') or False
+            request.env['website.directory.stat.website'].sudo().create({'listing_id': directory_company.id, 'ip': request.httprequest.remote_addr})
+        
+            return werkzeug.utils.redirect(directory_company.website)
         else:
             return "ACCESS DENIED"
 
