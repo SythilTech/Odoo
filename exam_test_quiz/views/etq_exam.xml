@@ -28,6 +28,8 @@
       	          <group>
       	              <field name="name"/>
       	              <field name="show_correct_questions"/>
+      	              <field name="fill_mode"/>
+      	              <field name="fill_mode_random_number" attrs="{'invisible':[('fill_mode','!=','random')]}" />
       	              <field name="questions">
       	                  <tree>
       	                      <field name="question"/>
@@ -92,9 +94,10 @@
       	      </form>
       	  </field>
       </record>
-      
-      <menuitem id="etq_exam" name="Online Tests" parent="base.menu_administration" sequence="90"/>
-      <menuitem id="etq_exams" name="Exams" parent="etq_exam" action="etq_exam_action" sequence="10"/>
+
+      <menuitem id="training" name="Training" sequence="90"/>
+      <menuitem id="etq_exam" name="Online Tests" parent="training" sequence="10"/>
+      <menuitem id="etq_exams" name="Exams" parent="etq_exam" action="etq_exam_action" sequence="20"/>
       
     </data>
 </openerp>

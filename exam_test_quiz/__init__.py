@@ -1,1 +1,1 @@
-import etq_exam_share, etq_exam, etq_results, controllers
+import models, controllers

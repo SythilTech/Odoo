@@ -17,6 +17,8 @@ class etq_results(models.Model):
     user_id = fields.Many2one('res.users', string="User")
     score = fields.Char(string="Score", compute="_compute_score")
     results = fields.One2many('etq.result.question', 'result_id', string="Results", readonly=True)
+    token = fields.Char(string="Token")
+    state = fields.Selection([('incomplete','Incomplete'), ('complete','complete')], string="State")
     
     @api.one
     @api.depends('results')

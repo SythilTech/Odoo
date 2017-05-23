@@ -12,7 +12,7 @@
                         <h1 class="text-center"><t t-esc="exam.name"/></h1>
                     </div>
 		    
-                    <t t-foreach="exam.questions" t-as="question">
+                    <t t-foreach="questions" t-as="question">
                         <div class="form-group">
                             <div>
                             
@@ -58,7 +58,7 @@
             
                     <div class="form-group">
 		        <div class="col-md-7 col-sm-8">
-		            <input type="hidden" name="ExamID" t-attf-value="#{exam.id}"/>
+		            <input type="hidden" name="token" t-attf-value="#{token}"/>
 		            <button class="btn btn-primary btn-lg">Finish</button>
 		        </div>
 		    </div>
@@ -84,8 +84,14 @@
                             <t t-esc="percent"/>%
                         </h2>
                         <t t-if="exam_result.exam_id.show_correct_questions == True">
-                   
+
+                        <style>
+                            td, th {
+                                padding: 5px;
+                            }
+                        </style>
                         <table>
+                        <tr><th>Question</th><th>Correct</th></tr>
                         <t t-foreach="exam_result.results" t-as="question_result">
                             <tr><td><t t-esc="question_result.question.question"/></td>
                             <td>

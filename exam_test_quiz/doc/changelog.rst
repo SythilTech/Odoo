@@ -1,6 +1,28 @@
-1.1.2 Fix miscalculated exam result percentage
-1.1.1 Show percent score in background results
-1.1 user in results, ability to see which option was choosen in result and multiple exams slug fix
-1.0.3 Fix missing mail dependacy
-1.0.2 Fix issue with missing csrf token
-1.0 Initial release
+v1.2
+====
+* Use token system like survey
+* Randomly select questions in the question pool
+
+v1.1.2
+======
+* Fix miscalculated exam result percentage
+
+v1.1.1
+======
+* Show percent score in background results
+
+v1.1
+====
+* User in results, ability to see which option was choosen in result and multiple exams slug fix
+
+v1.0.3
+======
+* Fix missing mail dependacy
+
+v1.0.2
+======
+* Fix issue with missing csrf token
+
+v1.0
+====
+* Initial release

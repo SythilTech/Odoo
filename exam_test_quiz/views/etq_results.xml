@@ -33,8 +33,7 @@
       	              <field name="correct"/>
       	              <field name="question_options">
       	                  <tree>
-      	                      <field name="question_name"/>
-      	                      <field name="option_name"/>
+      	                      <field name="option_id"/>
       	                      <field name="question_options_value"/>
       	                  </tree>
       	              </field>

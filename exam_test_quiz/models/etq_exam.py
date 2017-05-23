@@ -16,7 +16,14 @@ class EtqExam(models.Model):
     slug = fields.Char(string="Slug", compute="slug_me", store="True")
     show_correct_questions = fields.Boolean(string="Show Correct Answers?")
     questions = fields.One2many('etq.question','exam_id', string="Questions")
+    fill_mode = fields.Selection([('all','All Questions'),('random','Random')], string="Fill Mode", default="all")
+    fill_mode_random_number = fields.Integer(string="Number of Random Questions")
 
+    @api.onchange('fill_mode')
+    def _onchange_fill_mode(self):
+        if self.fill_mode == "random":
+            self.fill_mode_random_number = len(self.questions)
+    
     @api.multi
     def view_quiz(self):
         quiz_url = request.httprequest.host_url + "exam/" + str(self.slug)
@@ -82,6 +89,7 @@ class EtqQuestion(models.Model):
 class EtqQuestionOptions(models.Model):
 
     _name = "etq.question.option"
+    _rec_name = "option"
     
     question_id = fields.Many2one('etq.question',string="Question ID")
     option = fields.Char(string="Option")
