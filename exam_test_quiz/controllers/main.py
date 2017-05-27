@@ -17,8 +17,7 @@ class MyController(http.Controller):
         exam = http.request.env['etq.exam'].sudo().search([('slug','=',exam_slug)])[0]
 
         token = uuid.uuid4().__str__()
-        exam_result = http.request.env['etq.result'].sudo().create({'exam_id':exam.id, 'token': token, 'state': 'incomplete'})
-        
+        exam_result = http.request.env['etq.result'].sudo().create({'exam_id':exam.id, 'token': token, 'state': 'incomplete', 'user_id':request.env.user.id})
         
         if exam.fill_mode == "random":
 
@@ -26,13 +25,13 @@ class MyController(http.Controller):
             
             for question in questions:
                 #Add random question to result
-                request.env['etq.result.question'].create({'result_id': exam_result.id, 'question': question.id})
+                request.env['etq.result.question'].sudo().create({'result_id': exam_result.id, 'question': question.id})
 
         else:
             questions = exam.questions
             for question in questions:
                 #Insert the question into the result
-                request.env['etq.result.question'].create({'result_id': exam_result.id, 'question': question.id})
+                request.env['etq.result.question'].sudo().create({'result_id': exam_result.id, 'question': question.id})
             
         return http.request.render('exam_test_quiz.exam_question_page', {'exam': exam, 'questions': questions, 'token': token})
         
@@ -119,4 +118,5 @@ class MyController(http.Controller):
                 result_question.correct = question_result
         
         percent = float(correct_count) / float(question_count) * 100
+        exam_result.state = "complete"
         return request.render('exam_test_quiz.exam_results', {'exam_result':exam_result, 'question_count': question_count, 'correct_count': correct_count,'percent':percent})

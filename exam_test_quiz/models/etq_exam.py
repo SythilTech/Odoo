@@ -49,6 +49,7 @@ class EtqQuestion(models.Model):
     _name = "etq.question"
     
     exam_id = fields.Many2one('etq.exam',string="Exam ID")
+    image = fields.Binary(string="Image")
     question = fields.Char(string="Question")
     question_rendered = fields.Char(string="Question Render", compute="render_question")    
     question_type = fields.Selection((('multi_choice','Multiple Choice'), ('fill_blank','Fill in the Blank')), default="multi_choice", string="Question Type")

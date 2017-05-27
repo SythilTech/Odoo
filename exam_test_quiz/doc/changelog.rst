@@ -1,3 +1,9 @@
+v1.2.1
+======
+* Exams mark as complete
+* Add incomplete and complete filters
+* Add image to questions
+
 v1.2
 ====
 * Use token system like survey

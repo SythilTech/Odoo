@@ -2,7 +2,6 @@
 <openerp>
     <data>
 
-
       <record model="ir.actions.act_window" id="etq_exam_share_action">
           <field name="name">Share Quiz</field>
       	  <field name="res_model">etq.exam.share</field>
@@ -70,6 +69,7 @@
       	      <form>
       	          <group>
       	              <field name="question"/>
+      	              <field name="image" widget="image"/>
       	              <field name="question_rendered"/>
       	              <field name="question_type"/>
       	              <field name="question_options" attrs="{'invisible':[('question_type','!=','multi_choice')]}" context="{'question_id':active_id}">

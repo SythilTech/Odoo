@@ -23,6 +23,9 @@
         		                <span> (select <t t-esc="question.num_correct"/>)</span>
         		            </t>
         		            </h2>
+        		            <t t-if="question.image">
+        		                <img t-att-src="website.image_url(question, 'image')"/><br/>
+        		            </t>
         		            <t t-foreach="question.question_options" t-as="option">
         		                <t t-if="question.num_correct == 1">
                                             <input type="radio" t-attf-name="question#{question.id}" t-attf-value="#{option.id}" required="True"/> <t t-esc="option.option"/><br/>    		            

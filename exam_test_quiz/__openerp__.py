@@ -1,6 +1,6 @@
 {
     'name': "Online Exam / Test / Quiz",
-    'version': "1.2",
+    'version': "1.2.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -8,6 +8,7 @@
     'license':'GPL-3',
     'data': [
         'data/mail.template.csv',
+        #'security/ir.model.access.csv',
         'views/etq_exam.xml',
         'views/exam_templates.xml',
         'views/etq_results.xml',
