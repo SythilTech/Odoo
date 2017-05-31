@@ -1,3 +1,7 @@
+v0.3.2
+======
+* Changed client to vb.net so it could have a windows user interface
+
 v0.3.1
 ======
 * Only backs up files that have changed

@@ -1,6 +1,6 @@
 {
-    'name': "PC Backup",
-    'version': "0.3.1",
+    'name': "PC Backup (BETA)",
+    'version': "0.3.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

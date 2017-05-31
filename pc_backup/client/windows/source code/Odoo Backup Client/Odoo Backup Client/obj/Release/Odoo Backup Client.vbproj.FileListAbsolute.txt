@@ -1,0 +1,10 @@
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\bin\Release\Odoo Backup Client.exe.config
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\bin\Release\Odoo Backup Client.exe
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\bin\Release\Odoo Backup Client.pdb
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\bin\Release\Odoo Backup Client.xml
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\obj\Release\Odoo_Backup_Client.Form1.resources
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\obj\Release\Odoo_Backup_Client.Resources.resources
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\obj\Release\Odoo Backup Client.vbproj.GenerateResource.Cache
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\obj\Release\Odoo Backup Client.exe
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\obj\Release\Odoo Backup Client.xml
+c:\users\steve\onedrive\documents\visual studio 2017\Projects\Odoo Backup Client\Odoo Backup Client\obj\Release\Odoo Backup Client.pdb
