@@ -1,3 +1,7 @@
+v1.0.11
+=======
+* Binary fields in input groups
+
 v1.0.10
 =======
 * Integer and float validation

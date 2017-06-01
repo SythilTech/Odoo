@@ -59,6 +59,7 @@ $(function() {
       var input_group_list = [];
       input_group_list = [];
       var row_string = "";
+      var row_counter = 0;
 
       //Go through each row(exlcuding the add button row)
       var input_group_row = $( this ).find(".row.form-group")
@@ -67,14 +68,31 @@ $(function() {
 		  var input_group_row_list = [];
 		  input_group_row_list = [];
           var input_string = "";
+          var row_values = {};
+          row_counter += 1;
 
 		  //Go through each input in the row
 		  $( this ).find("input").each(function( index ) {
 			  var my_key = $( this ).attr('data-sub-field-name');
 			  var my_value = $( this ).val();
 
-			  if (my_value != "") {
-			      input_string += "\"" + my_key + "\":\"" + my_value + "\","
+
+              if ($( this ).attr('type') == "file") {
+			      if (my_value != "") {
+
+			          $.each($(this).prop('files'), function(index, file) {
+						  //Post the file directly since we can't strinify it
+						  var post_name = html_name + "_" + row_counter + "_" + my_key;
+						  form_values[post_name] = file;
+
+			              row_values[my_key] = post_name;
+					  });
+
+		          }
+		      } else {
+			      if (my_value != "") {
+			          row_values[my_key] = my_value;
+		          }
 		      }
 		  });
 
@@ -84,16 +102,13 @@ $(function() {
 			  var my_value = $( this ).val();
 
 			  if (my_value != "") {
-			      input_string += "\"" + my_key + "\":\"" + my_value + "\","
+			      row_values[my_key] = my_value;
 		      }
 		  });
 
-          if (input_string != "") {
-              row_string += "{" + input_string.slice(0, -1) + "},";
-	      }
+          input_group_list.push(row_values);
 	  });
-	  var complete_string = "[" + row_string.slice(0, -1) + "]";
-      form_values[html_name] = complete_string;
+      form_values[html_name] = JSON.stringify(input_group_list);
     });
 
     //Have to get the files manually

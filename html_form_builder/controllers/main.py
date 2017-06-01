@@ -39,7 +39,7 @@ class HtmlFormController(http.Controller):
         field_options_html = ""
         
         for field in request.env['ir.model.fields'].search([('model_id.model', '=', my_field.relation ), ('name','!=','display_name')] ):
-            if (field.ttype == 'char' or field.ttype == 'integer' or field.ttype == 'selection'):
+            if (field.ttype == 'char' or field.ttype == 'integer' or field.ttype == 'selection' or field.ttype == 'binary'):
                 field_options_html += "<input type=\"checkbox\" name=\"input_group_fields\" value=\"" + str(field.id) + "\"/> " + str(field.field_description) + " (" + str(field.ttype) + ")<br/>\n"
  
         return {'field_options_html': field_options_html }
@@ -269,7 +269,8 @@ class HtmlFormController(http.Controller):
 
                 html_output += "</select>\n"
                 html_output += "</div>\n"
-
+            elif sub_field.ttype == "binary":
+                html_output += "      <div class=\"col-md-" + str(column_width) + "\"><input type=\"file\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\"/></div>\n"
 
 	html_output += "    </div>\n"
         html_output += "  </div>\n"
@@ -542,7 +543,7 @@ class HtmlFormController(http.Controller):
 	
                 field_valid = html_field_response()
                 
-	        field_valid = action(fi, values[fi.html_name])
+	        field_valid = action(fi, values[fi.html_name], values)
 
 	        if field_valid.error == "":
 	            secure_values[fi.field_id.name] = field_valid.return_data
@@ -607,7 +608,7 @@ class HtmlFormController(http.Controller):
     def my_insert(self, **kwargs):
         return self.process_form(kwargs)
                 
-    def _process_html_input_group(self, field, field_data):
+    def _process_html_input_group(self, field, field_data, values):
         """Validation for input_groups and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -623,7 +624,11 @@ class HtmlFormController(http.Controller):
             for sub_field in field.setting_input_group_sub_fields:
                 if sub_field.name not in row:
                     valid_row = False
-                    
+                
+                if sub_field.ttype == "binary":
+                    row[ str(sub_field.name) + "_filename"] = values[row[sub_field.name]].filename
+                    row[sub_field.name] = base64.encodestring( values[row[sub_field.name]].read() )
+
             if valid_row:
                 all_inserts.append( (0, 0, row ) )
             
@@ -632,7 +637,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
         
-    def _process_html_textbox(self, field, field_data):
+    def _process_html_textbox(self, field, field_data, values):
         """Validation for textbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -646,7 +651,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
-    def _process_html_checkbox_group(self, field, field_data):
+    def _process_html_checkbox_group(self, field, field_data, values):
         """Validation for checkbox group and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -661,7 +666,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
-    def _process_html_date_picker(self, field, field_data):
+    def _process_html_date_picker(self, field, field_data, values):
         """Validation for date picker textbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -675,7 +680,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
-    def _process_html_datetime_picker(self, field, field_data):
+    def _process_html_datetime_picker(self, field, field_data, values):
         """Validation for datetime picker textbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -689,7 +694,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
-    def _process_html_checkbox_boolean(self, field, field_data):
+    def _process_html_checkbox_boolean(self, field, field_data, values):
         """Validation for Checkboxes(Boolean) and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -703,7 +708,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
         
-    def _process_html_dropbox_m2o(self, field, field_data):
+    def _process_html_dropbox_m2o(self, field, field_data, values):
         """Validation for Dropbox(m2o) and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
@@ -717,7 +722,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
         
-    def _process_html_textarea(self, field, field_data):
+    def _process_html_textarea(self, field, field_data, values):
         html_response = html_field_response()
         html_response.error = ""
 
@@ -730,7 +735,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
-    def _process_html_radio_group_selection(self, field, field_data):
+    def _process_html_radio_group_selection(self, field, field_data, values):
         html_response = html_field_response()
         html_response.error = ""
 
@@ -743,7 +748,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
 
-    def _process_html_file_select(self, field, field_data):
+    def _process_html_file_select(self, field, field_data, values):
         html_response = html_field_response()
         html_response.error = ""
         
@@ -756,7 +761,7 @@ class HtmlFormController(http.Controller):
 
         return html_response
     
-    def _process_html_dropbox(self, field, field_data):
+    def _process_html_dropbox(self, field, field_data, values):
         """Validation for dropbox and preps for insertion into database"""
         html_response = html_field_response()
         html_response.error = ""
