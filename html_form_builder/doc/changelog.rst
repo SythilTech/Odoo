@@ -1,3 +1,7 @@
+v1.0.12
+=======
+* Fixed empty input group issue
+
 v1.0.11
 =======
 * Binary fields in input groups

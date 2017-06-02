@@ -106,9 +106,16 @@ $(function() {
 		      }
 		  });
 
-          input_group_list.push(row_values);
+          if(! jQuery.isEmptyObject(row_values) ) {
+              input_group_list.push(row_values);
+	      }
+
 	  });
-      form_values[html_name] = JSON.stringify(input_group_list);
+
+	  if (input_group_list.length > 0) {
+        form_values[html_name] = JSON.stringify(input_group_list);
+      }
+
     });
 
     //Have to get the files manually
