@@ -12,7 +12,10 @@
                         <h1 class="text-center"><t t-esc="exam.name"/></h1>
                     </div>
 		    
-                    <t t-foreach="questions" t-as="question">
+		    <t t-set="question_index" t-value="0"/>
+		    
+                    <t t-foreach="questions" t-as="question_result">
+                        <t t-set="question" t-value="question_result.question"/>
                         <div class="form-group">
                             <div>
                             

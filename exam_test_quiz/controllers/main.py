@@ -13,7 +13,7 @@ class MyController(http.Controller):
 
     @http.route('/exam/<exam_slug>', type="http", auth="public", website=True)
     def take_exam(self, exam_slug):
-        _logger.error(exam_slug)
+
         exam = http.request.env['etq.exam'].sudo().search([('slug','=',exam_slug)])[0]
 
         token = uuid.uuid4().__str__()
@@ -32,8 +32,20 @@ class MyController(http.Controller):
             for question in questions:
                 #Insert the question into the result
                 request.env['etq.result.question'].sudo().create({'result_id': exam_result.id, 'question': question.id})
-            
-        return http.request.render('exam_test_quiz.exam_question_page', {'exam': exam, 'questions': questions, 'token': token})
+
+        return werkzeug.utils.redirect("/exam/" + exam_slug + "/" + token)
+
+    @http.route('/exam/<exam_slug>/<string:token>', type="http", auth="public", website=True)
+    def take_exam_token(self, exam_slug, token):
+
+        exam = http.request.env['etq.exam'].sudo().search([('slug','=',exam_slug)])[0]
+        exam_result = request.env['etq.result'].search([('token','=', token )])
+        
+        if exam_result.state == "complete":
+            return "This attempt has already been used up"
+        else:
+            questions = exam_result.results
+            return http.request.render('exam_test_quiz.exam_question_page', {'exam': exam, 'questions': questions, 'token': token})
         
     @http.route('/exam/results', type="http", auth="public", website=True)
     def exam_result(self, **kwargs):

@@ -95,7 +95,7 @@
       	  </field>
       </record>
 
-      <menuitem id="training" name="Training" sequence="90"/>
+      <menuitem id="training" name="Training" sequence="90" groups="exam_master"/>
       <menuitem id="etq_exam" name="Online Tests" parent="training" sequence="10"/>
       <menuitem id="etq_exams" name="Exams" parent="etq_exam" action="etq_exam_action" sequence="20"/>
       

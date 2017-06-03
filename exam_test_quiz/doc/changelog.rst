@@ -1,3 +1,7 @@
+v1.2.2
+======
+* Public Exams permissions
+
 v1.2.1
 ======
 * Exams mark as complete
