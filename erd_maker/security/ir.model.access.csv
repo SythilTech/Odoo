@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_erd_maker","access_erd_maker","model_erd_maker","base.group_system",1,1,1,0
+"access_erd_maker_module","access_erd_maker_module","model_erd_maker_module","base.group_system",1,1,1,0
