@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_etq_exam","access etq.exam","model_etq_exam","base.group_public",1,0,0,0
+"access_etq_result","access etq.result","model_etq_result","base.group_public",1,1,0,0
+"access_etq_result_question","access etq.result.question","model_etq_result_question","base.group_public",1,1,0,0
+"access_etq_question","access etq.question","model_etq_question","base.group_public",1,0,0,0
+"access_etq_question_option","access etq.question.option","model_etq_question_option","base.group_public",1,0,0,0

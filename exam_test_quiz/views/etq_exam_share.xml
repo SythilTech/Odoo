@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+      <record model="ir.ui.view" id="etq_exam_share_form_view">
+          <field name="name">etq exam share Form View</field>
+          <field name="model">etq.exam.share</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="exam_id" invisible="True"/>
+      	              <field name="share_type"/>
+      	              <field name="partner_ids" attrs="{'invisible': [('share_type','!=','existing_contacts')]}"/>
+      	              <field name="email_list" attrs="{'invisible': [('share_type','!=','new_contacts')]}"/>
+      	              <field name="email_subject"/>
+      	              <field name="email_content"/>
+      	          </group>
+      	          <footer>
+      	          <button name="share_exam" type="object" string="Share Survey"/>
+      	          </footer>
+      	      </form>
+      	  </field>
+      </record>
+
+    </data>
+</openerp>

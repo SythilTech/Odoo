@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.actions.act_window" id="etq_exam_share_action">
+          <field name="name">Share Quiz</field>
+      	  <field name="res_model">etq.exam.share</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">form</field>
+      	  <field name="target">new</field>
+      	  <field name="context">{'default_exam_id':active_id}</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Share Your Quiz</p>
+	  </field>
+      </record>
+      
+      <record model="ir.ui.view" id="etq_exam_form_view">
+          <field name="name">etq exam Form View</field>
+          <field name="model">etq.exam</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <header>
+      	              <button name="view_quiz" type="object" string="View Exam"/>
+      	              <button type='action' name='%(etq_exam_share_action)d' string="Share Exam" />
+
+      	          </header>
+      	          <group>
+      	              <field name="name"/>
+      	              <field name="show_correct_questions"/>
+      	              <field name="fill_mode"/>
+      	              <field name="fill_mode_random_number" attrs="{'invisible':[('fill_mode','!=','random')]}" />
+      	              <field name="questions">
+      	                  <tree>
+      	                      <field name="question"/>
+      	                      <field name="question_type"/>
+      	                      <field name="num_options"/>
+      	                      <field name="num_correct"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="etq_exam_tree_view">
+          <field name="name">etq exam Tree View</field>
+          <field name="model">etq.exam</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="etq_exam_action">
+          <field name="name">Exams</field>
+      	  <field name="res_model">etq.exam</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Create an online exam</p>
+	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="etq_question_form_view">
+          <field name="name">etq question Form View</field>
+          <field name="model">etq.question</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="question"/>
+      	              <field name="question_rendered"/>
+      	              <field name="question_type"/>
+      	              <field name="question_options" attrs="{'invisible':[('question_type','!=','multi_choice')]}" context="{'question_id':active_id}">
+      	                  <tree editable="bottom">
+      	                      <field name="option"/>
+      	                      <field name="correct"/>
+      	                  </tree>
+      	              </field>
+
+      	          </group>
+      	          <div attrs="{'invisible':[('question_type','!=','fill_blank')]}">
+		      pharse questions like this<br/>
+		      Bob went to the {1} and bought a {2} yesterday<br/>
+		      the {1} and {2} will get replaced by blank boxes and will be marked as correct if they match the answers in this list<br/>
+		      max 9 blank boxes
+		      <field name="question_options_blank" context="{'question_id':active_id}">
+		          <tree editable="bottom">
+		              <field name="answer"/>
+		          </tree>
+		      </field>
+      	          </div>
+      	      </form>
+      	  </field>
+      </record>
+
+      <menuitem id="training" name="Training" sequence="90" groups="exam_master"/>
+      <menuitem id="etq_exam" name="Online Tests" parent="training" sequence="10"/>
+      <menuitem id="etq_exams" name="Exams" parent="etq_exam" action="etq_exam_action" sequence="20"/>
+      
+    </data>
+</openerp>

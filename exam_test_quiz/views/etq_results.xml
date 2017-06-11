@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.ui.view" id="etq_result_search_view">
+          <field name="name">etq result Search View</field>
+          <field name="model">etq.result</field>
+          <field name="arch" type="xml">
+      	      <search>
+      	          <field name="state"/>
+      	          <filter string="Complete Exams" name="complete_exams" domain="[('state','=','complete')]"/>
+		  <filter string="Incomplete Exams" name="incomplete_exams" domain="[('state','=','complete')]"/>
+      	      </search>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="etq_result_form_view">
+          <field name="name">etq result Form View</field>
+          <field name="model">etq.result</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="create_date" string="Finish Time"/>
+      	              <field name="state"/>
+      	              <field name="exam_id"/>
+      	              <field name="user_id"/>
+      	              <field name="score"/>
+      	              <field name="results">
+      	                  <tree>
+      	                      <field name="question"/>
+      	                      <field name="correct"/>
+      	                  </tree>
+      	              </field>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="etq_result_question_form_view">
+          <field name="name">etq result questionForm View</field>
+          <field name="model">etq.result.question</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="question"/>
+      	              <field name="correct"/>
+      	              <field name="question_options">
+      	                  <tree>
+      	                      <field name="option_id"/>
+      	                      <field name="question_options_value"/>
+      	                  </tree>
+      	              </field>
+
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+      
+      <record model="ir.ui.view" id="etq_result_tree_view">
+          <field name="name">etq result Tree View</field>
+          <field name="model">etq.result</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="create_date" string="Finish Time"/>
+      	          <field name="exam_id"/>
+      	          <field name="user_id"/>
+      	          <field name="score"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record model="ir.actions.act_window" id="etq_result_action">
+          <field name="name">Exam Results</field>
+      	  <field name="res_model">etq.result</field>
+      	  <field name="view_type">form</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">View Online Exam Results</p>
+	  </field>
+      </record>
+
+      <menuitem id="etq_menu_results" name="Exam Results" parent="etq_exam" action="etq_result_action" sequence="20"/>
+      
+    </data>
+</openerp>
