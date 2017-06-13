@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+      <record id="sms_account_view_form_inherit_sms_frame_twilio_media" model="ir.ui.view">
+          <field name="name">sms.message.view.form.meida</field>
+          <field name="model">sms.message</field>
+          <field name="inherit_id" ref="sms_frame.sms_message_view_form"/>
+          <field name="arch" type="xml">
+      	      <field name="media_id" position="after">
+      	          <field name="media_ids">
+      	              <tree>
+      	                  <field name="data" filename="data_filename"/>
+      	                  <field name="data_filename"/>
+                          <field name="content_type"/>
+      	              </tree>
+      	          </field>
+      	      </field>
+      	  </field>
+      </record>
+      
+  </data>
+</openerp>

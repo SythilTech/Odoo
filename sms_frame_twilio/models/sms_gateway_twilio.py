@@ -4,6 +4,7 @@ from datetime import datetime
 from lxml import etree
 import logging
 _logger = logging.getLogger(__name__)
+import base64
 
 from openerp.http import request
 from openerp import api, fields, models
@@ -84,6 +85,9 @@ class SmsGatewayTwilio(models.Model):
             payload = {}
             response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + sms_account.twilio_account_sid + "/Messages/" + message_id, data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
 	    root = etree.fromstring(str(response_string.text.encode('utf-8')))
+            
+            _logger.error(response_string.text)
+            
 	    my_messages = root.xpath('//Message')
             sms_message = my_messages[0]
             #only get the inbound ones as we track the outbound ones back to a user profile
@@ -96,8 +100,7 @@ class SmsGatewayTwilio(models.Model):
                 my_time = datetime.strptime(sms_account.twilio_last_check_date,'%Y-%m-%d %H:%M:%S')
                 payload = {'DateSent>': str(my_time.strftime('%Y-%m-%d'))}
             response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + sms_account.twilio_account_sid + "/Messages", data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
-            root = etree.fromstring(str(response_string.text.encode('utf-8')))
-            
+            root = etree.fromstring(str(response_string.text.encode('utf-8')))            
             
             #get all pages
             messages_tag = root.xpath('//Messages')
@@ -180,6 +183,29 @@ class SmsGatewayTwilio(models.Model):
             else:
                 #Create the sms record in history without the model or record_id 
                 history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})                
+
+
+
+            _logger.error(sms_message.find('NumMedia').text)
+            if sms_message.find('NumMedia').text > 0:
+                sms_account = self.env['sms.account'].browse(account_id)
+                
+                for sub_resource in sms_message.find('SubresourceUris'):
+                    media_list_url = sub_resource.text
+                    _logger.error(media_list_url)
+                    
+                    media_response_string = requests.get("https://api.twilio.com" + media_list_url, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
+
+                    media_root = etree.fromstring(media_response_string.text.encode('utf-8'))
+                    for media_mms in media_root.xpath('//MediaList/Media'):
+                        media_filename = media_mms.find("Sid").text + ".jpg"
+
+                        first_media_url = media_mms.find('Uri').text
+                        _logger.error(first_media_url)
+                    
+                        mms_media = base64.b64encode( requests.get("https://api.twilio.com" + first_media_url, ).content )                    
+                        self.env['sms.message.media'].sudo().create({'sms_id': history_id.id, 'data': mms_media, 'data_filename': media_filename, 'content_type': media_mms.find('ContentType').text })
+
 
     def delivary_receipt(self, account_sid, message_id):
         """Updates the sms message when it is successfully received by the mobile phone"""

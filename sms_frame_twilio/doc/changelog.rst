@@ -1,3 +1,7 @@
+v1.1
+====
+* MMS receiving support
+
 v1.0.10
 ======
 * CRM Lead fix

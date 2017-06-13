@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework - Twilio Gateway",
-    'version': "1.0.10",
+    'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -10,6 +10,7 @@
         'data/sms.gateway.csv',
         'views/sms_account.xml',
         'views/ir_actions_todo.xml',
+        'views/sms_message.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],
