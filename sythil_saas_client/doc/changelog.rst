@@ -1,3 +1,7 @@
+v1.1
+====
+* Trial restrictions
+
 v1.0.3
 ======
 * Automatic redirect to the saas user

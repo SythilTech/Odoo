@@ -9,6 +9,7 @@ import shutil
 import json
 import subprocess
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import tempfile
 import StringIO
 import requests
@@ -16,7 +17,7 @@ import requests
 import openerp
 import openerp.http as http
 from openerp.http import request
-from openerp import SUPERUSER_ID
+from openerp import SUPERUSER_ID, tools
 
 class SaasMultiDB(http.Controller):
 
@@ -24,7 +25,9 @@ class SaasMultiDB(http.Controller):
     def saas_portal(self, **kw):
         """Displays a list of databases owned by the current user"""
         user_databases = request.env['saas.database'].search([('user_id','=',request.env.user.id)])
-        return http.request.render('sythil_saas_server.saas_portal', {'user_databases': user_databases})
+        payment_methods = request.env['payment.method'].search([('partner_id','=',request.env.user.partner_id.id)])
+
+        return http.request.render('sythil_saas_server.saas_portal', {'user_databases': user_databases, 'payment_methods': payment_methods})
 
     @http.route('/saas/portal/domains', type="http", auth="user", website=True)
     def saas_portal_domains(self, **kw):
@@ -81,6 +84,157 @@ class SaasMultiDB(http.Controller):
         template_databases = request.env['saas.template.database'].search([])
         return http.request.render('sythil_saas_server.saas_choose_package', {'template_databases': template_databases})
 
+    @http.route('/saas/login/<db_name>', type="http", auth="user")
+    def saas_login_process(self, db_name, **kw):
+
+        saas_database = request.env['saas.database'].search([('name','=',db_name), ('partner_id','=',request.env.user.partner_id.id)])
+
+        if saas_database.state == "trial":
+            trial_expiration_date = datetime.strptime(saas_database.trial_expiration, tools.DEFAULT_SERVER_DATETIME_FORMAT)
+
+            if datetime.now() > trial_expiration_date:
+                return "Trial has exired"
+        
+        elif saas_database.state == "canceled":
+            return "Your subscription has been canceled, please resubscribe to continue using the software"        
+
+        #request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
+	#request.session.authenticate(saas_database.name, saas_database.login, saas_database.password)
+
+        return werkzeug.utils.redirect(saas_database.access_url)
+
+    @http.route('/saas/unsubscribe', type="http", auth="user")
+    def saas_unsubscribe_process(self, **kw):
+
+        values = {}
+	for field_name, field_value in kw.items():
+	    values[field_name] = field_value
+
+        database_name = values['database']
+        user_database = request.env['saas.database'].search([('name','=',database_name), ('partner_id','=', request.env.user.partner_id.id)])
+
+        user_database.sudo().state = "canceled"
+        user_database.sudo().next_payment_date = ""
+        user_database.sudo().payment_method_id = ""
+
+        #Connect to the saas database and update the subscription status
+	db = openerp.sql_db.db_connect(user_database.name)
+        registry = openerp.modules.registry.RegistryManager.new(user_database.name, False, None, update_module=False)
+	with closing(db.cursor()) as cr:
+	    cr.autocommit(True)     # avoid transaction block
+	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'canceled' )
+
+        return werkzeug.utils.redirect("/saas/portal")        
+
+    @http.route('/saas/subscribe', type="http", auth="user")
+    def saas_subscribe_process(self, **kw):
+
+        values = {}
+	for field_name, field_value in kw.items():
+	    values[field_name] = field_value
+
+        database_name = values['database']
+        user_database = request.env['saas.database'].search([('name','=',database_name), ('partner_id','=', request.env.user.partner_id.id)])
+        payment_method = request.env['payment.method'].search([('id','=', int(values['payment_method']) ), ('partner_id','=',request.env.user.partner_id.id)]  )        
+
+        user_database.sudo().state = "subscribed"
+        user_database.sudo().next_payment_date = datetime.now()  + relativedelta(months=1)
+        user_database.sudo().payment_method_id = payment_method.id
+        user_database.sudo().subscription_cost = user_database.template_database_id.price
+
+        #Connect to the saas database and update the subscription status
+	db = openerp.sql_db.db_connect(user_database.name)
+        registry = openerp.modules.registry.RegistryManager.new(user_database.name, False, None, update_module=False)
+	with closing(db.cursor()) as cr:
+	    cr.autocommit(True)     # avoid transaction block
+	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'subscribed' )
+
+        return werkzeug.utils.redirect("/saas/portal")        
+
+
+    @http.route('/saas/add/payment/process', type="http", auth="public", website=True)
+    def saas_add_payment_process(self, **kw):
+
+        values = {}
+	for field_name, field_value in kw.items():
+	    values[field_name] = field_value
+
+        card_number = values['card_number']
+        card_type = values['type']
+        owner = values['owner']
+        owner_first = owner.split(" ")[0]
+        owner_last = owner.split(" ")[1]
+        expiration_date_month = values['expiration_date_month']
+        expiration_date_year = values['expiration_date_year']
+        cvv = values['cvv']
+
+        payment_aquirer = request.env['ir.model.data'].get_object('payment_paypal', 'payment_acquirer_paypal')
+
+        #Request access
+        base_url = ""
+        if payment_aquirer.environment == "test":
+            base_url = "https://api.sandbox.paypal.com/v1/oauth2/token"
+        else:
+            base_url = "https://api.paypal.com/v1/oauth2/token"
+
+	payload = {'grant_type':"client_credentials"}
+	client_id = payment_aquirer.paypal_client_id
+	secret = payment_aquirer.paypal_secret
+	response_string = requests.post(base_url, data=payload, auth=(str(client_id), str(secret)), headers={"Content-Type": "application/x-www-form-urlencoded", "Accept-Language": "en_US"})
+                    
+        json_ob = json.loads(response_string.text)            
+        
+        if 'access_token' in json_ob:
+            payment_aquirer.sudo().paypal_api_access_token = json_ob['access_token']
+        else:
+            return response_string.text
+            
+        base_url = ""
+        if payment_aquirer.environment == "test":
+            base_url = "https://api.sandbox.paypal.com/v1/vault/credit-cards/"
+        else:
+            base_url = "https://api.paypal.com/v1/vault/credit-cards/"
+        
+        access_token = payment_aquirer.paypal_api_access_token
+        card_partner = request.env.user.partner_id
+        payload = {
+            'number': card_number.replace(" ",""),
+            'type': card_type,
+            'expire_month': expiration_date_month,
+            'expire_year': expiration_date_year,
+            'cvv2': cvv,
+            #'first_name': owner_first,
+            #'last_name': owner_last,
+            #'billing_address':  { "line1": card_partner.street, "city": card_partner.city, 'country_code': card_partner.country_id.code, 'postal_code': card_partner.zip, 'state':card_partner.state_id.code, 'phone':card_partner.phone},
+            'external_customer_id': "res_partner_" + str(request.env.user.partner_id.id)
+        }
+        
+        response_string = requests.post(base_url, data=json.dumps(payload), headers={"Content-Type": "application/json", "Authorization": "Bearer " + access_token})
+
+        json_ob = json.loads(response_string.text)
+        
+        if 'id' in json_ob:
+            credit_card_token = json_ob['id']
+            hidden_name = "**** **** **** *" + card_number[-3:]
+            request.env['payment.method'].sudo().create({'name': hidden_name,'partner_id': request.env.user.partner_id.id, 'active': True, 'acquirer_id': payment_aquirer.id, 'acquirer_ref': credit_card_token})    
+            
+            return werkzeug.utils.redirect("/saas/portal")
+
+        else:
+            error_string = ""
+            
+            for paypal_error in json_ob['details']:
+                error_string += paypal_error['issue'] + "\n"
+            
+            return error_string
+
+
+    @http.route('/saas/package/details/<template_id>', type="http", auth="public", website=True)
+    def saas_package_details(self, template_id, **kw):
+        template_database = request.env['saas.template.database'].browse( int(template_id) )
+        
+        return http.request.render('sythil_saas_server.saas_package_details', {'template_database': template_database})    
+    
     @http.route('/template/details/<template_id>', type="http", auth="public", website=True)
     def template_details(self, template_id, **kw):
         """Lists what is inside the template database"""
@@ -270,15 +424,16 @@ class SaasMultiDB(http.Controller):
         #System name comes from company name
         system_name = system_name.replace(" ","")
         system_name = system_name.replace("'","")        
+        system_name = system_name.lower()
         
         if system_name.isalnum() == False:
             return "Only AlphaNumeric characters allowed"
 
         #Check if this email has been used to create a SAAS system before
         if request.env['saas.database'].sudo().search_count([('login','=',email)]) > 0:
-            return "Email already used to create SAAS system"
+            return "This email has already been used to create a SAAS system"
 
-	#get the template database
+	#Get the template database
 	template_database = request.env['saas.template.database'].browse(int(values["package"]))
 	chosen_template = template_database.database_name
 
@@ -304,7 +459,8 @@ class SaasMultiDB(http.Controller):
         new_company.child_ids.sudo().create({'parent_id': new_company.id, 'type':'contact', 'name':person_name, 'email': email, 'category_id': [(4,saas_tag.id)] })
         
 	#Add this database to the saas list
-	new_saas_database = request.env['saas.database'].create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id, 'partner_id': new_company.id, 'user_id':new_user.id}) 
+	trial_expiration_date = datetime.now()  + timedelta(days=template_database.trial_duration)
+	new_saas_database = request.env['saas.database'].sudo().create({'name':system_name, 'login': email, 'password': password, 'template_database_id': template_database.id, 'partner_id': new_company.id, 'user_id':new_user.id, 'state': 'trial', 'trial_expiration': trial_expiration_date}) 
         
         #Create the new database from the template database, disconnecting any users that might be using the template database
         db_original_name = chosen_template
@@ -341,16 +497,17 @@ class SaasMultiDB(http.Controller):
 	    saas_user.write({'name':person_name, 'email':email, 'login':email, 'password':password})
 	    saas_company = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'base', 'main_company')
 	    saas_company.name = company
+	    
+	    #Init the trial period
+	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'trial' )
+	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'trial_expiration_date', trial_expiration_date.strftime(tools.DEFAULT_SERVER_DATETIME_FORMAT) )
+	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'saas_server_url', request.httprequest.host_url)
         
         #Automatically sign the new user in
         request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
 	request.session.authenticate(request.env.cr.dbname, values['email'], values['password'])
         
-        return werkzeug.utils.redirect("/saas/portal")
-        #if request.env['ir.config_parameter'].get_param('saas_system_redirect') == "db_filter":
-        #    return werkzeug.utils.redirect("http://" + request.httprequest.host + "/web?db=" + system_name)
-        #else:
-        #    return werkzeug.utils.redirect("http://" + system_name + "." + request.httprequest.host )
+        return werkzeug.utils.redirect("/saas/portal")        
         
     def _drop_conn(self, cr, db_name):
         # Try to terminate all other connections that might prevent

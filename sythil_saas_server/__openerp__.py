@@ -1,6 +1,6 @@
 {
     'name': "Sythil SAAS Server",
-    'version': "1.2.2",
+    'version': "1.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -13,6 +13,7 @@
         'views/saas_template_database_views.xml',
         'views/saas_settings_views.xml',
         'views/saas_database_domain_views.xml',
+        'views/payment_acquirer_views.xml',
         'data/ir.config_parameter.csv',
         'data/ir.cron.csv',
         'data/saas.modules.builtin.csv',
@@ -30,6 +31,6 @@
         'static/description/4.jpg',
         'static/description/5.jpg',
     ],
-    'depends': ['website'],
+    'depends': ['website','product', 'payment_paypal'],
     'installable': True,
 }

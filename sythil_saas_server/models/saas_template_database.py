@@ -19,8 +19,12 @@ class SaasTemplateDatabase(models.Model):
     
     name = fields.Char(string="Display Name", help="Displayed on the website")
     database_name = fields.Char(string="Database Name", help="The name of the template database in psql")
+    trial_duration = fields.Integer(string="Trial Duration (days)")
     image = fields.Binary(string="Image")
+    product_id = fields.Many2one('product.template', string="Saas Product", help="Place to put price and other details")
+    price = fields.Float(string="Price")
     description = fields.Char(string="Description", default="Placeholder description")
+    html_description = fields.Html(string="HTML Description")
     saas_database_ids = fields.One2many('saas.database', 'template_database_id', string="SAAS Databases")
     auto_backup = fields.Boolean(string="Auto Backup")
     auto_backup_days_to_keep = fields.Integer(string="Auto Backup Days to Keep", default="7")

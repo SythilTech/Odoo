@@ -11,6 +11,10 @@
                       <button name="login_to_saas_user" type="object" string="Login to SAAS System"/>
                   </header>
                   <group>
+                      <field name="state"/>
+                      <field name="trial_expiration" attrs="{'invisible': [('state', '!=', 'trial')]}"/>
+                      <field name="next_payment_date" attrs="{'invisible': [('state', '!=', 'subscribed')]}"/>
+                      <field name="subscription_cost" attrs="{'invisible': [('state', '!=', 'subscribed')]}"/>
                       <field name="partner_id"/>
                       <field name="name"/>
                       <field name="login"/>

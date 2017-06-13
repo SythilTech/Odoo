@@ -1,3 +1,7 @@
+v1.3
+====
+* Trial and paid subscription management
+
 v1.2.2
 ======
 * Disable database export since it allowed people to reverse engineer the super user password
