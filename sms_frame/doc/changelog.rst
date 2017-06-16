@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Fix queue sms check issue
+
 v1.0.8
 ======
 * SMS queuing in position for mass sms
