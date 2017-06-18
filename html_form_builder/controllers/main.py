@@ -379,12 +379,12 @@ class HtmlFormController(http.Controller):
         for form_field in html_form.fields_ids:
 
             method = '_generate_html_%s' % (form_field.field_type.html_type,)
-        action = getattr(self, method, None)
+            action = getattr(self, method, None)
 
-        if not action:
-            raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+            if not action:
+                raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 
-        form_string += action(form_field)
+            form_string += action(form_field)
 
         if html_form.captcha:
             form_string += "<div class=\"html_form_captcha col-md-12 form-group\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
