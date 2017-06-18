@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+                
+        
+        <record id="view_users_form_inherit_sms_frame" model="ir.ui.view">
+            <field name="name">SMS frame Api</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+      	        <notebook position="inside">
+      	            <page string="SMS API">
+      	                <group>
+      	                    <field name="sms_rest_key"/>
+      	                    <field name="sms_account_id"/>
+      	                </group>
+      	            </page>
+      	        </notebook>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>

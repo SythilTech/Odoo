@@ -1,0 +1,16 @@
+<div class="container">
+<h2>Description</h2>
+Extends the sms framework giving it api access<br/>
+<br/>
+Find a bug? feature idea? send an email to steven@sythiltech.com.au<br>
+<h2>How To</h2>
+Go into a user that you want to have API access and go into the SMS API tab<br/>
+Enter a random API key and select which account they will use<br/>
+The user can send smses by going requesting the url &lt;yoursite&gt;/sms/api/send using the following parameters<br/>
+'From' = the from mobile number<br/>
+'To' = the to number, does not have to be a partner in the system<br/>
+'Body' = the content of the sms<br/>
+'Key' = the API key entered in the first step<br/>
+<br/>
+Example. http://sythiltech.com.au/sms/api/send?Key=fakekey&From=0437846375&To=56748392&Body=example<br/>
+</div>
