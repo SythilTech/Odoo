@@ -87,3 +87,5 @@ class VoipCallClient(models.Model):
     state = fields.Selection([('invited','Invited'),('joined','joined'),('media_access','Media Access')], string="State", default="invited")
     sip_invite = fields.Char(string="SIP INVITE Message")
     sip_addr = fields.Char(string="Address")
+    sip_addr_host = fields.Char(string="SIP Address Host")
+    sip_addr_port = fields.Char(string="SIP Address Port")

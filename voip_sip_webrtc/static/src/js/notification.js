@@ -38,7 +38,7 @@ var peerConnectionConfig = {
 };
 
 //navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-navigator.mediaDevices.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia || navigator.msGetUserMedia;
+window.navigator.mediaDevices.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia || navigator.msGetUserMedia;
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 window.RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
@@ -71,7 +71,11 @@ WebClient.include({
                     to_partner_id = notification[1].to_partner_id
 
                     //Ask for media access before we start the call
-                    navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+                    if (navigator.webkitGetUserMedia) {
+						navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+					} else {
+                        window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+				    }
 
                 } else if (notification[0][1] === 'voip.notification') {
 					var self = this;
@@ -362,7 +366,11 @@ var VoipCallIncomingNotification = Notification.extend({
                 }
 
                 //Ask for media access only if the call is accepted
-                navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+                if (navigator.webkitGetUserMedia) {
+					navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+			    } else {
+                    window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+			    }
 
                 this.destroy(true);
             },

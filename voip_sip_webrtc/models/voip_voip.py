@@ -69,7 +69,7 @@ class VoipVoip(models.Model):
             self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': to_partner_id.id, 'state':'joined', 'name': to_partner_id.name})
 
             #Also add the external partner to the list but assume we already have media access, the long polling will be ignored since the from is external to the system
-            self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': from_partner_id.id, 'state':'media_access', 'name': from_partner_id.name, 'sip_invite': sip_invite, 'sip_addr': addr})
+            self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': from_partner_id.id, 'state':'media_access', 'name': from_partner_id.name, 'sip_invite': sip_invite, 'sip_addr_host': addr[0], 'sip_addr_port': addr[1] })
 
             #Send notification to callee
             notification = {'voip_call_id': voip_call.id, 'ringtone': ringtone, 'ring_duration': ring_duration, 'from_name': from_partner_id.name, 'caller_partner_id': from_partner_id.id, 'direction': 'incoming', 'mode': "audiocall"}

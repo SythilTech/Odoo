@@ -137,6 +137,8 @@ class VoipController(http.Controller):
         
         _logger.error(str(call) + " call was accepted")
         voip_call = request.env['voip.call'].browse( int(call) )
+        call_client = request.env['voip.call.client'].search([('vc_id','=', voip_call.id ), ('partner_id','=', request.env.user.partner_id.id) ])
+        call_client.sip_addr_host = request.httprequest.remote_addr
         voip_call.accept_call()
 
         return True
@@ -250,16 +252,15 @@ class VoipController(http.Controller):
                 reply += "From: " + from_client.name + "<" + sip_dict['From'].strip() + "\r\n"
                 reply += "To: " + to_client.name + "<" + sip_dict['To'].strip() + ";tag=" + str(voip_call.sip_tag) + "\r\n"
                 reply += "CSeq: " + sip_dict['CSeq'].strip() + "\r\n"
+                reply += "Contact: <sip:" + to_client.name + "@" + to_client.sip_addr_host + ">\r\n"
                 reply += "Content-Type: application/sdp\r\n"
                 reply += "Content-Disposition: session\r\n"
                 reply += "Content-Length: " + str( len( sdp_data['sdp'] ) ) + "\r\n"
                 reply += "\r\n"
                 reply += sdp_data['sdp'].strip()
                 
-                addr = literal_eval(from_client.sip_addr)
-                _logger.error(addr)
                 serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                serversocket.sendto(reply, addr )
+                serversocket.sendto(reply, (from_client.sip_addr_host,from_client.sip_addr_port) )
 
                 _logger.error("200 OK: " + reply )
 

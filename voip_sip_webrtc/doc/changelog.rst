@@ -1,3 +1,7 @@
+v1.2.5
+======
+* Chrome fix
+
 v1.2.4
 ======
 * Media access is requested before the call is started
