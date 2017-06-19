@@ -22,7 +22,7 @@ class VoipSettings(models.Model):
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
     sip_running = fields.Boolean(string="SIP Running")
     sip_listening = False
-
+    
     @api.multi
     def get_default_sip_running(self, fields):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

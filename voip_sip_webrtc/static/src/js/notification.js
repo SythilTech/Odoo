@@ -11,7 +11,7 @@ var ajax = require('web.ajax');
 var bus = require('bus.bus').bus;
 var Notification = require('web.notification').Notification;
 var WebClient = require('web.WebClient');
-
+var SystrayMenu = require('web.SystrayMenu');
 
 var _t = core._t;
 var qweb = core.qweb;
@@ -29,6 +29,102 @@ var role;
 var mode = false;
 var call_type = ""
 var to_partner_id;
+
+
+
+var VOIPItem = Widget.extend({
+    template:'VoipSystemTray',
+    events: {
+        "click": "on_click",
+        "click .start_voip_audio_call": "start_voip_audio_call",
+        "click .start_voip_video_call": "start_voip_video_call",
+        "click .start_voip_screenshare_call": "start_voip_screenshare_call",
+    },
+    on_click: function (event) {
+        event.preventDefault();
+
+	    session.rpc('/voip/user/list', {}).then(function(result) {
+
+            $("#voip_tray").html("");
+
+	        for (var voip_user in result) {
+				var voip_user = result[voip_user];
+				var drop_menu_html = "";
+
+				drop_menu_html += "<li>";
+				drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name + "</a>" + " <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_video_call\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"/> Video Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_audio_call\"><i class=\"fa fa-volume-up\" aria-hidden=\"true\"/> Audio Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_screenshare_call\"><i class=\"fa fa-desktop\" aria-hidden=\"true\"/> Screenshare Call</a>";
+				drop_menu_html += "</li>";
+
+
+				/*
+				drop_menu_html += "<li class=\"dropdown-submenu\">";
+				drop_menu_html += "  <a tabindex=\"-1\" href=\"#\">" + voip_user.name + " <span class=\"caret\"/></a>";
+				drop_menu_html += "  <ul class=\"dropdown-menu\">";
+				drop_menu_html += "    <li><a href=\"#\">Video Call</a></li>";
+				drop_menu_html += "    <li><a href=\"#\">Audio Call</a></li>";
+				drop_menu_html += "  </ul>";
+				drop_menu_html += "</li>";
+				*/
+
+			    $("#voip_tray").append(drop_menu_html);
+
+			}
+
+         });
+    },
+    start_voip_screenshare_call: function (event) {
+		console.log("screenshare call");
+
+        role = "caller";
+        mode = "screensharing";
+        call_type = "internal";
+        to_partner_id = $(event.currentTarget).data("partner");
+
+        var constraints = {'video': {'mediaSource': "screen"}};
+
+        if (navigator.webkitGetUserMedia) {
+		    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+		} else {
+            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+		}
+
+	},
+    start_voip_audio_call: function (event) {
+		console.log("audio call");
+
+        role = "caller";
+        mode = "audiocall";
+        call_type = "internal";
+        to_partner_id = $(event.currentTarget).data("partner");
+		var constraints = {'audio': true};
+
+        if (navigator.webkitGetUserMedia) {
+		    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+		} else {
+            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+		}
+
+	},
+    start_voip_video_call: function (event) {
+		console.log("video call");
+
+        role = "caller";
+        mode = "videocall";
+        call_type = "internal";
+        to_partner_id = $(event.currentTarget).data("partner");
+		var constraints = {'audio': true, 'video': true};
+
+        if (navigator.webkitGetUserMedia) {
+		    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+		} else {
+            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+		}
+
+	},
+});
+
+SystrayMenu.Items.push(VOIPItem);
+
 
 var peerConnectionConfig = {
     'iceServers': [
@@ -54,30 +150,13 @@ WebClient.include({
 
         $('body').append(qweb.render('voip_sip_webrtc.VoipWindow', {}));
 
-        $(".s-voip-manager").draggable();
+        $(".s-voip-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
 
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
 
 
-                if (notification[0][1] === 'voip.permission') {
-					var self = this;
-					console.log("Ask Caller Permission");
-
-                    role = "caller";
-                    mode = notification[1].mode;
-                    call_type = notification[1].call_type;
-                    var constraints = notification[1].constraints;
-                    to_partner_id = notification[1].to_partner_id
-
-                    //Ask for media access before we start the call
-                    if (navigator.webkitGetUserMedia) {
-						navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-					} else {
-                        window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-				    }
-
-                } else if (notification[0][1] === 'voip.notification') {
+                  if (notification[0][1] === 'voip.notification') {
 					var self = this;
 
 					call_id = notification[1].voip_call_id;

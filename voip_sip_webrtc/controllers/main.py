@@ -19,6 +19,17 @@ from openerp.http import request
 
 class VoipController(http.Controller):         
 
+    @http.route('/voip/user/list', type='json', auth="user")
+    def voip_user_list(self, **kw):
+        """ Get all active users so we can palcew them in the system tray """
+
+        user_list = []
+        
+        for voip_user in request.env['res.users'].search([('active','=',True), ('share','=', False), ('id', '!=', request.env.user.id)]):
+            _logger.error(voip_user.name)
+            user_list.append({'name': voip_user.name, 'partner_id':voip_user.partner_id.id})
+        
+        return user_list
 
     @http.route('/voip/call/notify', type="http", auth="user")
     def voip_call_notify(self, mode, to_partner_id, call_type):

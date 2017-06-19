@@ -10,14 +10,11 @@ class VoipBusController(BusController):
     # --------------------------
     def _poll(self, dbname, channels, last, options):
         if request.session.uid:
-
-            #We ask media permission from the caller before starting the call this way we already have permission for message bank
-            channels.append((request.db, 'voip.permission', request.env.user.partner_id.id))
             
-            #Callee receives notication asking to accept or reject the call plus permission, Caller receives a notification showing how much time left before missing call
+            #Callee receives notication asking to accept or reject the call plus media permission, Caller receives a notification showing how much time left before call is missed
             channels.append((request.db, 'voip.notification', request.env.user.partner_id.id))
             
-            #Both the caller and callee are notified if the call is accepted, rejected or the call is ended early by the caller, the voip window shows
+            #Both the caller and callee are notified if the call is accepted, rejected or the call is ended early by the caller, the voip window then shows
             channels.append((request.db, 'voip.response', request.env.user.partner_id.id))
             
             #Both users have accepted media access so let's start the call          

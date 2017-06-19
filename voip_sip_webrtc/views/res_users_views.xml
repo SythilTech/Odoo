@@ -14,9 +14,6 @@
                         <field name="voip_missed_call" filename="voip_missed_call_filename"/>
                         <field name="voip_missed_call_filename" invisible="1"/>
       	            </group>
-      	            <button type="object" name="create_video_voip_room" string="Make Video Call"/>
-      	            <button type="object" name="create_audio_voip_room" string="Make Audio Call"/>
-      	            <button type="object" name="create_screensharing_voip_room" string="Make Screensharing Call"/>
       	        </page>
       	    </notebook>
         </field>

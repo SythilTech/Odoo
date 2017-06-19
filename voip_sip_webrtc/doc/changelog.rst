@@ -1,3 +1,8 @@
+v1.2.6
+======
+* Make calls from system bar (top right)
+* Voip window now resizable and draggable
+
 v1.2.5
 ======
 * Chrome fix
