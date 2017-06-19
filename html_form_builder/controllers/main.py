@@ -340,21 +340,21 @@ class HtmlFormController(http.Controller):
         if field.setting_general_required is True:
             html_output += " required=\"required\""
 
-            html_output += ">\n"
-            html_output += "    <option value=\"\">Select Option</option>\n"
+        html_output += ">\n"
+        html_output += "    <option value=\"\">Select Option</option>\n"
 
-            if field.field_id.ttype == "selection":
+        if field.field_id.ttype == "selection":
 
-                selection_list = dict(request.env[field.field_id.model_id.model]._fields[field.field_id.name].selection)
+            selection_list = dict(request.env[field.field_id.model_id.model]._fields[field.field_id.name].selection)
 
-                for selection_value, selection_label in selection_list.items():
-                    html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
+            for selection_value, selection_label in selection_list.items():
+                html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
 
-            elif field.field_id.ttype == "many2one":
-                selection_list = request.env[field.field_id.relation].search([])
+        elif field.field_id.ttype == "many2one":
+            selection_list = request.env[field.field_id.relation].search([])
 
-                for row in selection_list:
-                    html_output += "    <option value=\"" + str(row.id) + "\">" + row.name + "</option>\n"
+            for row in selection_list:
+                html_output += "    <option value=\"" + str(row.id) + "\">" + row.name + "</option>\n"
 
         html_output += "  </select>\n"
         html_output += "</div>\n"
