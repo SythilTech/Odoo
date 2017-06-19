@@ -288,10 +288,10 @@ class HtmlFormController(http.Controller):
         if field.setting_radio_group_layout_type == "single":
             html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
 
-        selection_list = dict(request.env[field.field_id.model_id.model]._columns[field.field_id.name].selection)
+        selection_list = dict(request.env[field.field_id.model_id.model].fields_get(allfields=[field.field_id.name])[field.field_id.name]['selection'])
 
         for selection_value, selection_label in selection_list.items():
-            if field.setting_radio_group_layout_type == "multi":
+            if field.setting_radio_group_layout_type == "multi" or not field.setting_radio_group_layout_type:
                 html_output += "  <div class=\"radio\">\n"
             if field.setting_radio_group_layout_type == "single":
                 html_output += "  <div class=\"radio-inline\">\n"
