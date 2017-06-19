@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+
         <record id="sequence_html_field_seq" model="ir.sequence">
             <field name="name">html.form.field sequence</field>
             <field name="code">html.form.field</field>
             <field eval="1" name="number_next"/>
             <field eval="1" name="number_increment"/>
         </record>
+
         <record id="html_form_action_view_form" model="ir.ui.view">
             <field name="name">html.form.action.view.form</field>
             <field name="model">html.form.action</field>
@@ -28,6 +30,7 @@
                 </form>
             </field>
         </record>
+
         <record id="html_form_view_form" model="ir.ui.view">
             <field name="name">html.form.view.form</field>
             <field name="model">html.form</field>
@@ -75,6 +78,7 @@
                 </form>
             </field>
         </record>
+
         <record id="html_form_history_view_form" model="ir.ui.view">
             <field name="name">html.form.history.view.form</field>
             <field name="model">html.form.history</field>
@@ -96,6 +100,7 @@
                 </form>
             </field>
         </record>
+
         <record id="html_form_history_view_tree" model="ir.ui.view">
             <field name="name">html.form.history.view.tree</field>
             <field name="model">html.form.history</field>
@@ -106,6 +111,7 @@
                 </tree>
             </field>
         </record>
+
         <record id="html_form_action" model="ir.actions.act_window">
             <field name="name">HTML Forms</field>
             <field name="res_model">html.form</field>
@@ -115,6 +121,7 @@
                 <p class="oe_view_nocontent_create">Create the first HTML Embed form</p>
             </field>
         </record>
+
         <record id="html_form_history_action" model="ir.actions.act_window">
             <field name="name">HTML Form Submissions</field>
             <field name="res_model">html.form.history</field>
@@ -124,8 +131,10 @@
                 <p class="oe_view_nocontent_create">Create the first HTML Embed form</p>
             </field>
         </record>
+
         <menuitem id="html_form_parent_menu" name="HTML Embed Forms" parent="base.menu_administration" sequence="160"/>
         <menuitem action="html_form_action" id="html_form_menu" name="Create Forms" parent="html_form_parent_menu" sequence="10"/>
         <menuitem action="html_form_history_action" id="html_form_history_menu" name="Inserted Form Data" parent="html_form_parent_menu" sequence="180"/>
+
     </data>
 </openerp>
