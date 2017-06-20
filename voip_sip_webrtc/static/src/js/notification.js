@@ -29,7 +29,7 @@ var role;
 var mode = false;
 var call_type = ""
 var to_partner_id;
-
+var outgoing_ring_interval;
 
 
 var VOIPItem = Widget.extend({
@@ -73,7 +73,7 @@ var VOIPItem = Widget.extend({
          });
     },
     start_voip_screenshare_call: function (event) {
-		console.log("screenshare call");
+		console.log("Call Type: screenshare call");
 
         role = "caller";
         mode = "screensharing";
@@ -90,7 +90,7 @@ var VOIPItem = Widget.extend({
 
 	},
     start_voip_audio_call: function (event) {
-		console.log("audio call");
+		console.log("Call Type: audio call");
 
         role = "caller";
         mode = "audiocall";
@@ -106,7 +106,7 @@ var VOIPItem = Widget.extend({
 
 	},
     start_voip_video_call: function (event) {
-		console.log("video call");
+		console.log("Call Type: video call");
 
         role = "caller";
         mode = "videocall";
@@ -199,36 +199,28 @@ WebClient.include({
                         $("#toPartnerImage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
 					}
                 } else if (notification[0][1] === 'voip.response') {
-					console.log("Response");
+
 					var status = notification[1].status;
 					var type = notification[1].type;
 
-					//call_id = notification[1].call_id;
+					console.log("Response: " + status + " | " + type);
 
 					//Destroy the notifcation because the call was accepted or rejected, no need to wait until timeout
 					if (typeof outgoingNotification !== "undefined") {
 					    outgoingNotification.destroy(true);
 					}
 
-					/*if (status == "accepted") {
-                        $(".s-voip-manager").css("opacity","1");
-			    	}*/
-			    } else if (notification[0][1] === 'voip.start') {
-					console.log("Start Call");
-
-                    window.peerConnection.createOffer().then(createdDescription).catch(errorHandler);
-
 				} else if(notification[0][1] === 'voip.sdp') {
                     var sdp_json = notification[1].sdp;
                     var sdp = JSON.parse(sdp_json)['sdp'];
-                    console.log("Got SDP");
+                    console.log("Got SDP " + sdp.type);
                     console.log(sdp);
 
                     window.peerConnection.setRemoteDescription(new RTCSessionDescription(sdp)).then(function() {
 						console.log("Set Remote Description");
                         // Only create answers in response to offers
                         if(sdp.type == 'offer') {
-							console.log("Create Answer");
+							console.log("Create SDP Answer");
                             window.peerConnection.createAnswer().then(createdDescription).catch(errorHandler);
                         }
                     }).catch(errorHandler);
@@ -236,7 +228,7 @@ WebClient.include({
 				} else if(notification[0][1] === 'voip.ice') {
                     var ice_json = notification[1].ice;
                     var ice = JSON.parse(ice_json)['ice'];
-                    console.log("Got ICE");
+                    console.log("Got Remote ICE Candidate");
                     console.log(ice_json);
 					peerConnection.addIceCandidate(new RTCIceCandidate(ice)).catch(errorHandler);
 				} else if(notification[0][1] === 'voip.end') {
@@ -279,8 +271,8 @@ function getUserMediaSuccess(stream) {
     window.peerConnection.addStream(localStream);
 
     if (role == "caller") {
-		//Show the VOIP Manager now because we may need it if wego to message bank
-        console.log("Notify Call");
+		//Show the VOIP Manager now because we may need it if we go to message bank
+        console.log("Notify Callee of incoming phone call");
 
         $.ajax({
 	        method: "GET",
@@ -293,8 +285,8 @@ function getUserMediaSuccess(stream) {
     }
 
     if (role == "callee") {
-		//Start sending out SDP now both caller and callee have granted media access
-		console.log("Start Call");
+		//Start sending out SDP now since both caller and callee have granted media access
+		console.log("Create SDP Offer");
 		window.peerConnection.createOffer().then(createdDescription).catch(errorHandler);
 	}
 
@@ -322,9 +314,23 @@ function createdDescription(description) {
     }).catch(errorHandler);
 }
 
+function messageBankDescription(description) {
+    console.log('created Message Bank Description: ' + description);
+
+    window.peerConnection.setLocalDescription(description).then(function() {
+
+    //Send the sdp offer to the server
+    session.rpc('/voip/messagebank', {'voip_call_id': call_id, 'sdp': "test"}).then(function(result) {
+
+    });
+
+
+    }).catch(errorHandler);
+}
+
 function gotIceCandidate(event) {
     if(event.candidate != null) {
-		console.log("Got Ice Candidate: " + event.candidate);
+		console.log("Send ICE Candidate: " + event.candidate);
 
         $.ajax({
 	        method: "GET",
@@ -338,9 +344,10 @@ function gotIceCandidate(event) {
 }
 
 function gotRemoteStream(event) {
-    console.log("Got Remote Stream: " + event.streams[0]);
+    console.log("Got Remote Stream: " + event.streams[0].id);
     remoteVideo.srcObject = event.streams[0];
     remoteStream = event.streams[0];
+    clearInterval(outgoing_ring_interval);
 
     var startDate = new Date();
 
@@ -401,10 +408,15 @@ var VoipCallOutgoingNotification = Notification.extend({
         secondsLeft = countdown;
         $("#callsecondsoutgoingleft").html(secondsLeft);
 
-        var outgoing_ring_interval = setInterval(function() {
+        outgoing_ring_interval = setInterval(function() {
             $("#callsecondsoutgoingleft").html(secondsLeft);
             if (secondsLeft == 0) {
+				console.log("Missed Call");
+
 				myNotif.rpc("/voip/missed/" + call_id);
+
+                //Send the offer to message bank (server)
+		        //window.peerConnection.createOffer().then(messageBankDescription).catch(errorHandler);
 
 				//Play the missed call audio
 				mySound = new Audio("/voip/miss/" + call_id + ".mp3");

@@ -16,10 +16,7 @@ class VoipBusController(BusController):
             
             #Both the caller and callee are notified if the call is accepted, rejected or the call is ended early by the caller, the voip window then shows
             channels.append((request.db, 'voip.response', request.env.user.partner_id.id))
-            
-            #Both users have accepted media access so let's start the call          
-            channels.append((request.db, 'voip.start', request.env.user.partner_id.id))
-            
+                        
             #Season Description Procotol
             channels.append((request.db, 'voip.sdp', request.env.user.partner_id.id))
             

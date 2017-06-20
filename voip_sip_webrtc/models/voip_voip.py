@@ -30,6 +30,65 @@ class VoipVoip(models.Model):
         return sip_dict
 
     @api.model
+    def generate_server_ice(self):
+
+        ice_response = ""
+        ip = "10.0.0.29"
+        port = "62380"
+        
+        #See https://tools.ietf.org/html/rfc5245#section-4.1.2.1 (I don't make up these formulas...)
+        priority = ((2 ^ 24) * 126) + ((2 ^ 8) * 65535)
+        
+        ice_response = "candidate:0 1 UDP " + str(priority) + " " + str(ip) + " " + str(port) + " typ host"
+        
+        return ice_response
+        
+    @api.model
+    def generate_server_sdp(self):
+    
+        sdp_response = ""
+                
+        #Protocol Version ("v=") https://tools.ietf.org/html/rfc4566#section-5.1 (always 0 for us)
+        sdp_response += "v=0\r\n"
+
+        #Origin ("o=") https://tools.ietf.org/html/rfc4566#section-5.2 (should really have a unique sess-id but whatever...)
+        sdp_response += "o=- 4835683596547242223 0 IN IP4 0.0.0.0\r\n"
+        
+        #Session Name ("s=") https://tools.ietf.org/html/rfc4566#section-5.3 (We don't need a session name, information about the call is all displayed in the UI)
+        sdp_response += "s= \r\n"
+        
+        #Timing ("t=") https://tools.ietf.org/html/rfc4566#section-5.9 (For now sessions are infinite but we may use this if for example a company charges a price for a fixed 30 minute consultation)
+        sdp_response += "t=0 0\r\n"
+        
+        #Attributes ("a=") https://tools.ietf.org/html/rfc4566#section-5.13 (standard only mentions some of these...)
+        sdp_response += "a=recvonly\r\n"
+        sdp_response += "a=fingerprint:sha-256 77:EF:86:05:29:4F:98:BC:D6:F5:E5:A8:B8:39:DE:5A:C3:90:94:AD:2F:EA:13:DF:FC:EB:9E:87:95:DC:65:C5\r\n"
+        sdp_response += "a=ice-options:trickle\r\n"
+        sdp_response += "a=msid-semantic:WMS *\r\n"
+        
+        #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
+        sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF 109 101\r\n"
+        
+        #Connection Data ("c=") https://tools.ietf.org/html/rfc4566#section-5.7 (always seems to be 0.0.0.0?)
+        sdp_response += "c=IN IP4 0.0.0.0\r\n"
+        
+        #Why is sendrecv appear twice?
+        sdp_response += "a=recvonly\r\n"
+        sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
+        sdp_response += "a=fmtp:101 0-15\r\n"
+        sdp_response += "a=ice-pwd:c35411c63e8ab7603830d7f4760c6547\r\n"
+        sdp_response += "a=ice-ufrag:83315759\r\n"
+        sdp_response += "a=mid:sdparta_0\r\n"
+        sdp_response += "a=msid:{3778521f-c0cd-47a8-aa20-66c06fbf184e} {7d104cf0-8223-49bf-9ff4-6058cf92e1cf}\r\n"
+        sdp_response += "a=rtcp-mux\r\n"
+        sdp_response += "a=rtpmap:109 opus/48000/2\r\n"
+        sdp_response += "a=rtpmap:101 telephone-event/8000\r\n"
+        sdp_response += "a=setup:active\r\n"
+        sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
+        
+        return sdp_response    
+
+    @api.model
     def start_sip_call(self, to_partner):
         #Ask for media permission from the caller
         mode = "audiocall"
