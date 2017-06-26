@@ -1,3 +1,7 @@
+v1.0.13
+=======
+* Add filename of binary fields
+
 v1.0.12
 =======
 * Fixed empty input group issue

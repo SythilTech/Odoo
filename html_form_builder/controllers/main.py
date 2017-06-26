@@ -535,6 +535,11 @@ class HtmlFormController(http.Controller):
                 method = '_process_html_%s' % (fi.field_type.html_type,)
                 action = getattr(self, method, None)
 
+                if fi.field_type.html_type == "file_select":
+                    #Also insert the filename
+                    filename_field = str(fi.field_id.name) + "_filename"
+                    secure_values[filename_field] = values[fi.html_name].filename
+
                 if not action:
                     raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 
@@ -751,9 +756,11 @@ class HtmlFormController(http.Controller):
         #Required Check
         if field.setting_general_required is True and field_data == "":
             html_response.error = "Field Required"
-
-        html_response.return_data = base64.encodestring(field_data.read())
-        html_response.history_data = base64.encodestring(field_data.read())
+        
+        base64_string = base64.encodestring(field_data.read())
+                
+        html_response.return_data = base64_string
+        html_response.history_data = base64_string
 
         return html_response
 
