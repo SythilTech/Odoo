@@ -57,5 +57,5 @@ class SmsMessage(models.Model):
 
 
         #Turn the queue manager off if we are out of queued smses
-        if ( self.env['sms.message'].search_count([('status_code','=','queued')]) ) == 0:
-            self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').active = Fals
+        #if ( self.env['sms.message'].search_count([('status_code','=','queued')]) ) == 0:
+        #    self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').active = False

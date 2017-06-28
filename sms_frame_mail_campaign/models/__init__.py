@@ -1,0 +1,1 @@
+import marketing_campaign_activity

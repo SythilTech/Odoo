@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_marketing_campaign_activity_form_inherit_sms_frame_mail_campaign" model="ir.ui.view">
+            <field name="name">sms.marketing.campaign.activity</field>
+            <field name="model">marketing.campaign.activity</field>
+            <field name="inherit_id" ref="marketing_campaign.view_marketing_campaign_activity_form"/>
+            <field name="arch" type="xml">
+      	        <field name="action_type" position="after">
+      	            <field name="sms_template_id" attrs="{'required':[('action_type','=','sms')], 'invisible':[('action_type','!=','sms')]}" context="{'default_model_id':object_id}"/>
+      	        </field>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>

@@ -1,3 +1,7 @@
+v1.0.5
+======
+* SMS queue fix
+
 v1.0.4
 ======
 * utf-8 encoding for sms body
