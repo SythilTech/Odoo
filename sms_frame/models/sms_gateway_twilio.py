@@ -151,11 +151,34 @@ class SmsGatewayTwilio(models.Model):
             discussion_subtype = self.env['ir.model.data'].get_object('mail', 'mt_comment')
             my_message = ""
 
+            attachments = []
+
+            _logger.error(sms_message.find('NumMedia').text)
+            if sms_message.find('NumMedia').text > 0:
+                sms_account = self.env['sms.account'].browse(account_id)
+                
+                for sub_resource in sms_message.find('SubresourceUris'):
+                    media_list_url = sub_resource.text
+                    _logger.error(media_list_url)
+                    
+                    media_response_string = requests.get("https://api.twilio.com" + media_list_url, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
+
+                    media_root = etree.fromstring(media_response_string.text.encode('utf-8'))
+                    for media_mms in media_root.xpath('//MediaList/Media'):
+                        media_filename = media_mms.find("Sid").text + ".jpg"
+                        attachments.append((media_filename, requests.get("https://api.twilio.com" + first_media_url).content) )
+
+
+
+            #Simulate MMS attachment
+            #media_filename = "test.jpg"            
+            #attachments.append((media_filename, requests.get("http://192.168.56.101:8069/web/image/542").content) )
+
             if target['target_model'] == "res.partner":
                 model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
 
                 my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
-                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment")
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment", attachments=attachments)
 
                 #Notify followers of this partner who are listenings to the 'discussions' subtype
                 for notify_partner in self.env['mail.followers'].search([('res_model','=','res.partner'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
@@ -167,7 +190,7 @@ class SmsGatewayTwilio(models.Model):
                 model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
 
                 my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
-                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, message_type="comment")
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, message_type="comment", attachments=attachments)
 
                 #Notify followers of this lead who are listenings to the 'discussions' subtype
                 for notify_partner in self.env['mail.followers'].search([('res_model','=','crm.lead'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
@@ -177,7 +200,8 @@ class SmsGatewayTwilio(models.Model):
                 history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text, 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
             else:
                 #Create the sms record in history without the model or record_id 
-                history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})                
+                history_id = self.env['sms.message'].create({'account_id': account_id, 'status_code': "RECEIVED", 'from_mobile': sms_message.find('From').text, 'to_mobile': sms_message.find('To').text, 'sms_gateway_message_id': sms_message.find('Sid').text, 'sms_content': sms_message.find('Body').text, 'direction':'I', 'message_date':sms_message.find('DateUpdated').text})
+
 
     def delivary_receipt(self, account_sid, message_id):
         """Updates the sms message when it is successfully received by the mobile phone"""
