@@ -20,6 +20,7 @@
       	                <tree editable="bottom">
       	                    <field name="old_value"/>
       	                    <field name="new_value" widget="amor"/>
+      	                    <button name="auto_create_record" type="object" string="Create Record"/>
       	                </tree>
       	            </field>
       	        </group>

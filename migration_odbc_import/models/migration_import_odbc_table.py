@@ -422,6 +422,11 @@ class MigrationImportOdbcTableFieldAlter(models.Model):
     field_id = fields.Many2one('migration.import.odbc.table.field', string="Field")
     old_value = fields.Char(string="Old Value")
     new_value = fields.Char(string="New Value")
+    
+    def auto_create_record(self):
+        if self.new_value != "":
+            new_record = self.env[self.field_id.field_id.relation].create({'name': self.old_value})
+            self.new_value = new_record.id    
             
 class MigrationImportOdbcTableFieldDistinct(models.Model):
 
