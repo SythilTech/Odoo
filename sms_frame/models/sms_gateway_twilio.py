@@ -165,6 +165,7 @@ class SmsGatewayTwilio(models.Model):
 
                     media_root = etree.fromstring(media_response_string.text.encode('utf-8'))
                     for media_mms in media_root.xpath('//MediaList/Media'):
+                        first_media_url = media_mms.find('Uri').text
                         media_filename = media_mms.find("Sid").text + ".jpg"
                         attachments.append((media_filename, requests.get("https://api.twilio.com" + first_media_url).content) )
 

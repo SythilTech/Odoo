@@ -1,3 +1,7 @@
+v1.0.7
+======
+* MMS receiving fix
+
 v1.0.6
 ======
 * MMS receiving and attaching to message
