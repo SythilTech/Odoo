@@ -72,7 +72,7 @@ class VoipSettings(models.Model):
             if not data: 
                 break
         
-            #_logger.error(data)
+            _logger.error(data)
 
             #Read the body as a dictionary
             sip_dict = {}

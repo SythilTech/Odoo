@@ -19,16 +19,7 @@ from openerp.http import request
 
 class VoipController(http.Controller):         
 
-    @http.route('/voip/user/list', type='json', auth="user")
-    def voip_user_list(self, **kw):
-        """ Get all active users so we can palcew them in the system tray """
 
-        user_list = []
-        
-        for voip_user in request.env['res.users'].search([('active','=',True), ('share','=', False), ('id', '!=', request.env.user.id)]):
-            user_list.append({'name': voip_user.name, 'partner_id':voip_user.partner_id.id})
-        
-        return user_list
 
     @http.route('/voip/call/notify', type="http", auth="user")
     def voip_call_notify(self, mode, to_partner_id, call_type):
@@ -110,22 +101,6 @@ class VoipController(http.Controller):
         response = request.make_response(ringtone_base64, headers)
 
         return response
-
-    @http.route('/voip/messagebank', type="json", auth="user")
-    def voip_message_bank(self, voip_call_id, sdp):
-
-        _logger.error("Message Bank")
-        voip_call = request.env['voip.call'].browse( int(voip_call_id ) )
-
-        sdp_response = request.env['voip.voip'].generate_server_sdp()
-        server_sdp_dict = {"sdp": {"type":"answer","sdp":sdp_response}}
-        server_sdp_json = json.dumps(server_sdp_dict)
-        
-        _logger.error(server_sdp_json)
-        notification = {'call_id': voip_call.id, 'sdp': server_sdp_json }
-        request.env['bus.bus'].sendone((request._cr.dbname, 'voip.sdp', voip_call.from_partner_id.id), notification)
-                    
-        return "Message Bank"
                     
     @http.route('/voip/miss/<voip_call_id>.mp3', type="json", auth="user")
     def voip_miss_message(self, voip_call_id):

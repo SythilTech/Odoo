@@ -43,7 +43,8 @@ var VOIPItem = Widget.extend({
     on_click: function (event) {
         event.preventDefault();
 
-	    session.rpc('/voip/user/list', {}).then(function(result) {
+        var model = new Model("voip.server");
+        model.call("user_list", [[]]).then(function(result) {
 
             $("#voip_tray").html("");
 
@@ -70,7 +71,8 @@ var VOIPItem = Widget.extend({
 
 			}
 
-         });
+        });
+
     },
     start_voip_screenshare_call: function (event) {
 		console.log("Call Type: screenshare call");
@@ -315,14 +317,15 @@ function createdDescription(description) {
 }
 
 function messageBankDescription(description) {
-    console.log('created Message Bank Description: ' + description);
+    console.log('Created Message Bank Description: ' + description);
 
     window.peerConnection.setLocalDescription(description).then(function() {
 
-    //Send the sdp offer to the server
-    session.rpc('/voip/messagebank', {'voip_call_id': call_id, 'sdp': "test"}).then(function(result) {
-
-    });
+        //Send the sdp offer to the server
+        var model = new Model("voip.server");
+        model.call("message_bank", [[call_id]], {'voip_call_id': call_id, 'sdp': description}).then(function(result) {
+            console.log("Message Bank Call");
+        });
 
 
     }).catch(errorHandler);
@@ -416,7 +419,7 @@ var VoipCallOutgoingNotification = Notification.extend({
 				myNotif.rpc("/voip/missed/" + call_id);
 
                 //Send the offer to message bank (server)
-		        //window.peerConnection.createOffer().then(messageBankDescription).catch(errorHandler);
+		        window.peerConnection.createOffer().then(messageBankDescription).catch(errorHandler);
 
 				//Play the missed call audio
 				mySound = new Audio("/voip/miss/" + call_id + ".mp3");
