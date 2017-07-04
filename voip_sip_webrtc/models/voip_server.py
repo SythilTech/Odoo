@@ -23,6 +23,61 @@ class VoipVoip(models.Model):
         
         return user_list
 
+    def voip_call_notify(self, mode, to_partner_id, call_type):
+        """ Create the VOIP call record and notify the callee of the incoming call """
+        
+        #Create the VOIP call now so we can mark it as missed / rejected / accepted
+        voip_call = self.env['voip.call'].create({'type': call_type, 'mode': mode })
+        
+        #Add the current user is the call owner
+        voip_call.from_partner_id = self.env.user.partner_id.id
+
+        #Add the selected user as the to partner
+        voip_call.partner_id = int(to_partner_id)
+
+        #Also add both partners to the client list
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.env.user.partner_id.id, 'state':'joined', 'name': self.env.user.partner_id.name})
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': voip_call.partner_id.id, 'state':'invited', 'name': voip_call.partner_id.name})
+
+        #Ringtone will either the default ringtone of the users ringtone
+        ringtone = "/voip/ringtone/" + str(voip_call.id) + ".mp3"
+        ring_duration = self.env['ir.values'].get_default('voip.settings', 'ring_duration')
+        
+        #Complicated code just to get the display name of the mode...
+        mode_display = dict(self.env['voip.call'].fields_get(allfields=['mode'])['mode']['selection'])[voip_call.mode]
+        
+        #Send notification to callee
+        notification = {'voip_call_id': voip_call.id, 'ringtone': ringtone, 'ring_duration': ring_duration, 'from_name': self.env.user.partner_id.name, 'caller_partner_id': self.env.user.partner_id.id, 'direction': 'incoming', 'mode':mode}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', voip_call.partner_id.id), notification)
+
+        #Also send one to yourself so we get the countdown
+        notification = {'voip_call_id': voip_call.id, 'ring_duration': ring_duration, 'to_name': voip_call.partner_id.name, 'callee_partner_id': voip_call.partner_id.id, 'direction': 'outgoing'}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', voip_call.from_partner_id.id), notification)
+
+        if voip_call.type == "external":        
+            _logger.error("external call")
+               
+            #Send the REGISTER
+            from_sip = voip_call.from_partner_id.sip_address.strip()
+            to_sip = voip_call.partner_id.sip_address.strip()
+            reg_from = from_sip.split("@")[1]
+            reg_to = to_sip.split("@")[1]
+
+            register_string = ""
+            register_string += "REGISTER sip:" + reg_to + " SIP/2.0\r\n"
+            register_string += "Via: SIP/2.0/UDP " + reg_from + "\r\n"
+            register_string += "From: sip:" + from_sip + "\r\n"
+            register_string += "To: sip:" + to_sip + "\r\n"
+            register_string += "Call-ID: " + "17320@" + reg_to + "\r\n"
+            register_string += "CSeq: 1 REGISTER\r\n"
+            register_string += "Expires: 7200\r\n"
+            register_string += "Contact: " + voip_call.from_partner_id.name + "\r\n"
+
+            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            serversocket.sendto(register_string, ('91.121.209.194', 5060) )
+
+            _logger.error("REGISTER: " + register_string)        
+
     @api.model
     def generate_server_ice(self, port, component_id):
 
@@ -57,7 +112,7 @@ class VoipVoip(models.Model):
         sdp_response += "t=0 0\r\n"
         
         #Attributes ("a=") https://tools.ietf.org/html/rfc4566#section-5.13 (standard only mentions some of these...)
-        sdp_response += "a=recvonly\r\n"
+        sdp_response += "a=sendrecv\r\n"
         sdp_response += "a=fingerprint:sha-256 77:EF:86:05:29:4F:98:BC:D6:F5:E5:A8:B8:39:DE:5A:C3:90:94:AD:2F:EA:13:DF:FC:EB:9E:87:95:DC:65:C5\r\n"
         sdp_response += "a=ice-options:trickle\r\n"
         sdp_response += "a=msid-semantic:WMS *\r\n"
@@ -69,7 +124,7 @@ class VoipVoip(models.Model):
         sdp_response += "c=IN IP4 0.0.0.0\r\n"
         
         #Why is sendrecv appear twice?
-        sdp_response += "a=recvonly\r\n"
+        sdp_response += "a=sendrecv\r\n"
         sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
         sdp_response += "a=fmtp:101 0-15\r\n"
         sdp_response += "a=ice-pwd:c35411c63e8ab7603830d7f4760c6547\r\n"

@@ -18,67 +18,6 @@ import openerp.http as http
 from openerp.http import request
 
 class VoipController(http.Controller):         
-
-
-
-    @http.route('/voip/call/notify', type="http", auth="user")
-    def voip_call_notify(self, mode, to_partner_id, call_type):
-        """ STEP 1 Create the VOIP call record and notify the callee of the incoming call """
-        
-        #We create the voip call record now since we have permission and can track if the call was missed or rejected
-        voip_call = request.env['voip.call'].create({'type': call_type, 'mode': mode })
-        
-        #Add the current user is the call owner
-        voip_call.from_partner_id = request.env.user.partner_id.id
-
-        #Add the selected user as the to partner
-        voip_call.partner_id = int(to_partner_id)
-
-        #Also add both partners to the client list
-        request.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': request.env.user.partner_id.id, 'state':'joined', 'name': request.env.user.partner_id.name})
-        request.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': voip_call.partner_id.id, 'state':'invited', 'name': voip_call.partner_id.name})
-
-        #Ringtone will either the default ringtone of the users ringtone
-        ringtone = "/voip/ringtone/" + str(voip_call.id) + ".mp3"
-        ring_duration = request.env['ir.values'].get_default('voip.settings', 'ring_duration')
-        
-        #Complicated code just to get the display name of the mode...
-        mode_display = dict(request.env['voip.call'].fields_get(allfields=['mode'])['mode']['selection'])[voip_call.mode]
-        
-        #Send notification to callee
-        notification = {'voip_call_id': voip_call.id, 'ringtone': ringtone, 'ring_duration': ring_duration, 'from_name': request.env.user.partner_id.name, 'caller_partner_id': request.env.user.partner_id.id, 'direction': 'incoming', 'mode':mode}
-        request.env['bus.bus'].sendone((request._cr.dbname, 'voip.notification', voip_call.partner_id.id), notification)
-
-        #Also send one to yourself so we get the countdown
-        notification = {'voip_call_id': voip_call.id, 'ring_duration': ring_duration, 'to_name': voip_call.partner_id.name, 'callee_partner_id': voip_call.partner_id.id, 'direction': 'outgoing'}
-        request.env['bus.bus'].sendone((request._cr.dbname, 'voip.notification', request.env.user.partner_id.id), notification)
-
-        if voip_call.type == "external":        
-            _logger.error("external call")
-               
-            #Send the REGISTER
-            from_sip = request.env.user.partner_id.sip_address.strip()
-            to_sip = voip_call.partner_id.sip_address.strip()
-            reg_from = from_sip.split("@")[1]
-            reg_to = to_sip.split("@")[1]
-
-            register_string = ""
-            register_string += "REGISTER sip:" + reg_to + " SIP/2.0\r\n"
-            register_string += "Via: SIP/2.0/UDP " + reg_from + "\r\n"
-            register_string += "From: sip:" + from_sip + "\r\n"
-            register_string += "To: sip:" + to_sip + "\r\n"
-            register_string += "Call-ID: " + "17320@" + reg_to + "\r\n"
-            register_string += "CSeq: 1 REGISTER\r\n"
-            register_string += "Expires: 7200\r\n"
-            register_string += "Contact: " + request.env.user.partner_id.name + "\r\n"
-
-            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            serversocket.sendto(register_string, ('91.121.209.194', 5060) )
-
-            _logger.error("REHISTER: " + register_string)
-
-        
-        return "Notify"
         
     @http.route('/voip/ringtone/<voip_call_id>.mp3', type="http", auth="user")
     def voip_ringtone(self, voip_call_id):

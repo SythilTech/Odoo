@@ -274,17 +274,13 @@ function getUserMediaSuccess(stream) {
     window.peerConnection.addStream(localStream);
 
     if (role == "caller") {
-		//Show the VOIP Manager now because we may need it if we go to message bank
-        console.log("Notify Callee of incoming phone call");
 
-        $.ajax({
-	        method: "GET",
-	    	url: "/voip/call/notify",
-		    data: { mode: mode, to_partner_id: to_partner_id, call_type: call_type },
-            success: function(data) {
-
-            }
+        //Send the call notification to the callee
+        var model = new Model("voip.server");
+        model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type}).then(function(result) {
+            console.log("Notify Callee of incoming phone call");
         });
+
     }
 
     if (role == "callee") {
