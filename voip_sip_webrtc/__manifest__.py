@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication (BETA)",
-    'version': "1.2.6",
+    'version': "1.2.7",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
-    'summary': "Make video calls with other users",
+    'summary': "Make video calls with other users inside your system",
     'license':'LGPL-3',
     'data': [
         'views/voip_sip_webrtc_templates.xml',

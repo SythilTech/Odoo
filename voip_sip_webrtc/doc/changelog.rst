@@ -1,3 +1,7 @@
+v1.2.7
+======
+* Fix call timeout still happening if call was rejected or failed
+
 v1.2.6
 ======
 * Make calls from system bar (top right)

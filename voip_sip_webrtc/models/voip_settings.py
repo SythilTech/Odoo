@@ -22,18 +22,6 @@ class VoipSettings(models.Model):
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
     sip_running = fields.Boolean(string="SIP Running")
     sip_listening = False
-    
-    @api.multi
-    def get_default_sip_running(self, fields):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex(('127.0.0.1',5060))
-        sip_running = ""
-        if result == 0:
-            sip_running = False
-        else:
-            sip_running = True
-    
-        return {'sip_running': sip_running}
 
     #-----Ringtone ID-----
 

@@ -26,9 +26,13 @@ class VoipCall(models.Model):
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
 
     def accept_call(self):
-
+        """ Mark the call as accepted and send response to close the notification window and open the VOIP window """
+        
         if self.status == "pending":
             self.status = "accepted"
+
+        #call_client = request.env['voip.call.client'].search([('vc_id','=', voip_call.id ), ('partner_id','=', request.env.user.partner_id.id) ])
+        #call_client.sip_addr_host = request.httprequest.remote_addr
         
         #Notify caller and callee that the call was accepted
         for voip_client in self.client_ids:
@@ -36,6 +40,7 @@ class VoipCall(models.Model):
             self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
 
     def reject_call(self):
+        """ Mark the call as rejected and send the response so the notification window is closed on both ends """
     
         if self.status == "pending":
             self.status = "rejected"
@@ -46,24 +51,22 @@ class VoipCall(models.Model):
             self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
     
     def miss_call(self):
-    
+        """ Mark the call as missed, both caller and callee will close there notification window due to the timeout """
+
         if self.status == "pending":
             self.status = "missed"
         
-        #The client side timer will allow both the caller and callee to know the call is missed
-        #for voip_client in self.client_ids:
-        #    notification = {'call_id': self.id, 'status': 'missed'}
-        #    self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
-
     def begin_call(self):
-    
+        """ Mark the call as active, we start recording the call duration at this point """
+        
         if self.status == "accepted":
             self.status = "active"
 
         self.start_time = datetime.datetime.now()
 
     def end_call(self):
-    
+        """ Mark the call as over, we can calculate the call duration based on the start time, also send notification to both sides to close there VOIP windows """
+        
         if self.status == "active":
             self.status = "over"
 

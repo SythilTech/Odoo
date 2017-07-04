@@ -207,8 +207,9 @@ WebClient.include({
 
 					console.log("Response: " + status + " | " + type);
 
-					//Destroy the notifcation because the call was accepted or rejected, no need to wait until timeout
+					//Destroy the notifcation and stop the countdown because the call was accepted or rejected, no need to wait until timeout
 					if (typeof outgoingNotification !== "undefined") {
+						clearInterval(outgoing_ring_interval);
 					    outgoingNotification.destroy(true);
 					}
 
@@ -350,7 +351,6 @@ function gotRemoteStream(event) {
     console.log("Got Remote Stream: " + event.streams[0].id);
     remoteVideo.srcObject = event.streams[0];
     remoteStream = event.streams[0];
-    clearInterval(outgoing_ring_interval);
 
     var startDate = new Date();
 
@@ -366,25 +366,19 @@ function gotRemoteStream(event) {
         $("#voip_text").html( Math.round(seconds) + " seconds");
     }, 1000);
 
-    $.ajax({
-	    method: "GET",
-		url: "/voip/call/begin",
-		data: { call: call_id },
-        success: function(data) {
 
-        }
+    var model = new Model("voip.call");
+    model.call("begin_call", [[call_id]], {}).then(function(result) {
+        console.log("Begin Call");
     });
+
 }
 
 $(document).on('click', '#voip_end_call', function(){
 
-    $.ajax({
-	    method: "GET",
-		url: "/voip/call/end",
-		data: { call: call_id },
-        success: function(data) {
-
-        }
+    var model = new Model("voip.call");
+    model.call("end_call", [[call_id]], {}).then(function(result) {
+        console.log("End Call");
     });
 
 });
@@ -414,12 +408,16 @@ var VoipCallOutgoingNotification = Notification.extend({
         outgoing_ring_interval = setInterval(function() {
             $("#callsecondsoutgoingleft").html(secondsLeft);
             if (secondsLeft == 0) {
-				console.log("Missed Call");
 
-				myNotif.rpc("/voip/missed/" + call_id);
+                var model = new Model("voip.call");
+                model.call("miss_call", [[call_id]], {}).then(function(result) {
+				    console.log("Missed Call");
+				});
 
                 //Send the offer to message bank (server)
-		        window.peerConnection.createOffer().then(messageBankDescription).catch(errorHandler);
+                if (mode == "audiocall") {
+		            window.peerConnection.createOffer().then(messageBankDescription).catch(errorHandler);
+			    }
 
 				//Play the missed call audio
 				mySound = new Audio("/voip/miss/" + call_id + ".mp3");
@@ -445,7 +443,12 @@ var VoipCallIncomingNotification = Notification.extend({
         this.events = _.extend(this.events || {}, {
             'click .link2accept': function() {
 
-                this.rpc("/voip/accept/" + call_id);
+                var model = new Model("voip.call");
+                model.call("accept_call", [[call_id]], {}).then(function(result) {
+                    console.log("Accept Call");
+                });
+
+
                 mySound.pause();
                 mySound.currentTime = 0;
 
@@ -471,7 +474,11 @@ var VoipCallIncomingNotification = Notification.extend({
 
             'click .link2reject': function() {
 
-				this.rpc("/voip/reject/" + call_id);
+                var model = new Model("voip.call");
+                model.call("reject_call", [[call_id]], {}).then(function(result) {
+                    console.log("Reject Call");
+                });
+
                 mySound.pause();
                 mySound.currentTime = 0;
                 this.destroy(true);
@@ -487,7 +494,6 @@ var VoipCallIncomingNotification = Notification.extend({
         var incoming_ring_interval = setInterval(function() {
             $("#callsecondsincomingleft").html(secondsLeft);
             if (secondsLeft == 0) {
-				//myNotif.rpc("/voip/missed/" + call_id);
                 mySound.pause();
                 mySound.currentTime = 0;
                 clearInterval(incoming_ring_interval);

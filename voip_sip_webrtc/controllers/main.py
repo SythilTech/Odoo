@@ -104,6 +104,7 @@ class VoipController(http.Controller):
                     
     @http.route('/voip/miss/<voip_call_id>.mp3', type="json", auth="user")
     def voip_miss_message(self, voip_call_id):
+        """ Play the missed call mp3 of the callee """
 
         voip_call = request.env['voip.call'].browse( int(voip_call_id) )
         to_user = request.env['res.users'].search([('partner_id','=',voip_call.partner_id.id)])
@@ -119,64 +120,6 @@ class VoipController(http.Controller):
             return response
         else:
             return ""
-
-
-    @http.route('/voip/accept/<call>', type="json", auth="user")
-    def voip_accept(self, call):
-        """Mark the call as accepted, and open the VOIP window"""
-        
-        _logger.error(str(call) + " call was accepted")
-        voip_call = request.env['voip.call'].browse( int(call) )
-        call_client = request.env['voip.call.client'].search([('vc_id','=', voip_call.id ), ('partner_id','=', request.env.user.partner_id.id) ])
-        call_client.sip_addr_host = request.httprequest.remote_addr
-        voip_call.accept_call()
-
-        return True
-
-    @http.route('/voip/reject/<call>', type="json", auth="user")
-    def voip_reject(self, call):
-        """Mark the call as rejected"""
-        
-        voip_call = request.env['voip.call'].browse( int(call) )
-        voip_call.reject_call()
-                
-        return True
-
-    @http.route('/voip/missed/<call>', type="json", auth="user")
-    def voip_missed(self, call):
-        """Mark the call as missed"""
-        
-        voip_call = request.env['voip.call'].browse( int(call) )
-        voip_call.miss_call()
-
-        return "Bye"
-
-    @http.route('/voip/call/begin', type="http", auth="user")
-    def voip_call_begin(self, **kwargs):
-        """Remote video was received so this marks the beginning of the call"""
-
-        values = {}
-        for field_name, field_value in kwargs.items():
-            values[field_name] = field_value
-            
-        voip_call = request.env['voip.call'].browse( int(values['call']) )
-        voip_call.begin_call()
-        
-        return "hi"
-
-
-    @http.route('/voip/call/end', type="http", auth="user")
-    def voip_call_end(self, **kwargs):
-        """Call ends when person clicks the the end call button"""
-
-        values = {}
-        for field_name, field_value in kwargs.items():
-            values[field_name] = field_value
-
-        voip_call = request.env['voip.call'].browse( int(values['call']) )
-        voip_call.end_call()
-                
-        return "Bye"
         
     @http.route('/voip/call/sdp', type="http", auth="user")
     def voip_call_sdp(self, **kwargs):
