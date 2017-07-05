@@ -658,9 +658,9 @@ class HtmlFormController(http.Controller):
         html_response.error = ""
 
         create_list = []
-        checkbox_group = ast.literal_eval(field_data)
+        checkbox_group = field_data.split(",")
         for checkbox in checkbox_group:
-            create_list.append((4, checkbox))
+            create_list.append((4, int(checkbox) ))
 
         html_response.return_data = create_list
         html_response.history_data = create_list

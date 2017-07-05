@@ -1,3 +1,7 @@
+v1.0.14
+=======
+* Single checkbox in checkbox group process fix
+
 v1.0.13
 =======
 * Add filename of binary fields
