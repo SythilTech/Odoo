@@ -1,9 +1,30 @@
 # -*- coding: utf-8 -*-
+import logging
+_logger = logging.getLogger(__name__)
+
 from openerp import api, fields, models
 
 class ResPartnerSms(models.Model):
 
     _inherit = "res.partner"
+
+    @api.multi
+    def sms_action(self):
+        self.ensure_one()
+        
+        default_mobile = self.env['sms.number'].search([])[0]
+        
+        return {
+            'name': 'SMS Compose',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sms.compose',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'context': {'default_from_mobile_id': default_mobile.id, 'default_field_id':'mobile','default_to_number':self.mobile, 'default_record_id':self.id,'default_model_id':'res.partner'}
+         }
+        
+    
     
     @api.onchange('country_id','mobile')
     def _onchange_mobile(self):

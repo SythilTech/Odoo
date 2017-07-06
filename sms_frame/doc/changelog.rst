@@ -1,3 +1,7 @@
+v1.0.8
+======
+* Auto select from mobile in compose window
+
 v1.0.7
 ======
 * MMS receiving fix
