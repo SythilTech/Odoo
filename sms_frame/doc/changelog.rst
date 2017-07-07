@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Fix auto from number messing up send sms
+
 v1.0.8
 ======
 * Auto select from mobile in compose window

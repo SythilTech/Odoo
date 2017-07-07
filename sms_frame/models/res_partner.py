@@ -21,7 +21,7 @@ class ResPartnerSms(models.Model):
             'res_model': 'sms.compose',
             'target': 'new',
             'type': 'ir.actions.act_window',
-            'context': {'default_from_mobile_id': default_mobile.id, 'default_field_id':'mobile','default_to_number':self.mobile, 'default_record_id':self.id,'default_model_id':'res.partner'}
+            'context': {'default_from_mobile_id': default_mobile.id,'default_to_number':self.mobile, 'default_record_id':self.id,'default_model':'res.partner'}
          }
         
     
