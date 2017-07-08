@@ -159,7 +159,12 @@ class HtmlFormController(http.Controller):
         """Generate textbox HTML"""
         html_output = ""
         html_output += "<div class=\"hff hff_textbox form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
-        html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
+        html_output += "  <label class=\"control-label"
+        
+        if field.setting_general_required is True:
+            html_output += "  required"
+        
+        html_output += "\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
         html_output += "  <input type=\""
 
         if field.validation_format == "email":
@@ -171,8 +176,6 @@ class HtmlFormController(http.Controller):
 
         html_output += "\" class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 
-        if field.setting_general_required is True:
-            html_output += " required=\"required\""
 
         if field.validation_format == "lettersonly":
             html_output += ' pattern="[a-zA-Z ]+" title="Letters Only"'
@@ -323,7 +326,12 @@ class HtmlFormController(http.Controller):
         """Generate Checkbox(Boolean) HTML"""
         html_output = ""
         html_output += "<div class=\"hff hff_checkbox checkbox\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
-        html_output += "  <label><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
+        html_output += "  <label"
+        
+        if field.setting_general_required is True:
+            html_output += " class=\"required\""
+        
+        html_output += "><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
         html_output += "</div>\n"
 
         return html_output
@@ -458,11 +466,12 @@ class HtmlFormController(http.Controller):
         insert_values['field_type'] = field_type.id
         insert_values['html_name'] = field_id.name
         insert_values['field_label'] = field_id.field_description
+        
         if 'format_validation' in values:
             insert_values['validation_format'] = values['format_validation']
         if 'character_limit' in values:
             insert_values['character_limit'] = values['character_limit']
-        if 'setting_general_required' in values:
+        if 'field_required' in values:
             insert_values['setting_general_required'] = values['field_required']
         if 'layout_type' in values:
             insert_values['setting_radio_group_layout_type'] = values['layout_type']

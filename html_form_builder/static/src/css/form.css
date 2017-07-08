@@ -8,9 +8,9 @@ margin-top:20px;
 margin-top:-20px;
 }
 
-/* Add required red star, required class is manually added */
-.hff.form-group.required .control-label:after {
-  content:"*";
+/* Add required red star */
+.hff label.required:after {
+  content:" *";
   color:red;
 }
 

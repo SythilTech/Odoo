@@ -1,3 +1,7 @@
+v1.0.16
+=======
+* Required tickbox fix
+
 v1.0.15
 =======
 * UTF 8 checkbox group fix
