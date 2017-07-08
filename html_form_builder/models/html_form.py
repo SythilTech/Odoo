@@ -69,10 +69,19 @@ class HtmlForm(models.Model):
         html_output += "</form>\n"
         self.output_html = html_output
 
+    def _generate_html_checkbox_group(self, fe):
+        html_output = ""
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>\n"
+
+        for my_record in request.env[fe.field_id.relation].search([('name', '!=', '')]):
+            html_output += "  <label><input type=\"checkbox\" value=\"" + str(my_record.id) + "\" name=\"" + fe.html_name + "\"/>" + my_record.name + "</label>\n"
+
+        return html_output
+
     def _generate_html_file_select(self, fe):
         html_output = ""
         html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
-        html_output += "  <input type=\"file\" id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+        html_output += "  <input type=\"file\" id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required is True:
             html_output += " required=\"required\""

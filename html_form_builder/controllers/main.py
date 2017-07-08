@@ -312,7 +312,7 @@ class HtmlFormController(http.Controller):
 
         for my_record in request.env[field.field_id.relation].search([('name', '!=', '')]):
             html_output += "  <div class=\"checkbox\">\n"
-            html_output += "    <label><input type=\"checkbox\" value=\"" + str(my_record.id) + "\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + my_record.name.encode("utf-8") + "</label>\n"
+            html_output += "    <label><input type=\"checkbox\" value=\"" + str(my_record.id) + "\" name=\"" + field.html_name + "\"/>" + my_record.name + "</label>\n"
             html_output += "  </div>\n"
 
         html_output += "</div>\n"
@@ -658,9 +658,17 @@ class HtmlFormController(http.Controller):
         html_response.error = ""
 
         create_list = []
-        checkbox_group = field_data.split(",")
-        for checkbox in checkbox_group:
-            create_list.append((4, int(checkbox) ))
+        
+        _logger.error(request.httprequest.form.getlist(field.html_name))
+        
+        for checkbox_value in request.httprequest.form.getlist(field.html_name):
+        
+            #Awkward hack to deal for javascript posting...
+            if "," in checkbox_value:
+                for checkbox_subvalue in checkbox_value.split(","):
+                    create_list.append((4, int(checkbox_subvalue) ))                
+            else:
+                create_list.append((4, int(checkbox_value) ))
 
         html_response.return_data = create_list
         html_response.history_data = create_list

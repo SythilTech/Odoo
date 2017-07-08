@@ -1,3 +1,8 @@
+v1.0.15
+=======
+* UTF 8 checkbox group fix
+* Add external form checkbox group generation / processing
+
 v1.0.14
 =======
 * Single checkbox in checkbox group process fix
