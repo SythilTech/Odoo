@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework",
-    'version': "1.0.9",
+    'version': "1.0.10",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -12,6 +12,7 @@
         'data/res.country.csv',
         'data/ir.model.access.csv',
         'data/sms.gateway.csv',
+        'data/mail.message.subtype.csv',
         'views/sms_views.xml',
         'views/res_partner_views.xml',
         'views/sms_message_views.xml',

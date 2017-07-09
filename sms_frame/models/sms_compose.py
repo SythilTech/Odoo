@@ -60,8 +60,8 @@ class SmsCompose(models.Model):
 	    sms_message = self.env['sms.message'].create({'record_id': self.record_id,'model_id':my_model[0].id,'account_id':self.from_mobile_id.account_id.id,'from_mobile':self.from_mobile_id.mobile_number,'to_mobile':self.to_number,'sms_content':self.sms_content,'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id, 'by_partner_id':self.env.user.partner_id.id})
 	    
 	    try:
-	        discussion_subtype = self.env['ir.model.data'].get_object('mail', 'mt_comment')
-	        self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=discussion_subtype.id)
+	        sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
+	        self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id)
 	    except:
 	        #Message post only works if CRM module is installed
 	        pass

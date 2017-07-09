@@ -1,3 +1,7 @@
+v1.0.10
+======
+* SMS subtype
+
 v1.0.9
 ======
 * Fix auto from number messing up send sms
