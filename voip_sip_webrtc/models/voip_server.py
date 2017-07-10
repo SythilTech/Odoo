@@ -5,6 +5,7 @@ import threading
 import logging
 _logger = logging.getLogger(__name__)
 import json
+from random import randint
 
 from odoo import api, fields, models, registry
 
@@ -92,7 +93,7 @@ class VoipVoip(models.Model):
         
         ice_response = "candidate:" + foundation + " " + str(component_id) + " UDP " + str(priority) + " " + str(ip) + " " + str(port) + " typ host"
         
-        return ice_response
+        return {"candidate":ice_response,"sdpMid":"sdparta_0","sdpMLineIndex":0}
 
     @api.model
     def generate_server_sdp(self):
@@ -116,14 +117,21 @@ class VoipVoip(models.Model):
         sdp_response += "a=fingerprint:sha-256 77:EF:86:05:29:4F:98:BC:D6:F5:E5:A8:B8:39:DE:5A:C3:90:94:AD:2F:EA:13:DF:FC:EB:9E:87:95:DC:65:C5\r\n"
         sdp_response += "a=ice-options:trickle\r\n"
         sdp_response += "a=msid-semantic:WMS *\r\n"
+
+        #Random stuff, so I don't have get it a second time if needed
+        #example supported audio profiles: 109 9 0 8 101
+        #sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF 109 101\r\n"
+        
+        #Use G722 Audio Profile (https://en.wikipedia.org/wiki/RTP_audio_video_profile)
+        audio_codec = "9"
         
         #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
-        sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF 109 101\r\n"
+        sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF " + audio_codec + "\r\n"
         
         #Connection Data ("c=") https://tools.ietf.org/html/rfc4566#section-5.7 (always seems to be 0.0.0.0?)
         sdp_response += "c=IN IP4 0.0.0.0\r\n"
         
-        #Why is sendrecv appear twice?
+        #Description of audio 101 / 109 profile?!?
         sdp_response += "a=sendrecv\r\n"
         sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
         sdp_response += "a=fmtp:101 0-15\r\n"
@@ -136,36 +144,38 @@ class VoipVoip(models.Model):
         sdp_response += "a=rtpmap:101 telephone-event/8000\r\n"
         sdp_response += "a=setup:active\r\n"
         sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
-        
-        return sdp_response    
+    
+        return {"type":"answer","sdp": sdp_response}
         
     def message_bank(self, voip_call_id, sdp):
 
         _logger.error("Message Bank")
         voip_call = self.env['voip.call'].browse( int(voip_call_id ) )
 
-        sdp_response = self.env['voip.server'].generate_server_sdp()
-        server_sdp_dict = {"sdp": {"type":"answer","sdp":sdp_response}}
-        server_sdp_json = json.dumps(server_sdp_dict)
+        server_sdp = self.env['voip.server'].generate_server_sdp()
 
-        _logger.error(server_sdp_json)
-        notification = {'call_id': voip_call.id, 'sdp': server_sdp_json }
+        _logger.error(server_sdp)
+        
+        notification = {'call_id': voip_call.id, 'sdp': server_sdp }
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.sdp', voip_call.from_partner_id.id), notification)
 
+        #RTP
         port = 62382
-        ice_candidate_1 = self.generate_server_ice(port, 1)        
-        self.start_rtc_listener(port)
-        notification = {'call_id': voip_call.id, 'ice': json.dumps({"ice":{"candidate":ice_candidate_1,"sdpMid":"sdparta_0","sdpMLineIndex":0}}) }
+        #port = randint(16384,32767)
+        server_ice_candidate = self.generate_server_ice(port, 1)        
+        self.start_rtc_listener(port, "RTP")
+        notification = {'call_id': voip_call.id, 'ice': server_ice_candidate }
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', voip_call.from_partner_id.id), notification)
 
+        #RTCP
         port += 1
-        ice_candidate_2 = self.generate_server_ice(port, 2)        
-        self.start_rtc_listener(port)
-        notification = {'call_id': voip_call.id, 'ice': json.dumps({"ice":{"candidate":ice_candidate_2,"sdpMid":"sdparta_0","sdpMLineIndex":0}}) }
+        server_ice_candidate = self.generate_server_ice(port, 2)
+        self.start_rtc_listener(port, "RTCP")
+        notification = {'call_id': voip_call.id, 'ice': server_ice_candidate }
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', voip_call.from_partner_id.id), notification)
 
-    def rtc_server_listener(self, port):
-        _logger.error("Start RTC Listening on Port " + str(port) )
+    def rtp_server_listener(self, port):
+        _logger.error("Start RTP Listening on Port " + str(port) )
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         serversocket.bind(('', port));
 
@@ -173,14 +183,34 @@ class VoipVoip(models.Model):
         while rtc_listening:
             data, addr = serversocket.recvfrom(2048)
 
-            _logger.error(data)
+            _logger.error("RTP: " + data)
             
             if not data: 
                 break
 
-            _logger.error(data)
 
-    def start_rtc_listener(self, port):
+    
+    def rtcp_server_listener(self, port):
+        _logger.error("Start RTCP Listening on Port " + str(port) )
+        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        serversocket.bind(('', port));
+
+        rtc_listening = True
+        while rtc_listening:
+            data, addr = serversocket.recvfrom(2048)
+
+            _logger.error("RTCP: " + data)
+            
+            if not data: 
+                break
+
+
+
+    def start_rtc_listener(self, port, mode):
         #Start a new thread so you don't block the main Odoo thread
-        rtc_listener_starter = threading.Thread(target=self.rtc_server_listener, args=(port,))
-        rtc_listener_starter.start()
+        if mode is "RTP":
+            rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(port,))
+            rtc_listener_starter.start()
+        elif mode is "RTCP":
+            rtc_listener_starter = threading.Thread(target=self.rtcp_server_listener, args=(port,))
+            rtc_listener_starter.start()

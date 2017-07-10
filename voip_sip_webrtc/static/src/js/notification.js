@@ -56,17 +56,6 @@ var VOIPItem = Widget.extend({
 				drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name + "</a>" + " <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_video_call\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"/> Video Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_audio_call\"><i class=\"fa fa-volume-up\" aria-hidden=\"true\"/> Audio Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_screenshare_call\"><i class=\"fa fa-desktop\" aria-hidden=\"true\"/> Screenshare Call</a>";
 				drop_menu_html += "</li>";
 
-
-				/*
-				drop_menu_html += "<li class=\"dropdown-submenu\">";
-				drop_menu_html += "  <a tabindex=\"-1\" href=\"#\">" + voip_user.name + " <span class=\"caret\"/></a>";
-				drop_menu_html += "  <ul class=\"dropdown-menu\">";
-				drop_menu_html += "    <li><a href=\"#\">Video Call</a></li>";
-				drop_menu_html += "    <li><a href=\"#\">Audio Call</a></li>";
-				drop_menu_html += "  </ul>";
-				drop_menu_html += "</li>";
-				*/
-
 			    $("#voip_tray").append(drop_menu_html);
 
 			}
@@ -214,10 +203,9 @@ WebClient.include({
 					}
 
 				} else if(notification[0][1] === 'voip.sdp') {
-                    var sdp_json = notification[1].sdp;
-                    var sdp = JSON.parse(sdp_json)['sdp'];
-                    console.log("Got SDP " + sdp.type);
-                    console.log(sdp);
+                    var sdp = notification[1].sdp;
+                    console.log("Got SDP Type: " + sdp.type);
+                    console.log("Got SDP Data: " + sdp.sdp);
 
                     window.peerConnection.setRemoteDescription(new RTCSessionDescription(sdp)).then(function() {
 						console.log("Set Remote Description");
@@ -229,10 +217,11 @@ WebClient.include({
                     }).catch(errorHandler);
 
 				} else if(notification[0][1] === 'voip.ice') {
-                    var ice_json = notification[1].ice;
-                    var ice = JSON.parse(ice_json)['ice'];
-                    console.log("Got Remote ICE Candidate");
-                    console.log(ice_json);
+                    var ice = notification[1].ice;
+
+                    console.log("Got Remote ICE Candidate:");
+                    console.log(ice);
+
 					peerConnection.addIceCandidate(new RTCIceCandidate(ice)).catch(errorHandler);
 				} else if(notification[0][1] === 'voip.end') {
                     console.log("Call End");
@@ -297,24 +286,19 @@ function getUserMediaError(error) {
 };
 
 function createdDescription(description) {
-    console.log('createdDescription: ' + description);
 
     window.peerConnection.setLocalDescription(description).then(function() {
 
-        $.ajax({
-	        method: "GET",
-	    	url: "/voip/call/sdp",
-	    	data: { call: call_id, sdp: JSON.stringify({'sdp': peerConnection.localDescription}) },
-            success: function(data) {
-
-            }
+        var model = new Model("voip.call");
+        model.call("voip_call_sdp", [[call_id]], {'sdp': description}).then(function(result) {
+            console.log("Send SDP: " + description);
         });
 
     }).catch(errorHandler);
 }
 
 function messageBankDescription(description) {
-    console.log('Created Message Bank Description: ' + description);
+    console.log('Created Message Bank Description: ' + description.sdp);
 
     window.peerConnection.setLocalDescription(description).then(function() {
 
@@ -330,16 +314,12 @@ function messageBankDescription(description) {
 
 function gotIceCandidate(event) {
     if(event.candidate != null) {
-		console.log("Send ICE Candidate: " + event.candidate);
 
-        $.ajax({
-	        method: "GET",
-	    	url: "/voip/call/ice",
-	    	data: { call: call_id, ice: JSON.stringify({'ice': event.candidate}) },
-            success: function(data) {
-
-            }
+        var model = new Model("voip.call");
+        model.call("voip_call_ice", [[call_id]], {'ice': event.candidate}).then(function(result) {
+		    console.log("Send ICE Candidate: " + event.candidate);
         });
+
     }
 }
 
