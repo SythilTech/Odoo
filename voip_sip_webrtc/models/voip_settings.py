@@ -20,6 +20,7 @@ class VoipSettings(models.Model):
     ringtone = fields.Binary(string="Default Ringtone")
     ringtone_filename = fields.Char("Ringtone Filename")
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
+    message_bank_duration = fields.Integer(string="Message Bank Duration (Seconds)", help="The time before message bank automatically hangs up")
     sip_running = fields.Boolean(string="SIP Running")
     sip_listening = False
 
@@ -45,6 +46,17 @@ class VoipSettings(models.Model):
         for record in self:
             self.env['ir.values'].set_default('voip.settings', 'ring_duration', record.ring_duration)
 
+
+    #-----Message Bank Duration-----
+
+    @api.multi
+    def get_default_message_bank_duration(self, fields):
+        return {'message_bank_duration': self.env['ir.values'].get_default('voip.settings', 'message_bank_duration')}
+
+    @api.multi
+    def set_default_message_bank_duration(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'message_bank_duration', record.message_bank_duration)
 
     def sip_server(self):
         _logger.error("Start SIP Listening")

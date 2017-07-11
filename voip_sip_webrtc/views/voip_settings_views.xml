@@ -15,6 +15,7 @@
                 <group>
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
+                    <field name="message_bank_duration"/>
                 </group>
       	    </form>
         </field>

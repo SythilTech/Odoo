@@ -41,7 +41,7 @@ class VoipController(http.Controller):
 
         return response
                     
-    @http.route('/voip/miss/<voip_call_id>.mp3', type="json", auth="user")
+    @http.route('/voip/miss/<voip_call_id>.mp3', type="http", auth="user")
     def voip_miss_message(self, voip_call_id):
         """ Play the missed call mp3 of the callee """
 

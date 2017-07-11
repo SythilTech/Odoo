@@ -6,6 +6,7 @@ import logging
 _logger = logging.getLogger(__name__)
 import json
 from random import randint
+import time
 
 from odoo import api, fields, models, registry
 
@@ -146,71 +147,3 @@ class VoipVoip(models.Model):
         sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
     
         return {"type":"answer","sdp": sdp_response}
-        
-    def message_bank(self, voip_call_id, sdp):
-
-        _logger.error("Message Bank")
-        voip_call = self.env['voip.call'].browse( int(voip_call_id ) )
-
-        server_sdp = self.env['voip.server'].generate_server_sdp()
-
-        _logger.error(server_sdp)
-        
-        notification = {'call_id': voip_call.id, 'sdp': server_sdp }
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.sdp', voip_call.from_partner_id.id), notification)
-
-        #RTP
-        port = 62382
-        #port = randint(16384,32767)
-        server_ice_candidate = self.generate_server_ice(port, 1)        
-        self.start_rtc_listener(port, "RTP")
-        notification = {'call_id': voip_call.id, 'ice': server_ice_candidate }
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', voip_call.from_partner_id.id), notification)
-
-        #RTCP
-        port += 1
-        server_ice_candidate = self.generate_server_ice(port, 2)
-        self.start_rtc_listener(port, "RTCP")
-        notification = {'call_id': voip_call.id, 'ice': server_ice_candidate }
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', voip_call.from_partner_id.id), notification)
-
-    def rtp_server_listener(self, port):
-        _logger.error("Start RTP Listening on Port " + str(port) )
-        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serversocket.bind(('', port));
-
-        rtc_listening = True
-        while rtc_listening:
-            data, addr = serversocket.recvfrom(2048)
-
-            _logger.error("RTP: " + data)
-            
-            if not data: 
-                break
-
-
-    
-    def rtcp_server_listener(self, port):
-        _logger.error("Start RTCP Listening on Port " + str(port) )
-        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serversocket.bind(('', port));
-
-        rtc_listening = True
-        while rtc_listening:
-            data, addr = serversocket.recvfrom(2048)
-
-            _logger.error("RTCP: " + data)
-            
-            if not data: 
-                break
-
-
-
-    def start_rtc_listener(self, port, mode):
-        #Start a new thread so you don't block the main Odoo thread
-        if mode is "RTP":
-            rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(port,))
-            rtc_listener_starter.start()
-        elif mode is "RTCP":
-            rtc_listener_starter = threading.Thread(target=self.rtcp_server_listener, args=(port,))
-            rtc_listener_starter.start()

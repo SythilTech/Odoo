@@ -1,3 +1,7 @@
+v1.2.8
+======
+* Clean up over call, so new ones can start fresh
+
 v1.2.7
 ======
 * Fix call timeout still happening if call was rejected or failed

@@ -30,6 +30,7 @@ var mode = false;
 var call_type = ""
 var to_partner_id;
 var outgoing_ring_interval;
+var call_interval;
 
 
 var VOIPItem = Widget.extend({
@@ -230,7 +231,13 @@ WebClient.include({
                     localStream.getTracks().forEach(track => track.stop());
                     remoteStream.getTracks().forEach(track => track.stop());
 
+                    $("#voip_text").html("Starting Call...");
                     $(".s-voip-manager").css("opacity","0");
+
+					//Reset all counters so we can start fresh for the next call
+				    clearInterval(outgoing_ring_interval);
+				    clearInterval(call_interval);
+
 				}
 
 
@@ -303,8 +310,8 @@ function messageBankDescription(description) {
     window.peerConnection.setLocalDescription(description).then(function() {
 
         //Send the sdp offer to the server
-        var model = new Model("voip.server");
-        model.call("message_bank", [[call_id]], {'voip_call_id': call_id, 'sdp': description}).then(function(result) {
+        var model = new Model("voip.call");
+        model.call("message_bank", [[call_id]], {'sdp': description}).then(function(result) {
             console.log("Message Bank Call");
         });
 
@@ -334,9 +341,9 @@ function gotRemoteStream(event) {
     $("#toPartnerImage").css('display','none');
     $("#remoteVideo").css('display','block');
 
-    //For video calls (2 streams) this get called twice so we use time difference as a work around
-    var call_interval = setInterval(function() {
-		var endDate   = new Date();
+    //For calls with multiple streams (e.g. video calls) this get called twice so we use time difference as a work around
+    call_interval = setInterval(function() {
+		var endDate = new Date();
 		var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
 
         $("#voip_text").html( Math.round(seconds) + " seconds");
