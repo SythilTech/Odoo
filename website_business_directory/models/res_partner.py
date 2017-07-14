@@ -10,7 +10,7 @@ class ResPartnerDirectory(models.Model):
 
     in_directory = fields.Boolean(string="In Directory")
     company_category_ids = fields.Many2many('res.partner.directory.category', string="Directory Categories")
-    directory_description = fields.Text(string="Directory Description")
+    directory_description = fields.Text(string="Directory Description", translate=True)
     business_owner = fields.Many2one('res.users', string="Business Owner")
     directory_monday_start = fields.Float(string="Monday Start Time")
     directory_monday_end = fields.Float(string="Monday End Time")

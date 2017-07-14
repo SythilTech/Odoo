@@ -19,7 +19,7 @@ class HtmlForm(models.Model):
     def _default_submit_url(self):
         return request.httprequest.host_url + "form/sinsert"
 
-    name = fields.Char(string="Form Name", required=True)
+    name = fields.Char(string="Form Name", required=True, translate=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True)
     fields_ids = fields.One2many('html.form.field', 'html_id', string="HTML Fields")
     output_html = fields.Text(string='Embed Code', readonly=True)

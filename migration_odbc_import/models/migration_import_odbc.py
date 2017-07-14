@@ -13,7 +13,7 @@ class MigrationImportOdbc(models.Model):
 
     _name = "migration.import.odbc"
 
-    name = fields.Char(string="Name", required="True")
+    name = fields.Char(string="Name", required="True", translate=True)
     dsn_id = fields.Many2one('migration.import.odbc.dsn', string="Driver")
     connection_string_template = fields.Many2one('migration.import.odbc.connect', string="Connection Template")
     connection_string = fields.Char(string="Connection String", help="See https://www.connectionstrings.com if you want a connection string other then MySQL")

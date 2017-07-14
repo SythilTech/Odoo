@@ -12,7 +12,7 @@ class EtqExam(models.Model):
 
     _name = "etq.exam"
     
-    name = fields.Char(string="Name")
+    name = fields.Char(string="Name", translate=True)
     slug = fields.Char(string="Slug", compute="slug_me", store="True")
     show_correct_questions = fields.Boolean(string="Show Correct Answers?")
     questions = fields.One2many('etq.question','exam_id', string="Questions")

@@ -11,7 +11,7 @@ class ProjectTaskCloudCategory(models.Model):
     _description = "Cloud Task Category"
     _order = "name asc"
     
-    name = fields.Char(string="Name")
+    name = fields.Char(string="Name", translate=True)
     
     def test_push_notif(self):
         payload = {'to': "/topics/category_" + str(self.id), 'data':  { "message": "This is a test message"} }        
