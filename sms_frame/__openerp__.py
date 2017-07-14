@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework",
-    'version': "1.0.10",
+    'version': "1.0.11",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -29,5 +29,6 @@
     'images':[
         'static/description/3.jpg',
     ],
+    'qweb': ['static/src/xml/sms_compose.xml'],
     'installable': True,
 }

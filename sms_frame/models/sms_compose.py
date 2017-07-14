@@ -62,6 +62,8 @@ class SmsCompose(models.Model):
 	    try:
 	        sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
 	        self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id)
-	    except:
-	        #Message post only works if CRM module is installed
+            except Exception as e:
+                _logger.error(e)
+                
+                #Message post only works if CRM module is installed
 	        pass

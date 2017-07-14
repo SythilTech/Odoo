@@ -1,3 +1,7 @@
+v1.0.11
+======
+* Just debug code
+
 v1.0.10
 ======
 * SMS subtype
