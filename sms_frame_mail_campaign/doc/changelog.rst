@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Remove redundant gatway_id from v9
+
 v1.0.2
 ======
 * Just queue the smses
