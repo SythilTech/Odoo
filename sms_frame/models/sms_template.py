@@ -58,7 +58,7 @@ class SmsTemplate(models.Model):
     name = fields.Char(required=True, string='Template Name', translate=True)
     model_id = fields.Many2one('ir.model', string='Applies to', help="The kind of document with with this template can be used")
     model = fields.Char(related="model_id.model", string='Related Document Model', select=True, store=True, readonly=True)
-    template_body = fields.Text('Body', translate=True, help="Plain text version of the message (placeholders may be used here)", translate=True)
+    template_body = fields.Text('Body', translate=True, help="Plain text version of the message (placeholders may be used here)")
     sms_from = fields.Char(string='From (Mobile)', help="Sender mobile number (placeholders may be used here). If not set, the default value will be the author's mobile number.")
     sms_to = fields.Char(string='To (Mobile)', help="To mobile number (placeholders may be used here)")
     account_gateway_id = fields.Many2one('sms.account', string="Account")    
