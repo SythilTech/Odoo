@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Remove gateway_id in sms create
+
 v1.0.2
 ======
 * Just queue the smses
