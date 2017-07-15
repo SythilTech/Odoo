@@ -1,6 +1,10 @@
+v1.0.4
+======
+* MMS sending support
+
 v1.0.3
 ======
-* Remove redundant gatway_id from v9
+* Remove redundant gatway_id from create sms
 
 v1.0.2
 ======
