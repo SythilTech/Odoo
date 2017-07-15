@@ -58,4 +58,5 @@ class VoipController(http.Controller):
         
             return response
         else:
+            #TODO read blank.mp3 and return it
             return ""        

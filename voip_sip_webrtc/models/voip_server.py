@@ -5,8 +5,10 @@ import threading
 import logging
 _logger = logging.getLogger(__name__)
 import json
+import random
 from random import randint
 import time
+import string
 
 from odoo import api, fields, models, registry
 
@@ -104,8 +106,11 @@ class VoipVoip(models.Model):
         #Protocol Version ("v=") https://tools.ietf.org/html/rfc4566#section-5.1 (always 0 for us)
         sdp_response += "v=0\r\n"
 
-        #Origin ("o=") https://tools.ietf.org/html/rfc4566#section-5.2 (should really have a unique sess-id but whatever...)
-        sdp_response += "o=- 4835683596547242223 0 IN IP4 0.0.0.0\r\n"
+        #Origin ("o=") https://tools.ietf.org/html/rfc4566#section-5.2 (Should come up with a better session id...)
+        sess_id = int(time.time()) #Not perfect but I don't expect more then one call a second
+        sess_version = 0 #Will always start at 0
+        _logger.error( str(sess_id) )
+        sdp_response += "o=- " + str(sess_id) + " " + str(sess_version) + " IN IP4 0.0.0.0\r\n"        
         
         #Session Name ("s=") https://tools.ietf.org/html/rfc4566#section-5.3 (We don't need a session name, information about the call is all displayed in the UI)
         sdp_response += "s= \r\n"
@@ -113,37 +118,50 @@ class VoipVoip(models.Model):
         #Timing ("t=") https://tools.ietf.org/html/rfc4566#section-5.9 (For now sessions are infinite but we may use this if for example a company charges a price for a fixed 30 minute consultation)
         sdp_response += "t=0 0\r\n"
         
-        #Attributes ("a=") https://tools.ietf.org/html/rfc4566#section-5.13 (standard only mentions some of these...)
+        #In later versions we might send the missed call mp3 via rtp
         sdp_response += "a=sendrecv\r\n"
-        sdp_response += "a=fingerprint:sha-256 77:EF:86:05:29:4F:98:BC:D6:F5:E5:A8:B8:39:DE:5A:C3:90:94:AD:2F:EA:13:DF:FC:EB:9E:87:95:DC:65:C5\r\n"
+
+        #No idea how I'm meant to generate my own fingerprint...
+        sdp_response += "a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:PS1uQCVeeCFCanVmcjkpPywjNWhcYD0mXXtxaVBR|2^20|1:32\r\n"
+        sdp_response += "a=fingerprint:sha-256 DA:52:67:C5:2A:2E:91:13:A2:7D:3A:E1:2E:A4:F3:28:90:67:71:0E:B7:6F:7B:56:79:F4:B2:D1:54:4B:92:7E\r\n"
+        sdp_response += "a=setup:actpass\r\n"
+        #sdp_response += "a=setup:active\r\n"
+        
+        #Sure why not
         sdp_response += "a=ice-options:trickle\r\n"
+
+        #Sigh no idea
         sdp_response += "a=msid-semantic:WMS *\r\n"
 
         #Random stuff, so I don't have get it a second time if needed
         #example supported audio profiles: 109 9 0 8 101
         #sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF 109 101\r\n"
-        
-        #Use G722 Audio Profile (https://en.wikipedia.org/wiki/RTP_audio_video_profile)
-        audio_codec = "9"
-        
+                
         #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
+        audio_codec = "9" #Use G722 Audio Profile
         sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF " + audio_codec + "\r\n"
         
         #Connection Data ("c=") https://tools.ietf.org/html/rfc4566#section-5.7 (always seems to be 0.0.0.0?)
         sdp_response += "c=IN IP4 0.0.0.0\r\n"
+
+        #ICE creds (https://tools.ietf.org/html/rfc5245#page-76)
+        ice_ufrag = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(4))
+        ice_pwd = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(22))
+        sdp_response += "a=ice-ufrag:" + str(ice_ufrag) + "\r\n"
+        sdp_response += "a=ice-pwd:" + str(ice_pwd) + "\r\n"
+
+        #Ummm naming each media?!?
+        sdp_response += "a=mid:sdparta_0\r\n"
         
         #Description of audio 101 / 109 profile?!?
-        sdp_response += "a=sendrecv\r\n"
-        sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
-        sdp_response += "a=fmtp:101 0-15\r\n"
-        sdp_response += "a=ice-pwd:c35411c63e8ab7603830d7f4760c6547\r\n"
-        sdp_response += "a=ice-ufrag:83315759\r\n"
-        sdp_response += "a=mid:sdparta_0\r\n"
-        sdp_response += "a=msid:{3778521f-c0cd-47a8-aa20-66c06fbf184e} {7d104cf0-8223-49bf-9ff4-6058cf92e1cf}\r\n"
-        sdp_response += "a=rtcp-mux\r\n"
-        sdp_response += "a=rtpmap:109 opus/48000/2\r\n"
-        sdp_response += "a=rtpmap:101 telephone-event/8000\r\n"
-        sdp_response += "a=setup:active\r\n"
-        sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
+        #sdp_response += "a=sendrecv\r\n"
+        #sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
+        #sdp_response += "a=fmtp:101 0-15\r\n"
+        #sdp_response += "a=msid:{3778521f-c0cd-47a8-aa20-66c06fbf184e} {7d104cf0-8223-49bf-9ff4-6058cf92e1cf}\r\n"
+        #sdp_response += "a=rtcp-mux\r\n"
+        #sdp_response += "a=rtpmap:109 opus/48000/2\r\n"
+        #sdp_response += "a=rtpmap:101 telephone-event/8000\r\n"
+
+        #sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
     
         return {"type":"answer","sdp": sdp_response}

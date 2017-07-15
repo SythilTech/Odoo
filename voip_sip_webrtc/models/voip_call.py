@@ -7,7 +7,16 @@ import threading
 _logger = logging.getLogger(__name__)
 import time
 from random import randint
-
+import hmac
+import hashlib
+from Crypto.Cipher import AES
+from Crypto import Random
+import Crypto.Util.Counter
+from OpenSSL import SSL
+from OpenSSL._util import (
+    ffi as _ffi,
+    lib as _lib)
+    
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp import api, fields, models
 
@@ -219,14 +228,25 @@ class VoipCall(models.Model):
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         serversocket.bind(('', port));
 
+
+        DTLSv1_METHOD = 7
+        SSL.Context._methods[DTLSv1_METHOD]=getattr(_lib, "DTLSv1_client_method")
+        ctx = SSL.Context(DTLSv1_METHOD)
+        ctx.set_cipher_list('AES128-SHA')
+
         start = time.time()
         
         while time.time() < start + message_bank_duration:
             data, addr = serversocket.recvfrom(2048)
 
             _logger.error("START RTP READ")
-            
+
             try:
+                #iv = "0000000000009001"
+                #ctr = Crypto.Util.Counter.new(128, initial_value=long(iv.encode("hex"), 16))
+                #aes = AES.new('GHRTYCFHUYNGUDRP', AES.MODE_CTR, counter=ctr)
+                #unenc_data = aes.decrypt(data)
+                
                 for rtp_char in data:
                     #_logger.error( ord(rtp_char) )
                     _logger.error( str(bin( ord(rtp_char) )[2:]).zfill(8) )
