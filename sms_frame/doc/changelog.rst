@@ -1,3 +1,7 @@
+v1.0.12
+======
+* MMS Fix
+
 v1.0.11
 ======
 * Just debug code
