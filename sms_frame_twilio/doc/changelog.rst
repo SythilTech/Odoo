@@ -1,3 +1,7 @@
+v1.1.1
+======
+* MMS Sending fix
+
 v1.1
 ====
 * MMS receiving support
