@@ -1,3 +1,7 @@
+v1.0.13
+======
+* MMS Fix number 2
+
 v1.0.12
 ======
 * MMS Fix
