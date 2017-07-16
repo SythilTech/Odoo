@@ -43,7 +43,7 @@ class SmsGatewayTwilio(models.Model):
             media_url = request.httprequest.host_url + "web/image/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
 	    
 	    #Force the creation of the new attachment before you make the request
-	    self.cr.commit() # all good, we commit
+	    self.env.cr.commit() # all good, we commit
             
         #send the sms/mms
         base_url = self.env['ir.config_parameter'].search([('key','=','web.base.url')])[0].value
