@@ -20,6 +20,7 @@ class SmsMessage(models.Model):
     direction = fields.Selection((("I","INBOUND"),("O","OUTBOUND")), string="Direction", readonly=True)
     message_date = fields.Datetime(string="Send/Receive Date", readonly=True, help="The date and time the sms is received or sent")
     media_id = fields.Binary(string="Media(MMS)")
+    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'sms.message')], string="MMS Attachments")
      
     @api.one
     @api.depends('to_mobile', 'model_id', 'record_id')
@@ -47,7 +48,7 @@ class SmsMessage(models.Model):
         #queue_limit = self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').args
         for queued_sms in self.env['sms.message'].search([('status_code','=','queued')], limit=queue_limit):
             gateway_model = queued_sms.account_id.account_gateway_id.gateway_model_name
-            my_sms = queued_sms.account_id.send_message(queued_sms.from_mobile, queued_sms.to_mobile, queued_sms.sms_content.encode('utf-8'), queued_sms.model_id.model, queued_sms.record_id, queued_sms.media_id)
+            my_sms = queued_sms.account_id.send_message(queued_sms.from_mobile, queued_sms.to_mobile, queued_sms.sms_content.encode('utf-8'), queued_sms.model_id.model, queued_sms.record_id, queued_sms.media_id, queued_sms_message=queued_sms)
 
             #Mark it as sent to avoid it being sent again
             queued_sms.status_code = my_sms.delivary_state

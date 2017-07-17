@@ -23,7 +23,7 @@ class SmsGatewayTwilio(models.Model):
     
     api_url = fields.Char(string='API URL')
     
-    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None):
+    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None):
         """Actual Sending of the sms"""
         sms_account = self.env['sms.account'].search([('id','=',sms_gateway_id)])
         
@@ -34,23 +34,31 @@ class SmsGatewayTwilio(models.Model):
         #format the to number before sending
         format_to = to_number
         if " " in format_to: format_to.replace(" ", "")        
+
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         
         media_url = ""
         #Create an attachment for the mms now since we need a url now
         if media:
+            _logger.error("Media")
             attachment_id = self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True})
-            media_url = request.httprequest.host_url + "web/image/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
+            media_url = base_url + "/web/image/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
 	    
 	    #Force the creation of the new attachment before you make the request
 	    self.env.cr.commit() # all good, we commit
             
         #send the sms/mms
-        base_url = self.env['ir.config_parameter'].search([('key','=','web.base.url')])[0].value
         payload = {'From': str(format_from), 'To': str(format_to), 'Body': sms_content.encode('utf-8'), 'StatusCallback': base_url + "/sms/twilio/receipt"}
+
+        if queued_sms_message:
+            for mms_attachment in queued_sms_message.attachment_ids:
+                #For now we only support a single MMS per message but that will change in future versions
+                payload['MediaUrl'] = base_url + "/web/image/" + str(mms_attachment.id) + "/media." + mms_attachment.mimetype.split("/")[1]            
 
         if media:
             payload['MediaUrl'] = media_url
             
+
         response_string = requests.post("https://api.twilio.com/2010-04-01/Accounts/" + str(sms_account.twilio_account_sid) + "/Messages", data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
 
         #Analyse the reponse string and determine if it sent successfully other wise return a human readable error message   

@@ -1,3 +1,7 @@
+v1.0.5
+======
+* MMS redesign to fix issue with multiple queued MMS messages
+
 v1.0.4
 ======
 * MMS sending support

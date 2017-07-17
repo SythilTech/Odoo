@@ -1,3 +1,7 @@
+v1.0.14
+======
+* MMS redesign to fix issue with multiple queued MMS messages
+
 v1.0.13
 ======
 * MMS Fix number 2
