@@ -2,16 +2,20 @@
 <openerp>
     <data>
                 
-        <act_window
-            id="act_send_sms_lead_menu"
-            name="SMS Lead"
-            res_model="sms.compose"
-            src_model="crm.lead"
-            view_mode="form" target="new" 
-            limit="1"
-            view_type="form"
-            context="{'default_field_id':'mobile','default_to_number':mobile, 'default_record_id':active_id,'default_model':active_model}"
-         />
+        <record id="sms_lead_more_menu_server_action" model="ir.actions.server">
+            <field name="name">SMS Lead</field>
+            <field name="model_id" ref="model_crm_lead"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">action = record.sms_action()</field>
+        </record>
+        
+        <record id="sms_lead_more_menu_client_action" model="ir.values">
+	    <field name="key2" eval="'client_action_multi'" />
+	    <field name="model" eval="'crm.lead'"/>
+	    <field name="name">SMS Lead</field>
+	    <field name="value" eval="'ir.actions.server,%d'%sms_lead_more_menu_server_action"/>
+        </record>
         
         <record id="view_lead_form_inherit_sms_frame" model="ir.ui.view">
             <field name="name">E.164 mobile placeholder (Lead)</field>
