@@ -1,3 +1,7 @@
+v1.8.10
+=======
+* Special "[ref]" default value to get previous URL
+
 v1.8.9
 ======
 * Pass submit data to submit actions
