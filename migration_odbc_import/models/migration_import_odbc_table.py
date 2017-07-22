@@ -5,6 +5,7 @@ import base64
 import logging
 _logger = logging.getLogger(__name__)
 from datetime import datetime
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 from openerp import api, tools, fields, models
 from odoo.exceptions import ValidationError, UserError
@@ -117,11 +118,18 @@ class MigrationImportOdbcTable(models.Model):
                 #Create a new record if the external ID does not exist
                 if self.env['ir.model.data'].xmlid_to_res_id('odbc_import.' + external_identifier) == False:
 
-                    #Go through all fields that we are importing and alter thier values
+                    #Go through each field and perform manual python transform operations
                     for import_field in self.env['migration.import.odbc.table.field'].search([('table_id','=', self.id), ('field_id','!=', False)]):
+
+                        #Remap the values to the Odoo ones
                         for alter_value in import_field.alter_value_ids:
-                            if merged_dict[import_field.field_id.name] == alter_value.old_value:
+                            if str(merged_dict[import_field.field_id.name]) == str(alter_value.old_value):
                                 merged_dict[import_field.field_id.name] = alter_value.new_value
+
+                        #Rearrange date to fit in with Odoo date
+                        if import_field.date_format:
+                            external_date = datetime.strptime(merged_dict[import_field.field_id.name], import_field.date_format)
+                            merged_dict[import_field.field_id.name] = external_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
                                 
                     new_rec = self.env[self.model_id.model].create(merged_dict)
                                         
@@ -223,6 +231,7 @@ class MigrationImportOdbcTableField(models.Model):
     orm_name = fields.Char(string="ORM Name")
     field_id = fields.Many2one('ir.model.fields', string="Field", help="The ORM field that the data get imported into")
     is_key = fields.Boolean(string="is Primary Key")
+    date_format = fields.Char(string="Date Format", help="Time format string of the import database e.g. '%Y-%m-%d'")    
     alter_value_ids = fields.One2many('migration.import.odbc.table.field.alter', 'field_id', string="Alter Values")
     valid = fields.Selection([('invalid','invalid'), ('valid','valid')], string="Valid")
             

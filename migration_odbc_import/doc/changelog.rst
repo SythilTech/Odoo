@@ -1,3 +1,7 @@
+v1.4
+====
+* Change date format during import
+
 v1.3
 ====
 * Fix issue with no _origin.id by removing onchange validation
