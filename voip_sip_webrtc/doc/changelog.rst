@@ -1,3 +1,7 @@
+v1.3
+====
+* Google Chrome support
+
 v1.2.8
 ======
 * Clean up over call, so new ones can start fresh

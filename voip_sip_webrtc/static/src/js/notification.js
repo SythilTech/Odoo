@@ -31,7 +31,8 @@ var call_type = ""
 var to_partner_id;
 var outgoing_ring_interval;
 var call_interval;
-
+var ice_candidate_queue = [];
+var got_remote_description = false;
 
 var VOIPItem = Widget.extend({
     template:'VoipSystemTray',
@@ -215,15 +216,24 @@ WebClient.include({
 							console.log("Create SDP Answer");
                             window.peerConnection.createAnswer().then(createdDescription).catch(errorHandler);
                         }
+
+                        got_remote_description = true;
+                        processIceQueue();
+
                     }).catch(errorHandler);
 
 				} else if(notification[0][1] === 'voip.ice') {
                     var ice = notification[1].ice;
 
-                    console.log("Got Remote ICE Candidate:");
-                    console.log(ice);
+                    console.log("Got Ice Candidate");
 
-					peerConnection.addIceCandidate(new RTCIceCandidate(ice)).catch(errorHandler);
+				    //Queue the ICE candidates that come before remote description is set
+					ice_candidate_queue.push(ice);
+
+                    if (got_remote_description) {
+                        processIceQueue();
+				    }
+
 				} else if(notification[0][1] === 'voip.end') {
                     console.log("Call End");
 
@@ -237,6 +247,8 @@ WebClient.include({
 					//Reset all counters so we can start fresh for the next call
 				    clearInterval(outgoing_ring_interval);
 				    clearInterval(call_interval);
+
+				    got_remote_description = false;
 
 				}
 
@@ -253,6 +265,18 @@ function errorHandler(error) {
     console.log(error);
 }
 
+function processIceQueue() {
+    console.log("Process Ice Queue");
+    for (var i = ice_candidate_queue.length - 1; i >= 0; i--) {
+        console.log("Add ICE Candidate:");
+        console.log(ice_candidate_queue[i]);
+
+		window.peerConnection.addIceCandidate(new RTCIceCandidate( ice_candidate_queue[i] )).catch(errorHandler);
+		ice_candidate_queue.splice(i, 1);
+    }
+
+}
+
 function getUserMediaSuccess(stream) {
     console.log("Got Media Access");
 
@@ -266,7 +290,8 @@ function getUserMediaSuccess(stream) {
 
     window.peerConnection = new RTCPeerConnection(peerConnectionConfig);
     window.peerConnection.onicecandidate = gotIceCandidate;
-    window.peerConnection.ontrack = gotRemoteStream;
+    //window.peerConnection.ontrack = gotRemoteStream;
+    window.peerConnection.onaddstream = gotRemoteStream;
     window.peerConnection.addStream(localStream);
 
     if (role == "caller") {
@@ -331,9 +356,9 @@ function gotIceCandidate(event) {
 }
 
 function gotRemoteStream(event) {
-    console.log("Got Remote Stream: " + event.streams[0].id);
-    remoteVideo.srcObject = event.streams[0];
-    remoteStream = event.streams[0];
+    console.log("Got Remote Stream: " + event.stream);
+    remoteVideo.srcObject = event.stream;
+    remoteStream = event.stream;
 
     var startDate = new Date();
 
