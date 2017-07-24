@@ -9,6 +9,7 @@ import random
 from random import randint
 import time
 import string
+import socket
 
 from odoo import api, fields, models, registry
 
@@ -86,7 +87,9 @@ class VoipVoip(models.Model):
     def generate_server_ice(self, port, component_id):
 
         ice_response = ""
-        ip = "10.0.0.24"
+        
+        #ip_addr = socket.gethostbyname(host)
+        ip = request.httprequest.host.split(":")[0]
         
         #See https://tools.ietf.org/html/rfc5245#section-4.1.2.1 (I don't make up these formulas...)
         priority = ((2 ^ 24) * 126) + ((2 ^ 8) * 65535)
@@ -121,10 +124,10 @@ class VoipVoip(models.Model):
         #In later versions we might send the missed call mp3 via rtp
         sdp_response += "a=sendrecv\r\n"
 
-        #No idea how I'm meant to generate my own fingerprint...
-        sdp_response += "a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:PS1uQCVeeCFCanVmcjkpPywjNWhcYD0mXXtxaVBR|2^20|1:32\r\n"
+        #TODO generate before call fingerprint...
         sdp_response += "a=fingerprint:sha-256 DA:52:67:C5:2A:2E:91:13:A2:7D:3A:E1:2E:A4:F3:28:90:67:71:0E:B7:6F:7B:56:79:F4:B2:D1:54:4B:92:7E\r\n"
-        sdp_response += "a=setup:actpass\r\n"
+        #sdp_response += "a=setup:actpass\r\n"
+        sdp_response += "a=setup:passive\r\n"
         #sdp_response += "a=setup:active\r\n"
         
         #Sure why not
@@ -133,7 +136,7 @@ class VoipVoip(models.Model):
         #Sigh no idea
         sdp_response += "a=msid-semantic:WMS *\r\n"
 
-        #Random stuff, so I don't have get it a second time if needed
+        #Random stuff, left here so I don't have get it a second time if needed
         #example supported audio profiles: 109 9 0 8 101
         #sdp_response += "m=audio 9 UDP/TLS/RTP/SAVPF 109 101\r\n"
                 

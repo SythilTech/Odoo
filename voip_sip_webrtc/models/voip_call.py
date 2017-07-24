@@ -192,7 +192,7 @@ class VoipCall(models.Model):
                 serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 serversocket.sendto(register_string, ('91.121.209.194', 5060) )
 
-                _logger.error("REHISTER: " + register_string)
+                _logger.error("REGISTER: " + register_string)
 
                 #reply = ""
                 #reply += "INVITE sip:" + to_sip + " SIP/2.0\r\n"
@@ -223,44 +223,55 @@ class VoipCall(models.Model):
                 notification = {'call_id': self.id, 'ice': ice }
                 self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', voip_client.partner_id.id), notification)        
 
+    def close_message_bank(self):
+        
+        #Notify the caller that the call is ended due to message bank timeout
+        notification = {'call_id': self.id}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.end', self.from_partner_id.id), notification)
+        
+        #TODO trancode G722 to a format that can be listened to within a browser
+        
+        #TODO save the transcoded file to the call so it can be listened to later (Only keep for 48 hours to save space also legal requirements in some places)
+        
+
     def rtp_server_listener(self, port, message_bank_duration):
+        
+        
+        #First Message we get is from STUN (Binding Request)
+        
+        #Second is DTLSv1.2 or more specifically dtls-strp
+        
+        #3rd is the stream with the G722 Audio payload        
+        
         _logger.error("Start RTP Listening on Port " + str(port) )
+                        
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         serversocket.bind(('', port));
-
-
-        DTLSv1_METHOD = 7
-        SSL.Context._methods[DTLSv1_METHOD]=getattr(_lib, "DTLSv1_client_method")
-        ctx = SSL.Context(DTLSv1_METHOD)
-        ctx.set_cipher_list('AES128-SHA')
 
         start = time.time()
         
         while time.time() < start + message_bank_duration:
             data, addr = serversocket.recvfrom(2048)
 
-            _logger.error("START RTP READ")
+            hex_string = ""
 
-            try:
-                #iv = "0000000000009001"
-                #ctr = Crypto.Util.Counter.new(128, initial_value=long(iv.encode("hex"), 16))
-                #aes = AES.new('GHRTYCFHUYNGUDRP', AES.MODE_CTR, counter=ctr)
-                #unenc_data = aes.decrypt(data)
-                
+            try:             
                 for rtp_char in data:
                     #_logger.error( ord(rtp_char) )
-                    _logger.error( str(bin( ord(rtp_char) )[2:]).zfill(8) )
+                    #_logger.error( str(bin( ord(rtp_char) )[2:]).zfill(8) )
+                    hex_string += hex(ord(rtp_char)) + " "
             except Exception as e:
-                _logger.error(e)                
+                _logger.error(e)
+                
+            _logger.error("RTP DATA: " + hex_string)
 
+        
         with api.Environment.manage():
             # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
 
-            #Notify both caller that the call is ended
-            notification = {'call_id': self.id}
-            self.env['bus.bus'].sendone((self._cr.dbname, 'voip.end', self.from_partner_id.id), notification)
+            self.close_message_bank()
 
             #Have to manually commit the new cursor?
             self.env.cr.commit()
@@ -268,20 +279,7 @@ class VoipCall(models.Model):
             self._cr.close()
 
         _logger.error("END MESSAGE BANK")
-    
-    def rtcp_server_listener(self, port):
-        _logger.error("Start RTCP Listening on Port " + str(port) )
-        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serversocket.bind(('', port));
-
-        rtc_listening = True
-        while rtc_listening:
-            data, addr = serversocket.recvfrom(2048)
-
-            _logger.error("RTCP: " + data)
-
-            rtc_listening = False
-            
+                
     def start_rtc_listener(self, port, mode):
     
         message_bank_duration = self.env['ir.values'].get_default('voip.settings', 'message_bank_duration')
@@ -292,7 +290,7 @@ class VoipCall(models.Model):
             rtc_listener_starter.start()
         #elif mode is "RTCP":
         #    For now we don't use RTCP...
-        #    rtc_listener_starter = threading.Thread(target=self.rtcp_server_listener, args=(port,))
+        #    rtc_listener_starter = threading.Thread(target=self.rtcp_server_listener, args=(port,message_bank_duration,))
         #    rtc_listener_starter.start()
  
 class VoipCallClient(models.Model):
