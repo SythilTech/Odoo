@@ -24,7 +24,8 @@ var secondsLeft;
 var callSeconds;
 var call_id = "";
 var myNotif = "";
-var outgoingNotification
+var incomingNotification;
+var outgoingNotification;
 var role;
 var mode = false;
 var call_type = ""
@@ -166,7 +167,7 @@ WebClient.include({
 
                         countdown = notification[1].ring_duration;
 
-                        var incomingNotification = new VoipCallIncomingNotification(self.notification_manager, "Incoming Call", notif_text, call_id);
+                        incomingNotification = new VoipCallIncomingNotification(self.notification_manager, "Incoming Call", notif_text, call_id);
 	                    self.notification_manager.display(incomingNotification);
 	                    mySound = new Audio(ringtone);
 	                    mySound.loop = true;
@@ -238,15 +239,32 @@ WebClient.include({
                     console.log("Call End");
 
                     //Stop all audio / video tracks
-                    localStream.getTracks().forEach(track => track.stop());
-                    remoteStream.getTracks().forEach(track => track.stop());
+                    if (localStream) {
+                        localStream.getTracks().forEach(track => track.stop());
+				    }
+
+                    if (remoteStream) {
+                        remoteStream.getTracks().forEach(track => track.stop());
+				    }
+
+					//Destroy the notifcation and stop the countdown because the call was accepted or rejected, no need to wait until timeout
+					if (typeof outgoingNotification !== "undefined") {
+						clearInterval(outgoing_ring_interval);
+					    outgoingNotification.destroy(true);
+					}
+
+					if (typeof incomingNotification !== "undefined") {
+				        clearInterval(call_interval);
+				        incomingNotification.destroy(true);
+
+                        mySound.pause();
+                        mySound.currentTime = 0;
+					}
 
                     $("#voip_text").html("Starting Call...");
                     $(".s-voip-manager").css("opacity","0");
 
-					//Reset all counters so we can start fresh for the next call
-				    clearInterval(outgoing_ring_interval);
-				    clearInterval(call_interval);
+
 
 				    got_remote_description = false;
 

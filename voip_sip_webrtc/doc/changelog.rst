@@ -1,3 +1,7 @@
+v1.3.1
+======
+* Allow caller to end call before callee accepts / rejects call
+
 v1.3
 ====
 * Google Chrome support

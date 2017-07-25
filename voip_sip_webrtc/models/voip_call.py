@@ -82,10 +82,10 @@ class VoipCall(models.Model):
         
         if self.status == "active":
             self.status = "over"
-
-        self.end_time = datetime.datetime.now()
-        diff_time = datetime.datetime.strptime(self.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(self.start_time, DEFAULT_SERVER_DATETIME_FORMAT)
-        self.duration = str(diff_time.seconds) + " Seconds"
+            
+            self.end_time = datetime.datetime.now()
+            diff_time = datetime.datetime.strptime(self.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(self.start_time, DEFAULT_SERVER_DATETIME_FORMAT)
+            self.duration = str(diff_time.seconds) + " Seconds"
 
         #Notify both caller and callee that the call is ended
         for voip_client in self.client_ids:
