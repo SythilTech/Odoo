@@ -233,7 +233,53 @@ class VoipCall(models.Model):
         
         #TODO save the transcoded file to the call so it can be listened to later (Only keep for 48 hours to save space also legal requirements in some places)
         
+    def rtp_stun_listener(self, d):
 
+        send_data = ""
+
+        if d[1] == "00" and d[2] == "01":
+            message_type = "Binding Request"
+            
+        
+        message_length = int( d[3] + d[4], 16)
+        message_cookie = d[5] + d[6] + d[7] + d[8]
+        transaction_id = d[9] + d[10] + d[11] + d[12] + d[13] + d[14] + d[15] + d[16] + d[17] + d[18] + d[19] + d[20]
+
+
+        #----Compose binding request-----
+        #Message Type (Binding Success Response)
+        send_data += "01 01"
+
+        #Message Length (need to calculate)
+        send_data += "00 0c"
+
+        #Magic Cookie (always set to 0x2112A442)
+        send_data += "21 12 a4 42"
+
+        #96 bit (12 byte) transaction ID (has to be the same as the bind request)
+        send_data += transaction_id
+        
+        #XOR mapped address
+        send_data += "00 20"
+
+        #Attribute Length (need to calculate...)
+        send_data += "00 08"
+
+        #Reservered (reserved for what...)
+        send_data += "00"
+
+        #Protocol Family (Always IPv4 for now...)
+        send_data += "01"
+        
+        #Port (Need to figure this one out...)
+        send_data += "f5 43"
+        
+        #IP XOR-d (Figure this out too...)
+        send_data += "a8 81 29 f7"
+
+        #Ok now convert it back so we can send it
+        return send_data.replace(" ","").decode('hex')
+    
     def rtp_server_listener(self, port, message_bank_duration):
         
         
@@ -249,23 +295,31 @@ class VoipCall(models.Model):
         serversocket.bind(('', port));
 
         start = time.time()
+        stage = "STUN"
+        hex_string = ""
+        
+        #Code is easier to understand if we start at 1 rather then 0...
+        hex_data = ['FF']
         
         while time.time() < start + message_bank_duration:
             data, addr = serversocket.recvfrom(2048)
 
-            hex_string = ""
+            #Convert to hex so we can human interpret each byte
+            for rtp_char in data:
+                hex_format = "{0:02x}".format(ord(rtp_char))
+                hex_data.append(hex_format)            
+                hex_string += hex_format + " "
 
-            try:             
-                for rtp_char in data:
-                    #_logger.error( ord(rtp_char) )
-                    #_logger.error( str(bin( ord(rtp_char) )[2:]).zfill(8) )
-                    hex_string += hex(ord(rtp_char)) + " "
-            except Exception as e:
-                _logger.error(e)
+            #_logger.error("RAW DATA: " + data)
+            _logger.error("HEX DATA: " + hex_string)
+            
+            if stage is "STUN":
+                send_data = self.rtp_stun_listener(hex_data)
+                _logger.error("SEND DATA: " + send_data)
+                serversocket.sendto(send_data, addr )
                 
-            _logger.error("RTP DATA: " + hex_string)
-
         
+        #End the call and do any post call processing
         with api.Environment.manage():
             # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
