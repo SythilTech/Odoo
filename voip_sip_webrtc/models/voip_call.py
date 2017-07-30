@@ -9,6 +9,7 @@ import time
 from random import randint
 import hmac
 import hashlib
+import struct
 from Crypto.Cipher import AES
 from Crypto import Random
 import Crypto.Util.Counter
@@ -233,50 +234,53 @@ class VoipCall(models.Model):
         
         #TODO save the transcoded file to the call so it can be listened to later (Only keep for 48 hours to save space also legal requirements in some places)
         
-    def rtp_stun_listener(self, d):
-
-        send_data = ""
+    def rtp_stun_listener(self, d, addr):
 
         if d[1] == "00" and d[2] == "01":
             message_type = "Binding Request"
-            
-        
+                
         message_length = int( d[3] + d[4], 16)
-        message_cookie = d[5] + d[6] + d[7] + d[8]
-        transaction_id = d[9] + d[10] + d[11] + d[12] + d[13] + d[14] + d[15] + d[16] + d[17] + d[18] + d[19] + d[20]
-
+        message_cookie = ' '.join(d[5:9])
+        transaction_id = ' '.join(d[9:21])
 
         #----Compose binding request-----
+        send_data = ""
+        
         #Message Type (Binding Success Response)
         send_data += "01 01"
 
-        #Message Length (need to calculate)
-        send_data += "00 0c"
+        #Message Length (a static 12 only because our output is mostly fixed)
+        send_data += " 00 0c"
 
         #Magic Cookie (always set to 0x2112A442)
-        send_data += "21 12 a4 42"
+        send_data += " 21 12 a4 42"
 
         #96 bit (12 byte) transaction ID (has to be the same as the bind request)
         send_data += transaction_id
         
-        #XOR mapped address
-        send_data += "00 20"
+        #XOR mapped address attribute
+        send_data += " 00 20"
 
-        #Attribute Length (need to calculate...)
-        send_data += "00 08"
+        #Attribute Length (1+1+2+4=8, for now this is static but that will change with additional attributes or ipv6 (20) )
+        send_data += " 00 08"
 
         #Reservered (reserved for what...)
-        send_data += "00"
+        send_data += " 00"
 
         #Protocol Family (Always IPv4 for now...)
-        send_data += "01"
+        send_data += " 01"
         
-        #Port (Need to figure this one out...)
-        send_data += "f5 43"
+        #Port XOR (Need to figure this one out...)
+        client_port = addr[1]
+        send_data += " " + format( client_port ^ 0x2112 , '04x')
         
         #IP XOR-d (Figure this out too...)
-        send_data += "a8 81 29 f7"
-
+        #server_ip = addr[0]
+        server_ip = "10.0.0.24"
+        server_ip_int = struct.unpack("!I", socket.inet_aton(server_ip))[0]
+        send_data += " " + format( server_ip_int ^ 0x2112A442 , '08x')
+        _logger.error(send_data)
+       
         #Ok now convert it back so we can send it
         return send_data.replace(" ","").decode('hex')
     
@@ -298,6 +302,7 @@ class VoipCall(models.Model):
         stage = "STUN"
         hex_string = ""
         
+        
         #Code is easier to understand if we start at 1 rather then 0...
         hex_data = ['FF']
         
@@ -307,17 +312,15 @@ class VoipCall(models.Model):
             #Convert to hex so we can human interpret each byte
             for rtp_char in data:
                 hex_format = "{0:02x}".format(ord(rtp_char))
-                hex_data.append(hex_format)            
+                hex_data.append(hex_format)
                 hex_string += hex_format + " "
-
-            #_logger.error("RAW DATA: " + data)
-            _logger.error("HEX DATA: " + hex_string)
+ 
+            _logger.error(addr)
+            _logger.error("HEX DATA: " + hex_string)            
             
             if stage is "STUN":
-                send_data = self.rtp_stun_listener(hex_data)
-                _logger.error("SEND DATA: " + send_data)
-                serversocket.sendto(send_data, addr )
-                
+                send_data = self.rtp_stun_listener(hex_data, addr)
+                serversocket.sendto(send_data, addr )                
         
         #End the call and do any post call processing
         with api.Environment.manage():
