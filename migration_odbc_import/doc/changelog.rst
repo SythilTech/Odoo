@@ -1,3 +1,7 @@
+v1.4.2
+======
+* Boolean validation and auto remapping
+
 v1.4.1
 ======
 * Auto remap for selection fields

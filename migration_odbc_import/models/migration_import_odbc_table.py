@@ -126,6 +126,10 @@ class MigrationImportOdbcTable(models.Model):
                             if str(merged_dict[import_field.field_id.name]) == str(alter_value.old_value):
                                 merged_dict[import_field.field_id.name] = alter_value.new_value
 
+                        #So 0 is interperted as False
+                        if import_field.field_id.ttype == "boolean":
+                            merged_dict[import_field.field_id.name] = int(merged_dict[import_field.field_id.name])
+
                         #Rearrange date to fit in with Odoo date
                         if import_field.date_format:
                             external_date = datetime.strptime(merged_dict[import_field.field_id.name], import_field.date_format)
@@ -340,6 +344,16 @@ class MigrationImportOdbcTableField(models.Model):
 
                         if remap_found == False:
                             self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
+        elif self.field_id.ttype == "boolean":
+
+            columns = [column[0] for column in odbc_cursor.description]
+
+            for row in odbc_cursor.fetchall():
+                #Convert to dictionary
+                row_dict = dict(zip(columns, row))
+
+                if row_dict['dis_value'] != "0" and row_dict['dis_value'] != "1":
+                    self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
         
     def check_valid(self):
         """ Called after a person has remapped all the values """
@@ -373,6 +387,39 @@ class MigrationImportOdbcTableField(models.Model):
             row_count = odbc_cursor.fetchone()[0]
             if row_count > 0:
                 valid = "invalid"
+
+        return valid
+
+    def _validate_boolean(self, odbc_cursor):
+        """ Only 2 possible valid values 0 or 1 """
+
+        #Valid until proven otherwise
+        valid = "valid"
+
+        #Get all distinct values and compare them to the internal values in the selection field
+        odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+
+        columns = [column[0] for column in odbc_cursor.description]
+
+        for row in odbc_cursor.fetchall():
+            #Convert to dictionary
+            row_dict = dict(zip(columns, row))
+
+            remap_valid = False
+            
+            if row_dict['dis_value'] == "0" or row_dict['dis_value'] == "1":
+                remap_valid = True
+
+            #Invalid if a remap is not 0 or 1
+            remap_values = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id)])
+            for remap_value in remap_values:
+                if remap_value.new_value == "0" or remap_value.new_value == "1":
+                    remap_valid = True
+            
+            #Invalid if even as single distinct value is not correctly mapped
+            if remap_valid == False:
+                valid = "invalid"
+                break
 
         return valid
         
