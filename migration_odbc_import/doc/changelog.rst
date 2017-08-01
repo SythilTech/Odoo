@@ -1,3 +1,8 @@
+v1.4.1
+======
+* Auto remap for selection fields
+* Take selection remap into consideration for valid check
+
 v1.4
 ====
 * Change date format during import

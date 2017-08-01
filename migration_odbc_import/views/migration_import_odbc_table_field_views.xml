@@ -8,8 +8,10 @@
             <form>
                 <header>
                     <button type="object" name="check_valid" string="Check Valid"/>
+                    <button type="object" name="auto_value_map" string="Auto Value Map"/>
                 </header>
       	        <group>
+      	            <field name="table_id"/>
       	            <field name="name"/>
       	            <field name="orm_type" invisible="True"/>
       	            <field name="orm_name" invisible="True"/>

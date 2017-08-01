@@ -27,7 +27,9 @@
         <template id="list_revisions" name="List the revisions of the file">
             <h1><t t-esc="user_file.file_name"/></h1>
             <t t-foreach="user_file.revision_ids" t-as="revision">
-                <t t-esc="revision.create_date"/> - <a t-attf-href="/backup/client/machines/#{user_file.bc_id.id}/#{user_file.id}/#{revision.id}">Download</a><br/>
+                <t t-esc="revision.create_date"/> - <a t-attf-href="/backup/client/machines/#{user_file.bc_id.id}/#{user_file.id}/#{revision.id}">Download</a>
+                - <a target="_blank" t-attf-href="/backup/client/machines/#{user_file.bc_id.id}/#{user_file.id}/#{revision.id}/diff">Difference</a>
+                <br/>
             </t>
         </template>
 

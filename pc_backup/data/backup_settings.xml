@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    
+        <function id="default_backup_mode"
+            model="ir.values" name="set_default"
+            eval="('backup.settings', 'backup_mode', 'full')"/>
+
+        <function id="default_odoo_backup_days"
+            model="ir.values" name="set_default"
+            eval="('backup.settings', 'odoo_backup_days', 7)"/>
+    
+    </data>     
+</odoo>

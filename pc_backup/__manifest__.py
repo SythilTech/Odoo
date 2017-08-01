@@ -1,6 +1,6 @@
 {
     'name': "PC Backup (BETA)",
-    'version': "0.3.2",
+    'version': "0.3.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -10,12 +10,14 @@
     'data': [
         'data/res.groups.csv',
         'data/ir.cron.csv',
+        'data/backup_settings.xml',
         'security/ir.model.access.csv',
         'views/res_users_views.xml',
         'views/backup_computer_views.xml',
         'views/backup_computer_file_views.xml',
         'views/backup_odoo_views.xml',
         'views/pc_backup_templates.xml',
+        'views/backup_settings_views.xml',
     ],
     'demo': [],
     'depends': ['web'],

@@ -17,8 +17,24 @@ class BackupComputer(models.Model):
     computer_identifier = fields.Char(string="Computer Identifier", help="Unique code for the PC, different computer means different backup archive for the user")
     computer_name = fields.Char(string="Computer Name", help="Display Purposes only, a user can restore files from any of thier computers")
     backup_file_ids = fields.One2many('backup.computer.file', 'bc_id', string="Backup Files")
-    backup_type = fields.Selection([('full','Full Backup')], string="Backup Type", default="full")
+    backup_type = fields.Selection([('full','Full Backup'), ('incremental','Incremental')], string="Backup Type", default="full")
 
+    @api.model
+    def backup_cleanup(self):
+        
+        odoo_backup_dyas = request.env['ir.values'].get_default('backup.settings', 'odoo_backup_dyas')
+        
+        #Remove Odoo Database Backups
+        for backup in self.env['backup.odoo'].sudo().search([]):
+            if backup.create_date < (datetime.datetime.now() - datetime.timedelta(days=odoo_backup_dyas) ).strftime("%Y-%m-%d %H:%M:%S"):
+                backup.unlink()
+
+        #Remove Old File Revisions
+        #for backup in self.env['backup.computer.file.revision'].sudo().search([]):
+        #    if backup.create_date < (datetime.datetime.now() - datetime.timedelta(days=backup_days_to_keep) ).strftime("%Y-%m-%d %H:%M:%S"):
+        #        backup.unlink()
+
+                
 class BackupComputerChange(models.Model):
 
     _name = "backup.computer.change"
@@ -52,4 +68,5 @@ class BackupComputerFileRevision(models.Model):
     backup_data_filename = fields.Char(string="Backup Data Filename", related="bcf_id.file_name")
     change_id = fields.Many2one('backup.computer.change', string="Backup Change")
     md5_hash = fields.Char(string="MD5 Hash")
+    backup_mode = fields.Selection([('full','Full Backup'), ('incremental','Incremental')], string="Backup Mode")
     type = fields.Selection([('creation','Creation'),('change','Change'),('deletion','Deletion') ] , string="Type", default="creation")

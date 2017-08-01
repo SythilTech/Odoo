@@ -10,10 +10,10 @@ import string
 import random
 import ntpath
 import hashlib
-
+import os.path
 import openerp.http as http
 from openerp.http import request
-
+import difflib
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -129,6 +129,32 @@ class BackupController(http.Controller):
         else:
             return "Not your File!!!"
 
+    @http.route('/backup/client/machines/<machine_id>/<file_id>/<revision_id>/diff', type="http", auth="user")
+    def backup_client_machines_revision_diff(self, machine_id, file_id, revision_id, **kw):
+        """Difference between this and the previous file revision"""
+        user_revision = request.env['backup.computer.file.revision'].browse( int(revision_id) )
+        
+        #Check if the file is owned by the user
+        if user_revision.bcf_id.bc_id.user_id.id == request.env.user.id:
+
+            previous_revision = request.env['backup.computer.file.revision'].search([('bcf_id','=', user_revision.bcf_id.id ), ('create_date','<', user_revision.create_date)], order="create_date desc", limit=1)[0]
+            previous_data = base64.b64decode(previous_revision.backup_data).strip().splitlines()
+            current_data = base64.b64decode(user_revision.backup_data).strip().splitlines()
+            diff_text = ""
+            diff_counter = 0
+            
+            for line in difflib.unified_diff(previous_data, current_data, fromfile='file1', tofile='file2'):
+                
+                if diff_counter >= 3:
+                    diff_text += line + "<br/>\n"
+                
+                diff_counter += 1
+    
+            return diff_text
+
+        else:
+            return "Not your File!!!"
+
     @http.route('/backup/client/register/change', type='http', auth="public", methods=['GET'], csrf=False)        
     def backup_client_register_change(self, key, computer_username, computer_name):
         backup_user = request.env['res.users'].sudo().search([('backup_key', '=', key)])[0]
@@ -136,7 +162,7 @@ class BackupController(http.Controller):
         
         if len(computer_backup) == 0:
             #This computer has not been backed up before so add it to the list
-            computer_backup = request.env['backup.computer'].sudo().create({'user_id': backup_user.id, 'username':computer_username, 'computer_name': computer_name })
+            computer_backup = request.env['backup.computer'].sudo().create({'user_id': backup_user.id, 'username':computer_username, 'computer_name': computer_name})
         elif len(computer_backup) == 1:
             computer_backup = computer_backup[0]
         
@@ -166,10 +192,14 @@ class BackupController(http.Controller):
                 last_revision = request.env['backup.computer.file.revision'].sudo().search([('bcf_id', '=', backup_file.id)], order="create_date desc", limit=1)
 
                 if md5_hash != last_revision.md5_hash: 
-                    #The file has changed so create a new revision
-                    backup_file_revision = request.env['backup.computer.file.revision'].sudo().create({'change_id': backup_change.id, 'bcf_id': backup_file.id, 'backup_data': encoded_string, 'md5_hash': md5_hash})
 
+                    #The file has changed so create a new revision
+                    backup_mode = request.env['ir.values'].get_default('backup.settings', 'backup_mode')
+                    backup_file_revision = request.env['backup.computer.file.revision'].sudo().create({'change_id': backup_change.id, 'bcf_id': backup_file.id, 'backup_data': encoded_string, 'md5_hash': md5_hash, 'backup_mode': 'full', 'diff_text': diff_text})
                     backup_change.changed_files += 1
+                    
+
+                    
                 
                     return str(backup_file_revision.id)
                 else:

@@ -1,3 +1,8 @@
+v0.3.3
+======
+* Days to keep Odoo database backup setting
+* View file differences from restore section
+
 v0.3.2
 ======
 * Changed client to vb.net so it could have a windows user interface

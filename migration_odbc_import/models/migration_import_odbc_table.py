@@ -289,7 +289,7 @@ class MigrationImportOdbcTableField(models.Model):
             'view_mode': 'form',
             'res_model': self._name,
             'res_id': self.id,
-            'target': 'new',
+            #'target': 'new',
         }
 
     @api.multi
@@ -304,6 +304,42 @@ class MigrationImportOdbcTableField(models.Model):
             'context': {'default_import_id': self.table_id.import_id.id, 'default_table1': self.table_id.id, 'default_table1_id_field': self.id},
             'target': 'new',
         }
+
+    def auto_value_map(self):
+
+        conn = pyodbc.connect(self.table_id.import_id.connection_string)
+        odbc_cursor = conn.cursor()
+        
+        #Get all distinct values and compare them to the internal values in the field
+        odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+        
+        if self.field_id.ttype == "selection":
+
+            columns = [column[0] for column in odbc_cursor.description]
+            selection_list = dict(self.env[self.model_id.model]._fields[self.field_id.name].selection)
+
+            for row in odbc_cursor.fetchall():
+                #Convert to dictionary
+                row_dict = dict(zip(columns, row))
+            
+            
+                #Only add new remaps that do not directly align
+                if str(row_dict['dis_value']) not in selection_list.keys():
+
+                    existing_remap_value = self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )])
+                    if existing_remap_value == 0:
+                        remap_found = False
+                        
+                        #Remap display name to internal selection name
+                        for key in selection_list.keys():
+                            value = dict(self.env[self.table_id.model_id.model].fields_get(allfields=[self.field_id.name])[self.field_id.name]['selection'])[key]
+                            if str(value) == str(row_dict['dis_value']):
+                                self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': key})
+                                remap_found = True
+                                break
+
+                        if remap_found == False:
+                            self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
         
     def check_valid(self):
         """ Called after a person has remapped all the values """
@@ -355,15 +391,22 @@ class MigrationImportOdbcTableField(models.Model):
         for row in odbc_cursor.fetchall():
             #Convert to dictionary
             row_dict = dict(zip(columns, row))
-            _logger.error(self.id)
-            remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )])
 
-            if not(str(row_dict['dis_value']) in selection_list.keys() or remap_value.new_value in selection_list.keys()):
-                valid = "invalid"
+            remap_valid = False
+
+            #Check if distinct values match selection internal values
+            if str(row_dict['dis_value']) in selection_list.keys():
+                remap_valid = True
                 
-                #Don't reaad the same value
-                if remap_value == False:
-                    self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
+            #If a direct map is not possible check if there is a valid remap
+            remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',str(row_dict['dis_value']))], limit=1)
+            if str(remap_value.new_value) in selection_list.keys():
+                remap_valid = True
+                
+            #Invalid if even as single distinct value is not correctly mapped
+            if remap_valid == False:
+                valid = "invalid"
+                break
 
         return valid
 
