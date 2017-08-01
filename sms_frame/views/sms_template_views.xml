@@ -16,6 +16,7 @@
                                 <field name="from_mobile"/>
                                 <field name="sms_to"/>
                                 <field name="media_id"/>
+                                <!--<field name="media_ids"/>-->
                             </group>
                         </div>
                         <notebook>
@@ -51,7 +52,7 @@
       </record>
 
       <record id="sms_template_action" model="ir.actions.act_window">
-          <field name="name">sms.template.action</field>
+          <field name="name">SMS/MMS Templates</field>
           <field name="res_model">sms.template</field>
           <field name="view_type">form</field>
           <field name="view_mode">tree,form</field>

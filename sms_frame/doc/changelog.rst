@@ -1,3 +1,7 @@
+v1.0.15
+======
+* Send MMS during automated action
+
 v1.0.14
 ======
 * MMS redesign to fix issue with multiple queued MMS messages

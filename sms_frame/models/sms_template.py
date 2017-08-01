@@ -71,7 +71,8 @@ class SmsTemplate(models.Model):
     from_mobile_verified_id = fields.Many2one('sms.number', string="From Mobile (stored)")
     from_mobile = fields.Char(string="From Mobile", help="Placeholders are allowed here")
     media_id = fields.Binary(string="Media(MMS)")
-        
+    media_ids = fields.Many2many('ir.attachment', string="Media(MMS)[Automated Actions Only]")
+    
     @api.onchange('model_object_field_id')
     def _onchange_model_object_field_id(self):
         if self.model_object_field_id.relation:
@@ -103,7 +104,9 @@ class SmsTemplate(models.Model):
          
         gateway_model = my_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
         
-	my_sms = self.env[gateway_model].send_message(my_template.from_mobile_verified_id.account_id.id, my_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id)
+	my_sms = self.env[gateway_model].send_message(my_template.from_mobile_verified_id.account_id.id, my_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id, my_template.media_id)
+
+	self.env['sms.message'].create({'record_id': record_id,'model_id': my_template.model_id.id, 'account_id': my_template.from_mobile_verified_id.account_id.id, 'from_mobile': my_template.from_mobile, 'to_mobile': rendered_sms_to, 'sms_content': sms_rendered_content, 'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id})
 	
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``
