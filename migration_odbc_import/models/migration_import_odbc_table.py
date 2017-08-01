@@ -330,6 +330,7 @@ class MigrationImportOdbcTableField(models.Model):
 
                         if remap_found == False:
                             self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
+                            
         elif self.field_id.ttype == "boolean":
 
             columns = [column[0] for column in odbc_cursor.description]
@@ -340,7 +341,29 @@ class MigrationImportOdbcTableField(models.Model):
 
                 if row_dict['dis_value'] != "0" and row_dict['dis_value'] != "1":
                     self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
-        
+
+        elif self.field_id.ttype == "many2one":
+
+            columns = [column[0] for column in odbc_cursor.description]
+
+            for row in odbc_cursor.fetchall():
+
+                #Convert to dictionary
+                row_dict = dict(zip(columns, row))
+
+                existing_remap_value = self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )])
+                        
+                if existing_remap_value == 0:
+                    for rec in self.env[self.field_id.relation].search([]):
+                        if rec.name_get()[0][1] == str(row_dict['dis_value']):
+
+                            if existing_remap_value == 0:
+                                self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': rec.id})
+                                break
+                
+                    #Record was not found so create placeholder
+                    self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})                
+                
     def check_valid(self):
         """ Called after a person has remapped all the values """
         conn = pyodbc.connect(self.table_id.import_id.connection_string)
@@ -360,20 +383,12 @@ class MigrationImportOdbcTableField(models.Model):
         else:
             self.valid = action(odbc_cursor)
 
-    def _validate_char(self, odbc_cursor):
-        """ char is super flexable so we only need to validate the length """
+    def _validate_binary(self, odbc_cursor):
+        """ Does it look like a base64 string  """
 
-        #Valid until proven otherwise
-        valid = "valid"
+        #Just assume it's valid since actually checking would be time consuming and inaccurate anyway...
+        valid = ""
         
-        if self.field_id.size > 0:
-            #Get any values that exceed the length of the field
-            odbc_cursor.execute("SELECT COUNT(" + self.name + ") FROM " + self.table_id.name + " WHERE LENGTH(" + self.name + ") > " + str(self.field_id.size) )
-
-            row_count = odbc_cursor.fetchone()[0]
-            if row_count > 0:
-                valid = "invalid"
-
         return valid
 
     def _validate_boolean(self, odbc_cursor):
@@ -407,6 +422,36 @@ class MigrationImportOdbcTableField(models.Model):
                 valid = "invalid"
                 break
 
+        return valid
+
+    def _validate_char(self, odbc_cursor):
+        """ char is super flexable so we only need to validate the length """
+
+        #Valid until proven otherwise
+        valid = "valid"
+        
+        if self.field_id.size > 0:
+            #Get any values that exceed the length of the field
+            odbc_cursor.execute("SELECT COUNT(" + self.name + ") FROM " + self.table_id.name + " WHERE LENGTH(" + self.name + ") > " + str(self.field_id.size) )
+
+            row_count = odbc_cursor.fetchone()[0]
+            if row_count > 0:
+                valid = "invalid"
+
+        return valid
+
+    def _validate_date(self, odbc_cursor):
+        """ Does it match Odoo time format or the remap date format"""
+
+        valid = ""
+        
+        return valid
+
+    def _validate_datetime(self, odbc_cursor):
+        """ Does it match Odoo time format or the remap datetime format"""
+
+        valid = ""
+        
         return valid
         
     def _validate_selection(self, odbc_cursor):
@@ -479,18 +524,13 @@ class MigrationImportOdbcTableField(models.Model):
             #Convert to dictionary
             row_dict = dict(zip(columns, row))            
             
-            #We have to loop through each record to get the name
-            for rec in self.env[self.field_id.relation].search([]):
-                if rec.name_get()[0][1] == str(row_dict['dis_value']):   
-                    #The value maps just fine so we don't need to alter it
-                    #Don't readd the same value
-                    if self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )]) == 0:
-                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': rec.id })
-                else:
-                    #Don't readd the same value
-                    if self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )]) == 0:
-                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
-                       
+            remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',str(row_dict['dis_value']))], limit=1)
+            if len(remap_value) == 0:
+                #All distinct values MUST be remapped to a record id
+                valid = "invalid"
+            else:
+                #The record id in remap must be a valid id
+                if self.env[self.field_id.relation].search_count([('id','=', int(remap_value.new_value) )]) != 1:
                     valid = "invalid"
 
         return valid

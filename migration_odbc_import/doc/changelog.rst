@@ -1,3 +1,7 @@
+v1.4.4
+======
+* Many2one auto remapping and validation taking into account remapping
+
 v1.4.3
 ======
 * Set limit on import per batch so large dataset can be imported 100 records at a time rather then clogging the system for hours
