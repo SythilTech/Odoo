@@ -16,6 +16,7 @@
       	        </header>
       	        <group>
       	            <field name="name"/>
+      	            <field name="batch_import_limit"/>
                     <field name="connection_string_template"/>
                     <field name="dsn_id"/>
                     <field name="storage" invisible="1"/>

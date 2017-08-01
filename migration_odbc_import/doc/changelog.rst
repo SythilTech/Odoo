@@ -1,3 +1,8 @@
+v1.4.3
+======
+* Set limit on import per batch so large dataset can be imported 100 records at a time rather then clogging the system for hours
+* Import files now occurs the same time as importing other data
+
 v1.4.2
 ======
 * Boolean validation and auto remapping

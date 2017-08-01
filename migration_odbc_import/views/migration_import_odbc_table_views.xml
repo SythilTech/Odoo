@@ -8,7 +8,6 @@
             <form>
                 <header>
       	            <button type="object" name="import_table_data_wrapper" string="Import Table Data"/>
-      	            <button type="object" name="import_files" string="Download Files"/>
       	            <button type="object" name="validate" string="Validate"/>
       	            <!--<button type="object" name="get_table_relationships" string="Fetch FK"/>-->
       	        </header>

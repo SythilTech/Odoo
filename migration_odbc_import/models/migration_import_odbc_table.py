@@ -53,40 +53,6 @@ class MigrationImportOdbcTable(models.Model):
         self.import_table_data(import_log)
         import_log.state = "done"
         import_log.finish_date = datetime.utcnow()
-
-    def import_files(self):
-        conn = pyodbc.connect(self.import_id.connection_string)
-        cursor = conn.cursor()
-        cursor.execute(self.select_sql)
-
-        columns = [column[0] for column in cursor.description]
-        results = []
-        for row in cursor.fetchall():
-            
-            #Merge the defaults with sql dictionary
-            row_dict = dict(zip(columns, row))
-
-            if 'id' in row_dict:
-                external_identifier = "import_record_" + self.model_id.model.replace(".","_") + "_" + str(row_dict['id'])
-                
-                existing_record = self.env['ir.model.data'].xmlid_to_object('odbc_import.' + external_identifier)
-                if existing_record:
-                    write_dict = {}
-                    for download_file in self.file_download_ids:
-                        url = download_file.download_url
-                        
-                        for column in row_dict:
-                            url = url.replace("${" + column + "}", str(row_dict[column]) )
-                            
-
-                        headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36"}
-                        r = requests.get(url, headers=headers)
-                        image_data = base64.b64encode( r.content )
- 
-                        if r.status_code == 200:
-                            write_dict[download_file.field_id.name] = image_data
-                        
-                    existing_record.write(write_dict)
         
     def import_table_data(self, import_log):
         conn = pyodbc.connect(self.import_id.connection_string)
@@ -134,14 +100,34 @@ class MigrationImportOdbcTable(models.Model):
                         if import_field.date_format:
                             external_date = datetime.strptime(merged_dict[import_field.field_id.name], import_field.date_format)
                             merged_dict[import_field.field_id.name] = external_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-                                
+
+
+                    for download_file in self.file_download_ids:
+                        url = download_file.download_url
+                        
+                        for column in row_dict:
+                            url = url.replace("${" + column + "}", str(row_dict[column]) )
+
+                        headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36"}
+                        r = requests.get(url, headers=headers)
+                        image_data = base64.b64encode( r.content )
+ 
+                        if r.status_code == 200:
+                            merged_dict[download_file.field_id.name] = image_data
+
+                    #Create the new record                                
                     new_rec = self.env[self.model_id.model].create(merged_dict)
-                                        
+                    
+                    #Create the external ID
                     self.env['ir.model.data'].create({'module': "odbc_import", 'name': external_identifier, 'model': self.model_id.model, 'res_id': new_rec.id })
 
-                #TODO write update record code
+                    import_record_count += 1
+                
+                    if self.import_id.batch_import_limit != 0 and import_record_count >= self.import_id.batch_import_limit:
+                        return False
+                    
+                    #TODO write update record code
 
-                import_record_count += 1
             else:
                 raise UserError("External ID is neccassary to import")
 

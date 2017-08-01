@@ -24,6 +24,7 @@ class MigrationImportOdbc(models.Model):
     connect_database = fields.Char(string="Database")
     connect_username = fields.Char(string="Username")
     connect_password = fields.Char(string="Password")
+    batch_import_limit = fields.Integer(string="Batch Import Limit", help="0 = No Limit")
 
     @api.onchange('name')
     def _onchange_name(self):
