@@ -13,12 +13,12 @@
                         <field name="custom_field_ids" context="{'default_model_id': active_id, 'default_crm_custom_field': True}">
                             <form>
                                 <group>
-                                    <field name="crm_custom_name" required="True"/>
-                                    <field name="model_id" invisible="True"/>
-                                    <field name="ttype" invisible="True"/>
-                                    <field name="name" invisible="True"/>
-                                    <field name="field_description" invisible="True"/>
-                                    <field name="selection" invisible="True"/>
+                                    <field name="model_id" invisible="1"/>
+                                    <field name="ttype" invisible="1"/>
+                                    <field name="field_description" invisible="1"/>
+                                    <field name="selection" invisible="1"/>
+                                    <field name="name"  invisible="1"/>
+                                    <field name="field_description" required="True"/>
                                     <field name="crm_limited_types"/>
                                     <field name="crm_custom_field_selection_ids" attrs="{'invisible': [('crm_limited_types', '!=', 'selection')]}">
                                         <tree editable="bottom">

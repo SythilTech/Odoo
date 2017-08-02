@@ -1,3 +1,7 @@
+v1.3.2
+======
+* Base field name on description rather then next id
+
 v1.3.1
 ======
 * Add datetime field and fix permission with add field button

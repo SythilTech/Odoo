@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging
+_logger = logging.getLogger(__name__)
 from openerp import api, fields, models
 
 class IrModelFieldsCRMFields(models.Model):
@@ -12,14 +14,6 @@ class IrModelFieldsCRMFields(models.Model):
     crm_custom_field_widget = fields.Many2one('crm.custom.fields.widget', string="Widget")
     crm_custom_field_selection_ids = fields.One2many('ir.model.fields.selections', 'imf_id', string="Selection Options")
     
-    @api.onchange('crm_custom_name')
-    def _onchange_crm_custom_name(self):
-        if self.crm_custom_name:
-            self.field_description = self.crm_custom_name
-            
-            #Give temp name because it is required
-            self.name = "x_" + str(self.env['ir.model.fields'].search_count([]) + 1)
-        
     @api.onchange('crm_limited_types')
     def _onchange_crm_limited_types(self):
         self.ttype = self.crm_limited_types
@@ -35,12 +29,14 @@ class IrModelFieldsCRMFields(models.Model):
     @api.model
     def create(self, values):
         """Assign name when it's actually saved overwise they all get the same ID"""
-        new_ins = super(IrModelFieldsCRMFields, self).create(values)
         
-        if new_ins.crm_custom_field:
-            new_ins.name = "x_" + str(new_ins.id)
+        if 'crm_custom_field' in values:
+            temp_name = "x_custom_" + values['field_description']
+            temp_name = temp_name.replace(" ","_").lower()
+            values['name'] = temp_name
+            _logger.error(temp_name)
         
-        return new_ins
+        return super(IrModelFieldsCRMFields, self).create(values)
         
 class CrmCustomFieldsWidget(models.Model):
 
