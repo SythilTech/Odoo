@@ -13,9 +13,7 @@ class ResPartnerSms(models.Model):
         self.ensure_one()
         
         default_mobile = self.env['sms.number'].search([])[0]
-        
-        _logger.error(default_mobile.id)
-        
+                
         return {
             'name': 'SMS Compose',
             'view_type': 'form',

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*
 from datetime import datetime
-
+import logging
+_logger = logging.getLogger(__name__)
+import base64
 from openerp import api, fields, models
 
 class SmsCompose(models.Model):
@@ -15,6 +17,7 @@ class SmsCompose(models.Model):
     to_number = fields.Char(required=True, string='To Mobile Number', readonly=True)
     sms_content = fields.Text(string='SMS Content')
     media_id = fields.Binary(string="Media (MMS)")      
+    media_filename = fields.Char(string="Media Filename")
     
     @api.onchange('sms_template_id')
     def _onchange_sms_template_id(self):
@@ -59,11 +62,8 @@ class SmsCompose(models.Model):
 	    #for single smses we only record succesful sms, failed ones reopen the form with the error message
 	    sms_message = self.env['sms.message'].create({'record_id': self.record_id,'model_id':my_model[0].id,'account_id':self.from_mobile_id.account_id.id,'from_mobile':self.from_mobile_id.mobile_number,'to_mobile':self.to_number,'sms_content':self.sms_content,'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id, 'by_partner_id':self.env.user.partner_id.id})
 	    
-	    try:
-	        sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
-	        self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id)
-            except Exception as e:
-                _logger.error(e)
-                
-                #Message post only works if CRM module is installed
-	        pass
+	    sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
+            attachments = []
+            attachments.append((self.media_filename, base64.b64decode(self.media_id)) )
+	    self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id, attachments=attachments)
+            

@@ -1,3 +1,7 @@
+v1.0.16
+=======
+* SMS Compose now puts MMS attachment in chatter
+
 v1.0.15
 ======
 * Send MMS during automated action

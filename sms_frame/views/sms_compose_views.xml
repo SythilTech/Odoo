@@ -15,7 +15,8 @@
       	              <field name="from_mobile_id"/>
       	              <field name="to_number" />
       	              <field name="sms_content"/>
-      	              <field name="media_id"/>
+      	              <field name="media_id" filename="media_filename"/>
+      	              <field name="media_filename" invisible="1"/> 
       	          </group>
                   <footer>
                       <button type="object" name="send_entity" string="Send SMS"/>

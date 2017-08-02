@@ -40,8 +40,9 @@ class SmsGatewayTwilio(models.Model):
         media_url = ""
         #Create an attachment for the mms now since we need a url now
         if media:
-            _logger.error("Media")
+
             attachment_id = self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True})
+            _logger.error(attachment_id.id)
             media_url = base_url + "/web/image/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
 	    
 	    #Force the creation of the new attachment before you make the request
