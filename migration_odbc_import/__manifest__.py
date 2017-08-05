@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Migration Toolkit",
-    'version': "1.4.4",
+    'version': "1.4.5",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

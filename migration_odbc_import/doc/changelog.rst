@@ -1,3 +1,7 @@
+v1.4.5
+======
+* Date and integer validation
+
 v1.4.4
 ======
 * Many2one auto remapping and validation taking into account remapping

@@ -5,7 +5,7 @@ import base64
 import logging
 _logger = logging.getLogger(__name__)
 from datetime import datetime
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 
 from openerp import api, tools, fields, models
 from odoo.exceptions import ValidationError, UserError
@@ -20,7 +20,7 @@ class MigrationImportOdbcTable(models.Model):
     field_count = fields.Integer(string="Fields", compute="_compute_field_count")
     db_field_ids = fields.One2many('migration.import.odbc.table.field', 'table_id', string="Database Fields")
     default_value_ids = fields.One2many('migration.import.odbc.table.default', 'table_id', string="Default Values", help="Set a value before importing into the record into the database")
-    select_sql = fields.Char(string="Select SQL", help="Modify this if you want to perform sql transformations such as concat first and last name into name field")
+    select_sql = fields.Text(string="Select SQL", help="Modify this if you want to perform sql transformations such as concat first and last name into name field")
     relationship_ids = fields.One2many('migration.import.odbc.relationship', 'table1', string="Database Relatioships")
     file_download_ids = fields.One2many('migration.import.odbc.table.download', 'table_id', string="File Import")
     where_clause = fields.Char(string="SQL WHERE Clause", default="WHERE 1=1")
@@ -57,6 +57,10 @@ class MigrationImportOdbcTable(models.Model):
     def import_table_data(self, import_log):
         conn = pyodbc.connect(self.import_id.connection_string)
         cursor = conn.cursor()
+
+        #Update statement applies only to local copy
+        #cursor.execute("UPDATE members SET name='test' WHERE name='stest 1'")
+        
         cursor.execute(self.select_sql)
 
         import_log_table = self.env['migration.import.odbc.log.table'].create({'log_id':import_log.id, 'table_id': self.id, 'total_records': len(list(cursor)) })
@@ -87,10 +91,18 @@ class MigrationImportOdbcTable(models.Model):
                     #Go through each field and perform manual python transform operations
                     for import_field in self.env['migration.import.odbc.table.field'].search([('table_id','=', self.id), ('field_id','!=', False)]):
 
+                        #Remove blank data
+                        if str(merged_dict[import_field.field_id.name]) == "":
+                            del merged_dict[import_field.field_id.name]
+                            continue
+                                    
                         #Remap the values to the Odoo ones
                         for alter_value in import_field.alter_value_ids:
                             if str(merged_dict[import_field.field_id.name]) == str(alter_value.old_value):
-                                merged_dict[import_field.field_id.name] = alter_value.new_value
+                                if str(alter_value.new_value) == "":
+                                    del merged_dict[import_field.field_id.name]
+                                else:
+                                    merged_dict[import_field.field_id.name] = alter_value.new_value
 
                         #So 0 is interperted as False
                         if import_field.field_id.ttype == "boolean":
@@ -99,7 +111,7 @@ class MigrationImportOdbcTable(models.Model):
                         #Rearrange date to fit in with Odoo date
                         if import_field.date_format:
                             external_date = datetime.strptime(merged_dict[import_field.field_id.name], import_field.date_format)
-                            merged_dict[import_field.field_id.name] = external_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                            merged_dict[import_field.field_id.name] = external_date.strftime(DEFAULT_SERVER_DATE_FORMAT)
 
 
                     for download_file in self.file_download_ids:
@@ -295,6 +307,10 @@ class MigrationImportOdbcTableField(models.Model):
             'target': 'new',
         }
 
+    @api.onchange('field_id')
+    def _onchange_field_id(self):
+        self.orm_type = self.field_id.ttype
+
     def auto_value_map(self):
 
         conn = pyodbc.connect(self.table_id.import_id.connection_string)
@@ -328,7 +344,7 @@ class MigrationImportOdbcTableField(models.Model):
                                 remap_found = True
                                 break
 
-                        if remap_found == False:
+                        if remap_found == False and str(row_dict['dis_value']) != "":
                             self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
                             
         elif self.field_id.ttype == "boolean":
@@ -339,7 +355,9 @@ class MigrationImportOdbcTableField(models.Model):
                 #Convert to dictionary
                 row_dict = dict(zip(columns, row))
 
-                if row_dict['dis_value'] != "0" and row_dict['dis_value'] != "1":
+                existing_remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )])
+                
+                if row_dict['dis_value'] != "0" and row_dict['dis_value'] != "1" and row_dict['dis_value'] != "" and len(existing_remap_value) == 0:
                     self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})
 
         elif self.field_id.ttype == "many2one":
@@ -353,16 +371,21 @@ class MigrationImportOdbcTableField(models.Model):
 
                 existing_remap_value = self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )])
                         
-                if existing_remap_value == 0:
+                if existing_remap_value == 0 and str(row_dict['dis_value']) != "":
+                
+                    #Go through all records and see if there is a name match
+                    found_match = False
                     for rec in self.env[self.field_id.relation].search([]):
                         if rec.name_get()[0][1] == str(row_dict['dis_value']):
 
                             if existing_remap_value == 0:
                                 self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': rec.id})
+                                found_match = True
                                 break
                 
                     #Record was not found so create placeholder
-                    self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})                
+                    if found_match == False:
+                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})                
                 
     def check_valid(self):
         """ Called after a person has remapped all the values """
@@ -397,7 +420,7 @@ class MigrationImportOdbcTableField(models.Model):
         #Valid until proven otherwise
         valid = "valid"
 
-        #Get all distinct values and compare them to the internal values in the selection field
+        #Get all distinct values and check if it is 0 or 1
         odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
 
         columns = [column[0] for column in odbc_cursor.description]
@@ -407,20 +430,18 @@ class MigrationImportOdbcTableField(models.Model):
             row_dict = dict(zip(columns, row))
 
             remap_valid = False
-            
-            if row_dict['dis_value'] == "0" or row_dict['dis_value'] == "1":
+                        
+            if row_dict['dis_value'] == "0" or row_dict['dis_value'] == "1" or row_dict['dis_value'] == "":
                 remap_valid = True
 
             #Invalid if a remap is not 0 or 1
-            remap_values = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id)])
-            for remap_value in remap_values:
-                if remap_value.new_value == "0" or remap_value.new_value == "1":
-                    remap_valid = True
+            remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',row_dict['dis_value'])])            
+            if remap_value.new_value == "0" or remap_value.new_value == "1":
+                remap_valid = True
             
             #Invalid if even as single distinct value is not correctly mapped
-            if remap_valid == False:
-                valid = "invalid"
-                break
+            if remap_valid is False:
+                return "invalid"
 
         return valid
 
@@ -443,7 +464,39 @@ class MigrationImportOdbcTableField(models.Model):
     def _validate_date(self, odbc_cursor):
         """ Does it match Odoo time format or the remap date format"""
 
-        valid = ""
+        #Valid until proven otherwise
+        valid = "valid"        
+
+        #I would prefer to just use a regex expression but checking each record also works just very slow...
+        odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
+
+        columns = [column[0] for column in odbc_cursor.description]
+
+        for row in odbc_cursor.fetchall():
+            #Convert to dictionary
+            row_dict = dict(zip(columns, row))
+            row_valid = True
+
+            if str(row_dict['dis_value']) != "":
+                try:
+                    #See if it matches the default date format
+                    external_date = datetime.strptime(str(row_dict['dis_value']), DEFAULT_SERVER_DATE_FORMAT)
+                    
+                except ValueError:
+                    row_valid = False
+                
+                    if self.date_format:
+                        try:
+                            #See if it matches the transform format
+                            external_date = datetime.strptime(str(row_dict['dis_value']), self.date_format)
+                            row_valid = True
+                        except ValueError:
+                            raise ValueError("'" + str(row_dict['dis_value']) + "' does not match the required date format")
+                            return "invalid"
+                            
+
+                    if row_valid == False:
+                        return "invalid"
         
         return valid
 
@@ -472,6 +525,10 @@ class MigrationImportOdbcTableField(models.Model):
 
             remap_valid = False
 
+            #Blank is fine it will get stripped anyway
+            if str(row_dict['dis_value']) == "":
+                remap_valid = True            
+
             #Check if distinct values match selection internal values
             if str(row_dict['dis_value']) in selection_list.keys():
                 remap_valid = True
@@ -496,16 +553,21 @@ class MigrationImportOdbcTableField(models.Model):
     def _validate_integer(self, odbc_cursor):
         """ Check to see if value contains only digits """
 
-        #valid until a non integer value is found
-        valid = ""
+        #Valid until proven otherwise
+        valid = "valid"
+        
+        #Go through all records and see if any are non integer
+        odbc_cursor.execute("SELECT " + self.name + " AS dis_value FROM " + self.table_id.name + " GROUP BY " + self.name)
 
-        #Regular expression does not work...
-        #odbc_cursor.execute("SELECT COUNT(" + self.name + ") FROM " + self.table_id.name + " WHERE " + self.name + " LIKE '^[0-9]+'")
+        columns = [column[0] for column in odbc_cursor.description]
 
-        #row_count = odbc_cursor.fetchone()[0]
-        #_logger.error(row_count)
-        #if row_count > 0:
-        #    valid = "invalid"
+        for row in odbc_cursor.fetchall():
+            #Convert to dictionary
+            row_dict = dict(zip(columns, row))
+
+            if str(row_dict['dis_value']).isdigit() == False and str(row_dict['dis_value']) != "":
+                raise ValueError("'" + str(row_dict['dis_value']) + "' does not match integer format")
+                return "invalid"
 
         return valid
         
@@ -524,14 +586,15 @@ class MigrationImportOdbcTableField(models.Model):
             #Convert to dictionary
             row_dict = dict(zip(columns, row))            
             
-            remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',str(row_dict['dis_value']))], limit=1)
-            if len(remap_value) == 0:
-                #All distinct values MUST be remapped to a record id
-                valid = "invalid"
-            else:
-                #The record id in remap must be a valid id
-                if self.env[self.field_id.relation].search_count([('id','=', int(remap_value.new_value) )]) != 1:
-                    valid = "invalid"
+            if str(row_dict['dis_value']) != "":
+                remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',str(row_dict['dis_value']))], limit=1)
+                if remap_value.new_value != False:
+                    if len(remap_value) == 0:
+                        #All distinct values MUST be remapped to a record id
+                        valid = "invalid"
+                    else:
+                        if self.env[self.field_id.relation].search_count([('id','=', int(remap_value.new_value) )]) != 1:
+                            valid = "invalid"                    
 
         return valid
                 
