@@ -41,12 +41,13 @@ class SmsGatewayTwilio(models.Model):
         #Create an attachment for the mms now since we need a url now
         if media:
 
-            attachment_id = self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True})
-            _logger.error(attachment_id.id)
-            media_url = base_url + "/web/image/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
-	    
+            attachment_id = self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True, 'mms': True})
+
 	    #Force the creation of the new attachment before you make the request
-	    self.env.cr.commit() # all good, we commit
+	    request.env.cr.commit()
+            
+            media_url = base_url + "/sms/twilio/mms/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
+	    
             
         #send the sms/mms
         payload = {'From': str(format_from), 'To': str(format_to), 'Body': sms_content.encode('utf-8'), 'StatusCallback': base_url + "/sms/twilio/receipt"}

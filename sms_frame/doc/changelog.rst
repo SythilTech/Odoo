@@ -1,3 +1,8 @@
+v1.0.17
+=======
+* Fix sms compose send sms without media issue.
+* Custom controller for MMS to increase security
+
 v1.0.16
 =======
 * SMS Compose now puts MMS attachment in chatter

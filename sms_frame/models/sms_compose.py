@@ -64,6 +64,9 @@ class SmsCompose(models.Model):
 	    
 	    sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
             attachments = []
-            attachments.append((self.media_filename, base64.b64decode(self.media_id)) )
+            
+            if self.media_id:
+                attachments.append((self.media_filename, base64.b64decode(self.media_id)) )
+	    
 	    self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id, attachments=attachments)
             
