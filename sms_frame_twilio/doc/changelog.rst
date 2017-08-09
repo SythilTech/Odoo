@@ -1,3 +1,7 @@
+v1.1.3
+======
+* SMS to lead fix
+
 v1.1.2
 ======
 * MMS Sending fix number 2

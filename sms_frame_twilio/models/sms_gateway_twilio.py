@@ -171,7 +171,7 @@ class SmsGatewayTwilio(models.Model):
                 model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
 
                 my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
-                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment")
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, message_type="comment")
 
                 #Notify followers of this partner who are listenings to the 'discussions' subtype
                 for notify_partner in self.env['mail.followers'].search([('res_model','=','crm.lead'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
