@@ -28,6 +28,10 @@ var CustomCSSEditor = Widget.extend({
 
     	this.template = 'website_style_manager.custom_css';
     	self.$modal = $( qweb.render(this.template, {}) );
+
+        //Remove previous instance first
+        $('#myCSSEditor').remove();
+
     	$('body').append(self.$modal);
         self.$modal.removeClass('oe_ccsse_closed').addClass('oe_ccsse_open');
 	    session.rpc('/style/load', {}).then(function(result) {
@@ -40,7 +44,8 @@ var CustomCSSEditor = Widget.extend({
 	    session.rpc('/style/save', {'css': $("#website-custom-css").val() }).then(function(result) {
 			alert("Save Complete");
 		    $("#custom_css_header").html(result.css_string);
-        });
+            $('#myCSSEditor').remove();
+         });
     });
 
     $("#formatCSS").click(function() {
@@ -49,6 +54,7 @@ var CustomCSSEditor = Widget.extend({
 
     $("#closeCSS").click(function() {
          $("#myCSSEditor").removeClass('oe_ccsse_open').addClass('oe_ccsse_closed');
+         $('#myCSSEditor').remove();
     });
 
     $("#website-custom-css").on('change keyup paste', function() {

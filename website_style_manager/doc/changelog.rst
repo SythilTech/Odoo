@@ -1,3 +1,7 @@
+v1.1.2
+======
+* Close button fix
+
 v1.1.1
 ======
 * Permissions for website designer
