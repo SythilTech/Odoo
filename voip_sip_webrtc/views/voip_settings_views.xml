@@ -9,13 +9,18 @@
                 <header>
                     <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                     <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-                    <button type="object" name="start_sip_server" string="Start SIP Server"/>
-	            <button type="object" name="stop_sip_server" string="Stop SIP Server"/>
+                    <button type="object" name="generate_self_signed_certificate" string="Generate Self Signed Certificate"/>
+                    <!--<button type="object" name="start_sip_server" string="Start SIP Server"/>
+	            <button type="object" name="stop_sip_server" string="Stop SIP Server"/>-->
                 </header>
                 <group>
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
                     <field name="message_bank_duration"/>
+                    <field name="server_ip"/>
+                    <field name="cert_path"/>
+                    <field name="key_path"/>
+                    <field name="fingerprint"/>
                 </group>
       	    </form>
         </field>

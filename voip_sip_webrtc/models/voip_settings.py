@@ -8,6 +8,14 @@ import requests
 _logger = logging.getLogger(__name__)
 from openerp.http import request
 import odoo
+from OpenSSL import crypto, SSL
+from socket import gethostname
+from pprint import pprint
+from time import gmtime, mktime
+from os.path import exists, join
+import os
+from hashlib import sha256
+
 from openerp import api, fields, models
 
 class VoipSettings(models.Model):
@@ -22,6 +30,10 @@ class VoipSettings(models.Model):
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
     message_bank_duration = fields.Integer(string="Message Bank Duration (Seconds)", help="The time before message bank automatically hangs up")
     sip_running = fields.Boolean(string="SIP Running")
+    server_ip = fields.Char(string="Public IP")
+    cert_path = fields.Char(string="Cert Path", help="Used by message bank")
+    key_path = fields.Char(string="Key Path", help="Used by message bank")
+    fingerprint = fields.Char(string="Fingerprint", help="Used by message bank")
     sip_listening = False
 
     #-----Ringtone ID-----
@@ -57,6 +69,49 @@ class VoipSettings(models.Model):
     def set_default_message_bank_duration(self):
         for record in self:
             self.env['ir.values'].set_default('voip.settings', 'message_bank_duration', record.message_bank_duration)
+
+    def generate_self_signed_certificate(self):
+        k = crypto.PKey()
+        k.generate_key(crypto.TYPE_RSA, 1024)
+
+        cert = crypto.X509()
+        cert.get_subject().C = "US" #Country
+        cert.get_subject().ST = "Springfield" #State
+        cert.get_subject().L = "Evergreen Terrace" #Locality
+        cert.get_subject().O = "Simpsons" #Organization
+        cert.get_subject().OU = "Homer" #Organization Unit
+        cert.get_subject().CN = gethostname() #Common Name
+        cert.set_serial_number(1000)
+        cert.gmtime_adj_notBefore(0)
+        cert.gmtime_adj_notAfter(10*365*24*60*60)
+        cert.set_issuer(cert.get_subject())
+        cert.set_pubkey(k)
+        cert.sign(k, 'sha1')
+
+        home_directory = os.path.expanduser('~')
+        cert_path = home_directory + "/cert.crt"
+        key_path = home_directory + "/cert.key"
+        
+        cert_data = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
+
+        open(cert_path, "wt").write(cert_data)
+        open(key_path, "wt").write(
+            crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
+        
+        self.cert_path = cert_path
+        self.key_path = key_path
+        
+        #Isn't there some library somewhere to generate the fingerprint?
+        fingerprint_hex = sha256(cert_data.rstrip()).hexdigest()
+        fingerprint_format = ""
+        counter = 0
+        for char in fingerprint_hex:
+            fingerprint_format += char.upper()
+            counter += 1
+            if counter % 2 == 0:
+                fingerprint_format += ":"
+        
+        self.fingerprint = fingerprint_format[:-1]
 
     def sip_server(self):
         _logger.error("Start SIP Listening")

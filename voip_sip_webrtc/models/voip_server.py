@@ -92,10 +92,10 @@ class VoipVoip(models.Model):
         ip = "13.54.58.172"
         
         #See https://tools.ietf.org/html/rfc5245#section-4.1.2.1 (I don't make up these formulas...)
-        priority = ((2 ^ 24) * 126) + ((2 ^ 8) * 65535)
+        priority = int((2 ^ 24) * 126) + int((2 ^ 8) * 65535)
         
         #For now we assume the server on has one public facing network card...
-        foundation = "Sc0a86317"
+        foundation = "0"
         
         ice_response = "candidate:" + foundation + " " + str(component_id) + " UDP " + str(priority) + " " + str(ip) + " " + str(port) + " typ host"
         

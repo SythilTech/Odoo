@@ -8,6 +8,8 @@ _logger = logging.getLogger(__name__)
 import time
 from random import randint
 from hashlib import sha1
+import ssl
+#from dtls import do_patch
 import hmac
 import hashlib
 import random
@@ -15,6 +17,7 @@ import string
 import passlib
 import struct
 import zlib
+import re
 from openerp.exceptions import UserError
 import binascii
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
@@ -37,6 +40,7 @@ class VoipCall(models.Model):
     mode = fields.Selection([('videocall','video call'), ('audiocall','audio call'), ('screensharing','screen sharing call')], string="Mode", help="This is only how the call starts, i.e a video call can turn into a screen sharing call mid way")
     sip_tag = fields.Char(string="SIP Tag")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
+    ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
 
     def accept_call(self):
@@ -103,7 +107,6 @@ class VoipCall(models.Model):
         #Origin ("o=") https://tools.ietf.org/html/rfc4566#section-5.2 (Should come up with a better session id...)
         sess_id = int(time.time()) #Not perfect but I don't expect more then one call a second
         sess_version = 0 #Will always start at 0
-        _logger.error( str(sess_id) )
         sdp_response += "o=- " + str(sess_id) + " " + str(sess_version) + " IN IP4 0.0.0.0\r\n"        
         
         #Session Name ("s=") https://tools.ietf.org/html/rfc4566#section-5.3 (We don't need a session name, information about the call is all displayed in the UI)
@@ -139,8 +142,8 @@ class VoipCall(models.Model):
         sdp_response += "c=IN IP4 0.0.0.0\r\n"
 
         #ICE creds (https://tools.ietf.org/html/rfc5245#page-76)
-        ice_ufrag = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(4))
-        ice_pwd = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(22))
+        ice_ufrag = ''.join(random.choice('123456789abcdef') for _ in range(4))
+        ice_pwd = ''.join(random.choice('123456789abcdef') for _ in range(22))
         self.ice_password = ice_pwd
         sdp_response += "a=ice-ufrag:" + str(ice_ufrag) + "\r\n"
         sdp_response += "a=ice-pwd:" + str(ice_pwd) + "\r\n"
@@ -165,9 +168,13 @@ class VoipCall(models.Model):
 
         _logger.error("Message Bank")
 
+        #Ideally an integrity check should be done to ensure binding requests are valid, this is particiularly an issue for http since the random port can be sniffed.
+        #result = re.search('\r\na=ice-pwd:(.*)\r\n', sdp['sdp'])
+        #ice_password = result.group(1)
+
         server_sdp = self.generate_call_sdp()
 
-        _logger.error(server_sdp)
+
         
         notification = {'call_id': self.id, 'sdp': server_sdp }
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.sdp', self.from_partner_id.id), notification)
@@ -182,11 +189,11 @@ class VoipCall(models.Model):
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', self.from_partner_id.id), notification)
 
         #RTCP
-        #port += 1
-        #server_ice_candidate = self.env['voip.server'].generate_server_ice(port, 2)
-        #self.start_rtc_listener(port, "RTCP")
-        #notification = {'call_id': self.id, 'ice': server_ice_candidate }
-        #self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', self.from_partner_id.id), notification)
+        port += 1
+        server_ice_candidate = self.env['voip.server'].generate_server_ice(port, 2)
+        self.start_rtc_listener(port, "RTCP")
+        notification = {'call_id': self.id, 'ice': server_ice_candidate }
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', self.from_partner_id.id), notification)
 
     def voip_call_sdp(self, sdp):
         """Store the description and send it to everyone else"""
@@ -302,13 +309,12 @@ class VoipCall(models.Model):
         
         #TODO save the transcoded file to the call so it can be listened to later (Only keep for 48 hours to save space also legal requirements in some places)
         
-    def rtp_stun_listener(self, d, addr):
+    def rtp_stun_listener(self, d, client_ip, port):
 
         if d[1] == "00" and d[2] == "01":
             message_type = "Binding Request"
                 
         message_length = int( d[3] + d[4], 16)
-        _logger.error(message_length)
         message_cookie = ' '.join(d[5:9])
         transaction_id = ' '.join(d[9:21])
 
@@ -318,8 +324,8 @@ class VoipCall(models.Model):
         #Message Type (Binding Success Response)
         send_data += "01 01"
 
-        #Message Length (a static 12 only because our output is mostly fixed)
-        send_data += " 00 0c"
+        #Message Length (In this controlled environment it will always be 44)
+        send_data += " 00 2C"
 
         #Magic Cookie (always set to 0x2112A442)
         send_data += " 21 12 a4 42"
@@ -333,8 +339,8 @@ class VoipCall(models.Model):
         #XOR mapped address attribute
         send_data += " 00 20"
 
-        #Attribute Length (In this controlled environment it will always be 44)
-        send_data += " 00 2C"
+        #Attribute Length (fixed 8 for IPv4, IPv12 will increase this)
+        send_data += " 00 08"
 
         #Reservered (reserved for what...)
         send_data += " 00"
@@ -343,66 +349,25 @@ class VoipCall(models.Model):
         send_data += " 01"
         
         #Port XOR (Need to figure this one out...)
-        client_port = addr[1]
+        client_port = port
         send_data += " " + format( client_port ^ 0x2112 , '04x')
         
         #IP XOR-d (Figure this out too...)
-        #server_ip = addr[0]
-        server_ip = "13.54.58.172"
-        server_ip_int = struct.unpack("!I", socket.inet_aton(server_ip))[0]
-        send_data += " " + format( server_ip_int ^ 0x2112A442 , '08x')
-
-
+        client_ip_int = struct.unpack("!I", socket.inet_aton(client_ip))[0]
+        send_data += " " + format( client_ip_int ^ 0x2112A442 , '08x')
+        
+        #Cut off header
+        hmac_input = send_data.replace(" ","")[8:]
             
-        try:
-            #How to get shared secret password???
-                        
-            #Test tool (https://caligatio.github.io/jsSHA/)
-            _logger.error("HMAC")
-            hmac_input = send_data.replace(" ","")
-            #stun_password = self.ice_password
-
-            #Example code (works) (http://pythonexample.com/snippet/python/stun-message-integrity-verifier)
-            #hmac_input = "000100542112a442e4e8b0fd9c22943265a6f9fd0006000c617957763a653343660000000024000478ffffff80290008000000003033323380540004310000008070000400000002"
-            #stun_password = u"xa/ykWBKUukRHCxH8O1hkQbo"
-            #Expected output: eb7db09217a9a9cdded592c200f3c372dd1c7417
-
-
-            #MS Example (works) (https://blogs.msdn.microsoft.com/openspecification/2016/02/23/verifying-stun-message-integrity-for-lync-and-skype-for-business-ice-traffic/)
-            #hmac_input = "000100542112A442BEEBD6F17710B6A1B6A92CBD0006000C764F614D3A66764173000000002400046EFFFEFF80290008000000000001E6E4805400043100000080700004000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-            #stun_password = u"ydYldnHIRgbOUr1MYUGy4t0g"
-            #Expected output: b87d4d8d56fc76794667aacae3593e58e1dbfe97
+        #Remove 8 from length
+        hmac_input = "01010024" + hmac_input
             
-            #RFC example (doesn't???) (https://tools.ietf.org/html/rfc5769)
-            hmac_input = "0101003c2112a442b7e7a701bc34d686fa87dfae8022000b7465737420766563746f7220002000080001a147e112a643" #48 bytes
-            stun_password = u"VOkJxbRl1RmTxUk/WvJxBt"
-            #Expected output: 2b91f599fd9e90c38c7489f92af9ba53f06be7d7
-            
-            #Wireshark example (doesn't???)
-            #ice 1 (raw): 4f9b6cb3a46d69c31f8e4e81593e87c5
-            #ice 2 (raw): 8af63ee16bd97224f01a3e8aee4791d1
-            #hmac_input = "0001004c2112a4428797acd4f4bd5dd741edbfa90006001138633063626663313a3333386634343961000000002400046e7e00ff8029000817ae03baa3d911ce"
-            #expected output : 87 92 09 e5 c5 88 ba 67 e9 3c 6d cc 11 64 5d d7 d6 30 05 99
+        stun_password = self.ice_password
+        
+        key = passlib.utils.saslprep( stun_password )
 
-
-            #Pad send_data to fit 64 bytes
-            send_data_length = len(hmac_input.decode("hex"))
-            _logger.error(send_data_length)
-            
-            if send_data_length % 64 != 0:
-                for _ in range(64 - (send_data_length % 64) ):
-                    hmac_input += "00"
-
-            _logger.error(len(hmac_input.decode("hex")))
-            
-            key = passlib.utils.saslprep( stun_password )
-
-            #Not tested
-            mess_hmac = hmac.new( str(key), msg=hmac_input.decode("hex"), digestmod=hashlib.sha1).digest().encode('hex')
-            
-            _logger.error(mess_hmac)
-        except Exception as e:
-            _logger.error(e)
+        #Not tested
+        mess_hmac = hmac.new( str(key), msg=hmac_input.decode("hex"), digestmod=hashlib.sha1).digest().encode('hex')
         
         #Message Integrity Attribute
         send_data += " 00 08"
@@ -414,25 +379,17 @@ class VoipCall(models.Model):
         send_data += mess_hmac
         
         
-        #send_data += " 9e 6c 30 f6 5c 10 8a 0d 49 69 69 dd f4 e0 6d 16 d7 07 cf 81"
-
-
-
         crc32_int = binascii.crc32( binascii.a2b_hex(  send_data.replace(" ","") ) )  % (1<<32)
         crc_hex = format( crc32_int ^ 0x5354554e, '08x')
 
         #Fingerprint Attribute
         send_data += " 80 28"
         
-        #Atrribute Length (CRC-32 is alyways 4 bytes)
+        #Atrribute Length (CRC-32 is always 4 bytes)
         send_data += " 00 04"
         
         #Fingerprint (TODO)
         send_data += " " + crc_hex
-
-
-
-        _logger.error(send_data)
         
         #Ok now convert it back so we can send it
         return send_data.replace(" ","").decode('hex')
@@ -447,9 +404,10 @@ class VoipCall(models.Model):
         #3rd is the stream with the G722 Audio payload        
         
         _logger.error("Start RTP Listening on Port " + str(port) )
+
                         
-        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serversocket.bind(('', port));
+        stunsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        stunsocket.bind(('', port));
 
         start = time.time()
         stage = "STUN"
@@ -459,8 +417,10 @@ class VoipCall(models.Model):
         #Code is easier to understand if we start at 1 rather then 0...
         hex_data = ['FF']
         
-        while time.time() < start + message_bank_duration:
-            data, addr = serversocket.recvfrom(2048)
+        #Stage 1 STUN Connectivity Test
+        while stage == "STUN":
+
+            data, addr = stunsocket.recvfrom(2048)
 
             #Convert to hex so we can human interpret each byte
             for rtp_char in data:
@@ -468,13 +428,51 @@ class VoipCall(models.Model):
                 hex_data.append(hex_format)
                 hex_string += hex_format + " "
  
-            _logger.error(addr)
             _logger.error("HEX DATA: " + hex_string)            
             
-            if stage is "STUN":
-                send_data = self.rtp_stun_listener(hex_data, addr)
-                serversocket.sendto(send_data, addr )                
+            send_data = self.rtp_stun_listener(hex_data, addr[0], port)
+            stunsocket.sendto(send_data, addr )
+            
+            #We don't get any acknowledgement so we just assume everything went fine...
+            stage = "DTLS"
+            stunsocket.close()
+
+
+        _logger.error("DTLS Stage")
         
+        #Stage 2 DTLS
+        try:
+            do_patch()
+
+
+            #dtlssocket = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), certfile="/etc/letsencrypt/live/sythiltech.com.au/cert.pem", keyfile="/etc/letsencrypt/live/sythiltech.com.au/privkey.pem")
+            
+            #addr = ('', int(port))
+            #dtlssocket.bind(addr)
+            #dtlssocket.listen(1)
+            #conn, addr = dtlssocket.accept()
+            
+        except Exception as e:
+            _logger.error(e)
+
+
+        #while time.time() < start + message_bank_duration:
+        #    try:
+
+
+                #Convert to hex so we can human interpret each byte
+        #        for rtp_char in data:
+        #            hex_format = "{0:02x}".format(ord(rtp_char))
+        #            hex_data.append(hex_format)
+        #            hex_string += hex_format + " "
+ 
+        #        _logger.error("DTLS DATA: " + hex_string)            
+
+        #    except Exception as e:
+        #        _logger.error(e)
+
+
+            
         #End the call and do any post call processing
         with api.Environment.manage():
             # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
@@ -498,10 +496,10 @@ class VoipCall(models.Model):
         if mode is "RTP":
             rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(port,message_bank_duration,))
             rtc_listener_starter.start()
-        #elif mode is "RTCP":
-        #    For now we don't use RTCP...
-        #    rtc_listener_starter = threading.Thread(target=self.rtcp_server_listener, args=(port,message_bank_duration,))
-        #    rtc_listener_starter.start()
+        elif mode is "RTCP":
+            #For now we don't use RTCP...
+            rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(port,message_bank_duration,))
+            rtc_listener_starter.start()
  
 class VoipCallClient(models.Model):
 
