@@ -1,3 +1,7 @@
+v1.0.18
+=======
+* Fix select no longer supported issue appearing in Odoo log
+
 v1.0.17
 =======
 * Fix sms compose send sms without media issue.
