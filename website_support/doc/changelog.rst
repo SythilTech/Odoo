@@ -1,3 +1,7 @@
+v1.2.6
+======
+* Fix support ticket by email
+
 v1.2.5
 ======
 * Added help page menu and help page count fix
