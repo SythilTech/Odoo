@@ -91,18 +91,11 @@ class MigrationImportOdbcTable(models.Model):
                     #Go through each field and perform manual python transform operations
                     for import_field in self.env['migration.import.odbc.table.field'].search([('table_id','=', self.id), ('field_id','!=', False)]):
 
-                        #Remove blank data
-                        if str(merged_dict[import_field.field_id.name]) == "":
-                            del merged_dict[import_field.field_id.name]
-                            continue
                                     
                         #Remap the values to the Odoo ones
                         for alter_value in import_field.alter_value_ids:
                             if str(merged_dict[import_field.field_id.name]) == str(alter_value.old_value):
-                                if str(alter_value.new_value) == "":
-                                    del merged_dict[import_field.field_id.name]
-                                else:
-                                    merged_dict[import_field.field_id.name] = alter_value.new_value
+                                merged_dict[import_field.field_id.name] = alter_value.new_value
 
                         #So 0 is interperted as False
                         if import_field.field_id.ttype == "boolean":
@@ -113,6 +106,10 @@ class MigrationImportOdbcTable(models.Model):
                             external_date = datetime.strptime(merged_dict[import_field.field_id.name], import_field.date_format)
                             merged_dict[import_field.field_id.name] = external_date.strftime(DEFAULT_SERVER_DATE_FORMAT)
 
+                        #Remove blank data
+                        if str(merged_dict[import_field.field_id.name]) == "" or merged_dict[import_field.field_id.name] == False:
+                            del merged_dict[import_field.field_id.name]
+                            continue
 
                     for download_file in self.file_download_ids:
                         url = download_file.download_url

@@ -57,10 +57,10 @@ class MigrationImportOdbc(models.Model):
                 db_table.import_table_data(import_log)
         import_log.state = "done"
     
-    @api.onchange('dsn_id','connect_server','connect_database','connect_username','connect_password')
+    @api.onchange('connection_string_template','dsn_id','connect_server','connect_database','connect_username','connect_password')
     def _onchange_dsn_id(self):
-        if self.dsn_id and self.dsn_id.connection_string:
-            cs = self.dsn_id.connection_string
+        if self.dsn_id and self.connection_string_template.connection_string:
+            cs = self.connection_string_template.connection_string
 
             cs = cs.replace("$driver", self.dsn_id.driver)
             

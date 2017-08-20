@@ -1,3 +1,7 @@
+v1.4.6
+======
+* Character set in DSN template
+
 v1.4.5
 ======
 * Date and integer validation
