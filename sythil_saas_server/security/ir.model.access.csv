@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_saas_database_public,access public saas.database,model_saas_database,,0,0,1,0
+access_saas_template_database_public,access public saas.template.database,model_saas_template_database,,1,0,0,0
+access_saas_modules_builtin_public,access public saas.modules.builtin,model_saas_modules_builtin,,1,0,0,0
+access_saas_database_user,access user saas.database,model_saas_database,"sythil_saas_server.saas_portal_group",1,0,0,0
+access_saas_database_domain_user,access user saas.database.domain,model_saas_database_domain,"sythil_saas_server.saas_portal_group",1,0,0,0

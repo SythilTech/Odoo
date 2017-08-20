@@ -1,0 +1,3 @@
+id,name,model,function,interval_number,interval_type,"active"
+"saas_auto_backup","SAAS Auto Backup","saas.template.database","saas_auto_backup",24,hours,"True"
+"saas_subscription_check","SAAS Subscription Check","saas.database","saas_subscription_check",24,hours,"1"

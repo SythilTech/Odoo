@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="saas_template_database_view_form" model="ir.ui.view">
+          <field name="name">saas.template.database.view.form</field>
+          <field name="model">saas.template.database</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                      <field name="image" widget="image"/>
+                      <field name="name"/>
+                      <field name="database_name"/>
+                      <field name="description"/>
+                      <field name="price"/>
+                      <field name="trial_duration"/>
+                      <field name="auto_backup"/>
+                      <field name="auto_backup_days_to_keep"/>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="saas_template_database_view_tree" model="ir.ui.view">
+          <field name="name">saas.template.database.view.tree</field>
+          <field name="model">saas.template.database</field>
+          <field name="arch" type="xml">
+              <tree>
+                  <field name="name"/>
+                  <field name="database_name"/>
+                  <field name="description"/>
+                  <field name="auto_backup"/>
+                  <field name="auto_backup_days_to_keep"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="saas_template_database_action" model="ir.actions.act_window">
+          <field name="name">SAAS Template Databases</field>
+          <field name="res_model">saas.template.database</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="target">current</field>
+      </record>
+        
+      <menuitem id="saas_template_database_menu" name="Template Databases" parent="saas_database_parent_menu" action="saas_template_database_action" sequence="20"/>
+        
+  </data>
+</openerp>

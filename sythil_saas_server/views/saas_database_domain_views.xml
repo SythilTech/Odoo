@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="saas_database_domain_view_form" model="ir.ui.view">
+          <field name="name">saas.database.domain.view.form</field>
+          <field name="model">saas.database.domain</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                      <field name="database_id"/>
+                      <field name="name"/>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="saas_database_domain_view_tree" model="ir.ui.view">
+          <field name="name">saas.database.domain.view.tree</field>
+          <field name="model">saas.database.domain</field>
+          <field name="arch" type="xml">
+              <tree>
+                  <field name="database_id"/>
+                  <field name="name"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="saas_database_domain_action" model="ir.actions.act_window">
+          <field name="name">SAAS Database Domains</field>
+          <field name="res_model">saas.database.domain</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="target">current</field>
+      </record>
+        
+      <menuitem id="saas_database_domain_menu" name="Database Domains" parent="saas_database_parent_menu" action="saas_database_domain_action" sequence="30"/>
+        
+  </data>
+</openerp>

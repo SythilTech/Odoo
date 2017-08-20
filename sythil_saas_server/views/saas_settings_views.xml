@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="saas_settings_view_form" model="ir.ui.view">
+          <field name="name">saas.settings.view.form</field>
+          <field name="model">saas.settings</field>
+          <field name="arch" type="xml">
+             <form>
+                 <header>
+	             <button string="Save" type="object" name="execute" class="oe_highlight"/> or <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                 </header>
+                 <group>
+                     <field name="system_redirect"/>
+                     <!--<button type="object" name="add_saas_setting" string="Set as SAAS Server"/>-->
+                     <button type="object" name="saas_server_setting" string="Log SAAS Server"/>
+                 </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="saas_settings_action" model="ir.actions.act_window">
+          <field name="name">SAAS Settings</field>
+          <field name="res_model">saas.settings</field>
+          <field name="view_mode">form</field>
+          <field name="target">inline</field>
+      </record>
+        
+      <menuitem id="saas_settings_menu" name="Settings" parent="saas_database_parent_menu" action="saas_settings_action" sequence="40"/>
+        
+  </data>
+</openerp>

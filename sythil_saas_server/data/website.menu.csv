@@ -1,0 +1,2 @@
+id,name,url,parent_id/id
+saas_portal_menu,SAAS Portal,/saas/portal,website.main_menu

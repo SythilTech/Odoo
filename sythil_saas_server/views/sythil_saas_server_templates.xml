@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="saas_add_payment" name="Saas Add Payment Method" page="True">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1 class="text-center">Add Payment Method</h1>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-8">
+                    <form method="POST" action="/add/payment/process">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="owner">Owner</label>
+                                    <input type="text" name="owner" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">           
+                                    <label for="card_number">Card Number</label>
+                                    <input type="text" name="card_number" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">                        
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="expiration_date_month">Expiration Date</label>
+                                    <select name="expiration_date_month" class="form-control">
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="expiration_date_year">Year</label>                            
+                                    <select name="expiration_date_year" class="form-control">
+                                        <option value="2017">2017</option>
+                                        <option value="2018">2018</option>
+                                        <option value="2019">2019</option>
+                                        <option value="2020">2020</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+			            <input type="text" name="cvv" class="form-control"/>
+			        </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg">Add Payment Method</button>
+                        </div>
+                    </form>
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                </div>
+            </t>
+        </template>
+                
+        <template id="saas_submit" name="Enter Package Details" page="True">
+            <t t-call="website.layout">
+              <div id="wrap" class="oe_structure oe_empty">
+                  <section>
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <h1 class="text-center">Enter Details</h1>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                    <div class="col-md-8">
+                    <form action="/saas/createdb" method="GET" class="form-horizontal mt32" enctype="multipart/form-data">
+                        <div t-attf-class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="person_name">Your Name</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="person_name" required="True"/>
+                            </div>
+                        </div>
+
+                        <div name="company_from_container" t-attf-class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="company">Company</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="company" required="True"/>
+                            </div>
+                        </div>
+
+                        <!--<div name="instance_type_container" class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="instance_type">Instance Type</label>
+                            <div class="col-md-7 col-sm-8">
+                                <select class="form-control" name="instance_type" required="True">
+                                    <option value="shared_instance">Shared Instance</option>
+                                    <option value="virtual_server">Virtual Server</option>
+                                </select>
+                            </div>
+                        </div>-->
+        
+                        <div name="email_from_container" t-attf-class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="email">Email</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="email" class="form-control" name="email" required="True"/>
+                            </div>
+                        </div>
+        
+                        <div t-attf-class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="password">Password</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="password" class="form-control" name="password" required="True"/>
+                            </div>
+                        </div>
+                    
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
+                                <input type="hidden" name="package" t-attf-value="#{template_database.id}"/>
+                                <button class="btn btn-primary btn-lg">Create Database</button>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                    <div class="col-md-4">
+                        <img t-att-src="website.image_url(template_database, 'image')" class="img-rounded mb8" t-attf-alt="#{template_database.name}" width="150" height="150"/><br/>
+                        <h3 t-field="template_database.name"></h3>
+                        <span><t t-esc="template_database.description"/></span><br/>
+                    </div>                
+                </div>
+            </t>
+        </template>
+
+<template id="saas_package_details" name="Select Package" page="True">
+    <t t-call="website.layout">
+      <h1 class="text-center"><t t-esc="template_database.name"/></h1>
+      <div id="wrap" class="oe_structure oe_empty" t-field="template_database.html_description">
+      
+      </div>
+    </t>
+</template>
+
+<template id="saas_choose_package" name="Select Package" page="True">
+    <t t-call="website.layout">
+      <div id="wrap" class="oe_structure oe_empty">
+      <section>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <h1 class="text-center">Select a Package</h1>
+            </div>
+          </div>
+        
+        
+           <div class="mt16 mb16 col-md-12">
+                <t t-foreach="template_databases" t-as="template_database">
+                    <div class="col-md-4" style="min-height:500px;">
+                        <h2 t-field="template_database.name"></h2>
+                        <img t-att-src="website.image_url(template_database, 'image')" class="img-rounded mb8" t-attf-alt="#{template_database.name}" width="150" height="150"/><br/>
+                                
+                        <p t-field="template_database.description"></p>
+                        <p>Price: $<t t-esc="template_database.price"/> per month</p>
+                        <div>
+                            <a t-attf-href="/saas/package/details/#{template_database.id}"><button class="btn btn-primary">More Details</button></a>
+                            <a t-attf-href="/try/details?templatedb=#{template_database.id}"><button class="btn btn-primary">Signup</button></a>
+                        </div>    
+                    </div>
+                    
+                </t>
+            </div>        
+        
+        
+        </div>        
+      </section>
+      </div>
+    </t>
+</template>
+
+<template id="template_details" name="Template Details" page="True">
+    <t t-call="website.layout">
+        <h1 class="text-center"><t t-esc="template_database.name"/></h1>
+        <div class="container">
+            <p class="text-center"><t t-esc="template_database.description"/></p>
+            <h2>Applications</h2>
+            <t t-raw="page_data_applications"/>
+            <br/>
+            <h2>Additional modules</h2>
+            <t t-raw="page_data_builtin"/>
+            <br/>
+            <h2>Community Modules</h2>
+            <t t-raw="page_data_community"/>
+            <br/>
+            <h2>Saas User Permissions</h2>
+            <t t-raw="groups_string"/>
+            <br/>
+        </div>
+    </t>
+</template>
+
+<template id="saas_portal" name="SAAS Portal" page="True">
+    <t t-call="website.layout">
+  <script type="text/javascript">
+  $(function() {
+
+      $('body').on('click','.o_database_action', function(ev) {
+          ev.preventDefault();
+          var db = $(ev.currentTarget).data('db');
+          var target = $(ev.currentTarget).data('target');
+          $(target).find('input[name=database]').val(db);
+          $(target).find('#saas_price').html( $(ev.currentTarget).data('price') );
+          
+          $(target).modal();
+      });
+
+      $('body').on('click','.o_database_action_unsubscribe', function(ev) {
+          ev.preventDefault();
+          var db = $(ev.currentTarget).data('db');
+          var target = $(ev.currentTarget).data('target');
+          $(target).find('input[name=database]').val(db);
+          $(target).modal();
+      });
+      
+      $('body').on('click','.o_database_action_credit_card', function(ev) {
+          ev.preventDefault();
+          //var db = $(ev.currentTarget).data('db');
+          var target = $(ev.currentTarget).data('target');
+          //$(target).find('input[name=database]').val(db);
+          $(target).modal();
+      });
+      
+  });
+  </script>
+        <h1 class="text-center">Database List</h1>
+        <div class="container">
+                 <table class="table table-striped table-bordered">
+                 <tr><th>Package</th><th>Subscription</th><th>Details</th></tr>
+                 <t t-foreach="user_databases" t-as="user_database">
+                     <tr>
+                         <td><a t-attf-href="/saas/login/#{user_database.name}"><t t-esc="user_database.template_database_id.name"/></a></td>
+                         <td>
+                             <t t-esc="user_database.state"/>
+                             <t t-if="user_database.state == 'trial' ">
+                                 (ends <t t-esc="user_database.trial_expiration"/>)
+                             </t>
+                         </td>
+                         <td>
+                             <t t-if="user_database.state == 'trial' or user_database.state == 'canceled' ">
+                                 <span t-attf-data-db="#{user_database.name}" t-attf-data-price="#{user_database.template_database_id.price}" data-target="#sythil_database_action_subscribe" class="o_database_action btn-link"><i class="fa fa-cc-visa"></i> Subscribe</span>
+                             </t>
+                             <t t-if="user_database.state == 'subscribed'">
+                                 <span t-attf-data-db="#{user_database.name}" data-target="#sythil_database_action_unsubscribe" class="o_database_action_unsubscribe btn-link"><i class="fa fa-ban"></i> Cancel Subscription</span>                             
+                             </t>
+                         </td>
+                     </tr>
+                </t>
+                </table>
+                <a href="/saas/add/payment" class="o_database_action_credit_card" data-target="#sythil_database_action_add_credit_card">Add Payment Method</a>
+        </div>
+
+
+
+<div id="sythil_database_action_subscribe" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Select Payment Method</h4>
+            </div>
+                <form method="POST" action="/saas/subscribe">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <div class="modal-body">
+                <p>Your credit card will be charged $<span id="saas_price"/> per month after the start of the subscription</p>
+            
+                <p>Please select a payment method below</p>
+
+
+                  <input type="hidden" name="database"/>
+                  <ul class="list-unstyled">
+                    <li t-foreach="payment_methods" t-as="payment_method">
+                      <label>
+                          <input t-att-value="payment_method.id" type="radio" name="payment_method" required="True"/>
+                          <span t-field="payment_method.name"/>
+                      </label>
+                    </li>
+                  </ul>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="database"/>
+                <input type="submit" value="Subscribe" class="btn btn-primary pull-right"/>
+            </div>          
+                </form>
+        </div>
+    </div>
+</div>
+
+
+<div id="sythil_database_action_unsubscribe" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Cancel Subscription</h4>
+            </div>
+                <form method="POST" action="/saas/unsubscribe">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <div class="modal-body">
+                <p>Unsubcribing will stop any reoccuring payments</p>
+                <p>You will lose access to your system until you resubscribe</p>
+                <p>Your data may be deleted during cleanup</p>
+                <p>Are you sure you wish to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="database"/>
+                <button type="submit" class="btn btn-danger btn-lg pull-right">Unsubscribe</button>
+            </div>          
+                </form>
+        </div>
+    </div>
+</div>
+
+
+<div id="sythil_database_action_add_credit_card" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Add Payment Method</h4>
+            </div>
+            
+            <form method="POST" action="/saas/add/payment/process">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <div class="modal-body">
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="owner">Owner</label>
+                                    <input type="text" name="owner" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">           
+                                    <label for="type">Type</label>
+                                    <select name="type" class="form-control">
+                                        <option value="visa">Visa</option>
+                                        <option value="mastercard">Mastercard</option>
+                                        <option value="amex">Amex</option>
+                                        <option value="discover">Discover</option>
+                                        <option value="maestro">Mestro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">                        
+                            <div class="col-md-12">
+                                <label for="card_number">Card Number</label>
+                                <input type="text" name="card_number" class="form-control"/>
+                            </div>
+                        </div>
+
+                        <div class="row">                        
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="expiration_date_month">Expiration Date</label>
+                                    <select name="expiration_date_month" class="form-control">
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="expiration_date_year">Year</label>                            
+                                    <select name="expiration_date_year" class="form-control">
+                                        <option value="2017">2017</option>
+                                        <option value="2018">2018</option>
+                                        <option value="2019">2019</option>
+                                        <option value="2020">2020</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+			            <input type="text" name="cvv" class="form-control"/>
+			        </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary btn-lg pull-right">Add Payment Method</button>
+            </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+      
+    </t>
+</template>
+
+</data>
+</openerp>
