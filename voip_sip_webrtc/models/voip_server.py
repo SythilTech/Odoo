@@ -89,7 +89,7 @@ class VoipVoip(models.Model):
         ice_response = ""
         
         #ip_addr = socket.gethostbyname(host)
-        ip = "13.54.58.172"
+        ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
         
         #See https://tools.ietf.org/html/rfc5245#section-4.1.2.1 (I don't make up these formulas...)
         priority = int((2 ^ 24) * 126) + int((2 ^ 8) * 65535)

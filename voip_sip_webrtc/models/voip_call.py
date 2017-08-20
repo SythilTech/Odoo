@@ -118,11 +118,10 @@ class VoipCall(models.Model):
         #In later versions we might send the missed call mp3 via rtp
         sdp_response += "a=sendrecv\r\n"
 
-        #TODO generate before call fingerprint...
-        sdp_response += "a=fingerprint:sha-256 DA:52:67:C5:2A:2E:91:13:A2:7D:3A:E1:2E:A4:F3:28:90:67:71:0E:B7:6F:7B:56:79:F4:B2:D1:54:4B:92:7E\r\n"
-        #sdp_response += "a=setup:actpass\r\n"
+        #TODO generate cert/fingerprint within module
+        fignerprint = self.env['ir.values'].get_default('voip.settings', 'fingerprint')
+        sdp_response += "a=fingerprint:sha-256 " + fignerprint + "\r\n"
         sdp_response += "a=setup:passive\r\n"
-        #sdp_response += "a=setup:active\r\n"
         
         #Sure why not
         sdp_response += "a=ice-options:trickle\r\n"
@@ -150,18 +149,7 @@ class VoipCall(models.Model):
 
         #Ummm naming each media?!?
         sdp_response += "a=mid:sdparta_0\r\n"
-        
-        #Description of audio 101 / 109 profile?!?
-        #sdp_response += "a=sendrecv\r\n"
-        #sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
-        #sdp_response += "a=fmtp:101 0-15\r\n"
-        #sdp_response += "a=msid:{3778521f-c0cd-47a8-aa20-66c06fbf184e} {7d104cf0-8223-49bf-9ff4-6058cf92e1cf}\r\n"
-        #sdp_response += "a=rtcp-mux\r\n"
-        #sdp_response += "a=rtpmap:109 opus/48000/2\r\n"
-        #sdp_response += "a=rtpmap:101 telephone-event/8000\r\n"
-
-        #sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
-    
+            
         return {"type":"answer","sdp": sdp_response}
 
     def message_bank(self, sdp):
@@ -333,13 +321,10 @@ class VoipCall(models.Model):
         #96 bit (12 byte) transaction ID (has to be the same as the bind request)
         send_data += transaction_id
 
-
-
-        
         #XOR mapped address attribute
         send_data += " 00 20"
 
-        #Attribute Length (fixed 8 for IPv4, IPv12 will increase this)
+        #Attribute Length (fixed 8 for IPv4, IPv6 will increase this)
         send_data += " 00 08"
 
         #Reservered (reserved for what...)
@@ -348,25 +333,24 @@ class VoipCall(models.Model):
         #Protocol Family (Always IPv4 for now...)
         send_data += " 01"
         
-        #Port XOR (Need to figure this one out...)
+        #Port XOR
         client_port = port
         send_data += " " + format( client_port ^ 0x2112 , '04x')
         
-        #IP XOR-d (Figure this out too...)
+        #IP XOR-d
         client_ip_int = struct.unpack("!I", socket.inet_aton(client_ip))[0]
         send_data += " " + format( client_ip_int ^ 0x2112A442 , '08x')
         
         #Cut off header
         hmac_input = send_data.replace(" ","")[8:]
             
-        #Remove 8 from length
+        #Readd header but subtract 8 from length before calculating hmac
         hmac_input = "01010024" + hmac_input
             
         stun_password = self.ice_password
         
         key = passlib.utils.saslprep( stun_password )
 
-        #Not tested
         mess_hmac = hmac.new( str(key), msg=hmac_input.decode("hex"), digestmod=hashlib.sha1).digest().encode('hex')
         
         #Message Integrity Attribute
@@ -428,7 +412,7 @@ class VoipCall(models.Model):
                 hex_data.append(hex_format)
                 hex_string += hex_format + " "
  
-            _logger.error("HEX DATA: " + hex_string)            
+            _logger.error("HEX DATA: " + hex_string)
             
             send_data = self.rtp_stun_listener(hex_data, addr[0], port)
             stunsocket.sendto(send_data, addr )
@@ -437,20 +421,18 @@ class VoipCall(models.Model):
             stage = "DTLS"
             stunsocket.close()
 
-
         _logger.error("DTLS Stage")
         
         #Stage 2 DTLS
         try:
             do_patch()
 
-
-            #dtlssocket = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), certfile="/etc/letsencrypt/live/sythiltech.com.au/cert.pem", keyfile="/etc/letsencrypt/live/sythiltech.com.au/privkey.pem")
+            dtlssocket = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), certfile="/etc/letsencrypt/live/sythiltech.com.au/cert.pem", keyfile="/etc/letsencrypt/live/sythiltech.com.au/privkey.pem", ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256")
             
-            #addr = ('', int(port))
-            #dtlssocket.bind(addr)
-            #dtlssocket.listen(1)
-            #conn, addr = dtlssocket.accept()
+            addr = ('', int(port))
+            dtlssocket.bind(addr)
+            dtlssocket.listen(1)
+            conn, addr = dtlssocket.accept()
             
         except Exception as e:
             _logger.error(e)

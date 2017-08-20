@@ -70,6 +70,50 @@ class VoipSettings(models.Model):
         for record in self:
             self.env['ir.values'].set_default('voip.settings', 'message_bank_duration', record.message_bank_duration)
 
+    #-----Server IP-----
+
+    @api.multi
+    def get_default_server_ip(self, fields):
+        return {'server_ip': self.env['ir.values'].get_default('voip.settings', 'server_ip')}
+
+    @api.multi
+    def set_default_server_ip(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'server_ip', record.server_ip)
+
+    #-----Cert Path-----
+
+    @api.multi
+    def get_default_cert_path(self, fields):
+        return {'cert_path': self.env['ir.values'].get_default('voip.settings', 'cert_path')}
+
+    @api.multi
+    def set_default_cert_path(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'cert_path', record.cert_path)
+
+    #-----Key Path-----
+
+    @api.multi
+    def get_default_key_path(self, fields):
+        return {'key_path': self.env['ir.values'].get_default('voip.settings', 'key_path')}
+
+    @api.multi
+    def set_default_key_path(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'key_path', record.key_path)
+
+    #-----Fingerprint-----
+
+    @api.multi
+    def get_default_fingerprint(self, fields):
+        return {'fingerprint': self.env['ir.values'].get_default('voip.settings', 'fingerprint')}
+
+    @api.multi
+    def set_default_fingerprint(self):
+        for record in self:
+            self.env['ir.values'].set_default('voip.settings', 'fingerprint', record.fingerprint)
+
     def generate_self_signed_certificate(self):
         k = crypto.PKey()
         k.generate_key(crypto.TYPE_RSA, 1024)
