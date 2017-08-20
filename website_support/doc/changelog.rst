@@ -1,3 +1,7 @@
+v1.2.7
+======
+* Remove required and create restrictions
+
 v1.2.6
 ======
 * Fix support ticket by email

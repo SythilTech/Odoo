@@ -6,7 +6,7 @@
           <field name="name">website.support.ticket.form.view</field>
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
-      	      <form create="false">
+      	      <form>
                   <header>
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply"/>
                       <button type="object" name="close_ticket" string="Close Ticket"/>                      
@@ -38,7 +38,7 @@
           <field name="name">website.support.ticket.tree.view</field>
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
-      	      <tree colors="black:ticket_color==False" create="false">
+      	      <tree colors="black:ticket_color==False">
       	          <field name="ticket_color" invisible="1"/>
       	          <field name="ticket_number_display" string="Ticket Number"/>
       	          <field name="priority_id"/>
