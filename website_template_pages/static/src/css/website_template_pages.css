@@ -1,0 +1,49 @@
+.page_template_glass_overlay {
+width: 570px;
+height: 427.5px;
+position:absolute;
+background-color:transparent;
+border:solid black 1px;
+z-index:5;
+}
+
+.page_template_preview_link {
+float:right;
+}
+
+.page_template_title {
+text-align:center;
+font-size: 20px;
+}
+
+.page_template_glass_overlay_selected {
+border:solid red 3px !important;
+}
+
+.sythil_page_template {
+margin-top: 20px;
+margin-bottom: 20px;
+}
+
+.sythil_iframe_wrap {
+width: 570px;
+height: 427.5px;
+padding: 0;
+overflow: hidden;
+}
+
+.sythil_webpage_preview {
+width: 1140px;
+height: 855px;
+border: 0;
+-ms-transform: scale(0.5);
+-moz-transform: scale(0.5);
+-o-transform: scale(0.5);
+-webkit-transform: scale(0.5);
+transform: scale(0.5);
+-ms-transform-origin: 0 0;
+-moz-transform-origin: 0 0;
+-o-transform-origin: 0 0;
+-webkit-transform-origin: 0 0;
+transform-origin: 0 0;
+}

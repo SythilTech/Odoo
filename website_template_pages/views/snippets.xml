@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="website_template_pages_editor" inherit_id="website.assets_editor" name="Website Page Tempalte Assests">
+            <xpath expr="/t" position="inside">
+                <script type="text/javascript" src="/website_template_pages/static/src/js/website_template_pages.js" />
+                <link rel="stylesheet" href="/website_template_pages/static/src/css/website_template_pages.css" />
+            </xpath>
+        </template>
+
+        <!-- User Navbar -->
+        <template id="page_template" inherit_id="website.user_navbar">
+            <xpath expr="//div[@id='o_website_add_page_modal']//ul" position="inside">
+                 <li><a href="#" data-action="save_sythil_webpage"><i class="fa fa-file-text-o"/><p>Save as Template</p></a></li>            
+                 <li><a href="#" data-action="new_sythil_webpage"><i class="fa fa-file-text"/><p>New Page Templates</p></a></li>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>

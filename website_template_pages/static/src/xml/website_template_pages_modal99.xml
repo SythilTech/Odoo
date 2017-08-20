@@ -1,0 +1,47 @@
+<templates id="template" xml:space="preserve">
+    <t t-name="website_template_pages.pick_template_modal">
+        <div class="modal fade" id="oe_webpage_template_modal">
+            <div class="modal-dialog modal-content">
+                <div class="modal-header alert alert-info mb0">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                    <h4 class="modal-title">Pick a Webpage Template</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+		        <label for="page-name" class="col-sm-3 control-label">Page Title:</label>
+		        <div class="col-sm-9">
+		            <input type="text" class="form-control" id="sythil_page_name" required="required"/>              
+		        </div>
+                    </div>
+                    <br/>
+                    <ul class="nav nav-pills nav-justified">
+                        <li class="active"><a data-toggle="pill" href="#local_page_templates">Local</a></li>
+                        <li><a data-toggle="pill" id="template_online_tab" href="#online_page_templates">Online</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="local_page_templates" class="tab-pane fade in active">
+                            <div id="templates_div">
+                    
+                            </div>
+                        </div>
+                        <div id="online_page_templates" class="tab-pane fade">
+                            <div id="templates_div_online">
+                    
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="sythil_selected_template_id"/>
+		    <button id="cancel" data-dismiss="modal" class="btn btn-primary">Cancel</button>
+		    <button id="submit_webpage_template" class="btn btn-danger">Create Webpage</button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
