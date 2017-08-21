@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+import odoo
+import openerp
+from odoo import api
+import re
+
+def db_filter(dbs, httprequest=None):
+    httprequest = httprequest or request.httprequest
+    h = httprequest.environ.get('HTTP_HOST', '').split(':')[0]
+    d, _, r = h.partition('.')
+    if d == "www" and r:
+        d = r.partition('.')[0]
+    r = odoo.tools.config['dbfilter'].replace('%h', h).replace('%d', d)
+    dbs = [i for i in dbs if re.match(r, i)]
+
+    saas_server_db = odoo.tools.config['sythilsaasserver']
+
+    #connect to the saas server database
+    db = openerp.sql_db.db_connect(saas_server_db)
+
+    #Create new registry
+    registry = odoo.modules.registry.Registry(saas_server_db)
+
+    #Get the database which matches the domain
+    with registry.cursor() as cr:
+        context = {}
+        env = api.Environment(cr, odoo.SUPERUSER_ID, context)
+
+	saas_domain_id = env['saas.database.domain'].search([('name','=',h)])
+
+        if saas_domain_id:
+	    saas_domain = env['saas.database.domain'].browse(saas_domain_id[0])
+	    
+	    #Select only that database
+	    dbs = [saas_domain.database_id.name]
+
+    return dbs

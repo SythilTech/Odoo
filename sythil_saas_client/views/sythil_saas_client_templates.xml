@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--<template id="assets" name="Sythil SAAS Client Backend Assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/sythil_saas_client/static/src/js/sythil_saas_client.js"></script>
+            </xpath>
+        </template>-->
+
+        <template id="trial_banner" name="Sythil SAAS Client Trial Banner" inherit_id="web.webclient_bootstrap">
+            <xpath expr="//nav" position="before">
+                <t t-if="subscription_status == 'trial'">
+                    <div style="text-align:center;padding:5px;font-size:20px;font-weight:bold;">TRIAL MODE - <t t-esc="trail_days"/> day(s) and <t t-esc="trail_hours"/> hour(s) left</div>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="saas_trial_expired" name="Sythil SAAS Trial Expired">
+            <div style="text-align:center;">
+                <p>Thank you for trying our software</p>
+                <p>If you wish to continuing using the software please consider purchasing a subscription</p>
+                <p><a t-attf-href="#{saas_server_url}saas/portal">Manage Subscription</a></p>
+            </div>
+        </template>
+
+        
+    </data>
+</openerp>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <record id="trial_expiration_date" model="ir.config_parameter">
+            <field name="key">trial_expiration_date</field>
+            <field name="value">2050-10-25 01:01:01</field>
+            <field name="group_ids" eval="[(4, ref('base.group_system'))]" />
+        </record>
+
+        <record id="saas_server_url" model="ir.config_parameter">
+            <field name="key">saas_server_url</field>
+            <field name="value">example.com</field>
+            <field name="group_ids" eval="[(4, ref('base.group_system'))]" />
+        </record>
+        
+    </data>
+</openerp>

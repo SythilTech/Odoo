@@ -13,6 +13,8 @@ from dateutil.relativedelta import relativedelta
 import tempfile
 import StringIO
 import requests
+import odoo
+from odoo import api
 
 import openerp
 import openerp.http as http
@@ -25,7 +27,7 @@ class SaasMultiDB(http.Controller):
     def saas_portal(self, **kw):
         """Displays a list of databases owned by the current user"""
         user_databases = request.env['saas.database'].search([('user_id','=',request.env.user.id)])
-        payment_methods = request.env['payment.method'].search([('partner_id','=',request.env.user.partner_id.id)])
+        payment_methods = request.env['payment.token'].search([('partner_id','=',request.env.user.partner_id.id)])
 
         return http.request.render('sythil_saas_server.saas_portal', {'user_databases': user_databases, 'payment_methods': payment_methods})
 
@@ -119,10 +121,12 @@ class SaasMultiDB(http.Controller):
 
         #Connect to the saas database and update the subscription status
 	db = openerp.sql_db.db_connect(user_database.name)
-        registry = openerp.modules.registry.RegistryManager.new(user_database.name, False, None, update_module=False)
-	with closing(db.cursor()) as cr:
-	    cr.autocommit(True)     # avoid transaction block
-	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'canceled' )
+
+        registry = odoo.modules.registry.Registry(user_database.name)
+        with registry.cursor() as cr:
+            context = {}
+            env = api.Environment(cr, SUPERUSER_ID, context)
+	    env['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'canceled' )
 
         return werkzeug.utils.redirect("/saas/portal")        
 
@@ -135,7 +139,7 @@ class SaasMultiDB(http.Controller):
 
         database_name = values['database']
         user_database = request.env['saas.database'].search([('name','=',database_name), ('partner_id','=', request.env.user.partner_id.id)])
-        payment_method = request.env['payment.method'].search([('id','=', int(values['payment_method']) ), ('partner_id','=',request.env.user.partner_id.id)]  )        
+        payment_method = request.env['payment.token'].search([('id','=', int(values['payment_method']) ), ('partner_id','=',request.env.user.partner_id.id)]  )        
 
         user_database.sudo().state = "subscribed"
         user_database.sudo().next_payment_date = datetime.now()  + relativedelta(months=1)
@@ -144,10 +148,12 @@ class SaasMultiDB(http.Controller):
 
         #Connect to the saas database and update the subscription status
 	db = openerp.sql_db.db_connect(user_database.name)
-        registry = openerp.modules.registry.RegistryManager.new(user_database.name, False, None, update_module=False)
-	with closing(db.cursor()) as cr:
-	    cr.autocommit(True)     # avoid transaction block
-	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'subscribed' )
+
+        registry = odoo.modules.registry.Registry(user_database.name)
+        with registry.cursor() as cr:
+            context = {}
+            env = api.Environment(cr, SUPERUSER_ID, context)
+	    env['ir.config_parameter'].set_param('subscription_status', 'subscribed' )
 
         return werkzeug.utils.redirect("/saas/portal")        
 
@@ -216,7 +222,7 @@ class SaasMultiDB(http.Controller):
         if 'id' in json_ob:
             credit_card_token = json_ob['id']
             hidden_name = "**** **** **** *" + card_number[-3:]
-            request.env['payment.method'].sudo().create({'name': hidden_name,'partner_id': request.env.user.partner_id.id, 'active': True, 'acquirer_id': payment_aquirer.id, 'acquirer_ref': credit_card_token})    
+            request.env['payment.token'].sudo().create({'name': hidden_name,'partner_id': request.env.user.partner_id.id, 'active': True, 'acquirer_id': payment_aquirer.id, 'acquirer_ref': credit_card_token})    
             
             return werkzeug.utils.redirect("/saas/portal")
 
@@ -244,9 +250,6 @@ class SaasMultiDB(http.Controller):
         #connect to the newly created database
 	db = openerp.sql_db.db_connect(template_database.database_name)
 
-        #Create new registry
-        registry = openerp.modules.registry.RegistryManager.new(template_database.database_name, False, None, update_module=True)
-
         page_data_applications = ""
         page_data_builtin = ""
         page_data_community = ""
@@ -256,32 +259,33 @@ class SaasMultiDB(http.Controller):
         for buildin_module in request.env['saas.modules.builtin'].search([]):
             buildin_modules_list.append(buildin_module.name)
 
-	#Get a list of all the installed modules
-	with closing(db.cursor()) as cr:
-	    cr.autocommit(True)     # avoid transaction block
+        registry = odoo.modules.registry.Registry(template_database.database_name)
+        with registry.cursor() as cr:
+            context = {}
+            env = api.Environment(cr, SUPERUSER_ID, context)
 	    
 	    #Application list
-	    application_modules = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed'), ('application','=',True) ])
+	    application_modules = env['ir.module.module'].search([('state','=','installed'), ('application','=',True) ])
 	    for installed_module_id in application_modules:
-	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
+	        installed_module = env['ir.module.module'].browse(installed_module_id)
 	        page_data_applications += "<h3>" + installed_module.shortdesc + " (" + installed_module.name + ")</h3>"
 	        
 	    #Built in modules
-	    builtin_modules = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed'), ('application','=',False)])
+	    builtin_modules = env['ir.module.module'].search([('state','=','installed'), ('application','=',False)])
 	    for installed_module_id in builtin_modules:
-	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
+	        installed_module = env['ir.module.module'].browse(installed_module_id)
 	        if installed_module.name in buildin_modules_list:
 	            page_data_builtin += "<h3>" + installed_module.shortdesc + " (" + installed_module.name + ")</h3>"
 	    
 	    #Community Modules
-	    community_modules = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed')])
+	    community_modules = env['ir.module.module'].search([('state','=','installed')])
 	    for installed_module_id in community_modules:
-	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id)
+	        installed_module = env['ir.module.module'].browse(installed_module_id)
 	        if installed_module.name not in buildin_modules_list:
-	            page_data_community += "<h3><a href=\"https://www.odoo.com/apps/modules/9.0/" + installed_module.name + "\">" + installed_module.shortdesc + " (" + installed_module.name + ")</a></h3>"
+	            page_data_community += "<h3><a href=\"https://www.odoo.com/apps/modules/10.0/" + installed_module.name + "\">" + installed_module.shortdesc + " (" + installed_module.name + ")</a></h3>"
 	            
-	    saas_user_id = registry['ir.model.data'].get_object_reference(cr, SUPERUSER_ID, 'sythil_saas_client', 'saas_user')[1]
-            saas_user = registry['res.users'].browse(cr, SUPERUSER_ID, saas_user_id)
+	    saas_user_id = env['ir.model.data'].get_object_reference('sythil_saas_client', 'saas_user')[1]
+            saas_user = env['res.users'].browse(saas_user_id)
             for group in saas_user.groups_id:
                 groups_string += "<h3>" + group.display_name + "</h3>\n"
 
@@ -388,17 +392,19 @@ class SaasMultiDB(http.Controller):
         #connect to the newly created database
 	db = openerp.sql_db.db_connect(template_database.database_name)
 
-        #Create new registry
-        registry = openerp.modules.registry.RegistryManager.new(template_database.database_name, demo, None, update_module=True)
-
         installed_module_string = ""
         my_return = []
 
 	#Get a list of installed modules on the template database
-	with closing(db.cursor()) as cr:
-	    cr.autocommit(True)     # avoid transaction block
-	    for installed_module_id in registry['ir.module.module'].search(cr, SUPERUSER_ID, [('state','=','installed')] ):
-	        installed_module = registry['ir.module.module'].browse(cr, SUPERUSER_ID, installed_module_id )	        
+        registry = odoo.modules.registry.Registry(template_database.database_name)
+
+	#Update the saas user's name, email, login and password
+        with registry.cursor() as cr:
+            context = {}
+            env = api.Environment(cr, SUPERUSER_ID, context)
+
+	    for installed_module_id in env['ir.module.module'].search([('state','=','installed')] ):
+	        installed_module = env['ir.module.module'].browse(installed_module_id )	        
 		my_return.append({"name": installed_module.name, "version":installed_module.installed_version}) 
 	        	    
         payload = {'templatedbdata': json.JSONEncoder().encode({"templatedb": template_database.id, "modules":my_return}) }
@@ -487,21 +493,21 @@ class SaasMultiDB(http.Controller):
         #connect to the newly created database
 	db = openerp.sql_db.db_connect(db_name)
 
-        #Create new registry
-        registry = openerp.modules.registry.RegistryManager.new(system_name, demo, None, update_module=True)
+        registry = odoo.modules.registry.Registry(db_name)
 
 	#Update the saas user's name, email, login and password
-	with closing(db.cursor()) as cr:
-	    cr.autocommit(True)     # avoid transaction block
-	    saas_user = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'sythil_saas_client', 'saas_user')
+        with registry.cursor() as cr:
+            context = {}
+            env = api.Environment(cr, SUPERUSER_ID, context)
+	    saas_user = env['ir.model.data'].get_object('sythil_saas_client', 'saas_user')
 	    saas_user.write({'name':person_name, 'email':email, 'login':email, 'password':password})
-	    saas_company = registry['ir.model.data'].get_object(cr, SUPERUSER_ID, 'base', 'main_company')
+	    saas_company = env['ir.model.data'].get_object('base', 'main_company')
 	    saas_company.name = company
 	    
 	    #Init the trial period
-	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'subscription_status', 'trial' )
-	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'trial_expiration_date', trial_expiration_date.strftime(tools.DEFAULT_SERVER_DATETIME_FORMAT) )
-	    registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'saas_server_url', request.httprequest.host_url)
+	    env['ir.config_parameter'].set_param('subscription_status', 'trial' )
+	    env['ir.config_parameter'].set_param('trial_expiration_date', trial_expiration_date.strftime(tools.DEFAULT_SERVER_DATETIME_FORMAT) )
+	    env['ir.config_parameter'].set_param('saas_server_url', request.httprequest.host_url)
         
         #Automatically sign the new user in
         request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
