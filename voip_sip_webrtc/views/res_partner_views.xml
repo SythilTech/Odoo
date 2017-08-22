@@ -9,7 +9,7 @@
         <field name="state">code</field>
         <field name="code">action = env['voip.voip'].start_sip_call(context['active_ids'][0])</field>
     </record>
-
+    
     <record id="sip_call_more_item" model="ir.values">
         <field eval="'client_action_multi'" name="key2"/>
         <field eval="'res.partner'" name="model"/>

@@ -192,6 +192,23 @@ WebClient.include({
 	                    $("#voipcalloutgoingimage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
                         $("#toPartnerImage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
 					}
+                } else if (notification[0][1] === 'voip.sip') {
+
+		            console.log("Call Type: SIP");
+
+                    role = "caller";
+                    mode = "audiocall";
+                    call_type = "external";
+                    to_partner_id = notification[1].to_partner_id;
+		            var constraints = {'audio': true};
+
+                    if (navigator.webkitGetUserMedia) {
+		                navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+		            } else {
+                        window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+		            }
+
+
                 } else if (notification[0][1] === 'voip.response') {
 
 					var status = notification[1].status;
@@ -531,6 +548,5 @@ var VoipCallIncomingNotification = Notification.extend({
 
     },
 });
-
 
 });

@@ -37,7 +37,7 @@ class VoipVoip(models.Model):
         mode = "audiocall"
         constraints = {'audio': True}
         notification = {'mode': mode, 'to_partner_id': to_partner, 'constraints':  constraints, 'call_type': 'external'}
-        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.permission', self.env.user.partner_id.id), notification)
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.sip', self.env.user.partner_id.id), notification)
                     
     @api.model
     def start_incoming_sip_call(self, sip_invite, addr, sip_tag):

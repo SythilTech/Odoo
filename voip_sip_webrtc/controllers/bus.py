@@ -10,6 +10,9 @@ class VoipBusController(BusController):
     # --------------------------
     def _poll(self, dbname, channels, last, options):
         if request.session.uid:
+
+            #Go back to the client and start the SIP call by asking for media permission
+            channels.append((request.db, 'voip.sip', request.env.user.partner_id.id))
             
             #Callee receives notication asking to accept or reject the call plus media permission, Caller receives a notification showing how much time left before call is missed
             channels.append((request.db, 'voip.notification', request.env.user.partner_id.id))

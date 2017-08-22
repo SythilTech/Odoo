@@ -10,6 +10,7 @@ from random import randint
 from hashlib import sha1
 import ssl
 #from dtls import do_patch
+#from dtls.sslconnection import SSLConnection
 import hmac
 import hashlib
 import random
@@ -296,6 +297,309 @@ class VoipCall(models.Model):
         #TODO trancode G722 to a format that can be listened to within a browser
         
         #TODO save the transcoded file to the call so it can be listened to later (Only keep for 48 hours to save space also legal requirements in some places)
+
+    def webrtc_dtls_handshake(self):
+        #Stage 2 DTLS
+        try:
+            dtls_packet = ""
+
+            #--------Server Hello (Header)---------
+            #Content Type
+            dtls_packet += "16"
+            
+            #Version (DTLS 1.2)
+            dtls_packet += "fe fd"
+            
+            #Epoch
+            dtls_packet += "00 00"
+            
+            #Sequence Number (0)
+            dtls_packet += "00 00 00 00 00 00"
+            
+            #Length (117)
+            dtls_packet += "00 75"
+            
+            #Server Hello (Body)
+            #Handshake Type (2)
+            dtls_packet += "02"
+            
+            #Length (105)
+            dtls_packet += "00 00 69"
+            
+            #Message Sequence (0)
+            dtls_packet += "00 00"
+
+            #Fragment Offset (0)
+            dtls_packet += "00 00 00"
+
+            #Fragment Length
+            dtls_packet += "00 00 69"
+
+            #Version DTLS 1.2
+            dtls_packet += "fe fd"
+
+            #Random (TODO)
+            dtls_packet += "be b5 08 7d 71 3a a4 d2 02 e0 de f2 9e 86 10 8e 5b 4f fa f8 2c 79 28 dc f0 bf 16 ed 99 84 ce cb"
+
+            #Session ID Length (32)
+            dtls_packet += "20"
+
+            #Session ID (TODO)
+            dtls_packet += "22 04 a9 62 48 53 c0 3c 4c fc 08 52 c7 19 0a d5 69 18 d5 fd 63 18 43 20 05 bc 9c 75 99 2c 9e 8b"
+
+            #Cipher Suite (TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256)
+            dtls_packet += "c0 2b"
+            
+            #Compression Method (null)
+            dtls_packet += "00"
+
+            #Extensions Length (33)
+            dtls_packet += "00 21"
+
+            #----Extension: renegotation_info----
+            #Type (65281)
+            dtls_packet += "ff 01"
+            
+            #Length (1)
+            dtls_packet += "00 01"
+
+            #Renegitaiation Info Extenstion
+            dtls_packet += "00"
+
+            #----Extension: ec_point_formats---
+            #Type (11)
+            dtls_packet += "00 0b"
+
+            #Length (2)
+            dtls_packet += "00 02"
+
+            #EC point formats length (1)
+            dtls_packet += "01"
+
+            #Elliptic Curves point formats(0)
+            dtls_packet += "00"
+
+            #----Extension: application_layer_protocol_negotiation----
+            #Type (16)
+            dtls_packet += "00 10"
+
+            #Length (9)
+            dtls_packet += "00 09"
+
+            #ALPN Extension Length (7)
+            dtls_packet += "00 07"
+
+            #ALPN string length (6)
+            dtls_packet += "06"
+          
+            #ALPN Next Protocol (webrtc) [Kinda feel like openssl should be able to do this...]
+            dtls_packet += "77 65 62 72 74 63"
+
+            #Extension: use_srtp [reinventing the wheel for 9 bytes...]
+            #Type (14)
+            dtls_packet += "00 0e"
+
+            #Length (5)
+            dtls_packet += "00 05"
+
+            #SRTP Protection Profiles Length (2)
+            dtls_packet += "00 02"
+
+            #SRTP Protection Profile (SRTP_AES128_CM_HMAC_SHA1_80)
+            dtls_packet += "00 01"
+
+            #MKI Length (0)
+            dtls_packet += "00"
+
+            #----------Certificate-------------
+            #Content Type (22)
+            dtls_packet += "16"
+
+            #Version (DTLS 1.2)
+            dtls_packet += "fe fd"
+
+            #Epoch (0)
+            dtls_packet += "00 00"
+
+            #Sequence Number (1)
+            dtls_packet += "00 00 00 00 00 01"
+
+            #Length (348)
+            dtls_packet += "01 5c"
+
+            #---Certificate (Body)---
+            #Type (11)
+            dtls_packet += "0b"
+
+            #Length (336)
+            dtls_packet += "00 01 50"
+
+            #Message Sequence (1)
+            dtls_packet += "00 01"
+
+            #Fragment Offset
+            dtls_packet += "00 00 00"
+
+            #Fragment Length (336)
+            dtls_packet += "00 01 50"
+
+            #Certificates Length (333)
+            dtls_packet += "00 01 4d"
+
+            #Certificate Length (330)
+            dtls_packet += "00 01 4a"
+            
+            #Certificate (TODO)
+            dtls_packet += "30 82 01 46 30 81 ec a0 03 02 01 02 02 04 1d ae 95 89 30 0a 06 08 2a 86 48 ce 3d 04 03 02 30 2b 31 29 30 27 06 03 55 04 03 13 20 34 39 61 38 35 65 61 31 30 31 32 61 64 66 39 66 33 34 34 34 36 35 66 35 30 65 36 63 61 65 66 37 30 1e 17 0d 31 37 30 38 31 39 32 33 32 30 34 34 5a 17 0d 31 37 30 39 31 39 32 33 32 30 34 34 5a 30 2b 31 29 30 27 06 03 55 04 03 13 20 34 39 61 38 35 65 61 31 30 31 32 61 64 66 39 66 33 34 34 34 36 35 66 35 30 65 36 63 61 65 66 37 30 59 30 13 06 07 2a 86 48 ce 3d 02 01 06 08 2a 86 48 ce 3d 03 01 07 03 42 00 04 d7 dd d4 ed f2 af 11 c9 27 06 e4 d3 0f 76 11 6c 2e 75 f4 4f ba 6b ee dd 15 ba 63 23 b1 6d 3a 42 b5 f4 31 3b 15 fb a5 fb ab 0d fe e1 4c d3 96 72 c0 42 73 fe c1 f6 8c 40 44 2a b5 7a b3 22 07 01 30 0a 06 08 2a 86 48 ce 3d 04 03 02 03 49 00 30 46 02 21 00 b9 68 24 72 46 9b 50 ba 91 6a 7e 0c c0 92 80 ec 80 08 0b 53 7e 64 da 00 4a 2b ad 4c c2 05 b9 f1 02 21 00 b7 1d 7a 03 fd 2c 9c fe 94 54 39 63 c9 d8 66 c4 e0 95 8d 9e e7 77 d7 3c 91 25 d9 7e f1 30 9a e3"
+
+            #--------Server Key Exchange--------
+            #Content Type (22)
+            dtls_packet += "16"
+
+            #Version DTLS 1.2
+            dtls_packet += "fe fd"
+
+            #Epoch (0)
+            dtls_packet += "00 00"
+
+            #Sequence Number (2)            
+            dtls_packet += "00 00 00 00 00 02"
+
+            #Length (123)
+            dtls_packet += "00 7b"
+            
+            #----Server Key Exchange----
+            dtls_packet += "0c"
+            
+            #Length
+            dtls_packet += "00 00 6f"
+
+            #Message Sequence (2)
+            dtls_packet += "00 02"
+
+            #Fragment Offset (0)            
+            dtls_packet += "00 00 00"
+            
+            #Fragment Length (111)
+            dtls_packet += "00 00 6f"
+
+            #----EC Diffie-Hellman Server Params----
+            #Curve Type (named curve)
+            dtls_packet += "03"
+
+            #Named Curve (x25519)
+            dtls_packet += "00 1d"
+
+            #Pubkey Length (32)                        
+            dtls_packet += "20"
+ 
+            #Pubkey (TODO)
+            dtls_packet += "4a 06 61 75 51 4f aa 90 cb 70 4f 88 4e 76 44 a9 b4 ce 74 2a 0f 9f 90 14 34 ce 4b 87 54 b5 c9 3f"
+
+            #Signature Hash Algorithm Hash (SHA256)
+            dtls_packet += "04"
+
+            #Signature Hash Algorithm Signature (ECDSA)
+            dtls_packet += "03"
+
+            #Signature Length (71)
+            dtls_packet += "00 47"
+            
+            #Signature (TODO)            
+            dtls_packet += "30 45 02 20 55 48 5f 04 78 3f ae 55 1f 99 49 7d 1d 42 0a f4 1a 4d dc a1 9e 31 45 f3 f5 e8 20 6c 7e 89 73 3c 02 21 00 fc 8b 7a 74 e3 05 05 b4 c4 6b 72 48 3d 2f f5 a0 54 7a e4 a7 f3 cf 90 f3 77 12 14 6a 1d 89 e8 62"
+
+            #------------Certificate Request (Header)------------
+            #Content Type (22)
+            dtls_packet += "16"
+
+            #Version (DTLS 1.2)
+            dtls_packet += "fe fd"
+
+            #Epoch (0)
+            dtls_packet += "00 00"
+
+            #Sequence Number (3)
+            dtls_packet += "00 00 00 00 00 03"
+
+            #Length (50)
+            dtls_packet += "00 32"
+
+            #----Certificate Request (Body)----
+            #Handshake Type (13)
+            dtls_packet += "0d"
+
+            #Length (38)            
+            dtls_packet += "00 00 26"
+            
+            #Message Sequence (3)
+            dtls_packet += "00 03"
+
+            #Fragment Offset (0)            
+            dtls_packet += "00 00 00"
+
+            #Fragment Length (38)            
+            dtls_packet += "00 00 26"
+
+            #Certificate types count (3)            
+            dtls_packet += "03"
+            
+            #Certificate type (RSA Sign, ECDSA Sign, DSS Sign)
+            dtls_packet += "01 40 02"
+
+            #Signature Hash Algorithms Length (30)                        
+            dtls_packet += "00 1e"
+
+            #Signature Has Algorithims (15)
+            dtls_packet += "04 03 05 03 06 03 02 03 08 04 08 05 08 06 04 01 05 01 06 01 02 01 04 02 05 02 06 02 02 02"
+
+            #Distinguished Names Length (0)
+            dtls_packet += "00 00"
+            
+            #------------Server Hello Done-------------            
+            #Content Type (22)
+            dtls_packet += "16"
+            
+            #Version (DTLS 1.2)
+            dtls_packet += "fe fd"
+                        
+            #Epoch (0)
+            dtls_packet += "00 00"
+            
+            #Sequence Number
+            dtls_packet += "00 00 00 00 00 04"
+
+            #Length (12)                        
+            dtls_packet += "00 0c"
+                    
+            #----Server Hello Done (Body)----
+            #Handshake type (14)
+            dtls_packet += "0e"
+            
+            #Length (0)
+            dtls_packet += "00 00 00"
+
+            #Message Sequence (4)
+            dtls_packet += "00 04"
+
+            #Fragment Offset( )
+            dtls_packet += "00 00 00"
+            
+            #Fragment Length (0)
+            dtls_packet += "00 00 00"
+
+
+            #Cipher Spec
+            #Header
+            #14 fe fd 00 00 00 00 00 00 00 05 00 01 01
+            #Record Layer
+            #16 fe fd 00 01 00 00 00 00 00 00 00 30 00 01 00 00 00 00 00 00 46 2d 74 09 29 eb 52 db 37 e8 c7 60 b3 fc 71 f6 4d c9 bb 01 72 5d ca 09 41 04 78 53 55 fb 53 a8 8e 7e f9 3a 26 af a7 fb
+
+
+            send_data = dtls_packet.replace(" ","").decode('hex')
+            return send_data
+            
+        except Exception as e:
+            _logger.error(e)
         
     def rtp_stun_listener(self, d, client_ip, port):
 
@@ -372,7 +676,7 @@ class VoipCall(models.Model):
         #Atrribute Length (CRC-32 is always 4 bytes)
         send_data += " 00 04"
         
-        #Fingerprint (TODO)
+        #Fingerprint
         send_data += " " + crc_hex
         
         #Ok now convert it back so we can send it
@@ -402,7 +706,7 @@ class VoipCall(models.Model):
         hex_data = ['FF']
         
         #Stage 1 STUN Connectivity Test
-        while stage == "STUN":
+        while stage == "STUN" or stage == "DTLS HELLO":
 
             data, addr = stunsocket.recvfrom(2048)
 
@@ -413,29 +717,34 @@ class VoipCall(models.Model):
                 hex_string += hex_format + " "
  
             _logger.error("HEX DATA: " + hex_string)
-            
-            send_data = self.rtp_stun_listener(hex_data, addr[0], port)
-            stunsocket.sendto(send_data, addr )
-            
-            #We don't get any acknowledgement so we just assume everything went fine...
-            stage = "DTLS"
-            stunsocket.close()
 
+            if stage == "STUN":            
+                send_data = self.rtp_stun_listener(hex_data, addr[0], port)
+                stunsocket.sendto(send_data, addr )
+                #We don't get any acknowledgement so we just assume everything went fine...
+                stage = "DTLS HELLO"
+            else:
+                send_data = self.webrtc_dtls_handshake()
+                stunsocket.sendto(send_data, addr )
+                stage = "DTLS CIPHER"
+                
         _logger.error("DTLS Stage")
         
         #Stage 2 DTLS
-        try:
-            do_patch()
+        #try:            
+            #do_patch()
+            
+            #dtlssocket = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), certfile="/odoo/cert.crt", keyfile="/odoo/cert.key", do_handshake_on_connect=True, ssl_version=ssl.PROTOCOL_DTLSv1, ciphers="ECDHE-ECDSA-AES128-GCM-SHA256")
 
-            dtlssocket = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), certfile="/etc/letsencrypt/live/sythiltech.com.au/cert.pem", keyfile="/etc/letsencrypt/live/sythiltech.com.au/privkey.pem", ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256")
+            #set_alpn_protocols("webrtc")
+            #dtlssocket.set_context(context)
             
-            addr = ('', int(port))
-            dtlssocket.bind(addr)
-            dtlssocket.listen(1)
-            conn, addr = dtlssocket.accept()
+            #dtlssocket.bind(('', int(port)))
+            #dtlssocket.listen(1)
+            #conn, addr = dtlssocket.accept()
             
-        except Exception as e:
-            _logger.error(e)
+        #except Exception as e:
+        #    _logger.error(e)
 
 
         #while time.time() < start + message_bank_duration:
