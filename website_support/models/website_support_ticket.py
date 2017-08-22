@@ -31,11 +31,12 @@ class WebsiteSupportTicket(models.Model):
 
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
     partner_id = fields.Many2one('res.partner', string="Partner")
+    user_id = fields.Many2one('res.users', string="Assigned User")
     person_name = fields.Char(string='Person Name')
     email = fields.Char(string="Email")
     category = fields.Many2one('website.support.ticket.categories', string="Category", track_visibility='onchange')
-    subject = fields.Char(string="Subject", readonly=True)
-    description = fields.Text(string="Description", readonly=True)
+    subject = fields.Char(string="Subject")
+    description = fields.Text(string="Description")
     state = fields.Many2one('website.support.ticket.states', readonly=True, default=_default_state, string="State")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
@@ -46,6 +47,11 @@ class WebsiteSupportTicket(models.Model):
     ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
     ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
     company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
+    
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.person_name = self.partner_id.name
+        self.email = self.partner_id.email
     
     def message_new(self, msg, custom_values=None):
         """ Create new support ticket upon receiving new email"""

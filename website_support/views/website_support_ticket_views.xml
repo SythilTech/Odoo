@@ -15,6 +15,7 @@
       	              <group>
       	                  <field name="ticket_number"/>
       	                  <field name="priority_id"/>
+      	                  <field name="user_id"/>
       	                  <field name="partner_id"/>
           	          <field name="person_name"/>
           	          <field name="email"/>

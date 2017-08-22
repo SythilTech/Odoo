@@ -32,7 +32,11 @@
                 <p>Your support ticket has been updated and is now in the category '${object.category.name}' </p>
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
-                <b>Ticket Category:</b> ${object.category.name}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
                 <b>Ticket Description:</b><br/>
                 ${object.description}
                 
@@ -52,7 +56,11 @@
                 <p>Your support ticket has been closed by our staff</p>
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
-                <b>Ticket Category:</b> ${object.category.name}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
                 <b>Ticket Description:</b><br/>
                 ${object.description}
                 
@@ -72,7 +80,11 @@
                 <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
-                <b>Ticket Category:</b> ${object.category.name}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
                 <b>Ticket Description:</b><br/>
                 ${object.description}
                 
@@ -92,7 +104,11 @@
                 <hr/>
                 <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
                 <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
-                <b>Ticket Category:</b> ${object.ticket_id.category.name}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
                 <b>Ticket Description:</b><br/>
                 ${object.ticket_id.description}
             ]]>

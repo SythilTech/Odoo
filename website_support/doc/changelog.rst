@@ -1,3 +1,7 @@
+v1.2.8
+======
+* Remove readonly restrictions
+
 v1.2.7
 ======
 * Remove required and create restrictions
