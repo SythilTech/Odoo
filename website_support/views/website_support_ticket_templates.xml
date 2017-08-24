@@ -14,7 +14,7 @@
                 <p>Person Name: ${object.person_name}</p>
                 <p>Category: ${object.category.name}</p>
                 <p>Subject: ${object.subject}</p>
-                <p>${object.description}</p>
+                <p>${object.description|safe}</p>
                 <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
             ]]>
             </field>
@@ -38,7 +38,7 @@
                 % endif
                 <br/>
                 <b>Ticket Description:</b><br/>
-                ${object.description}
+                ${object.description|safe}
                 
             ]]>
             </field>
@@ -62,7 +62,7 @@
                 % endif
                 <br/>
                 <b>Ticket Description:</b><br/>
-                ${object.description}
+                ${object.description|safe}
                 
             ]]>
             </field>
@@ -86,7 +86,7 @@
                 % endif
                 <br/>
                 <b>Ticket Description:</b><br/>
-                ${object.description}
+                ${object.description|safe}
                 
             ]]>
             </field>
@@ -110,7 +110,7 @@
                 % endif
                 <br/>
                 <b>Ticket Description:</b><br/>
-                ${object.ticket_id.description}
+                ${object.ticket_id.description|safe}
             ]]>
             </field>
         </record>

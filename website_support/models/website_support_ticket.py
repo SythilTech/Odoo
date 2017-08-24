@@ -71,10 +71,9 @@ class WebsiteSupportTicket(models.Model):
             partner_id = search_partner[0].id
             from_name = search_partner[0].name
 
-        body_short = msg.get('body')
+        body_short = tools.html_sanitize(msg.get('body'))
 
         #body_short = tools.html_email_clean(msg.get('body'), shorten=True, remove=True)
-        body_short = body_short.replace("<pre>","").replace("</pre>","") #Crude hack to get rid of warpping pre tag
         portal_access_key = randint(1000000000,2000000000)
         defaults = {'partner_id': partner_id, 'person_name': from_name, 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
         
@@ -83,7 +82,7 @@ class WebsiteSupportTicket(models.Model):
     def message_update(self, msg_dict, update_vals=None):
         """ Override to update the support ticket according to the email. """
 
-        body_short = msg_dict['body']
+        body_short = tools.html_sanitize(msg_dict['body'])
         #body_short = tools.html_email_clean(msg_dict['body'], shorten=True, remove=True)
                 
         #s = MLStripper()

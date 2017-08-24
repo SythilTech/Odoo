@@ -24,7 +24,7 @@
           	          <field name="subject"/>
           	          <field name="attachment" filename="attachment_filename"/>
           	          <field name="attachment_filename" invisible="True"/>
-          	          <field name="description"/>      	              
+          	          <field name="description" widget="html"/>      	              
           	      </group>
       	          </sheet>
                   <div class="oe_chatter">

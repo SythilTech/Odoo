@@ -1,3 +1,7 @@
+v1.2.9
+======
+* Manual html sanitise
+
 v1.2.8
 ======
 * Remove readonly restrictions
