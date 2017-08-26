@@ -35,7 +35,7 @@ class WebsiteStyleManager(models.Model):
         
         less_data = ""
         for less_style in self.custom_less_ids:
-            less_data += "@" + less_style.internal_name + ": " + less_style.value + ";\n"
+            less_data += "@" + str(less_style.internal_name) + ": " + str(less_style.value) + ";\n"
         
         with open(full_path, "w") as less_file:
             less_file.write(less_data)
@@ -89,7 +89,7 @@ class WebsiteStyleProfileLess(models.Model):
     _name = "website.style.profile.less"
     
     profile_id = fields.Many2one('website.style.profile', string="Profile")
-    name = fields.Char(string="Name", help="Display name of the less variable")
+    name = fields.Char(string="Display Name", help="Display name of the less variable")
     internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable")
     value = fields.Char(string="Value", help="Color HEX code")
     

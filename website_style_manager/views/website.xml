@@ -20,14 +20,15 @@
       	            <field name="custom_css"/>
       	            <field name="color_profile"/>
       	            <field name="custom_less_ids" context="{'default_website_id': active_id}">
-      	                <tree>
+      	                <tree editable="bottom">
       	                    <field name="name"/>
+      	                    <field name="internal_name"/>
       	                    <field name="value"/>
       	                </tree>
       	            </field>
       	        </group>
       	        <field name="css_text" invisible="1"/>
-      	        <button type="object" name="generate_less" string="Generate LESS"/>
+      	        <button type="object" name="generate_less" string="Update LESS File"/>
       	        </form>
             </field>
         </record>

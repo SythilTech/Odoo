@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Fix blank LESS internal name
+
 v1.1.2
 ======
 * Close button fix
