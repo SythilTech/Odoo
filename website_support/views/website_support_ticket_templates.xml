@@ -96,18 +96,15 @@
             <field name="name">Support Ticket Reply Wrapper</field>
             <field name="model_id" ref="model_website_support_ticket_compose"></field>
             <field name="subject">${object.subject}</field>
-            <field name="email_from">${user.email}</field>            
-            <field name="email_to">${object.email}</field>
+            <field name="email_from">${user.email|safe}</field>            
+            <field name="email_to">${object.email|safe}</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
-                ${object.body}
+                ${object.body|safe}
                 <hr/>
                 <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
                 <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
-                <b>Ticket Category:</b> 
-                % if object.category.name :
-                    ${object.category.name}
-                % endif
+                <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}
                 <br/>
                 <b>Ticket Description:</b><br/>
                 ${object.ticket_id.description|safe}

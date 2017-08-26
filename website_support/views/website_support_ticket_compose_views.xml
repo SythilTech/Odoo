@@ -12,7 +12,7 @@
           	      <field name="email"/>
           	      <field name="subject"/>
           	  </group>
-          	  <field name="body"/>
+          	  <field name="body" widget="html"/>
           	  <group>
           	      <field name="template_id"/>
                   </group>

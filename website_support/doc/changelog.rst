@@ -1,3 +1,7 @@
+v1.2.10
+=======
+* Blank category staff reply fix
+
 v1.2.9
 ======
 * Manual html sanitise
