@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<templates id="sip_widget" xml:space="preserve">
+    <t t-name="FieldSIP">
+        <t t-if="!widget.get('effective_readonly')">
+            <input type="text"></input>
+        </t>
+        <t t-if="widget.get('effective_readonly')">
+            <span class="oe_form_text_content"></span>
+        </t>
+    </t>
+</templates>

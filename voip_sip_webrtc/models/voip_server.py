@@ -12,6 +12,7 @@ import string
 import socket
 
 from odoo import api, fields, models, registry
+from odoo.exceptions import UserError, ValidationError
 
 class VoipVoip(models.Model):
 
@@ -62,27 +63,8 @@ class VoipVoip(models.Model):
 
         if voip_call.type == "external":        
             _logger.error("external call")
-               
-            #Send the REGISTER
-            from_sip = voip_call.from_partner_id.sip_address.strip()
-            to_sip = voip_call.partner_id.sip_address.strip()
-            reg_from = from_sip.split("@")[1]
-            reg_to = to_sip.split("@")[1]
-
-            register_string = ""
-            register_string += "REGISTER sip:" + reg_to + " SIP/2.0\r\n"
-            register_string += "Via: SIP/2.0/UDP " + reg_from + "\r\n"
-            register_string += "From: sip:" + from_sip + "\r\n"
-            register_string += "To: sip:" + to_sip + "\r\n"
-            register_string += "Call-ID: " + "17320@" + reg_to + "\r\n"
-            register_string += "CSeq: 1 REGISTER\r\n"
-            register_string += "Expires: 7200\r\n"
-            register_string += "Contact: " + voip_call.from_partner_id.name + "\r\n"
-
-            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            serversocket.sendto(register_string, ('91.121.209.194', 5060) )
-
-            _logger.error("REGISTER: " + register_string)        
+            
+            voip_call.start_sip_call()
 
     @api.model
     def generate_server_ice(self, port, component_id):

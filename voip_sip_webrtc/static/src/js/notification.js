@@ -12,6 +12,8 @@ var bus = require('bus.bus').bus;
 var Notification = require('web.notification').Notification;
 var WebClient = require('web.WebClient');
 var SystrayMenu = require('web.SystrayMenu');
+var form_common = require('web.form_common');
+var form_widgets = require('web.form_widgets');
 
 var _t = core._t;
 var qweb = core.qweb;
@@ -192,22 +194,6 @@ WebClient.include({
 	                    $("#voipcalloutgoingimage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
                         $("#toPartnerImage").attr('src', '/web/image/res.partner/' + callee_partner_id + '/image_medium/image.jpg');
 					}
-                } else if (notification[0][1] === 'voip.sip') {
-
-		            console.log("Call Type: SIP");
-
-                    role = "caller";
-                    mode = "audiocall";
-                    call_type = "external";
-                    to_partner_id = notification[1].to_partner_id;
-		            var constraints = {'audio': true};
-
-                    if (navigator.webkitGetUserMedia) {
-		                navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-		            } else {
-                        window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-		            }
-
 
                 } else if (notification[0][1] === 'voip.response') {
 
@@ -416,6 +402,40 @@ function gotRemoteStream(event) {
     });
 
 }
+
+
+var FieldSIP = form_widgets.FieldChar.extend({
+    events: {
+        'click .sip-call': 'start_sip_call',
+    },
+    render_value: function() {
+        if (this.get("effective_readonly")) {
+		    this.$el.html("" + this.get("value") + " <a href=\"javascript:;\"class=\"fa fa-phone sip-call\" style=\"text-decoration: underline;\" aria-hidden=\"true\"> Call</a>");
+        } else {
+			this.$input.val(this.get("value"));
+        }
+    },
+    start_sip_call: function() {
+
+        console.log("Call Type: SIP");
+
+        role = "caller";
+        mode = "audiocall";
+        call_type = "external";
+        to_partner_id = this.getParent().get_fields_values()['id'];
+    	var constraints = {'audio': true};
+
+        if (navigator.webkitGetUserMedia) {
+    	    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+    	} else {
+            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+        }
+
+
+    }
+});
+
+core.form_widget_registry.add('sip', FieldSIP)
 
 $(document).on('click', '#voip_end_call', function(){
 
