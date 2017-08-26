@@ -90,8 +90,8 @@ class WebsiteStyleProfileLess(models.Model):
     
     profile_id = fields.Many2one('website.style.profile', string="Profile")
     name = fields.Char(string="Display Name", help="Display name of the less variable")
-    internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable")
-    value = fields.Char(string="Value", help="Color HEX code")
+    internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable", required=True)
+    value = fields.Char(string="Value", help="Color HEX code", required=True)
     
     
 class WebsiteStyleLess(models.Model):
