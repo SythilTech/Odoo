@@ -100,8 +100,8 @@ class WebsiteStyleLess(models.Model):
     
     website_id = fields.Many2one('website', string="Website")
     name = fields.Char(string="Name", help="Display name of the less variable")
-    internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable")
-    value = fields.Char(string="Value", help="Color HEX code")
+    internal_name = fields.Char(string="Internal Name", help="The actually name of the less variable", required=True)
+    value = fields.Char(string="Value", help="Color HEX code", required=True)
     
 class WebsiteStyleHTMLTag(models.Model):
 
