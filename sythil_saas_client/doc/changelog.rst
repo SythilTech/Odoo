@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Remove feature that hides administration groups
+
 v1.1
 ====
 * Trial restrictions
