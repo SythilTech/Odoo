@@ -2,6 +2,7 @@
 import requests
 import werkzeug
 from datetime import datetime
+import time
 import json
 import math
 import base64
@@ -73,6 +74,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
                 
         insert_values = {'business_owner': request.env.user.id, 'in_directory': True, 'name': values['name']}
 
+        insert_values['image'] =  business_logo
         if 'email' in values: insert_values['email'] = values['email']
         if 'street' in values: insert_values['street'] = values['street']
         if 'city' in values: insert_values['city'] = values['city']
@@ -80,24 +82,95 @@ class WebsiteBusinessDiretoryController(http.Controller):
         if 'country_id' in values: insert_values['country_id'] = values['country']
         if 'zip' in values: insert_values['zip'] = values['zip']
         if 'directory_description' in values: insert_values['directory_description'] = values['directory_description']
-        if 'directory_monday_start' in values: insert_values['directory_monday_start'] = values['directory_monday_start']
-        if 'directory_monday_end' in values: insert_values['directory_monday_end'] = values['directory_monday_end']
-        if 'directory_tuesday_start' in values: insert_values['directory_tuesday_start'] = values['directory_tuesday_start']
-        if 'directory_tuesday_end' in values: insert_values['directory_tuesday_end'] = values['directory_tuesday_end']
-        if 'directory_wednbesday_start' in values: insert_values['directory_wednbesday_start'] = values['directory_wednesday_start']
-        if 'directory_wednbesday_end' in values: insert_values['directory_wednbesday_end'] = values['directory_wednesday_end']
-        if 'directory_thursday_start' in values: insert_values['directory_thursday_start'] = values['directory_thursday_start']
-        if 'directory_thursday_end' in values: insert_values['directory_thursday_end'] = values['directory_thursday_end']
-        if 'directory_friday_start' in values: insert_values['directory_friday_start'] = values['directory_friday_start']
-        if 'directory_friday_end' in values: insert_values['directory_friday_end'] = values['directory_friday_end']
-        if 'directory_saturday_start' in values: insert_values['directory_saturday_start'] = values['directory_saturday_start']
-        if 'directory_saturday_end' in values: insert_values['directory_saturday_end'] = values['directory_saturday_end']
-        if 'directory_sunday_start' in values: insert_values['directory_sunday_start'] = values['directory_sunday_start']
-        if 'directory_sunday_end' in values: insert_values['directory_sunday_end'] = values['directory_sunday_end']
         if 'website' in values: insert_values['website'] = values['website']
         if 'allow_restaurant_booking' in values: insert_values['allow_restaurant_booking'] = True
-        insert_values['image'] =  business_logo
         
+        insert_values['directory_listing_open_hours'] = []
+
+        #Monday        
+        if 'directory_monday_start' in values and 'directory_monday_end' in values:
+            start_time = time.strptime(values['directory_monday_start'] + values['directory_monday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_monday_start'] = start_float
+
+            end_time = time.strptime(values['directory_monday_end'] + values['directory_monday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_monday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'monday', 'start_time': start_float, 'end_time':  end_float}) )
+
+        #Tuesday
+        if 'directory_tuesday_start' in values and 'directory_tuesday_end' in values:
+            start_time = time.strptime(values['directory_tuesday_start'] + values['directory_tuesday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_tuesday_start'] = start_float
+
+            end_time = time.strptime(values['directory_tuesday_end'] + values['directory_tuesday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_tuesday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'tuesday', 'start_time': start_float, 'end_time':  end_float}) )
+
+        #Wednesday
+        if 'directory_wednesday_start' in values and 'directory_wednesday_end' in values:
+            start_time = time.strptime(values['directory_wednesday_start'] + values['directory_wednesday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_wednesday_start'] = start_float
+
+            end_time = time.strptime(values['directory_wednesday_end'] + values['directory_wednesday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_wednesday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'wednesday', 'start_time': start_float, 'end_time':  end_float}) )
+
+        #Thursday
+        if 'directory_thursday_start' in values and 'directory_thursday_end' in values:
+            start_time = time.strptime(values['directory_thursday_start'] + values['directory_thursday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_thursday_start'] = start_float
+
+            end_time = time.strptime(values['directory_thursday_end'] + values['directory_thursday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_thursday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'thursday', 'start_time': start_float, 'end_time':  end_float}) )
+
+        #Friday
+        if 'directory_friday_start' in values and 'directory_friday_end' in values:
+            start_time = time.strptime(values['directory_friday_start'] + values['directory_friday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_friday_start'] = start_float
+
+            end_time = time.strptime(values['directory_friday_end'] + values['directory_friday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_friday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'friday', 'start_time': start_float, 'end_time':  end_float}) )
+
+        #Saturday
+        if 'directory_saturday_start' in values and 'directory_saturday_end' in values:
+            start_time = time.strptime(values['directory_saturday_start'] + values['directory_saturday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_saturday_start'] = start_float
+
+            end_time = time.strptime(values['directory_saturday_end'] + values['directory_saturday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_saturday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'saturday', 'start_time': start_float, 'end_time':  end_float}) )
+
+        #Sunday
+        if 'directory_sunday_start' in values and 'directory_sunday_end' in values:
+            start_time = time.strptime(values['directory_sunday_start'] + values['directory_sunday_start_period'], "%I:%M%p")
+            start_float = start_time[3] + float(start_time[4]) / 60
+            insert_values['directory_sunday_start'] = start_float
+
+            end_time = time.strptime(values['directory_sunday_end'] + values['directory_sunday_end_period'], "%I:%M%p")
+            end_float = end_time[3] + float(end_time[4]) / 60
+            insert_values['directory_sunday_end'] = end_float
+
+            insert_values['directory_listing_open_hours'].append( (0, 0, { 'day': 'sunday', 'start_time': start_float, 'end_time':  end_float}) )
+  
         new_listing = request.env['res.partner'].sudo().create(insert_values)
 
         #Redirect them to thier account page
@@ -229,11 +302,22 @@ class WebsiteBusinessDiretoryController(http.Controller):
         else:
             return "BOOKINGS NOT ALLOWED"
 
-    @http.route('/directory/search/<search_string>', type="http", auth="public", website=True)
-    def directory_search_results(self, search_string, **kwargs):
-        #directory_companies = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string) ])
+    @http.route('/directory/search/name/<search_string>', type="http", auth="public", website=True)
+    def directory_search_name_results(self, search_string, **kwargs):
         featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string), ('featured_listing','=',True) ])
         regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string), ('featured_listing','=',False) ])
+        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings} )
+
+    @http.route('/directory/search/state/<model("res.country.state"):state>', type="http", auth="public", website=True)
+    def directory_search_state_results(self, state, **kwargs):
+        featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('featured_listing','=',True) ])
+        regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('featured_listing','=',False) ])
+        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings} )
+
+    @http.route('/directory/search/category/<model("res.partner.directory.category"):category>', type="http", auth="public", website=True)
+    def directory_search_category_results(self, category, **kwargs):
+        featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('company_category_ids','=', category.id), ('featured_listing','=',True) ])
+        regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('company_category_ids','=', category.id), ('featured_listing','=',False) ])
         return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings} )
 
     @http.route('/directory/categories', type="http", auth="public", website=True)
@@ -256,14 +340,14 @@ class WebsiteBusinessDiretoryController(http.Controller):
         directory_partners = request.env['res.partner'].sudo().search([('in_directory','=',True), ('name','=ilike',"%" + values['term'] + "%")],limit=5)
         
         for directory_partner in directory_partners:
-            return_item = {"label": directory_partner.name + "<br/><sub>" + directory_partner.street + "</sub>","value": "/directory/search/" + str(values['term']) }
+            return_item = {"label": directory_partner.name + "<br/><sub>" + directory_partner.street + "</sub>","value": "/directory/search/name/" + str(values['term']) }
             my_return.append(return_item)
 
         #Get all business types that match the search term
         directory_categories = request.env['res.partner.directory.category'].sudo().search([('name','=ilike',"%" + values['term'] + "%")],limit=5)
         
         for directory_category in directory_categories:
-            return_item = {"label": directory_category.name,"value": "/directory/search/" + str(values['term']) }
+            return_item = {"label": directory_category.name,"value": "/directory/search/category/" + slug(directory_category) }
             my_return.append(return_item)
         
         return json.JSONEncoder().encode(my_return)

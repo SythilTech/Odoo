@@ -69,10 +69,30 @@ $(document).ready(function() {
     <t t-call="website.layout">
         <div class="container">
             <div class="mt16 mb16">
+
+
+<script>
+
+$(document).ready(function() {
+    $("#search_business_directory").autocomplete({
+        source: '/directory/auto-complete',
+        minLength: 1,
+        select: function( event, ui ) {
+            window.location.href = ui.item.value;
+        }
+    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+         return $("<li></li>")
+             .data("item.autocomplete", item)
+             .append("<a>" + item.label + "</a>")
+             .appendTo(ul);
+    };
+});
+
+</script>
                 <div name="search_from_container" class="row">
                     <div class="col-md-3"></div>
                     <div class="col-md-6">
-                        <input type="search" class="form-control" id="search_business_directory" name="search" placeholder="Business name or type"/>
+                        <input type="search" class="form-control" id="search_business_directory" name="search" placeholder="Business name ot type"/>
                     </div>
                     <div class="col-md-3"></div>
                 </div>     
@@ -259,65 +279,153 @@ $(document).ready(function() {
                     <label for="description">Business Description</label>
                     <textarea name="directory_description" class="form-control"/>
                 </div>
-                <div class="form-group">
-                    <label for="directory_monday_start">Monday Start Time</label>
-                    <input type="text" name="directory_monday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_monday_end">Monday End Time</label>
-                    <input type="text" name="directory_monday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_start">Tuesday Start Time</label>
-                    <input type="text" name="directory_tuesday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_tuesday_end">Tuesday End Time</label>
-                    <input type="text" name="directory_tuesday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_wednesday_start">Wednesday Start Time</label>
-                    <input type="text" name="directory_wednesday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_wednesday_end">Wednesday End Time</label>
-                    <input type="text" name="directory_wednesday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_thursday_start">Thursday Start Time</label>
-                    <input type="text" name="directory_thursday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_thursday_end">Tuesday End Time</label>
-                    <input type="text" name="directory_thursday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_friday_start">Friday Start Time</label>
-                    <input type="text" name="directory_friday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_friday_end">Friday End Time</label>
-                    <input type="text" name="directory_friday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_saturday_start">Saturday Start Time</label>
-                    <input type="text" name="directory_saturday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_saturday_end">Saturday End Time</label>
-                    <input type="text" name="directory_saturday_end" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_sunday_start">Sunday Start Time</label>
-                    <input type="text" name="directory_sunday_start" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <label for="directory_sunday_end">Sunday End Time</label>
-                    <input type="text" name="directory_sunday_end" class="form-control"/>
-                </div>
+
                 <div class="checkbox">
 		  <label><input type="checkbox" name="allow_restaurant_booking"/> Allow Restaurant Bookings</label>
                 </div>
+                
+                <h2>Open Times</h2>
+                
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_monday_start">Monday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_monday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_monday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_monday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_monday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_tuesday_start">Tuesday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_tuesday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_tuesday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_tuesday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_tuesday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_wednesday_start">Wednesday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_wednesday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_wednesday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_wednesday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_wednesday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_thursday_start">Thursday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_thursday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_thursday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_thursday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_thursday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_friday_start">Friday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_friday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_friday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_friday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_friday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_saturday_start">Saturday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_saturday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_saturday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_saturday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_saturday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>                
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_sunday_start">Sunday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_sunday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_sunday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_sunday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_sunday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>                
+                
                 <button t-attf-class="btn btn-primary btn-lg">Add Business</button>
             </form>
         </div>
@@ -537,7 +645,7 @@ $(document).ready(function() {
     </t>
 </template>
 
-<template id="directory_categories" name="Directory Search" page="True">
+<template id="directory_categories" name="Directory Category Listings" page="True">
     <t t-call="website.layout">
         <div class="container">
             <div class="mt16 mb16">
@@ -557,8 +665,8 @@ $(document).ready(function() {
 </template>
 
 <template id="directory_categories_reoccursive" name="Directory Search Reoccusive" page="True">
-  <li>      
-      <a href="#" t-field="cat.name"/>
+  <li>
+      <a t-attf-href="/directory/search/category/#{slug(cat)}" t-field="cat.name"/>
       <ul t-if="cat.children_category_ids" class="nav nav-pills nav-stacked nav-hierarchy">
            <t t-foreach="cat.children_category_ids" t-as="cat">
               <t t-call="website_business_directory.directory_categories_reoccursive"/>

@@ -1,3 +1,8 @@
+v1.0.4
+======
+* Condense business add timeslots
+* Category searching working
+
 v1.0.3
 ======
 * Website link tracking
