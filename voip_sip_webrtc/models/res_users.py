@@ -12,6 +12,7 @@ class ResUsersVoip(models.Model):
     _inherit = "res.users"
 
     voip_ringtone = fields.Binary(string="Ringtone")
+    voip_account_id = fields.Many2one('voip.account', string="Account")
     voip_ringtone_filename = fields.Char(string="Ringtone Filename")
     voip_missed_call = fields.Binary(string="Missed Call Message")
     voip_missed_call_filename = fields.Char(string="Missed Call Message Filename")

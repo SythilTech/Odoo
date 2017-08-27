@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_account_view_form" model="ir.ui.view">
+        <field name="name">voip.account view form</field>
+        <field name="model">voip.account</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <header>
+      	            <button name="send_register" type="object" string="Send Register"/>
+      	        </header>
+      	        <group>
+      	            <field name="address"/>
+      	            <field name="password" password="True"/>
+      	            <field name="auth_username"/>
+      	            <field name="username"/>
+      	            <field name="domain"/>
+      	            <field name="outbound_proxy"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_account_view_tree" model="ir.ui.view">
+        <field name="name">voip.account view tree</field>
+        <field name="model">voip.account</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="address"/>
+      	        <field name="outbound_proxy"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_account_action" model="ir.actions.act_window">
+        <field name="name">VOIP Accounts</field>
+	<field name="res_model">voip.account</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No Accounts
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="voip_account_menu" name="Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>
+
+</odoo>
