@@ -1,3 +1,7 @@
+v1.1
+====
+* Display Google map on listing page
+
 v1.0.5
 ======
 * Search by state

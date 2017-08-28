@@ -23,12 +23,6 @@
             </field>
         </record>
 
-<!--<template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front Directory Editor">
-    <xpath expr="." position="inside">
-        <script type="text/javascript" src="/website_business_directory/static/src/js/website_business_directory.editor.front.js"></script>
-    </xpath>
-</template>-->
-
 <template id="directory_search" name="Directory Search" page="True">
     <t t-call="website.layout">    
 
@@ -65,6 +59,48 @@ $(document).ready(function() {
     </t>
 </template>
 
+<template id="directory_search_results_map" inherit_id="website_business_directory.directory_search_results" active="False" customize_show="True" name="Directory Search Results Map">
+    <xpath expr="//div[@id='g_map']" position="inside">
+        <div id="map" style="width:100%;height:300px;margin-bottom:10px;"></div>
+        <script t-attf-src="https://maps.googleapis.com/maps/api/js?key=#{google_maps_api_key}"/>
+        <script>
+
+            var geocoder = new google.maps.Geocoder();
+            
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+            });
+
+            function codeAddress(address) {
+
+                geocoder.geocode( { 'address': address}, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        map.setCenter(results[0].geometry.location);
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: results[0].geometry.location
+                        });
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                });
+            }
+
+        <!-- Maybe later we give featured listings a different marker icon -->
+        <t t-foreach="featured_listings" t-as="directory_company">
+            codeAddress('<t t-esc="directory_company.street"/>, <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.zip"/>');
+        </t>
+
+        <t t-foreach="regular_listings" t-as="directory_company">
+            codeAddress('<t t-esc="directory_company.street"/>, <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.zip"/>');
+        </t>
+
+        </script>
+        
+    </xpath>
+
+</template>
+
 <template id="directory_search_results" name="Directory Search Results" page="True">
     <t t-call="website.layout">
         <div class="container">
@@ -97,6 +133,8 @@ $(document).ready(function() {
                     <div class="col-md-3"></div>
                 </div>     
             </div>
+
+            <div id="g_map"/>
 
             <t t-foreach="featured_listings" t-as="directory_company">
                 <div class="panel panel-warning">

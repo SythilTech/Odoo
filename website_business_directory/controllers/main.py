@@ -252,19 +252,22 @@ class WebsiteBusinessDiretoryController(http.Controller):
     def directory_search_name_results(self, search_string, **kwargs):
         featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string), ('featured_listing','=',True) ])
         regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string), ('featured_listing','=',False) ])
-        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings} )
+        google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
+        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key} )
 
     @http.route('/directory/search/location/<model("res.country.state"):state>', type="http", auth="public", website=True)
     def directory_search_state_results(self, state, **kwargs):
         featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('featured_listing','=',True) ])
         regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('featured_listing','=',False) ])
-        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings} )
+        google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
+        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key} )
 
     @http.route('/directory/search/category/<model("res.partner.directory.category"):category>', type="http", auth="public", website=True)
     def directory_search_category_results(self, category, **kwargs):
         featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('company_category_ids','=', category.id), ('featured_listing','=',True) ])
         regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('company_category_ids','=', category.id), ('featured_listing','=',False) ])
-        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings} )
+        google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
+        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key} )
 
     @http.route('/directory/categories', type="http", auth="public", website=True)
     def directory_categories(self, **kwargs):
