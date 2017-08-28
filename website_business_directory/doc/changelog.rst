@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Search by state
+
 v1.0.4
 ======
 * Condense business add timeslots
