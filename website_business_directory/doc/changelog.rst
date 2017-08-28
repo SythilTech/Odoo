@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Move inherit below template
+
 v1.1
 ====
 * Display Google map on listing page
