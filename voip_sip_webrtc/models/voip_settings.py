@@ -185,6 +185,12 @@ class VoipSettings(models.Model):
                 _logger.error("options")
             elif data.startswith("REGISTER"):
                 _logger.error("register")
+            elif data.startswith("SIP/2.0 401 Unauthorized"):
+                _logger.error("Unauthorized")
+
+                voip_account = self.env['voip.account'].browse(1)
+                voip_account.send_auth_register(data)
+
             elif data.startswith("ACK"):
                 _logger.error("ack")
             elif data.startswith("INVITE"):
