@@ -1,3 +1,7 @@
+v1.1.2
+======
+* Display search type in autocomplete
+
 v1.1.1
 ======
 * Move inherit below template
