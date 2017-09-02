@@ -71,13 +71,24 @@
             <div class="mt16 mb16">
                 <h1 class="text-center">Directory Search</h1>                
                 <t t-call="website_business_directory.directory_search_box"/>
+
+                <div id="category-panel" class="panel panel-default mt16">
+                    <div class="panel-body">
+                        <t t-foreach="directory_categories" t-as="cat">
+                            <div class="col-md-3">
+                                <t t-call="website_business_directory.directory_categories_reoccursive"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
             </div>
         </div>
     </t>
 </template>
 
 <template id="directory_search_front_listings" inherit_id="website_business_directory.directory_search" active="False" customize_show="True" name="Directory Front Listings">
-    <xpath expr="//div[@class='container']" position="inside">
+    <xpath expr="//div[@id='category-panel']" position="after">
         <t t-foreach="featured_listings" t-as="directory_company">
             <t t-call="website_business_directory.directory_featuered_listing"/>
         </t>
@@ -704,25 +715,6 @@ $(document).ready(function() {
                 </div>
                 <button t-attf-class="btn btn-primary btn-lg">Make Booking</button>
             </form>
-        </div>
-    </t>
-</template>
-
-<template id="directory_categories" name="Directory Category Listings" page="True">
-    <t t-call="website.layout">
-        <div class="container">
-            <div class="mt16 mb16">
-                <h1 class="text-center">Directory Categories</h1>
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <t t-foreach="directory_categories" t-as="cat">
-                            <div class="col-md-3">
-                                <t t-call="website_business_directory.directory_categories_reoccursive"/>
-                            </div>
-                        </t>
-                    </div>
-                </div>
-            </div>
         </div>
     </t>
 </template>

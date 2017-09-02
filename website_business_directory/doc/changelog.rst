@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Category listing page merged with search page
+
 v1.1.2
 ======
 * Display search type in autocomplete

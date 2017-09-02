@@ -20,7 +20,8 @@ class WebsiteBusinessDiretoryController(http.Controller):
         featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('featured_listing','=',True) ])
         regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('featured_listing','=',False) ])    
         google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
-        return http.request.render('website_business_directory.directory_search', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key} )
+        directory_categories = request.env['res.partner.directory.category'].sudo().search([('parent_category','=',False)])
+        return http.request.render('website_business_directory.directory_search', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'directory_categories': directory_categories} )
 
     @http.route('/directory/register', type="http", auth="public", website=True)
     def directory_register(self, **kwargs):
@@ -297,11 +298,6 @@ class WebsiteBusinessDiretoryController(http.Controller):
         google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
         heading_string = str(len(featured_listings) + len(regular_listings)) + " Listings found in the category " + category.name
         return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'heading_string': heading_string} )
-
-    @http.route('/directory/categories', type="http", auth="public", website=True)
-    def directory_categories(self, **kwargs):
-        directory_categories = request.env['res.partner.directory.category'].sudo().search([('parent_category','=',False)])
-        return http.request.render('website_business_directory.directory_categories', {'directory_categories': directory_categories} )
         
     @http.route('/directory/auto-complete', auth="public", website=True, type='http')
     def directory_autocomplete(self, **kw):
@@ -344,7 +340,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         #    my_return.append(return_item)
 
 
-        directory_states = request.env['res.country.state'].sudo().search([('name','=ilike', values['term'] + "%")], limit=5)
+        directory_states = request.env['res.country.state'].sudo().search([('name','=ilike',"%" +  values['term'] + "%"), ('listing_count','>',0)], limit=5)
 
         for state in directory_states:
             return_item = {"label": state.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + state.country_id.name + "," + state.name + "</sub>","value": "/directory/search/location/" + slug(state) }
