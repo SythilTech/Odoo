@@ -331,19 +331,14 @@ class WebsiteBusinessDiretoryController(http.Controller):
             return_item = {"label": label,"value": "/directory/search/category/" + slug(directory_category) }
             my_return.append(return_item)
 
-
-        #Display only states that have a listing otherwise we get a massive list ( issue duplicate when multiple listings per state...)
-        #directory_states = request.env['res.partner'].sudo().search([('in_directory','=',True), ('state_id.name','=ilike',"%" + values['term'] + "%")],limit=5)
-
-        #for listing in directory_states:
-        #    return_item = {"label": listing.state_id.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + listing.state_id.country_id.name + "," + listing.state_id.name + "</sub>","value": "/directory/search/location/" + slug(listing.state_id) }
-        #    my_return.append(return_item)
-
-
         directory_states = request.env['res.country.state'].sudo().search([('name','=ilike',"%" +  values['term'] + "%"), ('listing_count','>',0)], limit=5)
-
         for state in directory_states:
-            return_item = {"label": state.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + state.country_id.name + "," + state.name + "</sub>","value": "/directory/search/location/" + slug(state) }
+            return_item = {"label": state.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + state.country_id.name + ", " + state.name + "</sub>","value": "/directory/search/location/" + slug(state) }
+            my_return.append(return_item)
+
+        directory_cities = request.env['res.country.state.city'].sudo().search([('name','=ilike',"%" +  values['term'] + "%")], limit=5)
+        for city in directory_cities:
+            return_item = {"label": city.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + city.state_id.name + ", " + city.name + "</sub>","value": "/directory/search/location/" + slug(city.state_id) + "/" + city.name }
             my_return.append(return_item)
         
         return json.JSONEncoder().encode(my_return)

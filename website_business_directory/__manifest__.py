@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Website Business Directory",
-    'version': "1.1.3",
+    'version': "1.1.4",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -17,6 +17,8 @@
         'views/website_directory_category_views.xml',
         'views/website_directory_level_views.xml',
         'views/website_directory_billingplan_views.xml',
+        'views/res_country_state_city_import_views.xml',
+        'views/res_country_state_city_views.xml',
         'views/menus.xml',
         'security/ir.model.access.csv',
     ],

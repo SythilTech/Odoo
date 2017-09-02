@@ -1,3 +1,7 @@
+v1.1.4
+======
+* Suburb import and search
+
 v1.1.3
 ======
 * Category listing page merged with search page

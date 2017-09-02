@@ -5,6 +5,9 @@
     <menuitem id="biz_directory_parent_menu" parent="biz_directory_top_menu" name="Business Directory" sequence="10"/>
     <menuitem id="biz_directory_listing_menu" parent="biz_directory_parent_menu" name="Listings" action="business_directory_action" sequence="20"/>
     <menuitem id="business_directory_category_menu" parent="biz_directory_parent_menu" name="Categories" action="website_directory_category_action" sequence="30"/>
+    <menuitem id="res_country_state_city_menu" name="Locations" parent="biz_directory_parent_menu" action="res_country_state_city_action" sequence="40"/>
+    <menuitem id="business_directory_geo_import_menu" parent="biz_directory_parent_menu" name="Import Locations" action="res_country_state_city_import_action" sequence="50"/>
+    
     <!--<menuitem id="business_directory_level_menu" parent="biz_directory_parent_menu" name="Levels" action="website_directory_level_action" sequence="40"/>
     <menuitem id="business_directory_billingplan_menu" parent="biz_directory_parent_menu" name="Billing Plans" action="website_directory_billingplan_action" sequence="50"/>-->
 

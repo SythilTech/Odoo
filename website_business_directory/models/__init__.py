@@ -1,1 +1,1 @@
-import website_directory_level, res_partner, website_directory_booking, website_directory_stat, res_country_state
+import website_directory_level, res_partner, website_directory_booking, website_directory_stat, res_country_state, res_country_state_city, res_country_state_city_import
