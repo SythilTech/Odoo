@@ -29,9 +29,9 @@ class SaasDatabase(models.Model):
     
     @api.depends('name')
     def _compute_access_url(self):
-        system_redirect = self.env['ir.config_parameter'].get_param('saas_system_redirect')
+        system_redirect = self.env['ir.values'].get_default('saas.settings', 'system_redirect')
         
-        if system_redirect == "db_filter":
+        if system_redirect == "db_filter" or system_redirect == False:
             self.access_url = "http://" + request.httprequest.host + "/web?db=" + self.name
         elif system_redirect == "subdomain":
             self.access_url = "http://" + self.name + "." + request.httprequest.host

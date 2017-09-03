@@ -174,7 +174,7 @@ class SaasMultiDB(http.Controller):
         expiration_date_year = values['expiration_date_year']
         cvv = values['cvv']
 
-        payment_aquirer = request.env['ir.model.data'].get_object('payment_paypal', 'payment_acquirer_paypal')
+        payment_aquirer = request.env['ir.model.data'].get_object('payment', 'payment_acquirer_paypal')
 
         #Request access
         base_url = ""

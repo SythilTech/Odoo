@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Subdomain filter fix
+
 v1.0.2
 ======
 * Remove random "Log SaaS Server" button
