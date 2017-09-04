@@ -8,7 +8,8 @@
           <field name="arch" type="xml">
               <form>
                   <header>
-                      <button name="login_to_saas_user" type="object" string="Login to SAAS System"/>
+                      <!--<button name="admin_login" type="object" string="Admin Login"/>-->
+                      <button name="user_login" type="object" string="User Login"/>
                   </header>
                   <group>
                       <field name="state"/>

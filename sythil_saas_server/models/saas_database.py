@@ -7,6 +7,11 @@ import openerp.http as http
 from openerp.http import request
 from dateutil.relativedelta import relativedelta
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+import odoo
+from odoo import api
+from odoo import SUPERUSER_ID
+
+import werkzeug
 
 class SaasDatabase(models.Model):
 
@@ -31,11 +36,24 @@ class SaasDatabase(models.Model):
     def _compute_access_url(self):
         system_redirect = self.env['ir.values'].get_default('saas.settings', 'system_redirect')
         
-        if system_redirect == "db_filter" or system_redirect == False:
+        if system_redirect == "db_filter" or system_redirect == False or system_redirect == "":
             self.access_url = "http://" + request.httprequest.host + "/web?db=" + self.name
         elif system_redirect == "subdomain":
             self.access_url = "http://" + self.name + "." + request.httprequest.host
 
+    def admin_login(self):
+        _logger.error("Admin Login")
+    
+    @api.multi
+    def user_login(self):
+        self.ensure_one()
+	request.session.authenticate(self.name, self.login, self.password)
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': self.access_url,
+        }
+        
     @api.model
     def saas_subscription_check(self):
         #Find all databases where payment is due

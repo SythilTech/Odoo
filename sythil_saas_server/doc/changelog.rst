@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Saas user login button
+
 v1.0.3
 ======
 * Subdomain filter fix

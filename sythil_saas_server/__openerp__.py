@@ -1,6 +1,6 @@
 {
     'name': "Sythil SAAS Server",
-    'version': "1.0.3",
+    'version': "1.0.4",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -21,6 +21,7 @@
         'data/res.groups.csv',
         'data/website.menu.csv',
         'data/ir.rule.csv',
+        'data/saas_settings.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],
