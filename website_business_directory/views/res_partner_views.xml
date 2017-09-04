@@ -13,6 +13,9 @@
       	                <field name="listing_level"/>
       	                <field name="business_owner"/>
       	                <field name="directory_description"/>
+      	                <field name="city_id"/>
+      	                <field name="latitude"/>
+      	                <field name="longitude"/>
       	                <field name="company_category_ids"/>
                         <field name="directory_monday_start" widget="float_time"/>
                         <field name="directory_monday_end" widget="float_time"/>

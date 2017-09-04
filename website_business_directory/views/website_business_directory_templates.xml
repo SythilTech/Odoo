@@ -28,37 +28,52 @@
     <script>
 
     $(document).ready(function() {
-        $("#search_business_directory").autocomplete({
-            source: '/directory/auto-complete',
-            minLength: 1,
-            select: function( event, ui ) {
-                window.location.href = ui.item.value;
-            }
+    
+        //Term Autocomplete
+        $("#search_term_business_directory").autocomplete({
+            source: '/directory/term-auto-complete',
+            minLength: 1           
         }).data("ui-autocomplete")._renderItem = function (ul, item) {
              return $("<li/>")
                  .data("item.autocomplete", item)
                  .append("<a>" + item.label + "</a>")
                  .appendTo(ul);
         };
+
+        //Location Autocomplete
+        $("#search_location_business_directory").autocomplete({
+            source: '/directory/location-auto-complete',
+            minLength: 1
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+             return $("<li/>")
+                 .data("item.autocomplete", item)
+                 .append("<a>" + item.label + "</a>")
+                 .appendTo(ul);
+        };        
     });
 
     </script>
         
     <div name="search_from_container" class="row">
-        <div class="col-md-3"/>
-        <div class="col-md-6">
+        <div class="col-md-2"/>
+        <div class="col-md-8">
             <form method="GET" action="/directory/search">
-
-                <div class="input-group">
-                    <input type="search" class="form-control" id="search_business_directory" name="term" placeholder="Business name, category or location"/>
-                    <span class="input-group-btn">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </span>
+                <div class="form-group col-md-6">
+                    <input type="search" class="form-control" id="search_term_business_directory" name="term" placeholder="Business name or category"/>                
+                </div>
+                <div class="form-group col-md-6">
+                    <div class="input-group">
+                    
+                        <input type="search" class="form-control" id="search_location_business_directory" name="location" placeholder="Location"/>
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </span>
+                    </div>
                 </div>
 
             </form>
         </div>
-        <div class="col-md-3"/>
+        <div class="col-md-2"/>
      </div>
 
      <div id="g_map"/>

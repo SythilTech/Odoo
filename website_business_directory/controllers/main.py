@@ -95,7 +95,17 @@ class WebsiteBusinessDiretoryController(http.Controller):
         insert_values['image'] =  business_logo
         if 'email' in values: insert_values['email'] = values['email']
         if 'street' in values: insert_values['street'] = values['street']
-        if 'city' in values: insert_values['city'] = values['city']
+        
+        if 'city' in values:
+            insert_values['city'] = values['city']
+            auto_city = request.env['res.country.state.city'].search([('state_id','=',int(values['state'])), ('name','=ilike',values['city'])])
+            if auto_city:
+                insert_values['city_id'] = auto_city.id
+                insert_values['latitude'] = auto_city.latitude
+                insert_values['longitude'] = auto_city.longitude
+            else:
+                return "City Not Found"
+        
         if 'state' in values: insert_values['state_id'] = values['state']
         if 'country' in values: insert_values['country_id'] = values['country']
         if 'zip' in values: insert_values['zip'] = values['zip']
@@ -259,36 +269,41 @@ class WebsiteBusinessDiretoryController(http.Controller):
         for field_name, field_value in kwargs.items():
             values[field_name] = field_value
             
-        search_string = values['term']
+        search_domain = [('in_directory','=', True)]
         
-        featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), '|', ('name','ilike', search_string), ('company_category_ids.name','ilike', search_string), ('featured_listing','=',True) ])
-        regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), '|', ('name','ilike', search_string), ('company_category_ids.name','ilike', search_string), ('featured_listing','=',False) ])
+        if values['term'] != "":
+            search_string = values['term']
+            search_domain.append('|')
+            search_domain.append( ('name','ilike', search_string) )
+            search_domain.append( ('company_category_ids.name','ilike', search_string) )
+
+        if values['location'] != "":
+            search_location = values['location']
+            search_state = search_location.split(", ")[1]
+            search_city = search_location.split(", ")[0]
+            search_city_id = request.env['res.country.state.city'].search([('state_id.name','=ilike',search_state), ('name','=ilike',search_city)])
+                
+            #In Kilometers
+            distance = 15
+ 	    mylon = float(search_city_id.longitude)
+ 	    mylat = float(search_city_id.latitude)
+ 	    dist = float(distance) * 0.621371
+ 	    lon_min = mylon-dist/abs(math.cos(math.radians(mylat))*69);
+ 	    lon_max = mylon+dist/abs(math.cos(math.radians(mylat))*69);
+ 	    lat_min = mylat-(dist/69);
+ 	    lat_max = mylat+(dist/69);
+ 	            
+            #Within distance
+            search_domain.append(('longitude','>=',lon_min))
+            search_domain.append(('longitude','<=',lon_max))
+            search_domain.append(('latitude','<=',lat_min))
+            search_domain.append(('latitude','>=',lat_max))
+
+        featured_listings = request.env['res.partner'].sudo().search( search_domain + [('featured_listing','=',True)] )
+        regular_listings = request.env['res.partner'].sudo().search( search_domain + [('featured_listing','=',False)] )
+        
         google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
         heading_string = str(len(featured_listings) + len(regular_listings)) + " Listings found"
-        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'heading_string': heading_string} )
-
-    @http.route('/directory/search/name/<search_string>', type="http", auth="public", website=True)
-    def directory_search_name_results(self, search_string, **kwargs):
-        featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string), ('featured_listing','=',True) ])
-        regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('name','ilike', search_string), ('featured_listing','=',False) ])
-        google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
-        heading_string = str(len(featured_listings) + len(regular_listings)) + " Listings found with the name '" + str(search_string) + "'"
-        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'heading_string': heading_string} )
-
-    @http.route('/directory/search/location/<model("res.country.state"):state>', type="http", auth="public", website=True)
-    def directory_search_state_results(self, state, **kwargs):
-        featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('featured_listing','=',True) ])
-        regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('featured_listing','=',False) ])
-        google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
-        heading_string = str(len(featured_listings) + len(regular_listings)) + " Listings found in " + state.name
-        return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'heading_string': heading_string} )
-
-    @http.route('/directory/search/location/<model("res.country.state"):state>/<city>', type="http", auth="public", website=True)
-    def directory_search_state_city_results(self, state, city, **kwargs):
-        featured_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('city','=',city), ('featured_listing','=',True) ])
-        regular_listings = request.env['res.partner'].sudo().search([('in_directory','=', True), ('state_id','=', state.id), ('city','=',city), ('featured_listing','=',False) ])
-        google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
-        heading_string = str(len(featured_listings) + len(regular_listings)) + " Listings found in " + city
         return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'heading_string': heading_string} )
 
     @http.route('/directory/search/category/<model("res.partner.directory.category"):category>', type="http", auth="public", website=True)
@@ -299,9 +314,9 @@ class WebsiteBusinessDiretoryController(http.Controller):
         heading_string = str(len(featured_listings) + len(regular_listings)) + " Listings found in the category " + category.name
         return http.request.render('website_business_directory.directory_search_results', {'featured_listings': featured_listings, 'regular_listings': regular_listings, 'google_maps_api_key': google_maps_api_key, 'heading_string': heading_string} )
         
-    @http.route('/directory/auto-complete', auth="public", website=True, type='http')
-    def directory_autocomplete(self, **kw):
-        """Provides an autocomplete list of businesses and typs in the directory"""
+    @http.route('/directory/term-auto-complete', auth="public", website=True, type='http')
+    def directory_term_autocomplete(self, **kw):
+        """Provides an autocomplete list of businesses and types in the directory"""
         values = {}
         for field_name, field_value in kw.items():
             values[field_name] = field_value
@@ -314,7 +329,7 @@ class WebsiteBusinessDiretoryController(http.Controller):
         directory_partners = request.env['res.partner'].sudo().search([('in_directory','=',True), ('name','=ilike',"%" + values['term'] + "%")],limit=5)
         
         for directory_partner in directory_partners:
-            return_item = {"label": directory_partner.name + "<sub style=\"float:right;\">Business</sub><br/><sub>" + directory_partner.street + "</sub>","value": "/directory/search/name/" + str(values['term']) }
+            return_item = {"label": directory_partner.name + "<sub style=\"float:right;\">Business</sub><br/><sub>" + directory_partner.street + "</sub>","value": directory_partner.name }
             my_return.append(return_item)
 
         #Get all business types that match the search term
@@ -328,17 +343,31 @@ class WebsiteBusinessDiretoryController(http.Controller):
             else:
                 label += "<sub>" + directory_category.name + "</sub>"
             
-            return_item = {"label": label,"value": "/directory/search/category/" + slug(directory_category) }
+            return_item = {"label": label,"value": directory_category.name }
             my_return.append(return_item)
+        
+        return json.JSONEncoder().encode(my_return)
 
-        directory_states = request.env['res.country.state'].sudo().search([('name','=ilike',"%" +  values['term'] + "%"), ('listing_count','>',0)], limit=5)
+    @http.route('/directory/location-auto-complete', auth="public", website=True, type='http')
+    def directory_location_autocomplete(self, **kw):
+        """Provides an autocomplete list locations in the directory"""
+        
+        values = {}
+        for field_name, field_value in kw.items():
+            values[field_name] = field_value
+        
+        return_string = ""
+        
+        my_return = []
+        
+        directory_states = request.env['res.country.state'].sudo().search([('name','=ilike',values['term'] + "%"), ('listing_count','>',0)], limit=5)
         for state in directory_states:
-            return_item = {"label": state.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + state.country_id.name + ", " + state.name + "</sub>","value": "/directory/search/location/" + slug(state) }
+            return_item = {"label": state.name + ", " + state.country_id.name,"value": state.name + ", " + state.country_id.name }
             my_return.append(return_item)
 
-        directory_cities = request.env['res.country.state.city'].sudo().search([('name','=ilike',"%" +  values['term'] + "%")], limit=5)
+        directory_cities = request.env['res.country.state.city'].sudo().search([('name','=ilike', values['term'] + "%")], limit=5)
         for city in directory_cities:
-            return_item = {"label": city.name + "<sub style=\"float:right;\">Location</sub><br/><sub>" + city.state_id.name + ", " + city.name + "</sub>","value": "/directory/search/location/" + slug(city.state_id) + "/" + city.name }
+            return_item = {"label": city.name + ", " + city.state_id.name,"value": city.name + ", " + city.state_id.name }
             my_return.append(return_item)
         
         return json.JSONEncoder().encode(my_return)

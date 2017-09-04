@@ -1,3 +1,7 @@
+v1.2
+====
+* Redesign search so you can do a dual location + category search
+
 v1.1.4
 ======
 * Suburb import and search
