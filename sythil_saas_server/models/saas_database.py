@@ -26,6 +26,8 @@ class SaasDatabase(models.Model):
     name = fields.Char(string="Database Name")
     login = fields.Char(string="Login")
     password = fields.Char(string="Password")
+    super_admin_login = fields.Char(string="Admin Login")
+    super_admin_password = fields.Char(string="Admin Password")
     template_database_id = fields.Many2one('saas.template.database', string="Template Database", ondelete="SET NULL")
     backup_ids = fields.One2many('ir.attachment', 'saas_database_id', string="Backups")
     user_id = fields.Many2one('res.users', string="SAAS User")
@@ -41,8 +43,15 @@ class SaasDatabase(models.Model):
         elif system_redirect == "subdomain":
             self.access_url = "http://" + self.name + "." + request.httprequest.host
 
+    @api.multi
     def admin_login(self):
-        _logger.error("Admin Login")
+        self.ensure_one()
+	request.session.authenticate(self.name, self.super_admin_login, self.super_admin_password)
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': self.access_url,
+        }
     
     @api.multi
     def user_login(self):

@@ -6,6 +6,8 @@ _logger = logging.getLogger(__name__)
 import os
 import zipfile
 import shutil
+import string
+import random
 import json
 import subprocess
 from datetime import datetime, timedelta
@@ -508,6 +510,15 @@ class SaasMultiDB(http.Controller):
 	    env['ir.config_parameter'].set_param('subscription_status', 'trial' )
 	    env['ir.config_parameter'].set_param('trial_expiration_date', trial_expiration_date.strftime(tools.DEFAULT_SERVER_DATETIME_FORMAT) )
 	    env['ir.config_parameter'].set_param('saas_server_url', request.httprequest.host_url)
+	    
+	    #Randomise the super admin password to maxamise security
+	    random_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
+	    saas_super_user = env['ir.model.data'].get_object('base', 'user_root')
+	    saas_super_user.write({'password':random_password})
+	    
+	    #Store it for later use with the login button
+	    new_saas_database.super_admin_login = saas_super_user.login
+	    new_saas_database.super_admin_password = random_password
         
         #Automatically sign the new user in
         request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction

@@ -26,6 +26,9 @@ class SythilSaasController(openerp.addons.web.controllers.main.Home):
 
         subscription_status = request.env['ir.config_parameter'].sudo().get_param('subscription_status')
         
+        if request.uid == 1:
+            return request.render('web.webclient_bootstrap', qcontext=context)
+        
         if subscription_status == "trial":
             trial_expiration_date = request.env['ir.config_parameter'].sudo().get_param('trial_expiration_date')        
             trial_expiration_date = datetime.strptime(trial_expiration_date, tools.DEFAULT_SERVER_DATETIME_FORMAT)        

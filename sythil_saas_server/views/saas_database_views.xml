@@ -8,7 +8,7 @@
           <field name="arch" type="xml">
               <form>
                   <header>
-                      <!--<button name="admin_login" type="object" string="Admin Login"/>-->
+                      <button name="admin_login" type="object" string="Admin Login"/>
                       <button name="user_login" type="object" string="User Login"/>
                   </header>
                   <group>

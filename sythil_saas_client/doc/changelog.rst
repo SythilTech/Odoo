@@ -1,3 +1,7 @@
+v1.1.2
+======
+* Allow admin login even after trial peroid has expired
+
 v1.1.1
 ======
 * Remove feature that hides administration groups

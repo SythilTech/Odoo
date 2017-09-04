@@ -1,6 +1,6 @@
 {
     'name': "Sythil Tech SAAS Client",
-    'version': "1.1.1",
+    'version': "1.1.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
