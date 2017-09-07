@@ -6,6 +6,7 @@ import time
 import json
 import math
 import base64
+import urllib
 import logging
 _logger = logging.getLogger(__name__)
 from openerp.addons.website.models.website import slug
@@ -279,14 +280,37 @@ class WebsiteBusinessDiretoryController(http.Controller):
 
         if values['location'] != "":
             search_location = values['location']
-            search_state = search_location.split(", ")[1]
-            search_city = search_location.split(", ")[0]
-            search_city_id = request.env['res.country.state.city'].search([('state_id.name','=ilike',search_state), ('name','=ilike',search_city)])
+            #search_state = search_location.split(", ")[1]
+            #search_city = search_location.split(", ")[0]
+            #search_city_id = request.env['res.country.state.city'].search([('state_id.name','=ilike',search_state), ('name','=ilike',search_city)])
+                        
+            base = r"https://maps.googleapis.com/maps/api/geocode/json?"
+            addP = "address=" + search_location.replace(" ","+")
+            GeoUrl = base + addP
+
+            google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
+            if google_maps_api_key:            
+                GeoUrl += "&key=" + google_maps_api_key
+            
+            response = urllib.urlopen(GeoUrl)
+            jsonRaw = response.read()
+            jsonData = json.loads(jsonRaw)
+            
+            longitude = ""
+            latitude = ""
+            
+            if jsonData['status'] == 'OK':
+                resu = jsonData['results'][0]           
+                longitude = resu['geometry']['location']['lng']
+                latitude = resu['geometry']['location']['lat']
+            else:
+                return "Geocode Failed"
+
                 
             #In Kilometers
             distance = 15
- 	    mylon = float(search_city_id.longitude)
- 	    mylat = float(search_city_id.latitude)
+ 	    mylon = float(longitude)
+ 	    mylat = float(latitude)
  	    dist = float(distance) * 0.621371
  	    lon_min = mylon-dist/abs(math.cos(math.radians(mylat))*69);
  	    lon_max = mylon+dist/abs(math.cos(math.radians(mylat))*69);

@@ -1,3 +1,7 @@
+v1.2.1
+======
+* Import state with existing state code fix
+
 v1.2
 ====
 * Redesign search so you can do a dual location + category search

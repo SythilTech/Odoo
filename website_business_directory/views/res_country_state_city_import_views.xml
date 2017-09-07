@@ -18,7 +18,7 @@
         </record>
                
        <record id="res_country_state_city_import_action" model="ir.actions.act_window">
-           <field name="name">res.country.state.city.import.action</field>
+           <field name="name">GeoNames Import Wizard</field>
 	   <field name="res_model">res.country.state.city.import</field>
 	   <field name="view_type">form</field>
 	   <field name="view_mode">form</field>

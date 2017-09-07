@@ -188,8 +188,12 @@ class VoipSettings(models.Model):
             elif data.startswith("SIP/2.0 401 Unauthorized"):
                 _logger.error("Unauthorized")
 
-                voip_account = self.env['voip.account'].browse(1)
-                voip_account.send_auth_register(data)
+                with api.Environment.manage():
+                    # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
+                    new_cr = self.pool.cursor()
+                    self = self.with_env(self.env(cr=new_cr))
+                    self.env['voip.account'].browse(1).send_auth_register(data)
+                    self._cr.close()
 
             elif data.startswith("ACK"):
                 _logger.error("ack")

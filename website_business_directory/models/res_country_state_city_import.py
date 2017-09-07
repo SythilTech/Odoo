@@ -36,7 +36,7 @@ class ResCountryStateCityImport(models.Model):
             longitude = row[10]
             
             #Create the state if it doesn't exist
-            state_search = self.env['res.country.state'].search([('name','=',state_name), ('country_id','=', self.country_id.id)])
+            state_search = self.env['res.country.state'].search([('code','=',state_code), ('country_id','=', self.country_id.id)])
             if len(state_search) == 0:
                 state = self.env['res.country.state'].create({'name': state_name, 'code':state_code, 'country_id': self.country_id.id})
             else:

@@ -32,7 +32,7 @@
         </record>
        
        <record id="res_country_state_city_action" model="ir.actions.act_window">
-           <field name="name">GeoNames Import Wizard</field>
+           <field name="name">Locations</field>
 	   <field name="res_model">res.country.state.city</field>
 	   <field name="view_type">form</field>
 	   <field name="view_mode">tree,form</field>
