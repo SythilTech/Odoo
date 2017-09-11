@@ -70,7 +70,7 @@ class VoipAccount(models.Model):
             #Code from http://code.activestate.com/recipes/302378/
             users = { self.auth_username:self.password }
             da = digestauth.DigestAuth(realm, users)
-            response = da.authenticate("GET", 'sip:' + self.domain, authheader)
+            response = da.authenticate("GET", 'sip:' + self.outbound_proxy, authheader)
 
             local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 

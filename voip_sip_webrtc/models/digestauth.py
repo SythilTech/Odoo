@@ -129,7 +129,10 @@ class DigestAuth:
                 _logger.error("cnonce or cn missing")
                 return self._returnTuple(400)
         # All else is OK, now check the response.
+        
+        #We only need the response we can generate the header manually
         return self.response()
+        
         if self.response() == self.params["response"]:
             _logger.error("200")
             return self._returnTuple(200)
