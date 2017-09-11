@@ -1,7 +1,16 @@
 <div style="margin-left:100px;margin-right:100px;">
 <h2>Description</h2>
 Assigns top level domains to database of any name<br/>
-This module needs to be installed as a server wide module<br/>
+<br/>
+
+<h2>Instructions</h2>
+You need to add an option to your odoo/tools.config.py file specifing the name of the database acting as the saas server<br/>
+<pre>group.add_option("--sythilsaasserver", dest="sythilsaasserver", my_default='saas', help="The name of the saas server database")</pre>
+<br/>
+You will also need to assign the module to be a server wide module<br/>
+<pre>group.add_option("--load", dest="server_wide_modules", help="Comma-separated list of server-wide modules.", my_default='web,web_kanban,sythil_saas_server_domain_filter')</pre>
+<br/>
+Once setup you can add domains under the saas->domains, when a person visits the domain it will do a lookup and automatically choose the appropiate database<br/>
 <br/>
 Find a bug? feature idea? send an email to steven@sythiltech.com.au<br/>
 </div>
