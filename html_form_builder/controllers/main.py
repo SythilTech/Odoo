@@ -401,7 +401,7 @@ class HtmlFormController(http.Controller):
 
         form_string += "      </div>\n"
         form_string += "      <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
-        form_string += "      <input type=\"hidden\" name=\"csrf_token\" t-att-value=\"request.csrf_token()\"/>\n"
+        form_string += "      <input type=\"hidden\" name=\"csrf_token\"/>\n"
         form_string += "      <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
         form_string += "      <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
         form_string += "    </form>\n"
@@ -427,7 +427,7 @@ class HtmlFormController(http.Controller):
         form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\" enctype=\"multipart/form-data\">\n"
         form_string += "      <div class=\"oe_structure\" id=\"html_fields\"/>\n"
         form_string += "      <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
-        form_string += "      <input type=\"hidden\" name=\"csrf_token\" t-att-value=\"request.csrf_token()\"/>\n"
+        form_string += "      <input type=\"hidden\" name=\"csrf_token\"/>\n"
         form_string += "      <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
         form_string += "      <button class=\"btn btn-primary btn-lg\">Submit</button>\n"
         form_string += "    </form>\n"

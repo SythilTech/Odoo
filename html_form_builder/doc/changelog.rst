@@ -1,3 +1,7 @@
+v1.0.17
+=======
+* CSRF token loaded via javascript because request.csrf_token causes form to be non removable
+
 v1.0.16
 =======
 * Required tickbox fix
