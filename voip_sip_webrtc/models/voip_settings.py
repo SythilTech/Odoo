@@ -185,6 +185,16 @@ class VoipSettings(models.Model):
                 _logger.error("options")
             elif data.startswith("REGISTER"):
                 _logger.error("register")
+            elif data.startswith("SIP/2.0 200 OK"):
+                _logger.error("OK")
+
+                with api.Environment.manage():
+                    # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
+                    new_cr = self.pool.cursor()
+                    self = self.with_env(self.env(cr=new_cr))
+                    self.env['voip.account'].browse(1).verify_account(data)
+                    self._cr.close()
+                
             elif data.startswith("SIP/2.0 401 Unauthorized"):
                 _logger.error("Unauthorized")
 
@@ -226,7 +236,7 @@ class VoipSettings(models.Model):
         _logger.error("SIP Shutdown")
         serversocket.shutdown(socket.SHUT_RDWR)
         serversocket.close()
-        
+
     def start_sip_server(self):
         #Start a new thread so you don't block the main Odoo thread
         sip_socket_thread = threading.Thread(target=self.sip_server, args=())
@@ -235,4 +245,3 @@ class VoipSettings(models.Model):
     def stop_sip_server(self):
         _logger.error("Stop SIP Server")
         sip_listening = False
-        self.sip_running = False
