@@ -29,12 +29,10 @@ class VoipSettings(models.Model):
     ringtone_filename = fields.Char("Ringtone Filename")
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
     message_bank_duration = fields.Integer(string="Message Bank Duration (Seconds)", help="The time before message bank automatically hangs up")
-    sip_running = fields.Boolean(string="SIP Running")
     server_ip = fields.Char(string="Public IP")
     cert_path = fields.Char(string="Cert Path", help="Used by message bank")
     key_path = fields.Char(string="Key Path", help="Used by message bank")
     fingerprint = fields.Char(string="Fingerprint", help="Used by message bank")
-    sip_listening = False
 
     #-----Ringtone ID-----
 
@@ -156,92 +154,3 @@ class VoipSettings(models.Model):
                 fingerprint_format += ":"
         
         self.fingerprint = fingerprint_format[:-1]
-
-    def sip_server(self):
-        _logger.error("Start SIP Listening")
-        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serversocket.bind(('', 5060));
-
-        sip_tag = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7))
-
-        sip_listening = True
-        while sip_listening:
-            data, addr = serversocket.recvfrom(2048)
-
-            if not data: 
-                break
-        
-            _logger.error(data)
-
-            #Read the body as a dictionary
-            sip_dict = {}
-            for line in data.split("\n"):
-                sip_key = line.split(":")[0]
-                sip_value = line[len(sip_key) + 2:]
-                sip_dict[sip_key] = sip_value
-        
-            
-            if data.startswith("OPTIONS"):
-                _logger.error("options")
-            elif data.startswith("REGISTER"):
-                _logger.error("register")
-            elif data.startswith("SIP/2.0 200 OK"):
-                _logger.error("OK")
-
-                with api.Environment.manage():
-                    # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
-                    new_cr = self.pool.cursor()
-                    self = self.with_env(self.env(cr=new_cr))
-                    self.env['voip.account'].browse(1).verify_account(data)
-                    self._cr.close()
-                
-            elif data.startswith("SIP/2.0 401 Unauthorized"):
-                _logger.error("Unauthorized")
-
-                with api.Environment.manage():
-                    # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
-                    new_cr = self.pool.cursor()
-                    self = self.with_env(self.env(cr=new_cr))
-                    self.env['voip.account'].browse(1).send_auth_register(data)
-                    self._cr.close()
-
-            elif data.startswith("ACK"):
-                _logger.error("ack")
-            elif data.startswith("INVITE"):
-                _logger.error("invite")
-                _logger.error(data)
-
-                #Send 180 Ringing
-                reply = ""
-                reply += "SIP/2.0 180 Ringing\r\n"
-                reply += "Via: " + sip_dict['Via'].strip() + "\r\n"                
-                reply += "From: " + sip_dict['From'].strip() + "\r\n"
-                reply += "To: " + sip_dict['To'].strip() + ";tag=" + str(sip_tag) + "\r\n"
-                reply += "Contact: " + sip_dict['Contact'].strip() + "\r\n"
-                reply += "Call-ID: " + sip_dict['Call-ID'].strip() + "\r\n"
-                reply += "CSeq: " + sip_dict['CSeq'].strip() + "\r\n"
-                reply += "Content-Length: 0\r\n"
-                #_logger.error("180 RINGING: " + reply )
-                _logger.error(addr)
-                serversocket.sendto(reply, addr)
-
-                with api.Environment.manage():
-                    # As this function is in a new thread, i need to open a new cursor, because the old one may be closed
-                    new_cr = self.pool.cursor()
-                    self = self.with_env(self.env(cr=new_cr))
-                    self.env['voip.voip'].start_incoming_sip_call(data, addr, sip_tag)
-                    self._cr.close()
-        
-        #Close the socket
-        _logger.error("SIP Shutdown")
-        serversocket.shutdown(socket.SHUT_RDWR)
-        serversocket.close()
-
-    def start_sip_server(self):
-        #Start a new thread so you don't block the main Odoo thread
-        sip_socket_thread = threading.Thread(target=self.sip_server, args=())
-        sip_socket_thread.start()
-        
-    def stop_sip_server(self):
-        _logger.error("Stop SIP Server")
-        sip_listening = False

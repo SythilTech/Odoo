@@ -95,7 +95,6 @@ class VoipVoip(models.Model):
         #Origin ("o=") https://tools.ietf.org/html/rfc4566#section-5.2 (Should come up with a better session id...)
         sess_id = int(time.time()) #Not perfect but I don't expect more then one call a second
         sess_version = 0 #Will always start at 0
-        _logger.error( str(sess_id) )
         sdp_response += "o=- " + str(sess_id) + " " + str(sess_version) + " IN IP4 0.0.0.0\r\n"        
         
         #Session Name ("s=") https://tools.ietf.org/html/rfc4566#section-5.3 (We don't need a session name, information about the call is all displayed in the UI)
@@ -138,16 +137,5 @@ class VoipVoip(models.Model):
 
         #Ummm naming each media?!?
         sdp_response += "a=mid:sdparta_0\r\n"
-        
-        #Description of audio 101 / 109 profile?!?
-        #sdp_response += "a=sendrecv\r\n"
-        #sdp_response += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
-        #sdp_response += "a=fmtp:101 0-15\r\n"
-        #sdp_response += "a=msid:{3778521f-c0cd-47a8-aa20-66c06fbf184e} {7d104cf0-8223-49bf-9ff4-6058cf92e1cf}\r\n"
-        #sdp_response += "a=rtcp-mux\r\n"
-        #sdp_response += "a=rtpmap:109 opus/48000/2\r\n"
-        #sdp_response += "a=rtpmap:101 telephone-event/8000\r\n"
-
-        #sdp_response += "a=ssrc:615080754 cname:{22894fcb-8532-410d-ad4b-6b8e58e7631a}\r\n"
-    
+            
         return {"type":"answer","sdp": sdp_response}

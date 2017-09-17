@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+    
+        <function id="default_port"
+            model="ir.values" name="set_default"
+            eval="('sip.settings', 'port', 5060)"/>
+    
+    </data>     
+</odoo>

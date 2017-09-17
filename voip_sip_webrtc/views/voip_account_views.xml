@@ -16,6 +16,7 @@
       	            <field name="username"/>
       	            <field name="domain"/>
       	            <field name="outbound_proxy"/>
+                    <field name="verified"/>
       	        </group>
       	    </form>
         </field>
