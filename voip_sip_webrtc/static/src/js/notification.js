@@ -316,13 +316,18 @@ function getUserMediaSuccess(stream) {
     window.peerConnection.addStream(localStream);
 
     if (role == "caller") {
+		if (call_type == "external") {
+		    //Send the sdp now since we need it for the INVITE
+		    window.peerConnection.createOffer().then(createCall).catch(errorHandler);
+	    } else {
 
-        //Send the call notification to the callee
-        var model = new Model("voip.server");
-        model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type}).then(function(result) {
-            console.log("Notify Callee of incoming phone call");
-        });
+            //Avoid sending the SDP data since it will stuff up the SDP answer
+            var model = new Model("voip.server");
+            model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': ''}).then(function(result) {
+                console.log("Notify Callee of incoming phone call");
+            });
 
+		}
     }
 
     if (role == "callee") {
@@ -337,6 +342,19 @@ function getUserMediaSuccess(stream) {
 function getUserMediaError(error) {
     alert("Failed to access to media: " + error);
 };
+
+function createCall(description) {
+
+    window.peerConnection.setLocalDescription(description).then(function() {
+
+        //Send the call notification to the callee
+        var model = new Model("voip.server");
+        model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': description}).then(function(result) {
+            console.log("Notify Callee of incoming phone call");
+        });
+
+    }).catch(errorHandler);
+}
 
 function createdDescription(description) {
 

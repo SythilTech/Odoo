@@ -29,7 +29,7 @@ class VoipVoip(models.Model):
         
         return user_list
 
-    def voip_call_notify(self, mode, to_partner_id, call_type):
+    def voip_call_notify(self, mode, to_partner_id, call_type, sdp):
         """ Create the VOIP call record and notify the callee of the incoming call """
         
         #Create the VOIP call now so we can mark it as missed / rejected / accepted
@@ -60,12 +60,39 @@ class VoipVoip(models.Model):
             #Also send one to yourself so we get the countdown
             notification = {'voip_call_id': voip_call.id, 'ring_duration': ring_duration, 'to_name': voip_call.partner_id.name, 'callee_partner_id': voip_call.partner_id.id, 'direction': 'outgoing'}
             self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', voip_call.from_partner_id.id), notification)
-
-        if voip_call.type == "external":        
+            
+        elif voip_call.type == "external":        
             _logger.error("external call")
             
-            voip_call.start_sip_call()
+            #Send the INVITE
+            voip_account = self.env.user.voip_account_id
 
+            local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
+
+            reply = ""
+            reply += "INVITE sip:" + voip_call.partner_id.sip_address.strip() + " SIP/2.0\r\n"
+            reply += "Via: SIP/2.0/UDP " + local_ip + "\r\n"
+            reply += "Max-Forwards: 70\r\n"
+            reply += "Contact: <sip:" + voip_account.username + "@" + local_ip + ":5060>\r\n"
+            reply += 'To: <sip:' + voip_call.partner_id.sip_address.strip() + ">\r\n"
+            reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + voip_account.address + ">;tag=903df0a\r\n"
+            reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(voip_call.id) + "\r\n"
+            reply += "CSeq: 1 INVITE\r\n"
+            reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+            reply += "Content-Type: application/sdp\r\n"
+            reply += "Supported: replaces\r\n"
+            reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+            reply += "Content-Length: " + str(len(sdp['sdp'])) + "\r\n"
+            reply += "\r\n"
+            reply += sdp['sdp']
+
+            _logger.error("INVITE: " + reply )
+                
+            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            serversocket.sendto(reply, (voip_account.outbound_proxy, 5060) )        
+
+
+            
     @api.model
     def generate_server_ice(self, port, component_id):
 
