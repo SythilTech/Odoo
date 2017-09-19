@@ -66,6 +66,8 @@ class VoipVoip(models.Model):
             
             #Send the INVITE
             voip_account = self.env.user.voip_account_id
+            voip_call.voip_account = voip_account
+            voip_call.from_partner_sdp = sdp['sdp']
 
             local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 

@@ -29,6 +29,7 @@ class VoipCall(models.Model):
     _name = "voip.call"
 
     from_partner_id = fields.Many2one('res.partner', string="From", help="From can be blank if the call comes from outside of the system")
+    from_partner_sdp = fields.Text(string="From Partner SDP")
     partner_id = fields.Many2one('res.partner', string="To")
     status = fields.Selection([('pending','Pending'), ('missed','Missed'), ('accepted','Accepted'), ('rejected','Rejected'), ('active','Active'), ('over','Complete')], string='Status', default="pending", help="Pending = Calling person\nActive = currently talking\nMissed = Call timed out\nOver = Someone hit end call\nRejected = Someone didn't want to answer the call")
     start_time = fields.Datetime(string="Answer Time", help="Time the call was answered, create_date is when it started dialing")
@@ -40,23 +41,29 @@ class VoipCall(models.Model):
     type = fields.Selection([('internal','Internal'),('external','External')], string="Type")
     mode = fields.Selection([('videocall','video call'), ('audiocall','audio call'), ('screensharing','screen sharing call')], string="Mode", help="This is only how the call starts, i.e a video call can turn into a screen sharing call mid way")
     sip_tag = fields.Char(string="SIP Tag")
+    voip_account = fields.Many2one('voip.account', string="VOIP Account")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
     ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
+
+    def start_call(self):
+        """ Process the ICE queue now """
+                
+        #Notify caller and callee that the call was rejected
+        for voip_client in self.client_ids:
+            notification = {'call_id': self.id}
+            self.env['bus.bus'].sendone((request._cr.dbname, 'voip.start', voip_client.partner_id.id), notification)
 
     def accept_call(self):
         """ Mark the call as accepted and send response to close the notification window and open the VOIP window """
         
         if self.status == "pending":
             self.status = "accepted"
-
-        #call_client = request.env['voip.call.client'].search([('vc_id','=', voip_call.id ), ('partner_id','=', request.env.user.partner_id.id) ])
-        #call_client.sip_addr_host = request.httprequest.remote_addr
         
         #Notify caller and callee that the call was accepted
         for voip_client in self.client_ids:
             notification = {'call_id': self.id, 'status': 'accepted', 'type': self.type}
-            self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)
+            self.env['bus.bus'].sendone((request._cr.dbname, 'voip.response', voip_client.partner_id.id), notification)            
 
     def reject_call(self):
         """ Mark the call as rejected and send the response so the notification window is closed on both ends """
@@ -98,6 +105,17 @@ class VoipCall(models.Model):
             notification = {'call_id': self.id}
             self.env['bus.bus'].sendone((self._cr.dbname, 'voip.end', voip_client.partner_id.id), notification)
 
+    def voip_call_sdp(self, sdp):
+        """Store the description and send it to everyone else"""
+        
+        if self.type == "internal":
+            for voip_client in self.client_ids:
+                if voip_client.partner_id.id == self.env.user.partner_id.id:
+                    voip_client.sdp = sdp
+                else:
+                    notification = {'call_id': self.id, 'sdp': sdp }
+                    self.env['bus.bus'].sendone((self._cr.dbname, 'voip.sdp', voip_client.partner_id.id), notification)
+                    
     def generate_call_sdp(self):
     
         sdp_response = ""
@@ -183,26 +201,10 @@ class VoipCall(models.Model):
         self.start_rtc_listener(port, "RTCP")
         notification = {'call_id': self.id, 'ice': server_ice_candidate }
         self.env['bus.bus'].sendone((self._cr.dbname, 'voip.ice', self.from_partner_id.id), notification)
-
-    def voip_call_sdp(self, sdp):
-        """Store the description and send it to everyone else"""
-
-        _logger.error(sdp)
-        
-        if self.type == "internal":
-            for voip_client in self.client_ids:
-                if voip_client.partner_id.id == self.env.user.partner_id.id:
-                    voip_client.sdp = sdp
-                else:
-                    notification = {'call_id': self.id, 'sdp': sdp }
-                    self.env['bus.bus'].sendone((self._cr.dbname, 'voip.sdp', voip_client.partner_id.id), notification)
                     
     def voip_call_ice(self, ice):
         """Forward ICE to everyone else"""
         
-        #_logger.error("ICE: ")
-        #_logger.error(ice)        
-
         for voip_client in self.client_ids:
             
             #Don't send ICE back to yourself
