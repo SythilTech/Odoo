@@ -4,13 +4,21 @@ Assigns top level domains to database of any name<br/>
 <br/>
 
 <h2>Instructions</h2>
-You need to add an option to your odoo/tools.config.py file specifing the name of the database acting as the saas server<br/>
+You need to add an option to your odoo/tools.config.py file, be sure to replace "my_default='saas'" with the actual name of the database with the saas server module installed.<br/>
 <pre>group.add_option("--sythilsaasserver", dest="sythilsaasserver", my_default='saas', help="The name of the saas server database")</pre>
 <br/>
-You will also need to assign the module to be a server wide module<br/>
-<pre>group.add_option("--load", dest="server_wide_modules", help="Comma-separated list of server-wide modules.", my_default='web,web_kanban,sythil_saas_server_domain_filter')</pre>
+You will also need to make the module run as a server wide module by changing the line<br/>
+<pre>self.options['server_wide_modules'] = 'web,web_kanban'</pre>
+to
+<pre>self.options['server_wide_modules'] = 'web,web_kanban,sythil_saas_server_domain_filter'</pre>
 <br/>
-Once setup you can add domains under the saas->domains, when a person visits the domain it will do a lookup and automatically choose the appropiate database<br/>
+Also if you are using a reverse proxy such as NGINX be sure to update your odoo config file (/etc/odoo.conf)
+<pre>proxy_mode = True</pre>
+<p>You can test that the module is running as a server side module by going to &lt;domain&gt;/saas/domain/test</p>
+
+<p>It should display a message that reads "SAAS Database:", be sure this matches the name of the database with the saas server modules installed</p>
+
+<p>Once setup you can add domains under the saas->domains, when a person visits the domain it will do a lookup and automatically choose the appropriate database</p>
 <br/>
 Find a bug? feature idea? send an email to steven@sythiltech.com.au<br/>
 </div>

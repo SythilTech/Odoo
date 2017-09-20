@@ -14,6 +14,7 @@ import zipfile
 import StringIO
 import base64
 import tempfile
+import odoo
 
 import openerp
 import openerp.http as http
@@ -24,4 +25,5 @@ class SaasDomainController(http.Controller):
 
     @http.route('/saas/domain/test', type='http', auth="none")
     def saas_client_domain_test(self, **kw):
-        return "Test 34256"
+        saas_server_db = odoo.tools.config['sythilsaasserver']
+        return "SAAS Database: " + str(saas_server_db)
