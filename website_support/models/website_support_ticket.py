@@ -35,6 +35,7 @@ class WebsiteSupportTicket(models.Model):
     person_name = fields.Char(string='Person Name')
     email = fields.Char(string="Email")
     category = fields.Many2one('website.support.ticket.categories', string="Category", track_visibility='onchange')
+    sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     subject = fields.Char(string="Subject")
     description = fields.Text(string="Description")
     state = fields.Many2one('website.support.ticket.states', readonly=True, default=_default_state, string="State")
@@ -47,6 +48,8 @@ class WebsiteSupportTicket(models.Model):
     ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
     ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
     company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
+    support_rating = fields.Integer(string="Support Rating")
+    support_comment = fields.Text(string="Support Comment")
     
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -163,6 +166,15 @@ class WebsiteSupportTicket(models.Model):
         
         return update_rec
 
+    def send_survey(self):
+
+        notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_survey')
+        values = notification_template.generate_email(self.id)
+        surevey_url = "support/survey/" + str(self.portal_access_key)
+        values['body_html'] = values['body_html'].replace("_survey_url_",surevey_url)
+        send_mail = self.env['mail.mail'].create(values)
+        send_mail.send(True)
+
     @api.one
     def close_ticket(self):
 
@@ -191,6 +203,13 @@ class WebsiteSupportTicketCategories(models.Model):
     
     name = fields.Char(required=True, translate=True, string='Category Name')
     cat_user_ids = fields.Many2many('res.users', string="Category Users")
+
+class WebsiteSupportTicketSubCategories(models.Model):
+
+    _name = "website.support.ticket.subcategory"
+    
+    name = fields.Char(required=True, translate=True, string='Sub Category Name')   
+    parent_category_id = fields.Many2one('website.support.ticket.categories', required=True, string="Parent Category")
    
 class WebsiteSupportTicketStates(models.Model):
 

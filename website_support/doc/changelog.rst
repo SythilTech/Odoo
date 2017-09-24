@@ -1,3 +1,7 @@
+v1.3
+====
+* Sub categories and support survey
+
 v1.2.10
 =======
 * Blank category staff reply fix

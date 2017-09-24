@@ -15,6 +15,37 @@ from openerp.addons.website.models.website import slug
 
 class SupportTicketController(http.Controller):
 
+    @http.route('/support/survey/<portal_key>', type="http", auth="public", website=True)
+    def support_ticket_survey(self, portal_key):
+        """Display the survey"""
+
+        support_ticket = request.env['website.support.ticket'].search([('portal_access_key','=', portal_key)])
+
+        if support_ticket.support_rating:
+            #TODO some security incase they guess the portal key of an incomplete survey
+            return "Survey Already Complete"
+        else:
+            return http.request.render('website_support.support_ticket_survey_page', {'support_ticket': support_ticket})
+
+
+    @http.route('/support/survey/process/<portal_key>', type="http", auth="public", website=True)
+    def support_ticket_survey_process(self, portal_key, **kw):
+        """Insert Survey Response"""
+
+        values = {}
+ 	for field_name, field_value in kw.items():
+            values[field_name] = field_value
+
+        support_ticket = request.env['website.support.ticket'].search([('portal_access_key','=', portal_key)])
+
+        if support_ticket.support_rating:
+            #TODO some security incase they guess the portal key of an incomplete survey
+            return "Survey Already Complete"
+        else:
+            support_ticket.support_rating = values['rating']
+            support_ticket.support_comment = values['comment']
+            return "Thank you for your feedback"
+
     @http.route('/support/help', type="http", auth="public", website=True)
     def support_help(self, **kw):
         """Displays all help groups and thier child help pages"""

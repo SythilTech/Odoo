@@ -25,12 +25,12 @@
       </record>
 
       <record id="website_support_ticket_categories_action" model="ir.actions.act_window">
-          <field name="name">website.support.ticket.categories.action</field>
+          <field name="name">Support Ticket Categories</field>
       	  <field name="res_model">website.support.ticket.categories</field>
       	  <field name="view_type">form</field>
       	  <field name="view_mode">tree,form</field>
       	  <field name="help" type="html">
-	      <p class="oe_view_nocontent_create">Create new categories</p>
+	      <p class="oe_view_nocontent_create">Create new category</p>
 	  </field>
       </record>
 

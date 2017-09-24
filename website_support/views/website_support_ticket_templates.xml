@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
+
+        <record id="support_ticket_survey" model="mail.template">
+            <field name="name">Support Ticket Survey</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email}</field>
+            <field name="subject">Support Ticket Survey (#${object.ticket_number or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>We would like to get your feedback on the support</p>
+                <p><a href="_survey_url_">here</a></p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+            ]]>
+            </field>
+        </record>
         
         <record id="new_support_ticket_category" model="mail.template">
             <field name="name">Support Ticket New Ticket (Category)</field>
@@ -111,6 +135,43 @@
             ]]>
             </field>
         </record>
+
+<template id="support_ticket_survey_page" name="Support Ticket Survey" page="True">
+    <t t-call="website.layout">
+        <div class="container">
+
+            <div class="mt16 mb16">
+                <h1 class="text-center">Support Ticket Survey</h1>
+            </div>
+
+            <p>Please give us feedback on our support service</p>
+            <blockquote><t t-raw="support_ticket.description"/></blockquote>
+
+            <form method="POST" t-attf-action="/support/survey/process/#{support_ticket.portal_access_key}">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            
+                <div class="form-group">
+                    <label class="radio-inline"><input type="radio" name="rating" value="1"/>&#128544; Terrible Support</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="2"/>&#128531; Bad Supprt</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="3"/>&#128528; Ok Support</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="4"/>&#128512; Good Support</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="5"/>&#128513; Great Support</label>
+                </div>
+
+                <div class="form-group">
+                     <label for="comment">Comment</label>
+                    <textarea class="form-control" rows="5" name="comment"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-primary btn-lg">Submit Feedback</button>
+                </div>
+
+            </form>
+            
+        </div>
+    </t>
+</template>
 
 <template id="support_ticket_view_list" name="My Support Tickets" page="True">
     <t t-call="website.layout">
