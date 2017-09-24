@@ -34,6 +34,7 @@ var call_type = ""
 var to_partner_id;
 var outgoing_ring_interval;
 var call_interval;
+var call_sdp = "";
 var ice_candidate_queue = [];
 var got_remote_description = false;
 
@@ -162,6 +163,7 @@ WebClient.include({
                         var ringtone = notification[1].ringtone;
                         var caller_partner_id = notification[1].caller_partner_id;
 
+                        call_sdp = notification[1].sdp;
                         role = "callee";
                         mode = notification[1].mode;
 

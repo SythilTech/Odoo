@@ -11,6 +11,7 @@
         'data/sip.server.csv',
         'data/sip_settings.xml',
         'views/sip_settings_views.xml',
+        'views/sip_account_views.xml',
     ],
     'demo': [],
     'depends': [],

@@ -64,7 +64,15 @@ class SIPServer(models.Model):
                 _logger.error("REGISTER")
             elif data.startswith("SIP/2.0 200 OK"):
                 _logger.error("OK")
-                self.verify_account(data)                    
+
+                call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
+                type = call_id.split("-")[1]
+
+                if type == "account":                
+                    self.verify_account(data)
+                elif type == "call":
+                    self.pass_sdp(data)
+                    
             elif data.startswith("SIP/2.0 401 Unauthorized"):
                 _logger.error("Unauthorized")
                 self.send_auth_register(data)
@@ -97,11 +105,26 @@ class SIPServer(models.Model):
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         serversocket.sendto("DIE BOT DIE!!!", (hostname, 5060) )
 
+    def pass_sdp(self, data):
+
+        _logger.error("Call OK get SDP")
+
+        call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]    
+        content_length = re.findall(r'Content-Length: (.*?)\r\n', data)[0]
+        
+        #SDP should always be split by a blank link, if there are multiple blank lines the SIP 200 OK is malformed anyway
+        sdp = data.split("\r\n\r\n")[1]
+        _logger.error(sdp)
+        
+        db_name = call_id.split("-")[0]
+        type = call_id.split("-")[1]
+        record_id = call_id.split("-")[2]
+
     def verify_account(self, data):
 
             _logger.error("OK Account Verified")
 
-            call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
+            call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]            
             db_name = call_id.split("-")[0]
             type = call_id.split("-")[1]
             record_id = call_id.split("-")[2]
@@ -116,6 +139,9 @@ class SIPServer(models.Model):
                 env = api.Environment(cr, SUPERUSER_ID, context)
                 voip_account = env['voip.account'].browse( int(record_id) )
                 voip_account.verified = True
+                
+                if self.env['sip.account'].search_count([('address','=', voip_account.address)]) == 0:
+                    self.env['sip.account'].create({'database': db_name, 'address': voip_account.address, 'password': voip_account.password, 'auth_username': voip_account.auth_usernam, 'username': voip_account.username, 'domain': voip_account.domain, 'outbound_proxy': voip_account.outbound_proxy})
 
     def H(self, data):
         return hashlib.md5(data).hexdigest()
@@ -201,10 +227,61 @@ class SIPServer(models.Model):
                 reply += 'Proxy-Authorization: Digest username="' + voip_account.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + voip_call.partner_id.sip_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
                 reply += "Supported: replaces\r\n"
                 reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
-                reply += "Content-Length: " + str(len(voip_call.from_partner_sdp)) + "\r\n"
-                reply += "\r\n"
+                #reply += "Content-Length: " + str(len(voip_call.from_partner_sdp)) + "\r\n"
+                #reply += "\r\n"
                 #Dislikes SDP data?!?
-                reply += voip_call.from_partner_sdp
+                #reply += voip_call.from_partner_sdp
+
+                #Sample data webrtc
+                #v=0\r\n
+                #o=mozilla...THIS_IS_SDPARTA-55.0.3 8294658421909368638 0 IN IP4 0.0.0.0\r\n
+                #s=-\r\n
+                #t=0 0\r\n
+                #a=fingerprint:sha-256 ED:FF:6A:68:8E:67:47:0E:A8:F7:D9:92:5F:20:4D:D4:B2:1A:3B:97:7D:B9:AA:02:0C:7F:0E:5A:64:FA:6E:A2\r\n
+                #a=group:BUNDLE sdparta_0\r\n
+                #a=ice-options:trickle\r\n
+                #a=msid-semantic:WMS *\r\n
+                #m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101\r\n
+                #c=IN IP4 0.0.0.0\r\n
+                #a=sendrecv\r\n
+                #a=extmap:1/sendonly urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n
+                #a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n
+                #a=fmtp:101 0-15\r\n
+                #a=ice-pwd:3289a8fe04b88eeb11eae873568c7fe8\r\n
+                #a=ice-ufrag:0a38dbfd\r\n
+                #a=mid:sdparta_0\r\n
+                #a=msid:{6ac1d3e6-0c31-4985-b007-58d09e6cdd6a} {4dd601cd-9f91-408f-8095-16386a5e5458}\r\n
+                #a=rtcp-mux\r\n
+                #a=rtpmap:109 opus/48000/2\r\n
+                #a=rtpmap:9 G722/8000/1\r\n
+                #a=rtpmap:0 PCMU/8000\r\n
+                #a=rtpmap:8 PCMA/8000\r\n
+                #a=rtpmap:101 telephone-event/8000/1\r\n
+                #a=setup:actpass\r\n
+                #a=ssrc:2976186053 cname:{d6f01826-125a-4974-a8b1-0439bdd082a3}\r\n
+
+
+                #Sample data X-Lite
+                sdp = ""
+                sdp += "v=0\r\n"
+                sdp += "o=- 13150342053296106 1 IN IP4 192.168.1.133\r\n"
+                sdp += "s=X-Lite release 5.0.1 stamp 86895\r\n"
+                sdp += "c=IN IP4 192.168.1.133\r\n"
+                sdp += "t=0 0\r\n"
+                sdp += "m=audio 53194 RTP/AVP 9 8 85 120 0 84 3 101\r\n"
+                sdp += "a=rtpmap:85 speex/8000\r\n"
+                sdp += "a=rtpmap:120 opus/48000/2\r\n"
+                sdp += "a=fmtp:120 useinbandfec=1; usedtx=1; maxaveragebitrate=64000\r\n"
+                sdp += "a=rtpmap:84 speex/16000\r\n"
+                sdp += "a=rtpmap:101 telephone-event/8000\r\n"
+                sdp += "a=fmtp:101 0-15\r\n"
+                sdp += "a=sendrecv\r\n"
+
+                #Should be 365
+                reply += "Content-Length: " + str(len(sdp)) + "\r\n"
+                reply += "\r\n"
+                reply += sdp
+                
         
                 serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 serversocket.sendto(reply, (voip_account.outbound_proxy, 5060) )

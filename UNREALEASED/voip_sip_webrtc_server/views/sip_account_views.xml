@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sip_account_view_form" model="ir.ui.view">
+        <field name="name">sip.account.view.form</field>
+        <field name="model">sip.account</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="database"/>
+                    <field name="address"/>
+                    <field name="password"/>
+                    <field name="auth_username"/>
+                    <field name="username"/>
+                    <field name="domain"/>
+                    <field name="outbound_proxy"/>
+                </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="sip_account_view_tree" model="ir.ui.view">
+        <field name="name">sip.account.view.tree</field>
+        <field name="model">sip.account</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="database"/>
+                <field name="address"/>
+                <field name="outbound_proxy"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="sip_account_action" model="ir.actions.act_window">
+        <field name="name">SIP Account</field>
+	<field name="res_model">sip.account</field>
+	<field name="help" type="html">
+	      <p>
+	          No SIP Accounts, register them to add to this list.
+	      </p>
+        </field>
+    </record>
+
+    <menuitem id="sip_account_menu" name="Accounts" parent="sip_parent_menu" action="sip_account_action" sequence="20"/>
+
+</odoo>
