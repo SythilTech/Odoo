@@ -1,3 +1,7 @@
+v1.2.2
+======
+* Escaped url fix
+
 v1.2.1
 ======
 * Pagination merged into a single function and optimise media get

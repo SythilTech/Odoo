@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Fix media pagenation issue
+
 v1.0.3
 ======
 * Fix to work with latest version of core module

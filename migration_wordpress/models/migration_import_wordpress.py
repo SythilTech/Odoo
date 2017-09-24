@@ -96,10 +96,10 @@ class MigrationImportWordpress(models.Model):
                 for media_json in media_json_data:
                     if 'sizes' in media_json['media_details']:
                         for key, value in media_json['media_details']['sizes'].iteritems():
-                            if value['source_url'] == image_tag.attrib['src']:
+                            if value['source_url'] == image_tag.attrib['src'] or value['source_url'] == image_tag.attrib['src'].replace("/",'\/'):
                                 media_attachment = self.transfer_media(media_json)
                     else:
-                        if media_json['guid']['rendered'] ==  image_tag.attrib['src']:
+                        if media_json['guid']['rendered'] == image_tag.attrib['src'] or media_json['guid']['rendered'] == image_tag.attrib['src'].replace("/",'\/'):
                             media_attachment = self.transfer_media(media_json)
 
                 if media_attachment:
@@ -157,7 +157,7 @@ class MigrationImportWordpress(models.Model):
         media_json_data = self.pagination_requests(self.wordpress_url + "/wp-json/wp/v2/media")
         
         for page_json in page_json_data:
-            _logger.error(page_json)
+
             title = page_json['title']['rendered']
             slug = page_json['slug']
             content = page_json['content']['rendered']

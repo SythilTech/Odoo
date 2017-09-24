@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Wordpress Migration - Blog Posts",
-    'version': "1.0.3",
+    'version': "1.0.4",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
