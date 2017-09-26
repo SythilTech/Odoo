@@ -15,6 +15,35 @@ from openerp.addons.website.models.website import slug
 
 class SupportTicketController(http.Controller):
 
+    @http.route('/support/subcategories/fetch', type='http', auth="public", website=True)
+    def support_subcategories_fetch(self, **kwargs):
+
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+	            
+	sub_categories = request.env['website.support.ticket.subcategory'].sudo().search([('parent_category_id','=', int(values['category']) )])
+	
+	#Only return a dropdown if this category has subcategories
+	return_string = ""
+	
+	if sub_categories:
+            return_string = ""
+
+	    return_string += "<div class=\"form-group\">\n"
+	    return_string += "    <label class=\"col-md-3 col-sm-4 control-label\" for=\"subcategory\">Sub Category</label>\n"
+	    return_string += "    <div class=\"col-md-7 col-sm-8\">\n"
+
+            return_string += "        <select class=\"form-control\" name=\"subcategory\">\n"
+            for sub_category in request.env['website.support.ticket.subcategory'].sudo().search([('parent_category_id','=', int(values['category']) )]):
+                return_string += "            <option value=\"" + str(sub_category.id) + "\">" + sub_category.name.encode("utf-8") + "</option>\n"
+
+            return_string += "        </select>\n"
+	    return_string += "    </div>\n"
+            return_string += "</div>\n"
+            
+        return return_string
+
     @http.route('/support/survey/<portal_key>', type="http", auth="public", website=True)
     def support_ticket_survey(self, portal_key):
         """Display the survey"""
@@ -117,9 +146,15 @@ class SupportTicketController(http.Controller):
             if file_extension == ".exe":
                 return "exe files are not allowed"
         
+        if "subcategory" in values:
+            sub_category = values['subcategory']
+        else:
+            sub_category = ""
+            
+        
         if http.request.env.user.name != "Public user":
             portal_access_key = randint(1000000000,2000000000)
-            new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'],'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
+            new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'],'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
             
             partner = http.request.env.user.partner_id
             
@@ -131,10 +166,10 @@ class SupportTicketController(http.Controller):
 
             if len(search_partner) > 0:
                 portal_access_key = randint(1000000000,2000000000)
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key})
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'portal_access_key': portal_access_key})
             else:
                 portal_access_key = randint(1000000000,2000000000)
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
+                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
 
         return werkzeug.utils.redirect("/support/ticket/thanks")
         

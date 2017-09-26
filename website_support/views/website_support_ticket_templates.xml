@@ -250,12 +250,6 @@
     </xpath>
 </template>
 
-<template id="assets_front_editor" inherit_id="website.assets_frontend" name="Website Front Support Editor">
-    <xpath expr="." position="inside">
-        <script type="text/javascript" src="/website_support/static/src/js/website_support.editor.front.js"></script>
-    </xpath>
-</template>
-
 <template id="support_ticket_view" name="Support Ticket" page="True">
     <t t-call="website.layout">
         <div class="container mt16 mb16">
@@ -306,7 +300,26 @@
                     </t>
                 </div>
             </div>
-            
+
+<script>
+
+$(document).ready(function() {
+    $("#search_help_pages").autocomplete({
+        source: '/support/help/auto-complete',
+        minLength: 1,
+        select: function( event, ui ) {
+            window.location.href = ui.item.value;
+        }
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+            return $("<li></li>")
+                .data("item.autocomplete", item)
+                .append("<a>" + item.label + "</a>")
+                .appendTo(ul);
+    };
+});
+
+</script>
+
             <div class="mt16 mb16">
                 <h1 class="text-center">Help Pages</h1>
                 
@@ -391,15 +404,42 @@
                     <input type="email" class="form-control" name="email" required="True" t-attf-value="#{email or ''}" t-att-readonly="'readonly' if email else None"/>
                 </div>
             </div>
+
+           <script>
+
+           $(document).ready(function() {
+
+               update_sub_categories()
+           
+               $("#category").change(function() {
+
+                    update_sub_categories()
+
+                });
+            });
+
+            function update_sub_categories() {
+
+                $.ajax({url: "/support/subcategories/fetch?category=" + $("#category").val(), success: function(result){
+                    $("#subcategoy").html(result);
+                }});
+            
+            }
+
+            </script>
+
             <div t-attf-class="form-group #{error and 'category' in error and 'has-error' or ''}">
                 <label class="col-md-3 col-sm-4 control-label" for="name">Category</label>
                 <div class="col-md-7 col-sm-8">
-                    <select class="form-control" name="category">
+                    <select class="form-control" id="category" name="category">
                         <t t-foreach="categories" t-as="category">
-		                <option t-attf-value="#{category.id}"><t t-esc="category.name"/></option>
+		            <option t-attf-value="#{category.id}"><t t-esc="category.name"/></option>
                         </t>
                     </select>
                 </div>
+            </div>
+            <div id="subcategoy">
+            
             </div>
             <div name="subject_container" t-attf-class="form-group #{error and 'subject' in error and 'has-error' or ''}">
 	        <label class="col-md-3 col-sm-4 control-label" for="subject">Subject</label>

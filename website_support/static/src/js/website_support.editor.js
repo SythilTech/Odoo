@@ -27,7 +27,7 @@ odoo.define('website_support.new_help_page', function (require) {
 });
 
 
-odoo.define('website_support.new_help_page', function (require) {
+odoo.define('website_support.new_help_group', function (require) {
 "use strict";
 
     var core = require('web.core');

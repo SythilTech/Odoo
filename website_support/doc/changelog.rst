@@ -1,3 +1,7 @@
+v1.3.1
+======
+* Sub categories on website form
+
 v1.3
 ====
 * Sub categories and support survey
