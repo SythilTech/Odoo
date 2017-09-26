@@ -1,3 +1,7 @@
+v1.3.2
+======
+* Sub categories permission fix
+
 v1.3.1
 ======
 * Sub categories on website form
