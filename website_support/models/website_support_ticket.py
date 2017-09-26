@@ -50,6 +50,7 @@ class WebsiteSupportTicket(models.Model):
     company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
     support_rating = fields.Integer(string="Support Rating")
     support_comment = fields.Text(string="Support Comment")
+    close_comment = fields.Text(string="Close Comment")
     
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -174,21 +175,6 @@ class WebsiteSupportTicket(models.Model):
         values['body_html'] = values['body_html'].replace("_survey_url_",surevey_url)
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send(True)
-
-    @api.one
-    def close_ticket(self):
-
-        closed_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')
-        
-        #We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
-        message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
-        self.message_post(body=message, subject="Ticket Closed by Staff")
-
-        self.state = closed_state.id
-
-        #Send an email notifing the customer  that the ticket has been closed
-        ticket_closed_email = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
-        ticket_closed_email.send_mail(self.id, True)
     
 class WebsiteSupportTicketMessage(models.Model):
 
@@ -237,6 +223,28 @@ class WebsiteSupportTicketUsers(models.Model):
     _inherit = "res.users"
     
     cat_user_ids = fields.Many2many('website.support.ticket.categories', string="Category Users")
+
+class WebsiteSupportTicketCompose(models.Model):
+
+    _name = "website.support.ticket.close"
+
+    ticket_id = fields.Many2one('website.support.ticket', string="Ticket ID")
+    message = fields.Text(string="Close Message")
+
+    def close_ticket(self):
+
+        closed_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')
+        
+        #We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
+        message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
+        self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
+
+        self.ticket_id.state = closed_state.id
+        self.ticket_id.close_comment = self.message
+        
+        #Send an email notifing the customer  that the ticket has been closed
+        ticket_closed_email = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
+        ticket_closed_email.send_mail(self.ticket_id.id, True)
     
 class WebsiteSupportTicketCompose(models.Model):
 

@@ -1,3 +1,7 @@
+v1.3.3
+======
+* close ticket comment
+
 v1.3.2
 ======
 * Sub categories permission fix
