@@ -27,6 +27,7 @@ from openerp import api, fields, models
 class VoipCall(models.Model):
 
     _name = "voip.call"
+    _order = 'create_date desc'
 
     from_partner_id = fields.Many2one('res.partner', string="From", help="From can be blank if the call comes from outside of the system")
     from_partner_sdp = fields.Text(string="From Partner SDP")

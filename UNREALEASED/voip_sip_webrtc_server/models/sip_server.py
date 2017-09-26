@@ -113,12 +113,29 @@ class SIPServer(models.Model):
         content_length = re.findall(r'Content-Length: (.*?)\r\n', data)[0]
         
         #SDP should always be split by a blank link, if there are multiple blank lines the SIP 200 OK is malformed anyway
-        sdp = data.split("\r\n\r\n")[1]
-        _logger.error(sdp)
+        sdp_data = data.split("\r\n\r\n")[1]
         
         db_name = call_id.split("-")[0]
         type = call_id.split("-")[1]
         record_id = call_id.split("-")[2]
+
+        #Connect to the saas database and update the subscription status
+	db = openerp.sql_db.db_connect(db_name)
+
+        registry = odoo.modules.registry.Registry(db_name)
+        with registry.cursor() as cr:
+                
+            context = {}
+            env = api.Environment(cr, SUPERUSER_ID, context)
+        
+            voip_call = env['voip.call'].browse( int(record_id) )                
+        
+
+            #Send the sdp data back to the caller
+            sdp = {'type': 'answer', 'sdp': sdp_data}
+            notification = {'call_id': record_id, 'sdp': sdp }
+            env['bus.bus'].sendone((db_name, 'voip.sdp', voip_call.from_partner_id.id), notification)
+
 
     def verify_account(self, data):
 
