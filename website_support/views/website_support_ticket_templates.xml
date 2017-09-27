@@ -6,7 +6,7 @@
             <field name="name">Support Ticket Survey</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
             <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
-            <field name="email_to">${object.email}</field>
+            <field name="email_to">${object.email|safe}</field>
             <field name="subject">Support Ticket Survey (#${object.ticket_number or object.id})</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
@@ -47,8 +47,8 @@
         <record id="new_support_ticket_category_change" model="mail.template">
             <field name="name">Support Ticket Category Change</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
-            <field name="email_from">${user.email}</field>            
-            <field name="email_to">${object.email}</field>
+            <field name="email_from">${user.email|safe}</field>            
+            <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been updated</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
@@ -71,8 +71,8 @@
         <record id="support_ticket_closed" model="mail.template">
             <field name="name">Support Ticket Closed</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
-            <field name="email_from">${user.email}</field>
-            <field name="email_to">${object.email}</field>
+            <field name="email_from">${user.email|safe}</field>
+            <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been closed</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
@@ -97,7 +97,7 @@
             <field name="name">Support Ticket New</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
             <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
-            <field name="email_to">${object.email}</field>
+            <field name="email_to">${object.email|safe}</field>
             <field name="subject">We have received your support ticket '${object.subject}' and will get back to you shortly</field>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[

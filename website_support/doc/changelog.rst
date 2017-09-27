@@ -1,3 +1,7 @@
+v1.3.5
+======
+* Fix email sanitisation issue
+
 v1.3.4
 ======
 * close ticket permission fix
