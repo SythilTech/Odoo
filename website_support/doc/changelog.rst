@@ -1,3 +1,7 @@
+v1.3.4
+======
+* close ticket permission fix
+
 v1.3.3
 ======
 * close ticket comment

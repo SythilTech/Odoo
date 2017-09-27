@@ -73,7 +73,7 @@ class SupportTicketController(http.Controller):
         else:
             support_ticket.support_rating = values['rating']
             support_ticket.support_comment = values['comment']
-            return "Thank you for your feedback"
+            return http.request.render('website_support.support_survey_thank_you', {})
 
     @http.route('/support/help', type="http", auth="public", website=True)
     def support_help(self, **kw):

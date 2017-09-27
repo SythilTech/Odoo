@@ -359,6 +359,23 @@ $(document).ready(function() {
     </xpath>
 </template>
 
+<template id="support_survey_thank_you" name="Support Ticket Survey Thank You" page="True">
+    <t t-call="website.layout">
+        <div id="wrap" class="oe_structure oe_empty">
+            <section>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1 class="text-center">Thank You</h1>
+                            <h3 class="text-muted text-center">Thank you for you feedback about our support</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </t>
+</template>
+
 <template id="support_thank_you" name="Support Ticket Thank You" page="True">
     <t t-call="website.layout">
         <div id="wrap" class="oe_structure oe_empty">
