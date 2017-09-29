@@ -243,8 +243,14 @@ class WebsiteSupportTicketCompose(models.Model):
         self.ticket_id.close_comment = self.message
         
         #Send an email notifing the customer  that the ticket has been closed
-        ticket_closed_email = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
-        ticket_closed_email.send_mail(self.ticket_id.id, True)
+        setting_close_email_template_id = self.env['ir.values'].get_default('website.support.settings', 'close_ticket_email_template_id')
+        
+        if setting_close_email_template_id:
+            setting_close_email_template = self.env['mail.template'].browse(setting_close_email_template_id)
+            setting_close_email_template.send_mail(self.ticket_id.id, True)
+        else:
+            ticket_closed_email = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
+            ticket_closed_email.send_mail(self.ticket_id.id, True)
     
 class WebsiteSupportTicketCompose(models.Model):
 

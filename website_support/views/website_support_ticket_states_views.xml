@@ -24,7 +24,7 @@
       </record>
 
       <record id="website_support_ticket_states_action" model="ir.actions.act_window">
-          <field name="name">website.support.ticket.states.action</field>
+          <field name="name">Support Ticket States</field>
       	  <field name="res_model">website.support.ticket.states</field>
       	  <field name="view_type">form</field>
       	  <field name="view_mode">tree,form</field>

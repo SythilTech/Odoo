@@ -15,7 +15,7 @@
       </record>
 
       <record id="website_support_ticket_priority_action" model="ir.actions.act_window">
-          <field name="name">Support Tickets Priorities</field>
+          <field name="name">Support Ticket Priorities</field>
 	  <field name="res_model">website.support.ticket.priority</field>
 	  <field name="view_mode">tree</field>
 	  <field name="help" type="html">

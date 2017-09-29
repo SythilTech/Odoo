@@ -1,3 +1,9 @@
+v1.3.6
+======
+* Close email template setting
+* Change categories, priorities and state to not update so changes are preserved across versions
+* Ticket survey now uses images to represent rating
+
 v1.3.5
 ======
 * Fix email sanitisation issue

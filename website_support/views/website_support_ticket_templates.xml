@@ -142,7 +142,7 @@
         <div class="container">
 
             <div class="mt16 mb16">
-                <h1 class="text-center">Support Ticket Survey</h1>
+                <h1 class="text-center">Your Feedback</h1>
             </div>
 
             <p>Please give us feedback on our support service</p>
@@ -150,15 +150,47 @@
 
             <form method="POST" t-attf-action="/support/survey/process/#{support_ticket.portal_access_key}">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            
-                <div class="form-group">
-                    <label class="radio-inline"><input type="radio" name="rating" value="1"/>&#128544; Terrible Support</label>
-                    <label class="radio-inline"><input type="radio" name="rating" value="2"/>&#128531; Bad Supprt</label>
-                    <label class="radio-inline"><input type="radio" name="rating" value="3"/>&#128528; Ok Support</label>
-                    <label class="radio-inline"><input type="radio" name="rating" value="4"/>&#128512; Good Support</label>
-                    <label class="radio-inline"><input type="radio" name="rating" value="5"/>&#128513; Great Support</label>
-                </div>
 
+<style>
+label > input{ /* HIDE RADIO */
+  visibility: hidden; /* Makes input not-clickable */
+  position: absolute; /* Remove input from document flow */
+}
+
+label > input + img{ /* IMAGE STYLES */
+  cursor:pointer;
+  border:2px solid transparent;
+}
+
+label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
+  border:2px solid #f00;
+}
+</style>
+                <label>
+                    <input type="radio" name="rating" value="5"/>
+                    <img src="/website_support/static/src/img/5-star.jpg"/>
+                </label>
+
+                <label>
+                    <input type="radio" name="rating" value="4"/>
+                    <img src="/website_support/static/src/img/4-star.jpg"/>
+                </label>
+
+                <label>
+                    <input type="radio" name="rating" value="3"/>
+                    <img src="/website_support/static/src/img/3-star.jpg"/>
+                </label>
+
+                <label>
+                    <input type="radio" name="rating" value="2"/>
+                    <img src="/website_support/static/src/img/2-star.jpg"/>
+                </label>
+
+                <label>
+                    <input type="radio" name="rating" value="1"/>
+                    <img src="/website_support/static/src/img/1-star.jpg"/>
+                </label>
+                
                 <div class="form-group">
                      <label for="comment">Comment</label>
                     <textarea class="form-control" rows="5" name="comment"></textarea>
