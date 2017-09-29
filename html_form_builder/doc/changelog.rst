@@ -1,3 +1,7 @@
+v1.0.18
+=======
+* External ReCapatcha code
+
 v1.0.17
 =======
 * CSRF token loaded via javascript because request.csrf_token causes form to be non removable
