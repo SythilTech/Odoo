@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+        <record id="support_ticket_closed_analytic_timesheets" model="mail.template">
+            <field name="name">Support Ticket Closed Analytic Timesheets</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from">${user.email|safe}</field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>Your support ticket has been closed by our staff, here is the final comment</p>
+                <p>${object.close_comment or ''}</p>
+
+                <h2>Time Sheet</h2>
+                <table>
+                    <tr><th>Staff Member</th><th>Time</th></tr>
+                    
+                    % for timeslot in object.analytic_timesheet_ids:
+
+                        <tr>
+                            <td>${timeslot.user_id.name}</td>
+                            <td>${timeslot.unit_amount}</td>
+                        </tr>
+
+                    % endfor
+                </table>
+
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                
+            ]]>
+            </field>
+        </record>
+
+</data>
+</openerp>
