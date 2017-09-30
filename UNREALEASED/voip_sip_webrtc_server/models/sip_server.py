@@ -72,7 +72,9 @@ class SIPServer(models.Model):
                     self.verify_account(data)
                 elif type == "call":
                     self.pass_sdp(data)
-                    
+            elif data.startswith("SIP/2.0 404 Not Found"):
+                #Call reject or or issue so end the call on our end
+                self.call_rejected(data)                
             elif data.startswith("SIP/2.0 401 Unauthorized"):
                 _logger.error("Unauthorized")
                 self.send_auth_register(data)
@@ -128,14 +130,19 @@ class SIPServer(models.Model):
             context = {}
             env = api.Environment(cr, SUPERUSER_ID, context)
         
-            voip_call = env['voip.call'].browse( int(record_id) )                
-        
+            voip_call = env['voip.call'].browse( int(record_id) )
 
             #Send the sdp data back to the caller
             sdp = {'type': 'answer', 'sdp': sdp_data}
             notification = {'call_id': record_id, 'sdp': sdp }
             env['bus.bus'].sendone((db_name, 'voip.sdp', voip_call.from_partner_id.id), notification)
 
+    def call_rejected(self, data):
+
+        call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]            
+        db_name = call_id.split("-")[0]
+        type = call_id.split("-")[1]
+        record_id = call_id.split("-")[2]
 
     def verify_account(self, data):
 
@@ -215,15 +222,6 @@ class SIPServer(models.Model):
                 qop = re.findall(r'qop="(.*?)"', authheader)[0]
                 nc = "00000001"
                 cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
-
-                #Sample Data (response works)
-                #realm = "jnctn.net"
-                #method = "INVITE"
-                #uri = "sip:stevewright2009@sythiltech.onsip.com"
-                #nonce = "59c04f390000acd39cf6455cc0c0a799d5466278a0b637ca"
-                #qop = "auth"
-                #nc = "00000001"
-                #cnonce = "be52ae979f0ee91add06f637dbf41f0d"
             
                 #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
                 A1 = voip_account.auth_username + ":" + realm + ":" + voip_account.password
@@ -249,36 +247,37 @@ class SIPServer(models.Model):
                 #Dislikes SDP data?!?
                 #reply += voip_call.from_partner_sdp
 
+
                 #Sample data webrtc
-                #v=0\r\n
-                #o=mozilla...THIS_IS_SDPARTA-55.0.3 8294658421909368638 0 IN IP4 0.0.0.0\r\n
-                #s=-\r\n
-                #t=0 0\r\n
-                #a=fingerprint:sha-256 ED:FF:6A:68:8E:67:47:0E:A8:F7:D9:92:5F:20:4D:D4:B2:1A:3B:97:7D:B9:AA:02:0C:7F:0E:5A:64:FA:6E:A2\r\n
-                #a=group:BUNDLE sdparta_0\r\n
-                #a=ice-options:trickle\r\n
-                #a=msid-semantic:WMS *\r\n
-                #m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101\r\n
-                #c=IN IP4 0.0.0.0\r\n
-                #a=sendrecv\r\n
-                #a=extmap:1/sendonly urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n
-                #a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n
-                #a=fmtp:101 0-15\r\n
-                #a=ice-pwd:3289a8fe04b88eeb11eae873568c7fe8\r\n
-                #a=ice-ufrag:0a38dbfd\r\n
-                #a=mid:sdparta_0\r\n
-                #a=msid:{6ac1d3e6-0c31-4985-b007-58d09e6cdd6a} {4dd601cd-9f91-408f-8095-16386a5e5458}\r\n
-                #a=rtcp-mux\r\n
-                #a=rtpmap:109 opus/48000/2\r\n
-                #a=rtpmap:9 G722/8000/1\r\n
-                #a=rtpmap:0 PCMU/8000\r\n
-                #a=rtpmap:8 PCMA/8000\r\n
-                #a=rtpmap:101 telephone-event/8000/1\r\n
-                #a=setup:actpass\r\n
-                #a=ssrc:2976186053 cname:{d6f01826-125a-4974-a8b1-0439bdd082a3}\r\n
+                sdp = ""
+                sdp += "v=0\r\n"
+                sdp += "o=mozilla...THIS_IS_SDPARTA-55.0.3 8294658421909368638 0 IN IP4 0.0.0.0\r\n"
+                sdp += "s=-\r\n"
+                sdp += "t=0 0\r\n"
+                sdp += "a=fingerprint:sha-256 ED:FF:6A:68:8E:67:47:0E:A8:F7:D9:92:5F:20:4D:D4:B2:1A:3B:97:7D:B9:AA:02:0C:7F:0E:5A:64:FA:6E:A2\r\n"
+                sdp += "a=group:BUNDLE sdparta_0\r\n"
+                sdp += "a=ice-options:trickle\r\n"
+                sdp += "a=msid-semantic:WMS *\r\n"
+                sdp += "m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101\r\n"
+                sdp += "c=IN IP4 0.0.0.0\r\n"
+                sdp += "a=sendrecv\r\n"
+                sdp += "a=extmap:1/sendonly urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n"
+                sdp += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
+                sdp += "a=fmtp:101 0-15\r\n"
+                sdp += "a=ice-pwd:3289a8fe04b88eeb11eae873568c7fe8\r\n"
+                sdp += "a=ice-ufrag:0a38dbfd\r\n"
+                sdp += "a=mid:sdparta_0\r\n"
+                sdp += "a=msid:{6ac1d3e6-0c31-4985-b007-58d09e6cdd6a} {4dd601cd-9f91-408f-8095-16386a5e5458}\r\n"
+                sdp += "a=rtcp-mux\r\n"
+                sdp += "a=rtpmap:109 opus/48000/2\r\n"
+                sdp += "a=rtpmap:9 G722/8000/1\r\n"
+                sdp += "a=rtpmap:0 PCMU/8000\r\n"
+                sdp += "a=rtpmap:8 PCMA/8000\r\n"
+                sdp += "a=rtpmap:101 telephone-event/8000/1\r\n"
+                sdp += "a=setup:actpass\r\n"
+                sdp += "a=ssrc:2976186053 cname:{d6f01826-125a-4974-a8b1-0439bdd082a3}\r\n"
 
-
-                #Sample data X-Lite
+                #Sample data X-Lite (works buts does not return ice-ufrag)
                 sdp = ""
                 sdp += "v=0\r\n"
                 sdp += "o=- 13150342053296106 1 IN IP4 192.168.1.133\r\n"
@@ -294,11 +293,11 @@ class SIPServer(models.Model):
                 sdp += "a=fmtp:101 0-15\r\n"
                 sdp += "a=sendrecv\r\n"
 
+
                 #Should be 365
                 reply += "Content-Length: " + str(len(sdp)) + "\r\n"
                 reply += "\r\n"
                 reply += sdp
-                
         
                 serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 serversocket.sendto(reply, (voip_account.outbound_proxy, 5060) )

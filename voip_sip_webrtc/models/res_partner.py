@@ -6,3 +6,4 @@ class ResPartnerVoip(models.Model):
     _inherit = "res.partner"
     
     sip_address  = fields.Char(string="SIP Address")
+    xmpp_address  = fields.Char(string="XMPP Address")

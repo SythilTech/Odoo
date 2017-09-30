@@ -15,6 +15,7 @@
         'views/voip_account_views.xml',
         'views/voip_settings_views.xml',
         'views/res_partner_views.xml',
+        'views/voip_message_compose_views.xml',
         'security/ir.model.access.csv',
         'data/voip_ringtone.xml',
         'data/voip_settings.xml',

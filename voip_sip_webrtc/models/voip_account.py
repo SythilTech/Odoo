@@ -14,6 +14,7 @@ class VoipAccount(models.Model):
     _name = "voip.account"
     _rec_name = "address"
 
+    type = fields.Selection([('sip', 'SIP'), ('xmpp', 'XMPP')], default="sip", string="Account type")
     address = fields.Char(string="SIP Address")
     password = fields.Char(string="SIP Password")
     auth_username = fields.Char(string="Auth Username")
