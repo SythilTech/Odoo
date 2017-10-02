@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        
+    <record id="view_partner_form_inherit_xmpp" model="ir.ui.view">
+        <field name="name">res.partner SIP</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="mobile" position="after">
+                <field name="xmpp_address" widget="xmpp"/>
+            </field>
+      	</field>
+    </record>
+
+</odoo>

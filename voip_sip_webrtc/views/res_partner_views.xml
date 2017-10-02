@@ -24,7 +24,6 @@
         <field name="arch" type="xml">
             <field name="mobile" position="after">
                 <field name="sip_address" widget="sip"/>
-                <field name="xmpp_address" widget="xmpp"/>
             </field>
       	</field>
     </record>

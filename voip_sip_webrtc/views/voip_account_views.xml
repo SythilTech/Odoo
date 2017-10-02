@@ -10,7 +10,6 @@
       	            <button name="send_register" type="object" string="Send Register"/>
       	        </header>
       	        <group>
-      	            <field name="type"/>
       	            <field name="address"/>
       	            <field name="password" password="True"/>
       	            <field name="auth_username"/>
@@ -40,7 +39,7 @@
 	<field name="view_mode">tree,form</field>
 	<field name="help" type="html">
 	    <p>
-	        No Accounts
+	        No SIP Accounts
 	    </p>
         </field>
     </record>

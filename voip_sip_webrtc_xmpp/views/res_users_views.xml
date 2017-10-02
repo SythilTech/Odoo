@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_inherit_xmpp" model="ir.ui.view">
+        <field name="name">res.users XMPP</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+      	    <field name="voip_account_id" position="after">
+      	        <field name="xmpp_account_id"/>
+      	    </field>
+        </field>
+    </record>
+
+</odoo>

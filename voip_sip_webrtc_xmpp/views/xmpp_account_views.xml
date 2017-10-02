@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="xmpp_account_view_form" model="ir.ui.view">
+        <field name="name">xmpp.account form view</field>
+        <field name="model">xmpp.account</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="address"/>
+      	            <field name="password" password="True"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="xmpp_account_view_tree" model="ir.ui.view">
+        <field name="name">xmpp.account tree view</field>
+        <field name="model">xmpp.account</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="address"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="xmpp_account_action" model="ir.actions.act_window">
+        <field name="name">XMPP Accounts</field>
+	<field name="res_model">xmpp.account</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No XMPP Accounts
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="xmpp_account_menu" name="XMPP Accounts" parent="voip_sip_webrtc.voip_parent_menu" action="xmpp_account_action" sequence="50"/>
+
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="xmpp_backend_assets" name="XMPP Client Assets" inherit_id="web.assets_backend">
+       <xpath expr="." position="inside">
+           <script type="text/javascript" src="/voip_sip_webrtc_xmpp/static/src/js/xmpp.js"></script>
+       </xpath>
+    </template>
+   
+</odoo>

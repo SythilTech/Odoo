@@ -1,3 +1,7 @@
+v1.4
+====
+* Core changes to support XMPP extension
+
 v1.3.1
 ======
 * Allow caller to end call before callee accepts / rejects call

@@ -3,6 +3,8 @@ import socket
 import threading
 import logging
 _logger = logging.getLogger(__name__)
+from lxml import etree
+import re
 
 from openerp import api, fields, models
 
@@ -21,6 +23,7 @@ class VoipMessageCompose(models.TransientModel):
         try:
             account = to_address.split("@")[0]
             domain = to_address.split("@")[1]
+            _logger.error(domain)
 
             xmpp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -29,14 +32,25 @@ class VoipMessageCompose(models.TransientModel):
             
             send_data = ""
             send_data += '<?xml version="1.0"?>'
-            send_data += '<stream:stream xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" to="jabberzac.org" version="1.0">'
-            #send_data += '<stream:stream xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" to="' + str(domain) + '" version="1.0">'
+            #send_data += '<stream:stream xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" to="jabberzac.org" version="1.0">'
+            send_data += '<stream:stream xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" to="' + str(domain) + '" version="1.0">'
 
-            _logger.error("Before Send")        
             xmpp_socket.send(send_data)
-            _logger.error("After Send")
+            rec_data = xmpp_socket.recv(1024)
+            
+            _logger.error(rec_data)
+            
+            stream_id = re.findall(r"id='(.*?)'", rec_data)[0]
+            
+            send_data = '<starttls xmlns="urn:ietf:params:xml:ns:xmpp-tls"/>'
+            xmpp_socket.send(send_data)
+            
+            rec_data = xmpp_socket.recv(1024)
+            _logger.error(rec_data)
+            
+            if "proceed" in rec_data:
+                _logger.error("We did it!!!")
 
-            _logger.error( xmpp_socket.recv(1024) )
             xmpp_socket.close             
 
         except Exception as e:
@@ -46,6 +60,11 @@ class VoipMessageCompose(models.TransientModel):
     def send_message(self):
         _logger.error("Send Message")
 
-        to_address = self.partner_id.xmpp_address
-        xmpp_listener_starter = threading.Thread(target=self.xmpp_listener, args=(to_address,))
-        xmpp_listener_starter.start()        
+
+        method = '_send_%s_message' % (self.type,)
+        action = getattr(self, method, None)
+
+        if not action:
+            raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+
+        action()
