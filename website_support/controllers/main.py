@@ -182,14 +182,15 @@ class SupportTicketController(http.Controller):
     @http.route('/support/ticket/view', type="http", auth="user", website=True)
     def support_ticket_view_list(self, **kw):
         """Displays a list of support tickets owned by the logged in user"""
-        support_tickets = http.request.env['website.support.ticket'].sudo().search([('partner_id','=',http.request.env.user.partner_id.id)])
+        support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', '=', http.request.env.user.partner_id.stp_ids.id) ])
+        
         return http.request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets)})
 
     @http.route('/support/ticket/view/<ticket>', type="http", auth="user", website=True)
     def support_ticket_view(self, ticket):
         """View an individual support ticket"""
         #only let the user this ticket is assigned to view this ticket
-        support_ticket = http.request.env['website.support.ticket'].sudo().search([('partner_id','=',http.request.env.user.partner_id.id), ('id','=',ticket) ])[0]        
+        support_ticket = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', '=', http.request.env.user.partner_id.stp_ids.id), ('id','=',ticket) ])[0]
         return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket})
 
     @http.route('/support/portal/ticket/view/<portal_access_key>', type="http", auth="public", website=True)
@@ -197,11 +198,30 @@ class SupportTicketController(http.Controller):
         """View an individual support ticket (portal access)"""
         
         support_ticket = http.request.env['website.support.ticket'].sudo().search([('portal_access_key','=',portal_access_key) ])[0]
-        return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket})
+        return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket, 'portal_access_key': portal_access_key})
 
+    @http.route('/support/portal/ticket/comment', type="http", auth="public", website=True)
+    def support_portal_ticket_comment(self, **kw):
+        """Adds a comment to the support ticket"""
+
+        values = {}
+        for field_name, field_value in kw.items():
+            values[field_name] = field_value
+        
+        support_ticket = http.request.env['website.support.ticket'].sudo().search([('portal_access_key','=', values['portal_access_key'] ) ])[0]
+
+        http.request.env['website.support.ticket.message'].create({'ticket_id':support_ticket.id,'content':values['comment']})
+            
+        support_ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
+            
+        request.env['website.support.ticket'].sudo().browse(support_ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
+        
+        return werkzeug.utils.redirect("/support/portal/ticket/view/" + str(support_ticket.portal_access_key) )
+        
     @http.route('/support/ticket/comment',type="http", auth="user")
     def support_ticket_comment(self, **kw):
         """Adds a comment to the support ticket"""
+
         values = {}
         for field_name, field_value in kw.items():
             values[field_name] = field_value
@@ -209,15 +229,17 @@ class SupportTicketController(http.Controller):
         ticket = http.request.env['website.support.ticket'].search([('id','=',values['ticket_id'])])
         
         #check if this user owns this ticket
-        if ticket.partner_id.id != http.request.env.user.partner_id.id:
-            return "You do not have permission to submit this commment"
-        else:
+        if ticket.partner_id.id == http.request.env.user.partner_id.id or ticket.partner_id in http.request.env.user.partner_id.stp_ids:
+
             http.request.env['website.support.ticket.message'].create({'ticket_id':ticket.id,'content':values['comment']})
             
             ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
             
             request.env['website.support.ticket'].sudo().browse(ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
-        
+
+        else:
+            return "You do not have permission to submit this commment"
+            
         return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
         
 

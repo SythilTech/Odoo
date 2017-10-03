@@ -13,6 +13,7 @@ class WebsiteSupportSettings(models.Model):
     _inherit = 'res.config.settings'
             
     close_ticket_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Close Ticket Email Template")
+    email_default_category_id = fields.Many2one('website.support.ticket.categories', string="Email Default Category")
 
     #-----Close Ticket Email Template-----
 
@@ -24,3 +25,14 @@ class WebsiteSupportSettings(models.Model):
     def set_default_close_ticket_email_template_id(self):
         for record in self:
             self.env['ir.values'].set_default('website.support.settings', 'close_ticket_email_template_id', record.close_ticket_email_template_id.id)
+            
+    #-----Email Default Category-----
+
+    @api.multi
+    def get_default_email_default_category_id(self, fields):
+        return {'email_default_category_id': self.env['ir.values'].get_default('website.support.settings', 'email_default_category_id')}
+
+    @api.multi
+    def set_default_email_default_category_id(self):
+        for record in self:
+            self.env['ir.values'].set_default('website.support.settings', 'email_default_category_id', record.email_default_category_id.id)

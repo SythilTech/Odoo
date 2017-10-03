@@ -1,3 +1,10 @@
+v1.3.7
+======
+* Default category for email ticket setting
+* Public website portal access to tickets created via email
+* Support ticket manager access field
+* Add group by category and user
+
 v1.3.6
 ======
 * Close email template setting

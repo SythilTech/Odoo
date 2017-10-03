@@ -30,6 +30,7 @@
           	          <field name="support_rating"/>
           	          <field name="support_comment"/>
           	          <field name="close_comment"/>
+          	          <field name="close_time"/>
           	      </group>
       	          </sheet>
                   <div class="oe_chatter">
@@ -64,6 +65,8 @@
       	      <search>
       	          <field name="partner_id"/>
                   <filter string="Unattended Tickets" name="unattended_tickets" domain="[('unattended', '=', True )]" />
+                  <filter name="group_by_category" string="Category" domain="[]"  context="{'group_by':'category'}"/>
+                  <filter name="group_by_user" string="User" domain="[]"  context="{'group_by':'user_id'}"/>
       	      </search>
       	  </field>
       </record>
@@ -72,8 +75,8 @@
           <field name="name">website.support.ticket.form.graph</field>
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
-              <graph>
-                  <field name="create_date" interval="day"/>
+              <graph stacked="False">
+                  <field name="create_date" interval="day" string="Create Date"/>
               </graph>
           </field>
       </record>

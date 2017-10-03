@@ -3,6 +3,8 @@ from openerp import api, fields, models
 from openerp import tools
 from HTMLParser import HTMLParser
 from random import randint
+import datetime
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -51,6 +53,8 @@ class WebsiteSupportTicket(models.Model):
     support_rating = fields.Integer(string="Support Rating")
     support_comment = fields.Text(string="Support Comment")
     close_comment = fields.Text(string="Close Comment")
+    close_time = fields.Datetime(string="Close Time")
+    time_to_close = fields.Integer(string="Time to close (seconds)")
     
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -80,6 +84,12 @@ class WebsiteSupportTicket(models.Model):
         #body_short = tools.html_email_clean(msg.get('body'), shorten=True, remove=True)
         portal_access_key = randint(1000000000,2000000000)
         defaults = {'partner_id': partner_id, 'person_name': from_name, 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
+
+        #Assign to default category
+        setting_email_default_category_id = self.env['ir.values'].get_default('website.support.settings', 'email_default_category_id')
+        
+        if setting_email_default_category_id:
+            defaults['category'] = setting_email_default_category_id
         
         return super(WebsiteSupportTicket, self).message_new(msg, custom_values=defaults)
 
@@ -233,7 +243,11 @@ class WebsiteSupportTicketCompose(models.Model):
 
     def close_ticket(self):
 
-        closed_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')
+        self.ticket_id.close_time = datetime.datetime.now()
+        diff_time = datetime.datetime.strptime(self.ticket_id.close_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(self.ticket_id.create_date, DEFAULT_SERVER_DATETIME_FORMAT)            
+        self.ticket_id.time_to_close = diff_time.seconds
+
+        closed_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')        
         
         #We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
         message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"

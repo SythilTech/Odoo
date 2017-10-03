@@ -104,6 +104,7 @@
                 <p>Dear ${object.person_name},</p>
                 <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
                 <hr/>
+                <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.portal_access_key}">here</a><br/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> 
                 % if object.category.name :
@@ -305,15 +306,27 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
                         <tr><td><t t-esc="chat.create_uid.name"/></td><td><t t-raw="chat.content"/></td></tr>
                     </t>
                 </table>
+                <t t-if="portal_access_key">
+                    <form method="GET" t-attf-action="/support/portal/ticket/comment">
+                        <b>Add Comment</b><br/>
+                        <textarea  class="form-control" name="comment" style="min-height: 120px" required="True"></textarea>
+                        <br/>
+                    
+                        <input type="hidden" name="portal_access_key" t-attf-value="#{portal_access_key}"/>
+                        <button class="btn btn-primary btn-lg">Submit</button>
+		    </form>
+		</t>
+                <t t-if="not portal_access_key">
+                    <form method="GET" t-attf-action="/support/ticket/comment">
+                        <b>Add Comment</b><br/>
+                        <textarea  class="form-control" name="comment" style="min-height: 120px" required="True"></textarea>
+                        <br/>
+                    
+                        <input type="hidden" name="ticket_id" t-attf-value="#{support_ticket.id}"/>
+                        <button class="btn btn-primary btn-lg">Submit</button>
+		   </form>
                 
-                <form method="GET" action="/support/ticket/comment">
-                    <b>Add Comment</b><br/>
-                    <textarea  class="form-control" name="comment" style="min-height: 120px" required="True"></textarea>
-                    <br/>
-                    <input type="hidden" name="ticket_id" t-attf-value="#{support_ticket.id}"/>
-                    <button class="btn btn-primary btn-lg">Submit</button>
-		</form>
-		
+                </t>
             </div>
             <div class="col-md-3"></div>
         </div>
