@@ -27,6 +27,7 @@ var callSeconds;
 var call_id = "";
 var myNotif = "";
 var incomingNotification;
+var incoming_ring_interval;
 var outgoingNotification;
 var role;
 var mode = false;
@@ -284,6 +285,38 @@ WebClient.include({
 
 });
 
+function resetCall() {
+
+    //Stop all audio / video tracks
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+	}
+
+    if (remoteStream) {
+        remoteStream.getTracks().forEach(track => track.stop());
+	}
+
+	//Destroy the notifcation and stop the countdown because the call was accepted or rejected, no need to wait until timeout
+	if (typeof outgoingNotification !== "undefined") {
+	    clearInterval(outgoing_ring_interval);
+		outgoingNotification.destroy(true);
+	}
+
+	if (typeof incomingNotification !== "undefined") {
+		clearInterval(call_interval);
+		incomingNotification.destroy(true);
+
+        mySound.pause();
+        mySound.currentTime = 0;
+    }
+
+    $("#voip_text").html("Starting Call...");
+    $(".s-voip-manager").css("opacity","0");
+
+	got_remote_description = false;
+
+}
+
 function errorHandler(error) {
     console.log(error);
 }
@@ -499,15 +532,18 @@ var VoipCallOutgoingNotification = Notification.extend({
 				});
 
                 //Send the offer to message bank (server)
+                /*
                 if (mode == "audiocall") {
 		            window.peerConnection.createOffer().then(messageBankDescription).catch(errorHandler);
 			    }
+			    */
 
 				//Play the missed call audio
 				mySound = new Audio("/voip/miss/" + call_id + ".mp3");
 				mySound.play();
 
 				clearInterval(outgoing_ring_interval);
+				resetCall();
                 myNotif.destroy(true);
             }
 
@@ -532,6 +568,8 @@ var VoipCallIncomingNotification = Notification.extend({
                     console.log("Accept Call");
                 });
 
+                //Clear the countdown now
+                clearInterval(incoming_ring_interval);
 
                 mySound.pause();
                 mySound.currentTime = 0;
@@ -563,6 +601,9 @@ var VoipCallIncomingNotification = Notification.extend({
                     console.log("Reject Call");
                 });
 
+                //Clear the countdown now
+                clearInterval(incoming_ring_interval);
+
                 mySound.pause();
                 mySound.currentTime = 0;
                 this.destroy(true);
@@ -575,11 +616,12 @@ var VoipCallIncomingNotification = Notification.extend({
         secondsLeft = countdown;
         $("#callsecondsincomingleft").html(secondsLeft);
 
-        var incoming_ring_interval = setInterval(function() {
+        incoming_ring_interval = setInterval(function() {
             $("#callsecondsincomingleft").html(secondsLeft);
             if (secondsLeft == 0) {
                 mySound.pause();
                 mySound.currentTime = 0;
+                resetCall();
                 clearInterval(incoming_ring_interval);
                 myNotif.destroy(true);
             }

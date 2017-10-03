@@ -44,6 +44,6 @@
         </field>
     </record>
 
-    <menuitem id="voip_account_menu" name="Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>
+    <!--<menuitem id="voip_account_menu" name="Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>-->
 
 </odoo>

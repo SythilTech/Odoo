@@ -1,3 +1,8 @@
+v1.4.1
+======
+* Incomplete feature clean up
+* Better reset call code
+
 v1.4
 ====
 * Core changes to support XMPP extension
