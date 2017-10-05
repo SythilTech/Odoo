@@ -1,3 +1,7 @@
+v1.3.9
+======
+* Prevent tickets with no partner displaying in website portal
+
 v1.3.8
 ======
 * Render HTML ticket description in website portal
