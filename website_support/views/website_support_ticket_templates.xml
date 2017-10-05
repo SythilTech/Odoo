@@ -288,6 +288,14 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
     <t t-call="website.layout">
         <div class="container mt16 mb16">
 
+            <style>
+            
+            /* Worlds laziest way of striping replies... */
+            .moz-cite-prefix, blockquote {
+             display :none
+            }
+            
+            </style>
 
             <div class="mt16 mb16">
                 <h1 class="text-center"><t t-esc="support_ticket.subject"/></h1>
@@ -297,7 +305,7 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
             <div class="col-md-6">
                 <b>Category</b> <t t-esc="support_ticket.category.name"/><br/>
                 <b>State</b> <t t-esc="support_ticket.state.name"/><br/>
-                <b>Description</b><br/><t t-esc="support_ticket.description"/><br/>
+                <b>Description</b><br/><t t-raw="support_ticket.description"/><br/>
                 <br/>
                 <b>Conversation History</b><br/>
                 <table class="table table-striped table-bordered table-hover table-condensed">

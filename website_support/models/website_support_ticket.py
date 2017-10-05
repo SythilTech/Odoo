@@ -80,8 +80,8 @@ class WebsiteSupportTicket(models.Model):
             from_name = search_partner[0].name
 
         body_short = tools.html_sanitize(msg.get('body'))
-
         #body_short = tools.html_email_clean(msg.get('body'), shorten=True, remove=True)
+        
         portal_access_key = randint(1000000000,2000000000)
         defaults = {'partner_id': partner_id, 'person_name': from_name, 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
 
@@ -109,9 +109,7 @@ class WebsiteSupportTicket(models.Model):
 	customer_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
         self.state = customer_replied.id
 
-        super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
-
-        return True
+        return super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
 
     @api.one
     @api.depends('ticket_number')
