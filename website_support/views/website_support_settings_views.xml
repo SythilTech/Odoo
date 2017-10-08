@@ -12,6 +12,7 @@
                 </header>
                 <group>
                     <field name="close_ticket_email_template_id"/>
+                    <field name="staff_reply_email_template_id"/>
                     <field name="email_default_category_id"/>
                 </group>
       	    </form>

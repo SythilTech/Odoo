@@ -36,6 +36,7 @@ class WebsiteSupportTicket(models.Model):
     user_id = fields.Many2one('res.users', string="Assigned User")
     person_name = fields.Char(string='Person Name')
     email = fields.Char(string="Email")
+    support_email = fields.Char(string="Support Email")
     category = fields.Many2one('website.support.ticket.categories', string="Category", track_visibility='onchange')
     sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     subject = fields.Char(string="Subject")
@@ -83,7 +84,7 @@ class WebsiteSupportTicket(models.Model):
         #body_short = tools.html_email_clean(msg.get('body'), shorten=True, remove=True)
         
         portal_access_key = randint(1000000000,2000000000)
-        defaults = {'partner_id': partner_id, 'person_name': from_name, 'email': msg.get('from'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
+        defaults = {'partner_id': partner_id, 'person_name': from_name, 'email': msg.get('from'), 'support_email': msg.get('to'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
 
         #Assign to default category
         setting_email_default_category_id = self.env['ir.values'].get_default('website.support.settings', 'email_default_category_id')
@@ -106,8 +107,13 @@ class WebsiteSupportTicket(models.Model):
         #Add to message history field for back compatablity
         self.conversation_history.create({'ticket_id': self.id, 'content': body_short })
 
-	customer_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
-        self.state = customer_replied.id
+        #If the to email address is to the customer then it must be a staff member...
+        if msg_dict.get('to') == self.email:
+            change_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')        
+        else:
+            change_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
+        
+        self.state = change_state.id
 
         return super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
 
@@ -285,7 +291,15 @@ class WebsiteSupportTicketCompose(models.Model):
     def send_reply(self):
         #Send email
         values = {}
-        email_wrapper = self.env['ir.model.data'].get_object('website_support','support_ticket_reply_wrapper')
+
+        setting_staff_reply_email_template_id = self.env['ir.values'].get_default('website.support.settings', 'staff_reply_email_template_id')
+        
+        if setting_staff_reply_email_template_id:
+            email_wrapper = self.env['mail.template'].browse(setting_staff_reply_email_template_id)
+        else:
+            #Defaults to staff reply template for back compatablity
+            email_wrapper = self.env['ir.model.data'].get_object('website_support','support_ticket_reply_wrapper')
+
         values = email_wrapper.generate_email([self.id])[self.id]
         values['model'] = "website.support.ticket"
         values['res_id'] = self.ticket_id.id

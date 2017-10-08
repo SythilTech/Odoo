@@ -1,3 +1,7 @@
+v1.4
+====
+* Setting to change staff reply email template
+
 v1.3.9
 ======
 * Prevent tickets with no partner displaying in website portal
