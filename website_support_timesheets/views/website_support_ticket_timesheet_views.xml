@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_ticket_timesheet_view_pivot" model="ir.ui.view">
+          <field name="name">website.support.ticket.timesheet pivot view</field>
+          <field name="model">website.support.ticket.timesheet</field>
+          <field name="arch" type="xml">
+              <pivot>
+                  <field name="create_uid" type="row"/>
+                  <field name="project_id" type="col"/>
+                  <field name="hours" type="measure"/>
+              </pivot>
+          </field>
+      </record>
+
+      <record id="website_support_ticket_timesheet_action" model="ir.actions.act_window">
+          <field name="name">Support Ticket Timesheet</field>
+	  <field name="res_model">website.support.ticket.timesheet</field>
+	  <field name="view_mode">pivot</field>
+      </record>
+      
+      <menuitem id="website_support_ticket_timesheets_menu" name="Support Tickets Timesheets" parent="website_support.website_support_parent_menu" action="website_support_ticket_timesheet_action" sequence="20"/>
+        
+  </data>
+</openerp>

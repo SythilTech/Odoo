@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket - Timesheets",
-    'version': "1.0.2",
+    'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -8,6 +8,7 @@
     'license':'LGPL-3',
     'data': [
         'views/website_support_ticket_views.xml',
+        'views/website_support_ticket_timesheet_views.xml',
         'views/website_support_ticket_templates.xml',
         'data/website.support.ticket.states.csv',
         'security/ir.model.access.csv',

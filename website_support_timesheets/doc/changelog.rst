@@ -1,3 +1,7 @@
+v1.1
+====
+* Pivot view
+
 v1.0.2
 ======
 * Timesheets close template
