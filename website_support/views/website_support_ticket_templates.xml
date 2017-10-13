@@ -44,10 +44,33 @@
             </field>
         </record>
 
+        <record id="support_ticket_user_change" model="mail.template">
+            <field name="name">Support Ticket User Change</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>            
+            <field name="subject">A Support Ticket has been assigned to you</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear _user_name_,</p>
+                <p>A support ticket has been assigned to you here are the details</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                
+            ]]>
+            </field>
+        </record>
+
         <record id="new_support_ticket_category_change" model="mail.template">
             <field name="name">Support Ticket Category Change</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
-            <field name="email_from">${user.email|safe}</field>            
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>            
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been updated</field>
             <field name="auto_delete" eval="False"/>
@@ -241,9 +264,9 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
             <div class="col-md-6">
                 <t t-if="ticket_count > 0"> 
                     <table class="table table-striped table-bordered table-hover table-condensed">
-                        <tr><th>Subject</th><th>Category</th><th>State</th><th>Create Date</th></tr>
+                        <tr><th>By</th><th>Subject</th><th>Category</th><th>State</th><th>Create Date</th></tr>
                         <t t-foreach="support_tickets" t-as="support_ticket">
-                            <tr><td><a t-attf-href="/support/ticket/view/#{support_ticket.id}"><t t-esc="support_ticket.subject"/></a></td><td><t t-esc="support_ticket.category.name"/></td><td><t t-esc="support_ticket.state.name"/></td><td><t t-esc="support_ticket.create_date"/></td></tr>
+                            <tr><td><t t-esc="support_ticket.partner_id.name"/><td></td><a t-attf-href="/support/ticket/view/#{support_ticket.id}"><t t-esc="support_ticket.subject"/></a></td><td><t t-esc="support_ticket.category.name"/></td><td><t t-esc="support_ticket.state.name"/></td><td><t t-esc="support_ticket.create_date"/></td></tr>
                         </t>
                 </table>
                 </t>

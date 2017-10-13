@@ -1,3 +1,7 @@
+v1.4.3
+======
+* Send email when user is assigned
+
 v1.4.2
 ======
 * Restrict support ticket menu to employee only since sometimes portal could gain access?

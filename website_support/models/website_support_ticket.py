@@ -178,6 +178,26 @@ class WebsiteSupportTicket(models.Model):
         if 'category' in values:
             change_category_email = self.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category_change')
             change_category_email.send_mail(self.id, True)
+
+        if 'user_id' in values:
+            setting_change_user_email_template_id = self.env['ir.values'].get_default('website.support.settings', 'change_user_email_template_id')
+        
+            if setting_change_user_email_template_id:
+                email_template = self.env['mail.template'].browse(setting_change_user_email_template_id)
+            else:
+                #Default email template
+                email_template = self.env['ir.model.data'].get_object('website_support','support_ticket_user_change')
+
+            email_values = email_template.generate_email([self.id])[self.id]
+            email_values['model'] = "website.support.ticket"
+            email_values['res_id'] = self.id
+            assigned_user = self.env['res.users'].browse( int(values['user_id']) )
+            email_values['email_to'] = assigned_user.partner_id.email
+            email_values['body_html'] = email_values['body_html'].replace("_user_name_", assigned_user.name)
+            email_values['body'] = email_values['body'].replace("_user_name_", assigned_user.name)
+            send_mail = self.env['mail.mail'].create(email_values)
+            send_mail.send()
+
         
         return update_rec
 
