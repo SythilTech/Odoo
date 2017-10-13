@@ -1,3 +1,7 @@
+v1.4.5
+======
+* Use comapany email in all cases
+
 v1.4.4
 ======
 * Filter out system emails and make it easier to create new email templates

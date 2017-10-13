@@ -98,7 +98,7 @@
         <record id="support_ticket_closed" model="mail.template">
             <field name="name">Support Ticket Closed</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
-            <field name="email_from">${user.email|safe}</field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been closed</field>
             <field name="auto_delete" eval="False"/>
@@ -172,7 +172,7 @@
             <field name="name">Support Ticket Reply Wrapper (support@)</field>
             <field name="model_id" ref="model_website_support_ticket_compose"></field>
             <field name="subject">${object.subject}</field>
-            <field name="email_from">${object.ticket_id.support_email|safe}</field>
+            <field name="email_from">${object.ticket_id.support_email or object.company_id.email}|safe}</field>
             <field name="reply_to">${object.ticket_id.support_email|safe}</field>
             <field name="email_to">${object.email|safe}</field>
             <field name="auto_delete" eval="False"/>
