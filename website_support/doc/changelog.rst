@@ -1,3 +1,7 @@
+v1.4.1
+======
+* Compatablity with web_list_autorefresh module
+
 v1.4
 ====
 * Setting to change staff reply email template
