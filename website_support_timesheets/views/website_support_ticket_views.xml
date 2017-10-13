@@ -16,7 +16,7 @@
                           <field name="create_uid" readonly="True" string="By"/>
                           <field name="hours"/>
                           <field name="minutes"/>
-                          <field name="project_id"/>
+                          <!--<field name="project_id"/>-->
                       </tree>
                   </field>
               </field>

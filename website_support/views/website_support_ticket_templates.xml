@@ -9,6 +9,7 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Support Ticket Survey (#${object.ticket_number or object.id})</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>We would like to get your feedback on the support</p>
@@ -32,6 +33,7 @@
             <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
             <field name="subject">New Support Ticket for your category</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear _user_name_,</p>
                 <p>A new support ticket has been created in a category that you follow</p>
@@ -50,6 +52,7 @@
             <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>            
             <field name="subject">A Support Ticket has been assigned to you</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear _user_name_,</p>
                 <p>A support ticket has been assigned to you here are the details</p>
@@ -74,6 +77,7 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been updated</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been updated and is now in the category '${object.category.name}' </p>
@@ -98,6 +102,7 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been closed</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been closed by our staff, here is the final comment</p>
@@ -123,6 +128,7 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">We have received your support ticket '${object.subject}' and will get back to you shortly</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
@@ -148,6 +154,7 @@
             <field name="email_from">${user.email|safe}</field>            
             <field name="email_to">${object.email|safe}</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 ${object.body|safe}
                 <hr/>
@@ -169,6 +176,7 @@
             <field name="reply_to">${object.ticket_id.support_email|safe}</field>
             <field name="email_to">${object.email|safe}</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 ${object.body|safe}
                 <hr/>

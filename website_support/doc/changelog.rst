@@ -1,3 +1,7 @@
+v1.4.4
+======
+* Filter out system emails and make it easier to create new email templates
+
 v1.4.3
 ======
 * Send email when user is assigned

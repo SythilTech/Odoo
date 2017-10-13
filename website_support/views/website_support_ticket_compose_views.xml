@@ -14,7 +14,7 @@
           	  </group>
           	  <field name="body" widget="html"/>
           	  <group>
-          	      <field name="template_id"/>
+          	      <field name="template_id" context="{'default_model':'website.support.ticket', 'default_body_html': body}"/>
                   </group>
                   <footer>
                         <button string="Send" name="send_reply" type="object" class="btn-primary"/>

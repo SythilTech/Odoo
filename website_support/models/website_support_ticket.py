@@ -299,7 +299,7 @@ class WebsiteSupportTicketCompose(models.Model):
     email = fields.Char(string="Email", readonly="True")
     subject = fields.Char(string="Subject", readonly="True")
     body = fields.Text(string="Message Body")
-    template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket')]")
+    template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
     
     @api.onchange('template_id')
     def _onchange_template_id(self):

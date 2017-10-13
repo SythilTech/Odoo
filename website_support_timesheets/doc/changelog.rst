@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Remove project field since the other timesheet module is designed for that
+
 v1.1
 ====
 * Pivot view
