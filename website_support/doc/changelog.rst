@@ -1,3 +1,7 @@
+v1.4.2
+======
+* Restrict support ticket menu to employee only since sometimes portal could gain access?
+
 v1.4.1
 ======
 * Compatablity with web_list_autorefresh module

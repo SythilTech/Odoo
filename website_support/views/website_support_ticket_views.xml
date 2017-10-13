@@ -104,7 +104,7 @@
           </field>
       </record>
 
-      <menuitem id="website_support_parent_menu" name="Customer Support" parent="sales_team.menu_base_partner" sequence="90"/>
+      <menuitem id="website_support_parent_menu" name="Customer Support" parent="sales_team.menu_base_partner" sequence="90" groups="base.group_user"/>
       <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
       <menuitem id="website_support_config_parent_menu" name="Support Tickets" parent="sales_team.menu_sale_config" sequence="80"/>
  
