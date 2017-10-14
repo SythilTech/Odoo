@@ -158,13 +158,9 @@ WebClient.include({
         var model = new Model("voip.server");
         model.call("get_user_agent", [[]]).then(function(result) {
 
-		    //console.log(result.address);
-            //console.log(result.auth_username);
-            //console.log(result.password);
-
             window.userAgent = new SIP.UA({
                 uri: result.address,
-                //wsServers: ['wss://edge.sip.onsip.com'],
+                wsServers: [result.wss],
                 authorizationUser: result.auth_username,
                 password: result.password
             });
@@ -499,7 +495,6 @@ function gotRemoteStream(event) {
 
 }
 
-
 var FieldSIP = form_widgets.FieldChar.extend({
     events: {
         'click .sip-call': 'start_sip_call',
@@ -507,8 +502,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
     },
     render_value: function() {
         if (this.get("effective_readonly")) {
-		    //this.$el.html("" + this.get("value") + " <a href=\"javascript:;\"class=\"fa fa-phone sip-call\" style=\"text-decoration: underline;\" aria-hidden=\"true\"> Call</a>");
-		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i>");
+		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i>");
         } else {
 			this.$input.val(this.get("value"));
         }
@@ -517,17 +511,24 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         console.log("Call Type: SIP");
 
-        role = "caller";
-        mode = "audiocall";
-        call_type = "external";
-        to_partner_id = this.getParent().get_fields_values()['id'];
-    	var constraints = {'audio': true};
+        $(".s-voip-manager").css("opacity","1");
 
-        if (navigator.webkitGetUserMedia) {
-    	    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-    	} else {
-            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-        }
+        //here you determine whether the call has video and audio
+        var options = {
+            media: {
+                constraints: {
+                    audio: true,
+                    video: true
+                 },
+                render: {
+                    remote: document.getElementById('remoteVideo'),
+                    local: document.getElementById('localVideo')
+                }
+            }
+        };
+
+        //makes the call
+        session = window.userAgent.invite('sip:' + this.get("value"), options);
 
 
     },
@@ -546,7 +547,10 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
 core.form_widget_registry.add('sip', FieldSIP)
 
+
 $(document).on('click', '#voip_end_call', function(){
+
+    window.session.bye();
 
     var model = new Model("voip.call");
     model.call("end_call", [[call_id]], {}).then(function(result) {

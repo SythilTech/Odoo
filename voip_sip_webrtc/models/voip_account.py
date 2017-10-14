@@ -22,6 +22,7 @@ class VoipAccount(models.Model):
     domain = fields.Char(string="Domain")
     outbound_proxy = fields.Char(string="Outbound Proxy")
     verified = fields.Boolean(string="Verified")
+    wss = fields.Char(string="WSS", default="wss://edge.sip.onsip.com")
     
     @api.onchange('address')
     def _onchange_address(self):
