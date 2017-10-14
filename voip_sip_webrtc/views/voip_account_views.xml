@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
       	    <form>
       	        <header>
-      	            <button name="send_register" type="object" string="Send Register"/>
+      	            <!--<button name="send_register" type="object" string="Send Register"/>-->
       	        </header>
       	        <group>
       	            <field name="address"/>
@@ -15,8 +15,8 @@
       	            <field name="auth_username"/>
       	            <field name="username"/>
       	            <field name="domain"/>
-      	            <field name="outbound_proxy"/>
-                    <field name="verified"/>
+      	            <!--<field name="outbound_proxy"/>-->
+                    <!--<field name="verified"/>-->
       	        </group>
       	    </form>
         </field>
@@ -44,6 +44,6 @@
         </field>
     </record>
 
-    <!--<menuitem id="voip_account_menu" name="Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>-->
+    <menuitem id="voip_account_menu" name="SIP Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>
 
 </odoo>

@@ -17,7 +17,7 @@
         <field eval="'ir.actions.server,%d'%sip_call_server_action" name="value"/>
     </record>
         
-    <!--<record id="view_partner_form_inherit_voip" model="ir.ui.view">
+    <record id="view_partner_form_inherit_voip" model="ir.ui.view">
         <field name="name">res.partner SIP</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
@@ -26,6 +26,6 @@
                 <field name="sip_address" widget="sip"/>
             </field>
       	</field>
-    </record>-->
+    </record>
 
 </odoo>

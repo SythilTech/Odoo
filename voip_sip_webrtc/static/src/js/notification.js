@@ -18,7 +18,7 @@ var form_widgets = require('web.form_widgets');
 var _t = core._t;
 var qweb = core.qweb;
 
-ajax.loadXML('/voip_sip_webrtc/static/src/xml/voip_window2.xml', qweb);
+ajax.loadXML('/voip_sip_webrtc/static/src/xml/voip_window.xml', qweb);
 
 var mySound = "";
 var countdown;
@@ -38,6 +38,8 @@ var call_interval;
 var call_sdp = "";
 var ice_candidate_queue = [];
 var got_remote_description = false;
+var userAgent;
+var to_sip;
 
 var VOIPItem = Widget.extend({
     template:'VoipSystemTray',
@@ -147,8 +149,32 @@ WebClient.include({
     show_application: function() {
 
         $('body').append(qweb.render('voip_sip_webrtc.VoipWindow', {}));
+        $('body').append(qweb.render('voip_sip_webrtc.ChatWindow', {}));
 
         $(".s-voip-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
+        $(".s-chat-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
+
+
+        var model = new Model("voip.server");
+        model.call("get_user_agent", [[]]).then(function(result) {
+
+		    //console.log(result.address);
+            //console.log(result.auth_username);
+            //console.log(result.password);
+
+            window.userAgent = new SIP.UA({
+                uri: result.address,
+                //wsServers: ['wss://edge.sip.onsip.com'],
+                authorizationUser: result.auth_username,
+                password: result.password
+            });
+
+            window.userAgent.start();
+            window.userAgent.on('message', onMessage);
+
+        });
+
+
 
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
@@ -321,6 +347,23 @@ function errorHandler(error) {
     console.log(error);
 }
 
+function onMessage(message) {
+
+    //Somehow set the to sip so we can respond back...
+    //window.to_sip = this.get("value");
+
+    if (message.body.includes("<isComposing") ) {
+	    console.log("Composing Message");
+    } else {
+        //Show the messenger
+        $(".s-chat-manager").css("opacity","1");
+
+        //Add the message to the chat log
+        $("#sip-message-log").append("<-" + message.body + "<br/>");
+    }
+
+}
+
 function processIceQueue() {
     console.log("Process Ice Queue");
     for (var i = ice_candidate_queue.length - 1; i >= 0; i--) {
@@ -460,10 +503,12 @@ function gotRemoteStream(event) {
 var FieldSIP = form_widgets.FieldChar.extend({
     events: {
         'click .sip-call': 'start_sip_call',
+        'click .sip-message': 'open_sip_messenger',
     },
     render_value: function() {
         if (this.get("effective_readonly")) {
-		    this.$el.html("" + this.get("value") + " <a href=\"javascript:;\"class=\"fa fa-phone sip-call\" style=\"text-decoration: underline;\" aria-hidden=\"true\"> Call</a>");
+		    //this.$el.html("" + this.get("value") + " <a href=\"javascript:;\"class=\"fa fa-phone sip-call\" style=\"text-decoration: underline;\" aria-hidden=\"true\"> Call</a>");
+		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i>");
         } else {
 			this.$input.val(this.get("value"));
         }
@@ -485,7 +530,17 @@ var FieldSIP = form_widgets.FieldChar.extend({
         }
 
 
+    },
+    open_sip_messenger: function() {
+
+        console.log("Message Type: SIP");
+        console.log(this.get("value"));
+
+        window.to_sip = this.get("value");
+        $(".s-chat-manager").css("opacity","1");
+
     }
+
 });
 
 
@@ -498,6 +553,18 @@ $(document).on('click', '#voip_end_call', function(){
         console.log("End Call");
     });
 
+});
+
+$(document).on('click', '#sip_message_send_button', function(){
+    window.userAgent.message(window.to_sip, $("#sip_address_textbox").val() );
+
+    //Add the message to the chat log
+    $("#sip-message-log").append("->" + $("#sip_address_textbox").val() + "<br/>");
+
+    //Clear the message
+    $("#sip_address_textbox").val("");
+
+    //TODO also add to chatter
 });
 
 $(document).on('click', '#voip_full_screen', function(){

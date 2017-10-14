@@ -19,6 +19,16 @@ class VoipVoip(models.Model):
     _name = "voip.server"
     _description = "Voip Server"
 
+    def get_user_agent(self, **kw):
+        """ Get SIP adress, auth username and password """
+
+        voip_account = self.env.user.voip_account_id        
+        
+        if voip_account:
+            return {'address': voip_account.address, 'auth_username': voip_account.auth_username, 'password': voip_account.password}
+        else:
+            return {'address': '', 'auth_username': '', 'password': ''}        
+
     def user_list(self, **kw):
         """ Get all active users so we can place them in the system tray """
 

@@ -1,3 +1,7 @@
+v1.4.2
+======
+* SIP messaging via onSIP
+
 v1.4.1
 ======
 * Incomplete feature clean up

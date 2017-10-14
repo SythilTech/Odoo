@@ -16,4 +16,14 @@
         </div>
     </t>
 
+    <t t-name="voip_sip_webrtc.ChatWindow">
+        <div class="s-chat-manager">
+            <div id="sip-message-log" style="border: solid black 1px;height:calc(100% - 50px);margin-bottom:10px;overflow: auto;">
+  
+            </div>
+  
+            <input id="sip_address_textbox" style="width: calc(100% - 50px);display:inline;" type="text"/> <button id="sip_message_send_button" class="btn btn-default btn-xs">Send</button>
+        </div>
+    </t>
+    
 </templates>
