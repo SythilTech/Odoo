@@ -14,10 +14,12 @@ class HtmlForm(models.Model):
     _description = "HTML Form"
 
     def _default_return_url(self):
-        return request.httprequest.host_url + "form/thankyou"
+        proto_ind_url = request.httprequest.host_url.replace("http:","")
+        return proto_ind_url + "form/thankyou"
 
     def _default_submit_url(self):
-        return request.httprequest.host_url + "form/sinsert"
+        proto_ind_url = request.httprequest.host_url.replace("http:","")
+        return proto_ind_url + "form/sinsert"
 
     name = fields.Char(string="Form Name", required=True, translate=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True)

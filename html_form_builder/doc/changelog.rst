@@ -1,3 +1,7 @@
+v1.0.19
+=======
+* Remove http: so websites that start http then go to https don't get blocked
+
 v1.0.18
 =======
 * External ReCapatcha code
