@@ -1,3 +1,7 @@
+v1.1.2
+======
+* Tree view for support timesheets
+
 v1.1.1
 ======
 * Remove project field since the other timesheet module is designed for that

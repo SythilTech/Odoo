@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket - Timesheets",
-    'version': "1.1.1",
+    'version': "1.1.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
