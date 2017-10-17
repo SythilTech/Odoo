@@ -1,3 +1,7 @@
+v1.4.6
+======
+* Restrict Customer Support menu to only the "Sales / Manager" and Sales / Users: All Docuemnts"
+
 v1.4.5
 ======
 * Use comapany email in all cases

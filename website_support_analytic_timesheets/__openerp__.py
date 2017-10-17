@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket - Analytic Timesheets",
-    'version': "1.0",
+    'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -9,6 +9,7 @@
     'data': [
         'views/website_support_ticket_views.xml',
         'views/website_support_ticket_templates.xml',
+        'views/account_analytic_line_views.xml',
     ],
     'demo': [],
     'depends': ['website_support','hr_timesheet_sheet'],

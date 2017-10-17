@@ -48,6 +48,11 @@ class WebsiteSupportTicketTimesheet(models.Model):
     _name = "website.support.ticket.timesheet"
     
     wst_id = fields.Many2one('website.support.ticket', string="Support Ticket")
+    ticket_description = fields.Text(related="wst_id.description", string="Description")
     hours = fields.Integer(string="Hours")
     minutes = fields.Integer(sring="Minutes")
     project_id = fields.Many2one('project.project', string="Project")
+    ticket_number_display = fields.Char(related="wst_id.ticket_number_display", string="Support Ticket Number")
+    state = fields.Many2one('website.support.ticket.states', readonly=True, related="wst_id.state", string="State")
+    open_time = fields.Datetime(related="wst_id.create_date", string="Open Time")
+    close_time = fields.Datetime(related="wst_id.close_time", string="Close Time")
