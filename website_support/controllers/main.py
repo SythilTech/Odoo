@@ -182,15 +182,25 @@ class SupportTicketController(http.Controller):
     @http.route('/support/ticket/view', type="http", auth="user", website=True)
     def support_ticket_view_list(self, **kw):
         """Displays a list of support tickets owned by the logged in user"""
-        support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', '=', http.request.env.user.partner_id.stp_ids.id), ('partner_id','!=',False) ])
+        
+        extra_access = []
+        for extra_permission in http.request.env.user.partner_id.stp_ids:
+            extra_access.append(extra_permission.id)
+        
+        support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])
         
         return http.request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets)})
 
     @http.route('/support/ticket/view/<ticket>', type="http", auth="user", website=True)
     def support_ticket_view(self, ticket):
         """View an individual support ticket"""
+        
+        extra_access = []
+        for extra_permission in http.request.env.user.partner_id.stp_ids:
+            extra_access.append(extra_permission.id)
+        
         #only let the user this ticket is assigned to view this ticket
-        support_ticket = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', '=', http.request.env.user.partner_id.stp_ids.id), ('id','=',ticket) ])[0]
+        support_ticket = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('id','=',ticket) ])[0]
         return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket})
 
     @http.route('/support/portal/ticket/view/<portal_access_key>', type="http", auth="public", website=True)

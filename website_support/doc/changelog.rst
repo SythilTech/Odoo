@@ -1,3 +1,7 @@
+v1.4.7
+======
+* Fix bug with multi ticket access allow only allowing single extra access
+
 v1.4.6
 ======
 * Restrict Customer Support menu to only the "Sales / Manager" and Sales / Users: All Docuemnts"
