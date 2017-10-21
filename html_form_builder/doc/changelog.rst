@@ -1,3 +1,7 @@
+v1.0.20
+=======
+* resolve CSRF issue for public users
+
 v1.0.19
 =======
 * Remove http: so websites that start http then go to https don't get blocked

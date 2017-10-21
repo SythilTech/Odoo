@@ -15,9 +15,6 @@ ajax.loadXML('/html_form_builder/static/src/xml/html_form_modal30.xml', qweb);
 
 $(function() {
 
-  //Load the token via javascript since Odoo has issue with request.csrf_token() inside snippets
-  $(".html_form input[name='csrf_token']").val(odoo.csrf_token);
-
   $( ".html_form button.btn-lg" ).click(function(e) {
 
     e.preventDefault();  // Prevent the default submit behavior
