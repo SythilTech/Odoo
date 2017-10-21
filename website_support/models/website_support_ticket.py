@@ -105,7 +105,7 @@ class WebsiteSupportTicket(models.Model):
         #body_short = s.get_data()
                 
         #Add to message history field for back compatablity
-        self.conversation_history.create({'ticket_id': self.id, 'content': body_short })
+        self.conversation_history.create({'ticket_id': self.id, 'by': 'customer', 'content': body_short })
 
         #If the to email address is to the customer then it must be a staff member...
         if msg_dict.get('to') == self.email:
@@ -215,6 +215,7 @@ class WebsiteSupportTicketMessage(models.Model):
     _name = "website.support.ticket.message"
     
     ticket_id = fields.Many2one('website.support.ticket', string='Ticket ID')
+    by = fields.Selection([('staff','Staff'), ('customer','Customer')], string="By")
     content = fields.Html(string="Content")
    
 class WebsiteSupportTicketCategories(models.Model):
@@ -327,7 +328,7 @@ class WebsiteSupportTicketCompose(models.Model):
         send_mail.send()
         
         #Add to message history field for back compatablity
-        self.env['website.support.ticket.message'].create({'ticket_id': self.ticket_id.id, 'content':self.body.replace("<p>","").replace("</p>","")})
+        self.env['website.support.ticket.message'].create({'ticket_id': self.ticket_id.id, 'by': 'staff', 'content':self.body.replace("<p>","").replace("</p>","")})
         
         #Post in message history
         #self.ticket_id.message_post(body=self.body, subject=self.subject, message_type='comment', subtype='mt_comment')

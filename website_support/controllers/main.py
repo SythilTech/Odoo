@@ -220,8 +220,8 @@ class SupportTicketController(http.Controller):
         
         support_ticket = http.request.env['website.support.ticket'].sudo().search([('portal_access_key','=', values['portal_access_key'] ) ])[0]
 
-        http.request.env['website.support.ticket.message'].create({'ticket_id':support_ticket.id,'content':values['comment']})
-            
+        http.request.env['website.support.ticket.message'].create({'ticket_id':support_ticket.id, 'by': 'customer','content':values['comment']})
+        
         support_ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
             
         request.env['website.support.ticket'].sudo().browse(support_ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
@@ -241,7 +241,7 @@ class SupportTicketController(http.Controller):
         #check if this user owns this ticket
         if ticket.partner_id.id == http.request.env.user.partner_id.id or ticket.partner_id in http.request.env.user.partner_id.stp_ids:
 
-            http.request.env['website.support.ticket.message'].create({'ticket_id':ticket.id,'content':values['comment']})
+            http.request.env['website.support.ticket.message'].create({'ticket_id':ticket.id, 'by': 'customer','content':values['comment']})
             
             ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
             

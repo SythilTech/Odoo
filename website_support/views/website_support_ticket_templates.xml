@@ -172,7 +172,7 @@
             <field name="name">Support Ticket Reply Wrapper (support@)</field>
             <field name="model_id" ref="model_website_support_ticket_compose"></field>
             <field name="subject">${object.subject}</field>
-            <field name="email_from">${object.ticket_id.support_email or object.company_id.email}|safe}</field>
+            <field name="email_from">${object.ticket_id.support_email or object.ticket_id.company_id.email}|safe}</field>
             <field name="reply_to">${object.ticket_id.support_email|safe}</field>
             <field name="email_to">${object.email|safe}</field>
             <field name="auto_delete" eval="False"/>
@@ -363,7 +363,24 @@ label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
                 <table class="table table-striped table-bordered table-hover table-condensed">
                     <tr><th>From</th><th>Message</th></tr>
                     <t t-foreach="support_ticket.conversation_history" t-as="chat">
-                        <tr><td><t t-esc="chat.create_uid.name"/></td><td><t t-raw="chat.content"/></td></tr>
+                        <tr><td>
+                            <t t-if="chat.by == ''">
+                                <t t-esc="chat.create_uid.name"/>                            
+                            </t>
+                            <t t-if="chat.by == 'staff'">                            
+                                <t t-esc="chat.create_uid.name"/>
+                            </t>
+                            <t t-if="chat.by == 'customer'">
+                                <t t-if="chat.ticket_id.person_name">
+                                    <t t-esc="chat.ticket_id.person_name"/>                                
+                                </t>
+                                <t t-if="not chat.ticket_id.person_name">
+                                    <t t-esc="chat.ticket_id.email"/>                                
+                                </t>
+                            </t>
+                            
+                        </td>
+                        <td><t t-raw="chat.content"/></td></tr>
                     </t>
                 </table>
                 <t t-if="portal_access_key">

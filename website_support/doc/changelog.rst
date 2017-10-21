@@ -1,3 +1,8 @@
+v1.4.8
+======
+* support email template fix
+* conversation history from is based on person_name or email not create_uid
+
 v1.4.7
 ======
 * Fix bug with multi ticket access allow only allowing single extra access
