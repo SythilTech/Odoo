@@ -1,3 +1,7 @@
+v1.4.9
+======
+* Remove message button in chatter since it bypasses reply code
+
 v1.4.8
 ======
 * support email template fix
