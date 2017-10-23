@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+        <menuitem id="migration_top_menu" name="Migration" sequence="80"/>        
+        <menuitem id="migration_parent_menu" parent="migration_top_menu" name="Migration" sequence="10"/>
+        <menuitem id="migration_import_wordpress_menu" parent="migration_parent_menu" name="Wordpress Sites" action="migration_import_wordpress_action" sequence="10"/>
+    
+    </data>
+</odoo>
