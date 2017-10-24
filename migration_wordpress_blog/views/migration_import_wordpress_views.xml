@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="migration_import_wordpress_blog_form_view" model="ir.ui.view">
+            <field name="name">migration.import.wordpress form view inherit blog</field>
+            <field name="model">migration.import.wordpress</field>
+            <field name="inherit_id" ref="migration_wordpress.migration_import_wordpress_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='import_pages']" position="after">
+                    <button name="import_posts" string="Import Blog Posts" type="object"/>
+                </xpath>
+                <field name="wordpress_imported_media" position="after">
+                    <field name="blog_post_ids"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

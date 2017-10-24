@@ -8,8 +8,8 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button name="import_media" string="Import Media" type="object" class="oe_highlight"/>
-                        <button name="import_pages" string="Import Pages" type="object" class="oe_highlight"/>
+                        <button name="import_media" string="Import Media" type="object"/>
+                        <button name="import_pages" string="Import Pages" type="object"/>
                     </header>
                     <group>
                         <field name="wordpress_url"/>

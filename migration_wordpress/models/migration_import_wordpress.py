@@ -175,8 +175,6 @@ class MigrationImportWordpress(models.Model):
             wraped_content += "</t>"
 
             transformed_content = "<?xml version=\"1.0\"?>\n" + self.transform_post_content(wraped_content, media_json_data)
-            _logger.error( str(transformed_content) )
-            
             external_identifier = "import_post_" + str(page_json['id'])
 
             #Create an external ID so we don't reimport the same page again
