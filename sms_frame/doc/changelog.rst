@@ -1,3 +1,7 @@
+v1.0.19
+=======
+* MMS template not loading name
+
 v1.0.18
 =======
 * Fix select no longer supported issue appearing in Odoo log

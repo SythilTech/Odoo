@@ -71,6 +71,7 @@ class SmsTemplate(models.Model):
     from_mobile_verified_id = fields.Many2one('sms.number', string="From Mobile (stored)")
     from_mobile = fields.Char(string="From Mobile", help="Placeholders are allowed here")
     media_id = fields.Binary(string="Media(MMS)")
+    media_filename = fields.Char(string="Media Filename")    
     media_ids = fields.Many2many('ir.attachment', string="Media(MMS)[Automated Actions Only]")
     
     @api.onchange('model_object_field_id')
