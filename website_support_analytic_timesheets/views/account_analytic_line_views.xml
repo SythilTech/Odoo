@@ -5,18 +5,28 @@
       <record id="website_support_ticket_view_form_inherit_hr_timesheet_line_tree" model="ir.ui.view">
           <field name="name">account.analytic.line inherit support ticket</field>
           <field name="model">account.analytic.line</field>
-          <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+          <field name="priority" eval="50"/>
           <field name="arch" type="xml">
-              <field name="project_id" position="after">
-                  <field name="ticket_number_display"/>              
-              </field>
-              <field name="unit_amount" position="after">
-                  <field name="state"/>
-                  <field name="open_time"/>
-                  <field name="close_time"/>
-              </field>
+              <tree>
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="unit_amount" sum="Quantity"/>
+                    <field name="amount" sum="Total"/>
+              </tree>
           </field>
       </record>
-        
+
+      <record id="website_support_analytics_action" model="ir.actions.act_window">
+          <field name="name">Support Ticket Timesheet Report</field>
+	  <field name="res_model">account.analytic.line</field>
+	  <field name="view_mode">tree</field>
+	  <field name="view_id" ref="website_support_ticket_view_form_inherit_hr_timesheet_line_tree"/>
+      </record>
+      
+      <menuitem id="website_support_analytics" name="Timesheet Reports" parent="website_support.website_support_parent_menu" action="website_support_analytics_action" sequence="30"/>
+      
   </data>
 </openerp>

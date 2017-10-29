@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Hack to allow timesheet lines to not have a project
+
 v1.0.2
 ======
 * Default project settings
