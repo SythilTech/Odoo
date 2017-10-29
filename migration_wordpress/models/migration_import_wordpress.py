@@ -45,6 +45,10 @@ class MigrationImportWordpress(models.Model):
     def transfer_media(self, media_json):
         """ Media can be imported from many places such as when importing pages, media library, blog posts or posts of any type """
 
+        if 'code' in media_json:
+            #Access denied so can not import image
+            return False
+
         url = media_json['guid']['rendered']
 
         filename = url.split('/')[-1]
