@@ -27,7 +27,7 @@ class VoipVoip(models.Model):
         if voip_account:
             return {'address': voip_account.address, 'wss': voip_account.wss, 'auth_username': voip_account.auth_username, 'password': voip_account.password}
         else:
-            return {'address': '', 'wss': '', 'auth_username': '', 'password': ''}        
+            return {'address': ''}        
 
     def user_list(self, **kw):
         """ Get all active users so we can place them in the system tray """

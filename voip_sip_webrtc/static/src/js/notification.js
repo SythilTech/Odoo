@@ -4,7 +4,7 @@ odoo.define('voip_sip_webrtc.voip_call_notification', function (require) {
 var core = require('web.core');
 var framework = require('web.framework');
 var Model = require('web.DataModel');
-var session = require('web.session');
+var odoo_session = require('web.session');
 var web_client = require('web.web_client');
 var Widget = require('web.Widget');
 var ajax = require('web.ajax');
@@ -158,15 +158,17 @@ WebClient.include({
         var model = new Model("voip.server");
         model.call("get_user_agent", [[]]).then(function(result) {
 
-            window.userAgent = new SIP.UA({
-                uri: result.address,
-                wsServers: [result.wss],
-                authorizationUser: result.auth_username,
-                password: result.password
-            });
+            if (result.address != '') {
+                window.userAgent = new SIP.UA({
+                    uri: result.address,
+                    wsServers: [result.wss],
+                    authorizationUser: result.auth_username,
+                    password: result.password
+                });
 
-            window.userAgent.start();
-            window.userAgent.on('message', onMessage);
+                window.userAgent.start();
+                window.userAgent.on('message', onMessage);
+		    }
 
         });
 
@@ -528,7 +530,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
         };
 
         //makes the call
-        session = window.userAgent.invite('sip:' + this.get("value"), options);
+        window.session = window.userAgent.invite('sip:' + this.get("value"), options);
 
 
     },

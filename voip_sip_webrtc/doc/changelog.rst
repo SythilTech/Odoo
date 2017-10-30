@@ -1,3 +1,7 @@
+v1.4.3
+======
+* Fix blank SIP account error message
+
 v1.4.2
 ======
 * SIP messaging via onSIP
