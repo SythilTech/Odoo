@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Fix issue with blank MMS attachment
+
 v1.0.5
 ======
 * MMS redesign to fix issue with multiple queued MMS messages
