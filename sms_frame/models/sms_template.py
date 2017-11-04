@@ -97,17 +97,17 @@ class SmsTemplate(models.Model):
     @api.model
     def send_sms(self, template_id, record_id):
         """Send the sms using all the details in this sms template, using the specified record ID""" 
-        my_template = self.env['sms.template'].browse( int(template_id) )
+        sms_template = self.env['sms.template'].browse( int(template_id) )
         
-        sms_rendered_content = self.env['sms.template'].render_template(my_template.template_body, my_template.model_id.model, record_id)
+        sms_rendered_content = self.env['sms.template'].render_template(sms_template.template_body, sms_template.model_id.model, record_id)
         
-        rendered_sms_to = self.env['sms.template'].render_template(my_template.sms_to, my_template.model_id.model, record_id)
+        rendered_sms_to = self.env['sms.template'].render_template(sms_template.sms_to, sms_template.model_id.model, record_id)
          
-        gateway_model = my_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
+        gateway_model = sms_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
         
-	my_sms = self.env[gateway_model].send_message(my_template.from_mobile_verified_id.account_id.id, my_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, my_template.model_id.model, record_id, my_template.media_id)
+	my_sms = self.env[gateway_model].send_message(sms_template.from_mobile_verified_id.account_id.id, sms_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, sms_template.model_id.model, record_id, sms_template.media_id)
 
-	self.env['sms.message'].create({'record_id': record_id,'model_id': my_template.model_id.id, 'account_id': my_template.from_mobile_verified_id.account_id.id, 'from_mobile': my_template.from_mobile, 'to_mobile': rendered_sms_to, 'sms_content': sms_rendered_content, 'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id})
+	self.env['sms.message'].create({'record_id': record_id,'model_id': sms_template.model_id.id, 'account_id': sms_template.from_mobile_verified_id.account_id.id, 'from_mobile': sms_template.from_mobile, 'to_mobile': rendered_sms_to, 'sms_content': sms_rendered_content, 'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id})
 	
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``

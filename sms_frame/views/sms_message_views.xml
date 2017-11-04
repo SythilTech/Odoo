@@ -93,7 +93,7 @@
         </record>
       
       <record id="sms_message_action" model="ir.actions.act_window">
-          <field name="name">sms.message.action</field>
+          <field name="name">SMS / MMS Messages</field>
           <field name="res_model">sms.message</field>
           <field name="view_type">form</field>
           <field name="view_mode">kanban,tree,form</field>

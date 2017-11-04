@@ -1,3 +1,7 @@
+v1.0.20
+=======
+* Minor text changes
+
 v1.0.19
 =======
 * MMS template not loading name
