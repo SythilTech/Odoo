@@ -158,7 +158,9 @@
             <field name="body_html"><![CDATA[
                 ${object.body|safe}
                 <hr/>
-                <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
+                % if object.ticket_id.portal_access_key :
+                    <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
+                % endif
                 <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
                 <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}
                 <br/>
@@ -180,7 +182,9 @@
             <field name="body_html"><![CDATA[
                 ${object.body|safe}
                 <hr/>
-                <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
+                 % if object.ticket_id.portal_access_key :
+                     <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
+                 % endif
                 <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
                 <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}
                 <br/>

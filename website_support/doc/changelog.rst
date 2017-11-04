@@ -1,3 +1,7 @@
+v1.4.10
+=======
+* Logged in users that submit tickets via the website no longer get website portal access (security precaution since website portal doesn't require any login)
+
 v1.4.9
 ======
 * Remove message button in chatter since it bypasses reply code
