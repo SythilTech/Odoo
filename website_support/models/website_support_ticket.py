@@ -163,9 +163,14 @@ class WebsiteSupportTicket(models.Model):
         for my_user in new_id.category.cat_user_ids:
             values = notification_template.generate_email(new_id.id)
             values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(new_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+            #values['body'] = values['body_html']
             values['email_to'] = my_user.partner_id.email
+                        
             send_mail = self.env['mail.mail'].create(values)
-            send_mail.send(True)
+            send_mail.send()
+            
+            #Remove the message from the chatter since this would bloat the communication history by a lot
+            send_mail.mail_message_id.unlink()
             
         return new_id
         

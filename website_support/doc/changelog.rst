@@ -1,3 +1,7 @@
+v1.4.11
+=======
+* Remove new ticket in category email from chatter
+
 v1.4.10
 =======
 * Logged in users that submit tickets via the website no longer get website portal access (security precaution since website portal doesn't require any login)
