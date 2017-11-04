@@ -1,6 +1,10 @@
+v1.0.21
+=======
+* Resolve dropbox malformed external html generation
+
 v1.0.20
 =======
-* resolve CSRF issue for public users
+* Resolve CSRF issue for public users
 
 v1.0.19
 =======

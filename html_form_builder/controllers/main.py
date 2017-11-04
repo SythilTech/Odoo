@@ -258,7 +258,7 @@ class HtmlFormController(http.Controller):
                 html_output += "      <div class=\"col-md-" + str(column_width) + "\">\n"
                 html_output += "<select class=\"form-control\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\">\n"
 
-                selection_list = dict(request.env[sub_field.model_id.model]._columns[sub_field.name].selection)
+                selection_list = dict(request.env[sub_field.model_id.model]._fields[sub_field.name].selection)
 
                 html_output += "<option value=\"\">" + sub_field.field_description + "</option>\n"
 

@@ -141,33 +141,12 @@ class HtmlForm(models.Model):
 
         html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label><br/>\n"
 
-        selection_list = dict(self.env[fe.field_id.model_id.model]._columns[fe.field_id.name].selection)
+        selection_list = dict(self.env[fe.field_id.model_id.model]._fields[fe.field_id.name].selection)
 
         for selection_value, selection_label in selection_list.items():
             html_output += "  <input type=\"radio\" name=\"" + selection_value.encode("utf-8") + "\""
 
             html_output += "/> " + selection_label.encode("utf-8") + "<br/>\n"
-
-        return html_output
-
-    def _generate_html_dropbox_m2o(self, fe):
-        html_output = ""
-
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
-
-        html_output += "  <select id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
-
-        if fe.field_id.required is True:
-            html_output += " required=\"required\""
-
-        html_output += ">\n"
-
-        selection_list = request.env[fe.field_id.relation].search([])
-
-        for row in selection_list:
-            html_output += "    <option value=\"" + str(row.id) + "\">" + cgi.escape(row.name) + "</option>\n"
-
-        html_output += "  </select><br/>\n"
 
         return html_output
 
@@ -178,17 +157,27 @@ class HtmlForm(models.Model):
 
         html_output += "  <select id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
 
-        if fe.field_id.required is True:
+        if fe.field_id.required == True:
             html_output += " required=\"required\""
 
-            html_output += ">\n"
+        html_output += ">\n"
 
-            selection_list = dict(self.env[fe.field_id.model_id.model]._columns[fe.field_id.name].selection)
+        if fe.field_id.ttype == "selection":
+
+            selection_list = dict(self.env[fe.field_id.model_id.model]._fields[fe.field_id.name].selection)
 
             for selection_value, selection_label in selection_list.items():
                 html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
 
-            html_output += "  </select><br/>\n"
+        elif fe.field_id.ttype == "many2one":
+
+            selection_list = request.env[fe.field_id.relation].search([])
+
+            for row in selection_list:
+                html_output += "    <option value=\"" + str(row.id) + "\">" + cgi.escape(row.name) + "</option>\n"
+
+        html_output += "  </select><br/>\n"
+        
         return html_output
 
     def _generate_html_textarea(self, fe):
