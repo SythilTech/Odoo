@@ -99,15 +99,27 @@ class SmsTemplate(models.Model):
         """Send the sms using all the details in this sms template, using the specified record ID""" 
         sms_template = self.env['sms.template'].browse( int(template_id) )
         
-        sms_rendered_content = self.env['sms.template'].render_template(sms_template.template_body, sms_template.model_id.model, record_id)
+        rendered_sms_template_body = self.env['sms.template'].render_template(sms_template.template_body, sms_template.model_id.model, record_id)
         
         rendered_sms_to = self.env['sms.template'].render_template(sms_template.sms_to, sms_template.model_id.model, record_id)
          
         gateway_model = sms_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
-        
-	my_sms = self.env[gateway_model].send_message(sms_template.from_mobile_verified_id.account_id.id, sms_template.from_mobile_verified_id.mobile_number, rendered_sms_to, sms_rendered_content, sms_template.model_id.model, record_id, sms_template.media_id)
 
-	self.env['sms.message'].create({'record_id': record_id,'model_id': sms_template.model_id.id, 'account_id': sms_template.from_mobile_verified_id.account_id.id, 'from_mobile': sms_template.from_mobile, 'to_mobile': rendered_sms_to, 'sms_content': sms_rendered_content, 'status_string':my_sms.response_string, 'direction':'O','message_date':datetime.utcnow(), 'status_code':my_sms.delivary_state, 'sms_gateway_message_id':my_sms.message_id})
+        #Queue the SMS message since we can't directly send MMS
+        queued_sms = self.env['sms.message'].create({'record_id': record_id,'model_id': sms_template.model_id.id,'account_id':sms_template.from_mobile_verified_id.account_id.id,'from_mobile':sms_template.from_mobile,'to_mobile':rendered_sms_to,'sms_content':rendered_sms_template_body, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued'})
+
+        #Also create the MMS attachment
+        if sms_template.media_id:
+            self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(queued_sms.id), 'type': 'binary', 'datas': sms_template.media_id, 'public': True, 'res_model': 'sms.message', 'res_id': queued_sms.id})
+
+        #Ok now we send the queued sms
+        my_sms = queued_sms.account_id.send_message(queued_sms.from_mobile, queued_sms.to_mobile, queued_sms.sms_content.encode('utf-8'), queued_sms.model_id.model, queued_sms.record_id, queued_sms.media_id, queued_sms_message=queued_sms)
+
+        #Mark it as sent to avoid it being sent again
+        queued_sms.status_code = my_sms.delivary_state
+        
+        #record the message in the communication log
+	self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(body=queued_sms.sms_content.encode('utf-8'), subject="SMS")
 	
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``
