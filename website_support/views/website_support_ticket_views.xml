@@ -9,7 +9,7 @@
       	      <form>
                   <header>
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply"/>
-                      <button type="action" name="%(website_support_ticket_close_action)d" context="{'default_ticket_id': active_id}" string="Close Ticket"/>
+                      <button type="object" name="open_close_ticket_wizard" string="Close Ticket"/>
                       <button type="object" name="send_survey" string="Send Survey"/>
                   </header>
       	          <sheet>  

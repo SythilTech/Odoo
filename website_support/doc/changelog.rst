@@ -1,3 +1,7 @@
+v1.4.12
+=======
+* Close wizard using python window action
+
 v1.4.11
 =======
 * Remove new ticket in category email from chatter

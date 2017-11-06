@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Timesheets must be filled in before closing
+
 v1.0.3
 ======
 * Hack to allow timesheet lines to not have a project

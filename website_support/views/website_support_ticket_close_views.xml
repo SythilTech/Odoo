@@ -19,14 +19,5 @@
       	  </field>
       </record>
 
-      <record id="website_support_ticket_close_action" model="ir.actions.act_window">
-          <field name="name">Support Ticket Close</field>
-	  <field name="res_model">website.support.ticket.close</field>
-	  <field name="type">ir.actions.act_window</field>
-          <field name="view_type">form</field>
-	  <field name="view_mode">form</field>
-          <field name="target">new</field>
-      </record>
-
     </data>
 </openerp>

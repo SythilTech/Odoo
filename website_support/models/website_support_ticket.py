@@ -132,7 +132,20 @@ class WebsiteSupportTicket(models.Model):
 
         if self.state == opened_state or self.state == customer_replied_state:
             self.unattended = True
-    
+
+    @api.multi
+    def open_close_ticket_wizard(self):
+
+        return {
+            'name': "Close Support Ticket",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket.close',
+            'context': {'default_ticket_id': self.id},
+            'target': 'new'
+        }
+
     @api.model
     def _needaction_domain_get(self):
         open_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')

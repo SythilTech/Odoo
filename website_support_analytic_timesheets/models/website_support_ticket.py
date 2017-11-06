@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from openerp import api, fields, models
+import logging
+_logger = logging.getLogger(__name__)
+
+from odoo.exceptions import UserError
 
 class WebsiteSupportTicketInheritTimesheets(models.Model):
 
@@ -8,6 +12,24 @@ class WebsiteSupportTicketInheritTimesheets(models.Model):
     analytic_timesheet_ids = fields.One2many('account.analytic.line', 'support_ticket_id', string="Timesheet")
     timesheet_project_id = fields.Many2one('project.project', string="Timesheet Project", compute="_compute_timesheet_project_id")
     analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", compute="_compute_analytic_account_id")
+
+    @api.multi
+    def open_close_ticket_wizard(self):
+
+        timesheet_count = len(self.analytic_timesheet_ids)
+        
+        if timesheet_count == 0:
+            raise UserError("Timesheets must be filled in before the ticket can be closed")
+
+        return {
+            'name': "Close Support Ticket",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket.close',
+            'context': {'default_ticket_id': self.id},
+            'target': 'new'
+        }
 
     @api.multi
     def _compute_analytic_account_id(self):
