@@ -112,15 +112,9 @@ class SmsTemplate(models.Model):
         if sms_template.media_id:
             self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(queued_sms.id), 'type': 'binary', 'datas': sms_template.media_id, 'public': True, 'res_model': 'sms.message', 'res_id': queued_sms.id})
 
-        #Ok now we send the queued sms
-        my_sms = queued_sms.account_id.send_message(queued_sms.from_mobile, queued_sms.to_mobile, queued_sms.sms_content.encode('utf-8'), queued_sms.model_id.model, queued_sms.record_id, queued_sms.media_id, queued_sms_message=queued_sms)
-
-        #Mark it as sent to avoid it being sent again
-        queued_sms.status_code = my_sms.delivary_state
+        #Turn the queue manager on
+        self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').active = True
         
-        #record the message in the communication log
-	self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(body=queued_sms.sms_content.encode('utf-8'), subject="SMS")
-	
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``
            with the result of evaluating these expressions with

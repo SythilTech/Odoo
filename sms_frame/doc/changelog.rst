@@ -1,3 +1,7 @@
+v1.0.22
+=======
+* Send SMS template code changed to better support MMS(Again)
+
 v1.0.21
 =======
 * Send SMS template code changed to better support MMS
