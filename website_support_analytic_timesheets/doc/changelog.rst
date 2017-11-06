@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Push support ticket fields into timesheet tree view
+
 v1.0.4
 ======
 * Timesheets must be filled in before closing

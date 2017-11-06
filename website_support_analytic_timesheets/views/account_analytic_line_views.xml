@@ -9,12 +9,17 @@
           <field name="arch" type="xml">
               <tree>
                     <field name="date"/>
+                    <field name="user_id"/>
                     <field name="name"/>
                     <field name="project_id"/>
+                    <field name="ticket_number_display"/>
+                    <field name="task_id"/>
                     <field name="currency_id" invisible="1"/>
                     <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="unit_amount" sum="Quantity"/>
-                    <field name="amount" sum="Total"/>
+                    <field name="unit_amount" string="Duration" sum="Total time" widget="float_time"/>
+                    <field name="state"/>
+                    <field name="open_time"/>
+                    <field name="close_time"/>
               </tree>
           </field>
       </record>
