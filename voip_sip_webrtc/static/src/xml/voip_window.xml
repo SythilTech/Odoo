@@ -19,7 +19,8 @@
 
     <t t-name="voip_sip_webrtc.ChatWindow">
         <div class="s-chat-manager">
-            <div id="sip-message-log" style="border: solid black 1px;height:calc(100% - 50px);margin-bottom:10px;overflow: auto;">
+            <div id="sip-panel-uri"/>
+            <div id="sip-message-log" style="border: solid black 1px;height:calc(100% - 60px);margin-bottom:10px;overflow: auto;">
   
             </div>
   

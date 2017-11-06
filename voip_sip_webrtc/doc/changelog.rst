@@ -1,3 +1,7 @@
+v1.4.4
+======
+* SIP reply
+
 v1.4.3
 ======
 * Fix blank SIP account error message

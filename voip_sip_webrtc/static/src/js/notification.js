@@ -168,6 +168,7 @@ WebClient.include({
 
                 window.userAgent.start();
                 window.userAgent.on('message', onMessage);
+                window.userAgent.on('invite', onInvite);
 		    }
 
         });
@@ -347,8 +348,6 @@ function errorHandler(error) {
 
 function onMessage(message) {
 
-    //Somehow set the to sip so we can respond back...
-    //window.to_sip = this.get("value");
 
     if (message.body.includes("<isComposing") ) {
 	    console.log("Composing Message");
@@ -358,7 +357,33 @@ function onMessage(message) {
 
         //Add the message to the chat log
         $("#sip-message-log").append("<-" + message.body + "<br/>");
+
+        var aor = message.remoteIdentity.uri.user + "@" + message.remoteIdentity.uri.host
+
+        $("#sip-panel-uri").html(message.remoteIdentity.displayName)
+
+        window.to_sip = aor;
+
     }
+
+}
+
+function onInvite(session) {
+
+	alert("Incoming Call");
+
+    console.log("Call Type: SIP");
+
+    $(".s-voip-manager").css("opacity","1");
+
+    session.accept({
+        media: {
+            render: {
+                remote: document.getElementById('remoteVideo'),
+                local: document.getElementById('localVideo')
+            }
+        }
+    });
 
 }
 
