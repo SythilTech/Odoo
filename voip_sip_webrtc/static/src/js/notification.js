@@ -387,6 +387,12 @@ function onInvite(session) {
 
 }
 
+function onPresence(notification) {
+    console.log("Presence");
+    console.log(notification.request.body);
+}
+
+
 function processIceQueue() {
     console.log("Process Ice Queue");
     for (var i = ice_candidate_queue.length - 1; i >= 0; i--) {
@@ -522,14 +528,26 @@ function gotRemoteStream(event) {
 
 }
 
+var chatSubscription;
+
 var FieldSIP = form_widgets.FieldChar.extend({
     events: {
         'click .sip-call': 'start_sip_call',
+        'click .sip-video': 'start_sip_video',
         'click .sip-message': 'open_sip_messenger',
     },
     render_value: function() {
+
         if (this.get("effective_readonly")) {
-		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i>");
+
+            console.log("Get " + this.get("value") + " presence information");
+
+            window.chatSubscription = window.userAgent.subscribe(this.get("value"), 'presence');
+
+            //We update the widget once we get presence information so a person doesn't try to call someone who isn't available
+            window.chatSubscription.on('notify', onPresence);
+
+		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
         } else {
 			this.$input.val(this.get("value"));
         }
@@ -537,6 +555,31 @@ var FieldSIP = form_widgets.FieldChar.extend({
     start_sip_call: function() {
 
         console.log("Call Type: SIP");
+
+        $(".s-voip-manager").css("opacity","1");
+
+        //here you determine whether the call has video and audio
+        var options = {
+            media: {
+                constraints: {
+                    audio: true,
+                    video: false
+                 },
+                render: {
+                    remote: document.getElementById('remoteVideo'),
+                    local: document.getElementById('localVideo')
+                }
+            }
+        };
+
+        //makes the call
+        window.session = window.userAgent.invite('sip:' + this.get("value"), options);
+
+
+    },
+    start_sip_video: function() {
+
+        console.log("Call Type: SIP Video");
 
         $(".s-voip-manager").css("opacity","1");
 
@@ -577,12 +620,14 @@ core.form_widget_registry.add('sip', FieldSIP)
 
 $(document).on('click', '#voip_end_call', function(){
 
-    window.session.bye();
-
-    var model = new Model("voip.call");
-    model.call("end_call", [[call_id]], {}).then(function(result) {
-        console.log("End Call");
-    });
+    if (call_type == "SIP") {
+        window.session.bye();
+    } else {
+        var model = new Model("voip.call");
+        model.call("end_call", [[call_id]], {}).then(function(result) {
+            console.log("End Call");
+        });
+    }
 
 });
 
