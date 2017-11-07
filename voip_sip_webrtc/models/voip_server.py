@@ -10,6 +10,7 @@ from random import randint
 import time
 import string
 import socket
+import datetime
 
 from odoo import api, fields, models, registry
 from odoo.exceptions import UserError, ValidationError
@@ -33,9 +34,17 @@ class VoipVoip(models.Model):
         """ Get all active users so we can place them in the system tray """
 
         user_list = []
-        
-        for voip_user in self.env['res.users'].search([('active','=',True), ('share','=', False), ('id', '!=', self.env.user.id)]):
-            user_list.append({'name': voip_user.name, 'partner_id':voip_user.partner_id.id})
+
+        #This list should only include users that have ever logged in, sort it by last presence that way all the online users are at the top
+        for presence_user in self.env['bus.presence'].search([('user_id','!=',self.env.user.id)], order="last_presence desc"):
+
+            #We kinda just assume if a person hasn't been active for 5 minutes they are AFK, this isn't reliable but is better then nothing
+            if presence_user.last_presence > (datetime.datetime.now() - datetime.timedelta(minutes=5) ).strftime("%Y-%m-%d %H:%M:%S"):
+                status = "Online"
+            else:
+                status = "Offline"
+
+            user_list.append({'name': presence_user.user_id.name, 'partner_id':presence_user.user_id.partner_id.id, 'status': status})        
         
         return user_list
 

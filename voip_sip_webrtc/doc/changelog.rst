@@ -1,3 +1,7 @@
+v1.4.5
+======
+* Odoo presence
+
 v1.4.4
 ======
 * SIP reply
