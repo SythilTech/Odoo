@@ -41,91 +41,6 @@ var got_remote_description = false;
 var userAgent;
 var to_sip;
 
-var VOIPItem = Widget.extend({
-    template:'VoipSystemTray',
-    events: {
-        "click": "on_click",
-        "click .start_voip_audio_call": "start_voip_audio_call",
-        "click .start_voip_video_call": "start_voip_video_call",
-        "click .start_voip_screenshare_call": "start_voip_screenshare_call",
-    },
-    on_click: function (event) {
-        event.preventDefault();
-
-        var model = new Model("voip.server");
-        model.call("user_list", [[]]).then(function(result) {
-
-            $("#voip_tray").html("");
-
-	        for (var voip_user in result) {
-				var voip_user = result[voip_user];
-				var drop_menu_html = "";
-
-				drop_menu_html += "<li>";
-				drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name +  " (" + voip_user.status + ")</a>" + " <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_video_call\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"/> Video Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_audio_call\"><i class=\"fa fa-volume-up\" aria-hidden=\"true\"/> Audio Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_screenshare_call\"><i class=\"fa fa-desktop\" aria-hidden=\"true\"/> Screenshare Call</a>";
-				drop_menu_html += "</li>";
-
-			    $("#voip_tray").append(drop_menu_html);
-
-			}
-
-        });
-
-    },
-    start_voip_screenshare_call: function (event) {
-		console.log("Call Type: screenshare call");
-
-        role = "caller";
-        mode = "screensharing";
-        call_type = "internal";
-        to_partner_id = $(event.currentTarget).data("partner");
-
-        var constraints = {'video': {'mediaSource': "screen"}};
-
-        if (navigator.webkitGetUserMedia) {
-		    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-		} else {
-            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-		}
-
-	},
-    start_voip_audio_call: function (event) {
-		console.log("Call Type: audio call");
-
-        role = "caller";
-        mode = "audiocall";
-        call_type = "internal";
-        to_partner_id = $(event.currentTarget).data("partner");
-		var constraints = {'audio': true};
-
-        if (navigator.webkitGetUserMedia) {
-		    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-		} else {
-            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-		}
-
-	},
-    start_voip_video_call: function (event) {
-		console.log("Call Type: video call");
-
-        role = "caller";
-        mode = "videocall";
-        call_type = "internal";
-        to_partner_id = $(event.currentTarget).data("partner");
-		var constraints = {'audio': true, 'video': true};
-
-        if (navigator.webkitGetUserMedia) {
-		    navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-		} else {
-            window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-		}
-
-	},
-});
-
-SystrayMenu.Items.push(VOIPItem);
-
-
 var peerConnectionConfig = {
     'iceServers': [
         {'urls': 'stun:stun.services.mozilla.com'},
@@ -143,6 +58,80 @@ var localStream;
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 var remoteStream = "";
+
+var VoipCallClient = Widget.extend({
+    init: function (p_role, p_mode, p_call_type, p_to_partner_id) {
+        this.role = p_role;
+        this.mode = p_mode;
+        this.call_type = p_call_type;
+        this.to_partner_id = p_to_partner_id;
+
+        //temp fix since the rest of the code still uses global variables
+        role = p_role;
+        mode = p_mode;
+        call_type = p_call_type;
+        to_partner_id = p_to_partner_id;
+
+    },
+    requestMediaAccess: function (contraints) {
+
+        if (navigator.webkitGetUserMedia) {
+		    navigator.webkitGetUserMedia(contraints, getUserMediaSuccess, getUserMediaError);
+		} else {
+            window.navigator.mediaDevices.getUserMedia(contraints).then(getUserMediaSuccess).catch(getUserMediaError);
+		}
+	},
+    endCall: function () {
+		console.log("End Call");
+	},
+});
+
+function getUserMediaSuccess(stream) {
+    console.log("Got Media Access");
+
+    $(".s-voip-manager").css("opacity","1");
+
+    localVideo = document.querySelector('#localVideo');
+    remoteVideo = document.querySelector('#remoteVideo');
+
+    localStream = stream;
+	localVideo.src = window.URL.createObjectURL(stream);
+
+    window.peerConnection = new RTCPeerConnection(peerConnectionConfig);
+    window.peerConnection.onicecandidate = gotIceCandidate;
+    //window.peerConnection.ontrack = gotRemoteStream;
+    window.peerConnection.onaddstream = gotRemoteStream;
+    window.peerConnection.addStream(localStream);
+
+    if (role == "caller") {
+		if (call_type == "external") {
+		    //Send the sdp now since we need it for the INVITE
+		    window.peerConnection.createOffer().then(createCall).catch(errorHandler);
+	    } else {
+
+            //Avoid sending the SDP data since it will stuff up the SDP answer
+            var model = new Model("voip.server");
+            model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': ''}).then(function(result) {
+                console.log("Notify Callee of incoming phone call");
+            });
+
+		}
+    }
+
+    if (role == "callee") {
+		//Start sending out SDP now since both caller and callee have granted media access
+		console.log("Create SDP Offer");
+		window.peerConnection.createOffer().then(createdDescription).catch(errorHandler);
+	}
+
+
+}
+
+function getUserMediaError(error) {
+    alert("Failed to access to media: " + error);
+};
+
+
 
 WebClient.include({
 
@@ -404,51 +393,6 @@ function processIceQueue() {
     }
 
 }
-
-function getUserMediaSuccess(stream) {
-    console.log("Got Media Access");
-
-    $(".s-voip-manager").css("opacity","1");
-
-    localVideo = document.querySelector('#localVideo');
-    remoteVideo = document.querySelector('#remoteVideo');
-
-    localStream = stream;
-	localVideo.src = window.URL.createObjectURL(stream);
-
-    window.peerConnection = new RTCPeerConnection(peerConnectionConfig);
-    window.peerConnection.onicecandidate = gotIceCandidate;
-    //window.peerConnection.ontrack = gotRemoteStream;
-    window.peerConnection.onaddstream = gotRemoteStream;
-    window.peerConnection.addStream(localStream);
-
-    if (role == "caller") {
-		if (call_type == "external") {
-		    //Send the sdp now since we need it for the INVITE
-		    window.peerConnection.createOffer().then(createCall).catch(errorHandler);
-	    } else {
-
-            //Avoid sending the SDP data since it will stuff up the SDP answer
-            var model = new Model("voip.server");
-            model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': ''}).then(function(result) {
-                console.log("Notify Callee of incoming phone call");
-            });
-
-		}
-    }
-
-    if (role == "callee") {
-		//Start sending out SDP now since both caller and callee have granted media access
-		console.log("Create SDP Offer");
-		window.peerConnection.createOffer().then(createdDescription).catch(errorHandler);
-	}
-
-
-}
-
-function getUserMediaError(error) {
-    alert("Failed to access to media: " + error);
-};
 
 function createCall(description) {
 
@@ -774,5 +718,11 @@ var VoipCallIncomingNotification = Notification.extend({
 
     },
 });
+
+
+return {
+    VoipCallClient: VoipCallClient,
+};
+
 
 });
