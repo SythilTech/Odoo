@@ -484,12 +484,14 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         if (this.get("effective_readonly")) {
 
-            console.log("Get " + this.get("value") + " presence information");
 
-            window.chatSubscription = window.userAgent.subscribe(this.get("value"), 'presence');
+            if (this.get("value")) {
+                console.log("Listening for " + this.get("value") + " presence information");
+                window.chatSubscription = window.userAgent.subscribe(this.get("value"), 'presence');
 
-            //We update the widget once we get presence information so a person doesn't try to call someone who isn't available
-            window.chatSubscription.on('notify', onPresence);
+                //We update the widget once we get presence information so a person doesn't try to call someone who isn't available
+                window.chatSubscription.on('notify', onPresence);
+		    }
 
 		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
         } else {

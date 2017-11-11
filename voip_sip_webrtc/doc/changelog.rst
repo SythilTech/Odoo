@@ -1,3 +1,7 @@
+v1.4.6
+======
+* Fix false SIP presence
+
 v1.4.5
 ======
 * Odoo presence
