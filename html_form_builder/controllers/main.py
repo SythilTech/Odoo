@@ -108,7 +108,7 @@ class HtmlFormController(http.Controller):
         html_output += "  <div class=\"input-group date\">\n"
         html_output += "    <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 
-        if field.setting_general_required is True:
+        if field.setting_general_required == True:
             html_output += " required=\"required\""
 
         html_output += "/>\n"
@@ -147,7 +147,7 @@ class HtmlFormController(http.Controller):
         html_output += "  <div class=\"input-group date\">\n"
         html_output += "    <input type=\"text\" class=\"form-control\" id=\"" + field.html_name.encode("utf-8") + "\" name=\"" + field.html_name.encode("utf-8") + "\""
 
-        if field.setting_general_required is True:
+        if field.setting_general_required == True:
             html_output += " required=\"required\""
 
         html_output += "/>\n"
@@ -475,6 +475,8 @@ class HtmlFormController(http.Controller):
             insert_values['character_limit'] = values['character_limit']
         if 'field_required' in values:
             insert_values['setting_general_required'] = values['field_required']
+        if field_id.required:
+            insert_values['setting_general_required'] = True
         if 'layout_type' in values:
             insert_values['setting_radio_group_layout_type'] = values['layout_type']
         if 'setting_date_format' in values:

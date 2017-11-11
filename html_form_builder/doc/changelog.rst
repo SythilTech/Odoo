@@ -1,3 +1,7 @@
+v1.0.23
+=======
+* Form fields are forced required if they are backend required
+
 v1.0.22
 =======
 * Date field use server date format
