@@ -1,3 +1,7 @@
+v1.0.22
+=======
+* Date field use server date format
+
 v1.0.21
 =======
 * Resolve dropbox malformed external html generation

@@ -6,6 +6,8 @@ import base64
 import json
 import ast
 from odoo.http import request
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+from datetime import datetime
 
 _logger = logging.getLogger(__name__)
 
@@ -589,6 +591,7 @@ class HtmlFormController(http.Controller):
             try:
                 new_record = http.request.env[entity_form.model_id.model].sudo().create(secure_values)
             except Exception as e:
+                _logger.error(str(e))
                 return "Failed to insert record<br/>\n" + str(e)
 
             new_history.record_id = new_record.id
@@ -624,7 +627,7 @@ class HtmlFormController(http.Controller):
         html_response.error = ""
 
         input_group_obj = json.loads(field_data)
-        _logger.error(field_data)
+        
         all_inserts = []
         for row in input_group_obj:
             _logger.error(row)
@@ -693,8 +696,10 @@ class HtmlFormController(http.Controller):
         if field.setting_general_required is True and field_data == "":
             html_response.error = "Field Required"
 
-        html_response.return_data = field_data
-        html_response.history_data = field_data
+        my_date = datetime.strptime(field_data, '%Y-%m-%d')
+
+        html_response.return_data = my_date.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        html_response.history_data = my_date.strftime(DEFAULT_SERVER_DATE_FORMAT)
 
         return html_response
 
