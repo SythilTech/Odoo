@@ -48,6 +48,39 @@ class VoipVoip(models.Model):
         
         return user_list
 
+    def sip_call_notify(self, mode, call_type, aor):
+        """ Create the VOIP call record and notify the callee of the incoming call """
+        
+        #Create the VOIP call now so we can mark it as missed / rejected / accepted
+        voip_call = self.env['voip.call'].create({'type': call_type, 'mode': mode })
+        
+        #Find the caller based on the address of record
+        from_partner = self.env['res.partner'].search([('sip_address','=', aor)])
+
+        if from_partner == False:
+            raise UserError("Could not find SIP partner")
+        
+        #Add the current user is the call owner
+        voip_call.from_partner_id = from_partner.id
+
+        #Add the current user as the to partner
+        voip_call.partner_id = self.env.user.partner_id.id
+
+        #Also add both partners to the client list
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': from_partner.id, 'state':'joined', 'name': from_partner.name})
+        self.env['voip.call.client'].sudo().create({'vc_id':voip_call.id, 'partner_id': self.env.user.partner_id.id, 'state':'invited', 'name': self.env.user.partner_id.name})
+
+        #Ringtone will either the default ringtone or the users ringtone
+        ringtone = "/voip/ringtone/" + str(voip_call.id) + ".mp3"
+        ring_duration = self.env['ir.values'].get_default('voip.settings', 'ring_duration')
+        
+        #Complicated code just to get the display name of the mode...
+        mode_display = dict(self.env['voip.call'].fields_get(allfields=['mode'])['mode']['selection'])[voip_call.mode]
+
+        #Send notification to callee
+        notification = {'voip_call_id': voip_call.id, 'ringtone': ringtone, 'ring_duration': ring_duration, 'from_name': from_partner.name, 'caller_partner_id': from_partner.id, 'direction': 'incoming', 'mode':mode, 'sdp': ''}
+        self.env['bus.bus'].sendone((self._cr.dbname, 'voip.notification', self.env.user.partner_id.id), notification)
+
     def voip_call_notify(self, mode, to_partner_id, call_type, sdp):
         """ Create the VOIP call record and notify the callee of the incoming call """
         

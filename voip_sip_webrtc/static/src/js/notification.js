@@ -148,6 +148,7 @@ WebClient.include({
         model.call("get_user_agent", [[]]).then(function(result) {
 
             if (result.address != '') {
+				console.log("Signing in as " + result.address);
                 window.userAgent = new SIP.UA({
                     uri: result.address,
                     wsServers: [result.wss],
@@ -365,13 +366,21 @@ function onInvite(session) {
 
     $(".s-voip-manager").css("opacity","1");
 
-    session.accept({
-        media: {
-            render: {
-                remote: document.getElementById('remoteVideo'),
-                local: document.getElementById('localVideo')
-            }
-        }
+    window.sip_session = session;
+
+        /* model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': description}).then(function(result) {
+            console.log("Notify Callee of incoming phone call");
+        });*/
+
+
+    mode = "audiocall";
+    call_type = "external";
+
+    var aor = session.remoteIdentity.uri.user + "@" + session.remoteIdentity.uri.host;
+
+    var model = new Model("voip.server");
+    model.call("sip_call_notify", [[]], {'mode': mode, 'call_type': call_type, 'aor': aor}).then(function(result) {
+        console.log("Incoming SIP Call Notify");
     });
 
 }
@@ -472,6 +481,18 @@ function gotRemoteStream(event) {
 
 }
 
+function sipOnError(request) {
+    var cause = request.cause;
+
+    if (cause === SIP.C.causes.REJECTED) {
+        alert("Call was rejected");
+    } else {
+		console.log("SIP Call Error");
+	    console.log(cause);
+	    alert(request.cause);
+	}
+}
+
 var chatSubscription;
 
 var FieldSIP = form_widgets.FieldChar.extend({
@@ -480,7 +501,13 @@ var FieldSIP = form_widgets.FieldChar.extend({
         'click .sip-video': 'start_sip_video',
         'click .sip-message': 'open_sip_messenger',
     },
+    init: function() {
+        this._super.apply(this, arguments);
+        this.clickable = true;
+    },
     render_value: function() {
+        this._super();
+
 
         if (this.get("effective_readonly")) {
 
@@ -493,10 +520,13 @@ var FieldSIP = form_widgets.FieldChar.extend({
                 window.chatSubscription.on('notify', onPresence);
 		    }
 
-		    this.$el.html("" + this.get("value") + " <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
+		    //this.$el.html("<span class=\"o_text_overflow\" style=\"width: 1px !important;min-width: 100%;\">" + this.get("value") + "</span> <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
+		    this.$el.html("<span>" + this.get("value") + "</span> <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
+
         } else {
 			this.$input.val(this.get("value"));
         }
+
     },
     start_sip_call: function() {
 
@@ -508,8 +538,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
         var options = {
             media: {
                 constraints: {
-                    audio: true,
-                    video: false
+                    audio: true
                  },
                 render: {
                     remote: document.getElementById('remoteVideo'),
@@ -518,9 +547,11 @@ var FieldSIP = form_widgets.FieldChar.extend({
             }
         };
 
-        //makes the call
-        window.session = window.userAgent.invite('sip:' + this.get("value"), options);
+        //Make the audio call
+        console.log("SIP audio calling: " + this.get("value"));
+        window.session = window.userAgent.invite(this.get("value"), options);
 
+        window.session.on('failed', sipOnError);
 
     },
     start_sip_video: function() {
@@ -543,9 +574,10 @@ var FieldSIP = form_widgets.FieldChar.extend({
             }
         };
 
-        //makes the call
+        //Make the video call
         window.session = window.userAgent.invite('sip:' + this.get("value"), options);
 
+        window.session.on('failed', sipOnError);
 
     },
     open_sip_messenger: function() {
@@ -566,8 +598,8 @@ core.form_widget_registry.add('sip', FieldSIP)
 
 $(document).on('click', '#voip_end_call', function(){
 
-    if (call_type == "SIP") {
-        window.session.bye();
+    if (call_type == "external") {
+        window.sip_session.bye();
     } else {
         var model = new Model("voip.call");
         model.call("end_call", [[call_id]], {}).then(function(result) {
@@ -673,12 +705,27 @@ var VoipCallIncomingNotification = Notification.extend({
                     constraints = {audio: true};
                 }
 
-                //Ask for media access only if the call is accepted
-                if (navigator.webkitGetUserMedia) {
-					navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
-			    } else {
-                    window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
-			    }
+                console.log(call_type);
+                if (call_type == "external") {
+					console.log("Accept SIP Call");
+
+                    window.sip_session.accept({
+                        media: {
+                            render: {
+                                remote: document.getElementById('remoteVideo'),
+                                local: document.getElementById('localVideo')
+                            }
+                        }
+                    });
+                } else {
+
+                    //Ask for media access only if the call is accepted
+                    if (navigator.webkitGetUserMedia) {
+				        navigator.webkitGetUserMedia(constraints, getUserMediaSuccess, getUserMediaError);
+			        } else {
+                        window.navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess).catch(getUserMediaError);
+			        }
+                }
 
                 this.destroy(true);
             },
