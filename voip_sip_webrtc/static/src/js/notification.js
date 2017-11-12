@@ -360,18 +360,11 @@ function onMessage(message) {
 
 function onInvite(session) {
 
-	alert("Incoming Call");
-
     console.log("Call Type: SIP");
 
     $(".s-voip-manager").css("opacity","1");
 
     window.sip_session = session;
-
-        /* model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': description}).then(function(result) {
-            console.log("Notify Callee of incoming phone call");
-        });*/
-
 
     mode = "audiocall";
     call_type = "external";
@@ -549,9 +542,9 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         //Make the audio call
         console.log("SIP audio calling: " + this.get("value"));
-        window.session = window.userAgent.invite(this.get("value"), options);
+        window.sip_session = window.userAgent.invite(this.get("value"), options);
 
-        window.session.on('failed', sipOnError);
+        window.sip_session.on('failed', sipOnError);
 
     },
     start_sip_video: function() {
@@ -575,9 +568,9 @@ var FieldSIP = form_widgets.FieldChar.extend({
         };
 
         //Make the video call
-        window.session = window.userAgent.invite('sip:' + this.get("value"), options);
+        window.sip_session = window.userAgent.invite('sip:' + this.get("value"), options);
 
-        window.session.on('failed', sipOnError);
+        window.sip_session.on('failed', sipOnError);
 
     },
     open_sip_messenger: function() {
@@ -709,14 +702,22 @@ var VoipCallIncomingNotification = Notification.extend({
                 if (call_type == "external") {
 					console.log("Accept SIP Call");
 
+					console.log(window.sip_session);
+
                     window.sip_session.accept({
                         media: {
+							constraints: {
+							    audio: true
+                            },
                             render: {
                                 remote: document.getElementById('remoteVideo'),
                                 local: document.getElementById('localVideo')
                             }
                         }
                     });
+
+                    window.sip_session.on('failed', sipOnError);
+
                 } else {
 
                     //Ask for media access only if the call is accepted
