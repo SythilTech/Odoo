@@ -9,6 +9,7 @@
       	        <group>
       	            <field name="type" invisible="True"/>
       	            <field name="partner_id" invisible="True"/>
+                    <field name="sip_account_id"/>
       	            <field name="message"/>
       	        </group>
                 <footer>

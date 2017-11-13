@@ -1,3 +1,7 @@
+v1.5.0
+======
+* SIP messaging via python and compose window
+
 v1.4.6
 ======
 * Fix false SIP presence

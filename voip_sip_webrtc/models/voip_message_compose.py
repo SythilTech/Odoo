@@ -5,6 +5,7 @@ import logging
 _logger = logging.getLogger(__name__)
 from lxml import etree
 import re
+from odoo.exceptions import UserError
 
 from openerp import api, fields, models
 
@@ -13,7 +14,11 @@ class VoipMessageCompose(models.TransientModel):
     _name = "voip.message.compose"
 
     type = fields.Char(string="Message Type")
-    partner_id = fields.Many2one('res.partner', string="Partner")
+    sip_account_id = fields.Many2one('voip.account', string="SIP Account")
+    partner_id = fields.Many2one('res.partner', string="Partner (Old)")
+    model = fields.Char(string="Model")
+    record_id = fields.Integer(string="Record ID")
+    to_address = fields.Char(string="To Address")
     message = fields.Text(string="Message")
 
     def xmpp_listener(self, to_address):
@@ -68,3 +73,11 @@ class VoipMessageCompose(models.TransientModel):
             raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 
         action()
+        
+    def _send_sip_message(self):
+        _logger.error("Send SIP Message")
+        if self.sip_account_id.send_simple_message(self.to_address, self.message, model=self.model, record_id=self.record_id):
+            _logger.error("SIP Message Sent")
+        else:
+            _logger.error("SIP Message Failure")
+            raise UserError("Failed to send SIP message")

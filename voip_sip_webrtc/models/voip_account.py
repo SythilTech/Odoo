@@ -43,7 +43,7 @@ class VoipAccount(models.Model):
         message_body = "tes"
         self.send_simple_message(to_address, message_body)
 
-    def send_simple_message(self, to_address, message_body):
+    def send_simple_message(self, to_address, message_body, model=False, record_id=False):
   
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 
@@ -69,6 +69,8 @@ class VoipAccount(models.Model):
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sipsocket.bind(('', port));
         
+
+        
         #Wait and send back the auth reply
         stage = "WAITING"
         while stage == "WAITING":
@@ -77,45 +79,55 @@ class VoipAccount(models.Model):
         
             data, addr = sipsocket.recvfrom(2048)
 
-            #TODO wait for SIP 200 OK
-            stage = "SENT"
+            #Send auth response if challenged
             _logger.error(data)
-
-            authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
-                        
-            realm = re.findall(r'realm="(.*?)"', authheader)[0]
-            method = "MESSAGE"
-            uri = "sip:" + to_address
-            nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-            qop = re.findall(r'qop="(.*?)"', authheader)[0]
-            nc = "00000001"
-            cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
-
-            #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
-            A1 = self.auth_username + ":" + realm + ":" + self.password
-            A2 = method + ":" + uri
-            response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
-
-            reply = ""
-            reply += "MESSAGE sip:" + self.domain + " SIP/2.0\r\n"
-            reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + "\r\n"
-            reply += "Max-Forwards: 70\r\n"
-            reply += 'To: "' + self.env.user.partner_id.name + '"<sip:' + to_address + ">;messagetype=IM\r\n"
-            reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
-            reply += "Call-ID: 86895YTZlZGM3MzFkZTk4MzA2NGE0NjU3ZGExNmU5NTE1ZDM\r\n"
-            reply += "CSeq: 2 MESSAGE\r\n"
-            reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-            reply += "Content-Type: text/html\r\n"
-            reply += 'Proxy-Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
-            reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
-            reply += "Content-Length: " + str(len(message_body)) + "\r\n"
-            reply += "\r\n"
-            reply += message_body
+            if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required":
             
-            _logger.error(reply)
+                authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
+                        
+                realm = re.findall(r'realm="(.*?)"', authheader)[0]
+                method = "MESSAGE"
+                uri = "sip:" + to_address
+                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
+                qop = re.findall(r'qop="(.*?)"', authheader)[0]
+                nc = "00000001"
+                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
 
-            sipsocket.sendto(reply, addr)
-        
+                #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
+                A1 = self.auth_username + ":" + realm + ":" + self.password
+                A2 = method + ":" + uri
+                response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
+
+                reply = ""
+                reply += "MESSAGE sip:" + self.domain + " SIP/2.0\r\n"
+                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + "\r\n"
+                reply += "Max-Forwards: 70\r\n"
+                reply += 'To: "' + self.env.user.partner_id.name + '"<sip:' + to_address + ">;messagetype=IM\r\n"
+                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+                reply += "Call-ID: 86895YTZlZGM3MzFkZTk4MzA2NGE0NjU3ZGExNmU5NTE1ZDM\r\n"
+                reply += "CSeq: 2 MESSAGE\r\n"
+                reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+                reply += "Content-Type: text/html\r\n"
+                reply += 'Proxy-Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                reply += "Content-Length: " + str(len(message_body)) + "\r\n"
+                reply += "\r\n"
+                reply += message_body
+            
+                sipsocket.sendto(reply, addr)
+            elif data.split("\r\n")[0] == "SIP/2.0 404 Not Found":
+                stage = "FAILURE"
+                return False
+            elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
+                stage = "SENT"
+                
+                if model:
+                    #Add to the chatter
+                    #TODO add SIP subtype
+                    self.env[model].browse( int(record_id) ).message_post(body=message_body, subject="SIP Message Sent", message_type="comment")
+
+                return True
+                
     def send_register(self):
   
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')

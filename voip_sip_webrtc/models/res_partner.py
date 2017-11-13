@@ -22,3 +22,19 @@ class ResPartnerVoip(models.Model):
                     self.mobile = self.country_id.mobile_prefix + self.mobile.replace(" ","")
             else:
                 self.mobile = self.mobile.replace(" ","")
+                
+    @api.multi
+    def sip_action(self):
+        self.ensure_one()
+        
+        default_voip_account = self.env['voip.account'].search([])[0]
+                
+        return {
+            'name': 'SIP Compose',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'voip.message.compose',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'context': {'default_type': 'sip', 'default_sip_account_id': default_voip_account.id, 'default_model':'res.partner', 'default_record_id':self.id, 'default_to_address': self.sip_address}
+         }
