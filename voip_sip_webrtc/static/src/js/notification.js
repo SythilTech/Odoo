@@ -366,6 +366,8 @@ function onInvite(session) {
 
     window.sip_session = session;
 
+
+
     mode = "audiocall";
     call_type = "external";
 
@@ -585,8 +587,55 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
 });
 
+var FieldSIPPSTN = form_widgets.FieldChar.extend({
+    events: {
+        'click .sip-pstn-call': 'start_pstn_call',
+    },
+    init: function() {
+        this._super.apply(this, arguments);
+        this.clickable = true;
+    },
+    render_value: function() {
+        this._super();
+
+
+        if (this.get("effective_readonly")) {
+		    this.$el.html("<span>" + this.get("value") + "</span> <i class=\"fa fa-phone sip-pstn-call\" aria-hidden=\"true\"></i>");
+        } else {
+			this.$input.val(this.get("value"));
+        }
+
+    },
+    start_pstn_call: function() {
+
+        console.log("Call Type: PSTN");
+
+        $(".s-voip-manager").css("opacity","1");
+
+        //here you determine whether the call has video and audio
+        var options = {
+            media: {
+                constraints: {
+                    audio: true
+                 },
+                render: {
+                    remote: document.getElementById('remoteVideo'),
+                    local: document.getElementById('localVideo')
+                }
+            }
+        };
+
+        //Make the audio call
+        console.log("PSTN audio calling: " + this.get("value"));
+        window.sip_session = window.userAgent.invite(this.get("value"), options);
+
+        window.sip_session.on('failed', sipOnError);
+
+    }
+});
 
 core.form_widget_registry.add('sip', FieldSIP)
+core.form_widget_registry.add('sippstn', FieldSIPPSTN)
 
 
 $(document).on('click', '#voip_end_call', function(){
@@ -717,6 +766,7 @@ var VoipCallIncomingNotification = Notification.extend({
                     });
 
                     window.sip_session.on('failed', sipOnError);
+                    window.sip_session.on('bye', resetCall);
 
                 } else {
 

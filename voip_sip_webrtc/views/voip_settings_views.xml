@@ -14,9 +14,9 @@
                 <group>
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
-                    <!--<field name="message_bank_duration"/>
+                    <!--<field name="message_bank_duration"/>-->
                     <field name="server_ip"/>
-                    <field name="cert_path"/>
+                    <!--<field name="cert_path"/>
                     <field name="key_path"/>
                     <field name="fingerprint"/>-->
                 </group>

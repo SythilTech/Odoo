@@ -8,6 +8,7 @@
       	    <form>
       	        <header>
       	            <!--<button name="send_register" type="object" string="Send Register"/>-->
+      	            <button name="test_simple_message" type="object" string="Test SIMPLE Message"/>
       	        </header>
       	        <group>
       	            <field name="address"/>
@@ -16,7 +17,7 @@
       	            <field name="username"/>
       	            <field name="domain"/>
       	            <field name="wss"/>
-      	            <!--<field name="outbound_proxy"/>-->
+      	            <field name="outbound_proxy"/>
                     <!--<field name="verified"/>-->
       	        </group>
       	    </form>

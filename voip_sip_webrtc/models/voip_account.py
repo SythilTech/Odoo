@@ -8,6 +8,7 @@ import re
 import hashlib
 import random
 from openerp import api, fields, models
+import threading
 
 class VoipAccount(models.Model):
 
@@ -30,6 +31,90 @@ class VoipAccount(models.Model):
             if "@" in self.address:
                 self.username = self.address.split("@")[0]
                 self.domain = self.address.split("@")[1]
+
+    def H(self, data):
+        return hashlib.md5(data).hexdigest()
+
+    def KD(self, secret, data):
+        return self.H(secret + ":" + data)
+
+    def test_simple_message(self):
+        to_address = "stevewright2009@sythiltech.onsip.com"
+        message_body = "tes"
+        self.send_simple_message(to_address, message_body)
+
+    def send_simple_message(self, to_address, message_body):
+  
+        local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
+
+        port = 8071
+
+        message_string = ""
+        message_string += "MESSAGE sip:" + self.domain + " SIP/2.0\r\n"
+        message_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + "\r\n"
+        message_string += "Max-Forwards: 70\r\n"
+        message_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + to_address + ">;messagetype=IM\r\n"
+        message_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+        message_string += "Call-ID: 86895YTZlZGM3MzFkZTk4MzA2NGE0NjU3ZGExNmU5NTE1ZDM\r\n"
+        message_string += "CSeq: 1 MESSAGE\r\n"
+        message_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+        message_string += "Content-Type: text/html\r\n"
+        message_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+        message_string += "Content-Length: " + str(len(message_body)) + "\r\n"
+        message_string += "\r\n"
+        message_string += message_body
+
+        _logger.error("MESSAGE: " + message_string)
+        
+        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sipsocket.bind(('', port));
+        
+        #Wait and send back the auth reply
+        stage = "WAITING"
+        while stage == "WAITING":
+
+            sipsocket.sendto(message_string, (self.outbound_proxy, 5060) )
+        
+            data, addr = sipsocket.recvfrom(2048)
+
+            #TODO wait for SIP 200 OK
+            stage = "SENT"
+            _logger.error(data)
+
+            authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
+                        
+            realm = re.findall(r'realm="(.*?)"', authheader)[0]
+            method = "MESSAGE"
+            uri = "sip:" + to_address
+            nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
+            qop = re.findall(r'qop="(.*?)"', authheader)[0]
+            nc = "00000001"
+            cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
+
+            #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
+            A1 = self.auth_username + ":" + realm + ":" + self.password
+            A2 = method + ":" + uri
+            response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
+
+            reply = ""
+            reply += "MESSAGE sip:" + self.domain + " SIP/2.0\r\n"
+            reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + "\r\n"
+            reply += "Max-Forwards: 70\r\n"
+            reply += 'To: "' + self.env.user.partner_id.name + '"<sip:' + to_address + ">;messagetype=IM\r\n"
+            reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+            reply += "Call-ID: 86895YTZlZGM3MzFkZTk4MzA2NGE0NjU3ZGExNmU5NTE1ZDM\r\n"
+            reply += "CSeq: 2 MESSAGE\r\n"
+            reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+            reply += "Content-Type: text/html\r\n"
+            reply += 'Proxy-Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+            reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+            reply += "Content-Length: " + str(len(message_body)) + "\r\n"
+            reply += "\r\n"
+            reply += message_body
+            
+            _logger.error(reply)
+
+            sipsocket.sendto(reply, addr)
         
     def send_register(self):
   
