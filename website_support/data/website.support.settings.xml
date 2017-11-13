@@ -13,6 +13,14 @@
         <function id="default_staff_reply_email_template_id"
             model="ir.values" name="set_default"
             eval="('website.support.settings', 'staff_reply_email_template_id', ref('website_support.support_ticket_reply_wrapper_support') )"/>
-    
+
+        <function id="default_max_ticket_attachments"
+            model="ir.values" name="set_default"
+            eval="('website.support.settings', 'max_ticket_attachments', 2 )"/>
+
+        <function id="default_max_ticket_attachment_filesize"
+            model="ir.values" name="set_default"
+            eval="('website.support.settings', 'max_ticket_attachment_filesize', 500 )"/>
+
     </data>     
 </odoo>

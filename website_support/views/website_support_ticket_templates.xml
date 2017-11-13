@@ -559,7 +559,23 @@ $(document).ready(function() {
 
                     update_sub_categories()
 
-                });
+               });
+
+
+               $('#file').change(function(){
+                   if(this.files.length > <t t-esc="setting_max_ticket_attachments"/>) {
+                       alert("You can only upload " + <t t-esc="setting_max_ticket_attachments"/> + " files");
+                   }
+
+                   for (var x in this.files) {
+                       if (this.files[x].size / 1024 > <t t-esc="setting_max_ticket_attachment_filesize"/>) {
+                           alert(this.files[x].name + " exceeds the " + <t t-esc="setting_max_ticket_attachment_filesize"/> + "KB file size limit");
+                           $('#file').val('');
+                       }
+                   }
+                   
+               });
+
             });
 
             function update_sub_categories() {
@@ -569,6 +585,7 @@ $(document).ready(function() {
                 }});
             
             }
+
 
             </script>
 
@@ -592,9 +609,9 @@ $(document).ready(function() {
 	        </div>
             </div>
             <div name="file_container" t-attf-class="form-group #{error and 'file' in error and 'has-error' or ''}">
-                <label class="col-md-3 col-sm-4 control-label" for="file">Add Attachment</label>
+                <label class="col-md-3 col-sm-4 control-label" for="file">Add Attachments</label>
 	        <div class="col-md-7 col-sm-8">
-                    <div class="btn btn-default btn-file col-md-12"><input name="file" type="file" /></div>
+                    <div class="btn btn-default btn-file col-md-12"><input name="file" id="file" type="file" multiple="multiple"/></div>
                 </div>
             </div>
             <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">

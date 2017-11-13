@@ -86,8 +86,20 @@ class SupportTicketController(http.Controller):
         person_name = ""
         if http.request.env.user.name != "Public user":
             person_name = http.request.env.user.name
+
+        setting_max_ticket_attachments = request.env['ir.values'].get_default('website.support.settings', 'max_ticket_attachments')
+        
+        if setting_max_ticket_attachments == 0:
+            #Back compatablity
+            setting_max_ticket_attachments = 2
+ 
+        setting_max_ticket_attachment_filesize = request.env['ir.values'].get_default('website.support.settings', 'max_ticket_attachment_filesize')
+
+        if setting_max_ticket_attachment_filesize == 0:
+            #Back compatablity
+            setting_max_ticket_attachment_filesize = 500
             
-        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email})
+        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize})
 
     @http.route('/support/feedback/process/<help_page>', type="http", auth="public", website=True)
     def support_feedback(self, help_page, **kw):
@@ -140,6 +152,7 @@ class SupportTicketController(http.Controller):
         my_attachment = ""
         file_name = ""
         if 'file' in values:
+            #Back compatablity for single attachment
             my_attachment = base64.encodestring(values['file'].read() )
             file_name = values['file'].filename
             file_extension = os.path.splitext(file_name)[1]
@@ -170,6 +183,21 @@ class SupportTicketController(http.Controller):
             else:
                 portal_access_key = randint(1000000000,2000000000)
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
+
+        if 'file' in values:
+            try:
+                for c_file in request.httprequest.files.getlist('file'):
+                    data = c_file.read()
+
+                    request.env['ir.attachment'].create({
+                        'name': c_file.filename,
+                        'datas': data.encode('base64'),
+                        'datas_fname': c_file.filename,
+                        'res_model': 'website.support.ticket',
+                        'res_id': new_ticket_id.id
+                    })
+            except Exception, e:
+                logger.exception("Failed to upload image to attachment")
 
         return werkzeug.utils.redirect("/support/ticket/thanks")
         

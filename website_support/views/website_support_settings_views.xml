@@ -15,6 +15,8 @@
                     <field name="change_user_email_template_id" context="{'default_model':'website.support.ticket'}"/>
                     <field name="staff_reply_email_template_id" context="{'default_model':'website.support.ticket.compose'}"/>
                     <field name="email_default_category_id"/>
+                    <field name="max_ticket_attachments"/>
+                    <field name="max_ticket_attachment_filesize"/>
                 </group>
       	    </form>
         </field>

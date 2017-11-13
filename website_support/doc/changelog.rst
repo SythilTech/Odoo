@@ -1,3 +1,7 @@
+v1.4.13
+=======
+* Add multiple attachments to support tickets + settings to limit quantity and filesize
+
 v1.4.12
 =======
 * Close wizard using python window action

@@ -16,7 +16,9 @@ class WebsiteSupportSettings(models.Model):
     change_user_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Change User Email Template")
     staff_reply_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket.compose')]", string="Staff Reply Email Template")
     email_default_category_id = fields.Many2one('website.support.ticket.categories', string="Email Default Category")
-
+    max_ticket_attachments = fields.Integer(string="Max Ticket Attachments")
+    max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
+    
     #-----Change User Email Template-----
 
     @api.multi
@@ -60,3 +62,25 @@ class WebsiteSupportSettings(models.Model):
     def set_default_staff_reply_email_template_id(self):
         for record in self:
             self.env['ir.values'].set_default('website.support.settings', 'staff_reply_email_template_id', record.staff_reply_email_template_id.id)
+
+    #-----Max Ticket Attachments-----
+
+    @api.multi
+    def get_default_max_ticket_attachments(self, fields):
+        return {'max_ticket_attachments': self.env['ir.values'].get_default('website.support.settings', 'max_ticket_attachments')}
+
+    @api.multi
+    def set_default_max_ticket_attachments(self):
+        for record in self:
+            self.env['ir.values'].set_default('website.support.settings', 'max_ticket_attachments', record.max_ticket_attachments)
+
+    #-----Max Ticket Attachment Filesize-----
+
+    @api.multi
+    def get_default_max_ticket_attachment_filesize(self, fields):
+        return {'max_ticket_attachment_filesize': self.env['ir.values'].get_default('website.support.settings', 'max_ticket_attachment_filesize')}
+
+    @api.multi
+    def set_default_max_ticket_attachment_filesize(self):
+        for record in self:
+            self.env['ir.values'].set_default('website.support.settings', 'max_ticket_attachment_filesize', record.max_ticket_attachment_filesize)

@@ -26,6 +26,11 @@
           	          <field name="subject"/>
           	          <field name="attachment" filename="attachment_filename"/>
           	          <field name="attachment_filename" invisible="True"/>
+                          <field name="attachment_ids">
+                              <tree>
+                                  <field name="datas_fname"/>
+                              </tree>
+                          </field>
           	          <field name="description" widget="html"/>
           	          <field name="support_rating"/>
           	          <field name="support_comment"/>

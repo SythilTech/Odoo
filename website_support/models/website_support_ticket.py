@@ -45,6 +45,7 @@ class WebsiteSupportTicket(models.Model):
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
+    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')], string="Media Attachments")
     unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
     ticket_number = fields.Integer(string="Ticket Number")
