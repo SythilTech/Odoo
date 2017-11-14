@@ -1,3 +1,7 @@
+v1.4.14
+=======
+* Hidden create user field
+
 v1.4.13
 =======
 * Add multiple attachments to support tickets + settings to limit quantity and filesize

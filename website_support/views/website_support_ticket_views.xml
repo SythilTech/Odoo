@@ -14,6 +14,7 @@
                   </header>
       	          <sheet>  
       	              <group>
+      	                  <field name="create_user_id" invisble="True"/>
       	                  <field name="ticket_number"/>
       	                  <field name="priority_id"/>
       	                  <field name="user_id"/>
@@ -56,6 +57,7 @@
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
       	      <tree colors="black:ticket_color==False">
+      	          <field name="create_user_id" invisble="True"/>
       	          <field name="ticket_color" invisible="1"/>
       	          <field name="ticket_number_display" string="Ticket Number"/>
       	          <field name="priority_id"/>
@@ -106,7 +108,7 @@
           <field name="name">Support Tickets</field>
 	  <field name="res_model">website.support.ticket</field>
 	  <field name="view_mode">tree,form,graph</field>
-	  <field name="context">{"search_default_unattended_tickets":1, 'auto_refresh': 1}</field>
+	  <field name="context">{"search_default_unattended_tickets":1, 'auto_refresh': 1, 'default_create_user_id': uid}</field>
 	  <field name="help" type="html">
 	      <p>
 	          No Support Tickets found
