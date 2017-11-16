@@ -7,7 +7,7 @@
           <field name="model">account.analytic.line</field>
           <field name="priority" eval="50"/>
           <field name="arch" type="xml">
-              <tree>
+              <tree create="false">
                     <field name="date"/>
                     <field name="user_id"/>
                     <field name="name"/>

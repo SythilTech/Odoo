@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Disable create button for analytic line
+
 v1.0.5
 ======
 * Push support ticket fields into timesheet tree view
