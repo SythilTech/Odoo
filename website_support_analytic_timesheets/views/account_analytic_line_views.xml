@@ -10,6 +10,7 @@
               <tree create="false">
                     <field name="date"/>
                     <field name="user_id"/>
+                    <field name="person_name"/>
                     <field name="name"/>
                     <field name="project_id"/>
                     <field name="ticket_number_display"/>

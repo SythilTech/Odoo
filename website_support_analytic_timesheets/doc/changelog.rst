@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Add customer name field
+
 v1.0.6
 ======
 * Disable create button for analytic line
