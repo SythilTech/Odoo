@@ -50,7 +50,7 @@ class SmsGatewayTwilio(models.Model):
 	    
             
         #send the sms/mms
-        payload = {'From': str(format_from), 'To': str(format_to), 'Body': sms_content.encode('utf-8'), 'StatusCallback': base_url + "/sms/twilio/receipt"}
+        payload = {'From': format_from.encode('utf-8'), 'To': format_to.encode('utf-8'), 'Body': sms_content.encode('utf-8'), 'StatusCallback': base_url + "/sms/twilio/receipt"}
 
         if queued_sms_message:
             for mms_attachment in queued_sms_message.attachment_ids:

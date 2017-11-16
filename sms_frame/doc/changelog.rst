@@ -1,3 +1,7 @@
+v1.0.23
+=======
+* Fix from / to character encoding issue
+
 v1.0.22
 =======
 * Send SMS template code changed to better support MMS(Again)
