@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
       	    <form>
       	        <header>
-      	            <!--<button name="send_register" type="object" string="Send Register"/>-->
-      	            <button name="test_simple_message" type="object" string="Test SIMPLE Message"/>
+      	            <button name="send_register" type="object" string="Send Register"/>
+      	            <button name="test_sip_call" type="object" string="Test SIP Call"/>
       	        </header>
       	        <group>
       	            <field name="address"/>
