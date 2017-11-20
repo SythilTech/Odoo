@@ -42,30 +42,78 @@ class VoipAccount(models.Model):
 
     def rtp_server_listener(self, port):
         
-        
         try:
-            _logger.error("Start RTP Listen 1")
 
-            stunsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            stunsocket.bind(('', port));
+            _logger.error("Start RTP Listening on Port " + str(port) )
+                
+            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            rtpsocket.bind(('', port));
 
-            _logger.error("Start RTP Listen 2")
-            
-            stage = "Connect"
-            while stage == "Connect":
+            d = ['FF']            
+            stage = "LISTEN"
+            hex_string = ""
+            joined_payload = ""
+            while stage == "LISTEN":
 
-                _logger.error("Start RTP Listening on Port " + str(port) )
-        
-                data, addr = stunsocket.recvfrom(2048)
-            
-                _logger.error("RTP DATA:" + data)
-            
-                stage = "END"
-                _logger.error("END RTP Listen")
 
-            #Send stream setup by SDP
-            
+                rtpsocket.settimeout(5)
+                data, addr = rtpsocket.recvfrom(2048)
+
+                if data == False:
+                    stage = "END"
+                    break
+
+                #Convert to hex so we can human interpret each byte
+                for rtp_char in data:
+                    hex_format = "{0:02x}".format(ord(rtp_char))
+                    d.append(hex_format)
+                    hex_string += hex_format + " "
+ 
+                #--- We need to extract certain pieces of information from the packet----
+                #Always G722 (9), will have to add support for additional codex
+                payload_type = 9
+
+                sequence_number = int( d[3] + d[4], 16)
+
+                timestamp = int( d[5] + d[6] + d[7] + d[8], 32)
+
+                synchronization_source_identifier = int( d[9] + d[10] + d[11] + d[12], 32)
+
+                payload = ' '.join(d[13:])
+                joined_payload += payload + " "
+
+                #rtp_data = ""
+
+                #---- Compose RTP packet to send back (TODO) ---
+                #10.. .... = Version: RFC 1889 Version (2)
+                #..0. .... = Padding: False
+                #...0 .... = Extension: False
+                #.... 0000 = Contributing source identifiers count: 0
+                #rtp_data += "80"
+
+                #1... .... = Marker: True
+                #Payload type: ITU-T G.722 (9)
+                #rtp_data += " 89"
+
+                #Sequence number: 29161
+                #rtp_data += " 71 e9"
+
+                #Timestamp: 1152425936
+                #rtp_data += " 44 b0 9f d0"
+
+                #Synchronization Source identifier: 0x1222763d (304248381)
+                #rtp_data += " 12 22 76 3d"
+
+                #Payload:
+                #rtp_data += " fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa f7 f7 f7 f7 f7 f7 f7 f8 f7 fa f7 f8 f8 fa fa f7 f7 f8 f7 fa f8 f7 fa f8 f7 fa f7 f8 f8 fa db f0 f8 f8 f8 f8 fa 58 f1 ba 78 9e b3 9c b8 b8 f8 f1 5c f1 da b2 52 b2 5b b3 fb fa e7 cd b8 d8 55 2a b9 db b9 70 dc 9b da d7 ee 32 9c fa 58 ad 14 9b 7b 56 ea 5b ba 7c ff db b6 78 dc 7a d9 d8 ec de 78 f6 29 88 0d a4 a0 04 04 ad 36 5d 30 b1 0b b8 a3 04 bf 3b"
+
         except Exception as e:
+            #_logger.error(joined_payload)
+            _logger.error("Write payload to file")
+            f = open('/odoo/mycall.raw', 'w')
+            f.write( joined_payload.replace(" ","").decode('hex') )
+            f.close()
+
             _logger.error(e)
 
 
