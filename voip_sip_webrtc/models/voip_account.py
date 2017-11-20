@@ -49,39 +49,49 @@ class VoipAccount(models.Model):
             rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             rtpsocket.bind(('', port));
 
-            d = ['FF']            
             stage = "LISTEN"
             hex_string = ""
             joined_payload = ""
+            packet_count = 0
             while stage == "LISTEN":
 
 
-                rtpsocket.settimeout(5)
+                rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
-
-                if data == False:
-                    stage = "END"
-                    break
+                
+                d = ['FF']
+                #TODO make loop stop when BYE is received on other port
 
                 #Convert to hex so we can human interpret each byte
                 for rtp_char in data:
                     hex_format = "{0:02x}".format(ord(rtp_char))
                     d.append(hex_format)
-                    hex_string += hex_format + " "
- 
-                #--- We need to extract certain pieces of information from the packet----
-                #Always G722 (9), will have to add support for additional codex
-                payload_type = 9
-
-                sequence_number = int( d[3] + d[4], 16)
-
-                timestamp = int( d[5] + d[6] + d[7] + d[8], 32)
-
-                synchronization_source_identifier = int( d[9] + d[10] + d[11] + d[12], 32)
 
                 payload = ' '.join(d[13:])
                 joined_payload += payload + " "
+                packet_count += 1
+                
+                #only inspect every 100th packet otherwise we would flood the log file
+                if packet_count % 100 == 0:
+                    payload_type = int(d[2])
+                    _logger.error("payload type: " + str(payload_type) )
+                
+                    sequence_number = int( d[3] + d[4], 16)
+                    _logger.error("sequence number: " + str(sequence_number) )
+                    
+                    timestamp = int( d[5] + d[6] + d[7] + d[8], 32)
+                    _logger.error("timestamp: " + str(timestamp) )
+                    
+                    synchronization_source_identifier = int( d[9] + d[10] + d[11] + d[12], 32)
 
+                    _logger.error("synchronization source identifier: " + str(synchronization_source_identifier) )
+                    _logger.error("payload length: " + str(len(payload)) )
+                    _logger.error("payload: " + str(payload) )
+
+                #For testing we only need a small amount of data
+                if packet_count > 300:
+                    break
+                
                 #rtp_data = ""
 
                 #---- Compose RTP packet to send back (TODO) ---
@@ -108,14 +118,17 @@ class VoipAccount(models.Model):
                 #rtp_data += " fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa f7 f7 f7 f7 f7 f7 f7 f8 f7 fa f7 f8 f8 fa fa f7 f7 f8 f7 fa f8 f7 fa f8 f7 fa f7 f8 f8 fa db f0 f8 f8 f8 f8 fa 58 f1 ba 78 9e b3 9c b8 b8 f8 f1 5c f1 da b2 52 b2 5b b3 fb fa e7 cd b8 d8 55 2a b9 db b9 70 dc 9b da d7 ee 32 9c fa 58 ad 14 9b 7b 56 ea 5b ba 7c ff db b6 78 dc 7a d9 d8 ec de 78 f6 29 88 0d a4 a0 04 04 ad 36 5d 30 b1 0b b8 a3 04 bf 3b"
 
         except Exception as e:
-            #_logger.error(joined_payload)
-            _logger.error("Write payload to file")
-            f = open('/odoo/mycall.raw', 'w')
-            f.write( joined_payload.replace(" ","").decode('hex') )
-            f.close()
-
             _logger.error(e)
 
+        try:
+            _logger.error("packet count: " + str(packet_count) )
+            _logger.error("payload length: " + str(len(joined_payload)) )
+            _logger.error("Write payload to file")
+            f = open('/odoo/mygsmcall.raw', 'w')
+            f.write( joined_payload.replace(" ","").decode('hex') )
+            f.close()
+        except Exception as e:
+            _logger.error(e)
 
     def test_sip_call(self):
 
@@ -158,14 +171,14 @@ class VoipAccount(models.Model):
         #Two way call because later we may use voice reconisation to control assistant menus        
         sdp += "a=sendrecv\r\n"
 
-        #Hack just use X-Lite SDp
+        #Hack just use X-Lite SDP (GSM)
         sdp = ""
         sdp += "v=0\r\n"
         sdp += "o=- " + str(sess_id) + " 1 IN IP4 " + local_ip + "\r\n"
         sdp += "s=X-Lite release 5.0.1 stamp 86895\r\n"
         sdp += "c=IN IP4 " + local_ip + "\r\n"
         sdp += "t=0 0\r\n"
-        sdp += "m=audio " + str(media_port) + " RTP/AVP 9 8 101\r\n"
+        sdp += "m=audio " + str(media_port) + " RTP/AVP 3 101\r\n"
         sdp += "a=rtpmap:101 telephone-event/8000\r\n"
         sdp += "a=fmtp:101 0-15\r\n"
         sdp += "a=sendrecv\r\n"
