@@ -1,3 +1,7 @@
+v1.0.8
+======
+* Task fields in tree view
+
 v1.0.7
 ======
 * Add customer name field

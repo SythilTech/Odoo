@@ -8,6 +8,7 @@
       	      <form>
       	          <group>
       	              <field name="name"/>
+      	              <field name="mail_template_id"/>
       	          </group>
       	      </form>
       	  </field>
@@ -19,6 +20,7 @@
           <field name="arch" type="xml">
       	      <tree>
       	          <field name="name"/>
+      	          <field name="mail_template_id"/>
       	      </tree>
       	  </field>
       </record>

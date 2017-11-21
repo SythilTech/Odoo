@@ -1,3 +1,7 @@
+v1.4.15
+=======
+* Mail template field
+
 v1.4.14
 =======
 * Hidden create user field

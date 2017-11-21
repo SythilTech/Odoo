@@ -257,6 +257,7 @@ class WebsiteSupportTicketStates(models.Model):
     _name = "website.support.ticket.states"
     
     name = fields.Char(required=True, translate=True, string='State Name')
+    mail_template_id = fields.Many2one('mail.template', string="Mail Template")
 
 class WebsiteSupportTicketPriority(models.Model):
 
