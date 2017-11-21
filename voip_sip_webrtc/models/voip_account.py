@@ -12,6 +12,11 @@ import threading
 import time
 import struct
 
+try:
+    from pydub import AudioSegment
+except Exception as e:
+    _logger.error(e)
+            
 class VoipAccount(models.Model):
 
     _name = "voip.account"
@@ -130,6 +135,15 @@ class VoipAccount(models.Model):
         except Exception as e:
             _logger.error(e)
 
+    def test_audio_transcode(self):
+        try:
+            #seg = AudioSegment.from_raw("/odoo/mygsmcall.raw", sample_width=1, frame_rate=8000, channels=1)
+            seg = AudioSegment.from_file("/odoo/mygsmcall.raw", "raw", "GSM", sample_width=1, frame_rate=8000, channels=1)
+            seg.export("/odoo/export.wav", format="wav")
+            _logger.error("Export Complete")
+        except Exception as e:
+            _logger.error(e)
+    
     def test_sip_call(self):
 
         port = random.randint(6000,7000)
