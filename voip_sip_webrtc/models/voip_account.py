@@ -14,6 +14,7 @@ from openerp import api, fields, models
 import threading
 import time
 import struct
+import base64
 
 try:
     from pydub import AudioSegment
@@ -132,7 +133,7 @@ class VoipAccount(models.Model):
             _logger.error("packet count: " + str(packet_count) )
             _logger.error("payload length: " + str(len(joined_payload)) )
             _logger.error("Write payload to file")
-            f = open('/odoo/mygsmcall.raw', 'w')
+            f = open('/odoo/mygsmcall.gsm', 'w')
             f.write( joined_payload.replace(" ","").decode('hex') )
             f.close()
         except Exception as e:
@@ -141,11 +142,25 @@ class VoipAccount(models.Model):
     def test_audio_transcode(self):
         try:
 
+            seg = AudioSegment.from_file("/odoo/mygsmcall.gsm", "gsm")
+            
+            seg.export("/odoo/export.mp3", format="mp3")
 
+            #Create the call with the audio
+            with api.Environment.manage():
+                # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+                new_cr = self.pool.cursor()
+                self = self.with_env(self.env(cr=new_cr))
 
-            #seg = AudioSegment.from_raw("/odoo/mygsmcall.raw", sample_width=1, frame_rate=8000, channels=1)
-            seg = AudioSegment.from_file("/odoo/mygsmcall.raw", "raw", "GSM", sample_width=1, frame_rate=8000, channels=1)
-            seg.export("/odoo/export.wav", format="wav")
+                with open("/odoo/export.wav", "rb") as audio_file:
+                    encoded_string = base64.b64encode(audio_file.read())
+                    self.env['voip.call'].create({'to_audio_filename':  time.strftime('%x') + ".mp3", 'to_audio': encoded_string })
+
+                #Have to manually commit the new cursor?
+                self.env.cr.commit()
+        
+                self._cr.close()
+
             _logger.error("Export Complete")
         except Exception as e:
             _logger.error(e)

@@ -43,6 +43,8 @@ class VoipCall(models.Model):
     mode = fields.Selection([('videocall','video call'), ('audiocall','audio call'), ('screensharing','screen sharing call')], string="Mode", help="This is only how the call starts, i.e a video call can turn into a screen sharing call mid way")
     sip_tag = fields.Char(string="SIP Tag")
     voip_account = fields.Many2one('voip.account', string="VOIP Account")
+    to_audio = fields.Binary(string="To Audio")
+    to_audio_filename = fields.Char(string="To Audio Filename")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
     ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
