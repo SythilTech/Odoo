@@ -1,0 +1,2 @@
+"id","name","payload_type","encoding","sample_rate","supported"
+"gsm","GSM","3","raw GSM","8000","1"

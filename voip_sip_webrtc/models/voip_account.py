@@ -3,6 +3,9 @@ import socket
 import logging
 from openerp.exceptions import UserError
 _logger = logging.getLogger(__name__)
+l = logging.getLogger("pydub.converter")
+l.setLevel(logging.DEBUG)
+l.addHandler(logging.StreamHandler())
 from openerp.http import request
 import re
 import hashlib
@@ -108,7 +111,7 @@ class VoipAccount(models.Model):
 
                 #1... .... = Marker: True
                 #Payload type: ITU-T G.722 (9)
-                #rtp_data += " 89"
+                #rtp_data += " 09"
 
                 #Sequence number: 29161
                 #rtp_data += " 71 e9"
@@ -137,6 +140,9 @@ class VoipAccount(models.Model):
 
     def test_audio_transcode(self):
         try:
+
+
+
             #seg = AudioSegment.from_raw("/odoo/mygsmcall.raw", sample_width=1, frame_rate=8000, channels=1)
             seg = AudioSegment.from_file("/odoo/mygsmcall.raw", "raw", "GSM", sample_width=1, frame_rate=8000, channels=1)
             seg.export("/odoo/export.wav", format="wav")

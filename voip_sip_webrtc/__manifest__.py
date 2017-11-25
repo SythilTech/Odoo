@@ -19,6 +19,7 @@
         'security/ir.model.access.csv',
         'data/voip_ringtone.xml',
         'data/voip_settings.xml',
+        'data/voip.codec.csv',
     ],
     'demo': [],
     'depends': ['web','crm','bus'],
