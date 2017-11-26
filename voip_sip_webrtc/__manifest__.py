@@ -11,6 +11,7 @@
         'views/voip_sip_webrtc_templates.xml',
         'views/res_users_views.xml',
         'views/voip_call_views.xml',
+        'views/voip_call_template_views.xml',
         'views/voip_ringtone_views.xml',
         'views/voip_account_views.xml',
         'views/voip_settings_views.xml',

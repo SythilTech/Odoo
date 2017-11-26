@@ -144,7 +144,8 @@ class VoipAccount(models.Model):
 
             seg = AudioSegment.from_file("/odoo/mygsmcall.gsm", "gsm")
             
-            seg.export("/odoo/export.mp3", format="mp3")
+            export_filename = "/odoo/export.mp3"
+            seg.export(export_filename, format="mp3")
 
             #Create the call with the audio
             with api.Environment.manage():
@@ -152,9 +153,9 @@ class VoipAccount(models.Model):
                 new_cr = self.pool.cursor()
                 self = self.with_env(self.env(cr=new_cr))
 
-                with open("/odoo/export.wav", "rb") as audio_file:
+                with open(export_filename, "rb") as audio_file:
                     encoded_string = base64.b64encode(audio_file.read())
-                    self.env['voip.call'].create({'to_audio_filename':  time.strftime('%x') + ".mp3", 'to_audio': encoded_string })
+                    self.env['voip.call'].create({'to_audio_filename':  "call.mp3", 'to_audio': encoded_string })
 
                 #Have to manually commit the new cursor?
                 self.env.cr.commit()
