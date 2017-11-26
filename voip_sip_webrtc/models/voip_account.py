@@ -3,9 +3,9 @@ import socket
 import logging
 from openerp.exceptions import UserError
 _logger = logging.getLogger(__name__)
-l = logging.getLogger("pydub.converter")
-l.setLevel(logging.DEBUG)
-l.addHandler(logging.StreamHandler())
+#l = logging.getLogger("pydub.converter")
+#l.setLevel(logging.DEBUG)
+#l.addHandler(logging.StreamHandler())
 from openerp.http import request
 import re
 import hashlib
@@ -15,6 +15,7 @@ import threading
 import time
 import struct
 import base64
+from random import randint
 
 try:
     from pydub import AudioSegment
@@ -49,6 +50,66 @@ class VoipAccount(models.Model):
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
 
+    def send_audio_stream_packet(self, clientsocket, input_data, sequence_number, seg_counter, timestamp, packet_count=0):
+
+        try:
+            
+            rtp_data = ""
+
+            #---- Compose RTP packet to send back (TODO) ---
+            #10.. .... = Version: RFC 1889 Version (2)
+            #..0. .... = Padding: False
+            #...0 .... = Extension: False
+            #.... 0000 = Contributing source identifiers count: 0
+            rtp_data += "80"
+
+            #0... .... = Marker: False
+            #Payload type: GSM (3)
+            if packet_count == 0:
+                rtp_data += " 83"
+            else:
+                rtp_data += " 03"
+
+            rtp_data += " " + format( sequence_number, '04x')
+            sequence_number += 1
+            #_logger.error("sequence number: " + str(sequence_number) )
+
+            #timestamp = int(time.time())
+            rtp_data += " " + format( timestamp, '08x')
+            timestamp += 160 #8000 / (1000ms / 20ms)
+            #_logger.error("timestamp: " + str(timestamp) )
+            
+            #Synchronization Source identifier: 0x1222763d (304248381)
+            rtp_data += " 12 22 76 3d"
+
+            #Payload:
+            payload_data = input_data[seg_counter : seg_counter + 33]
+            hex_string = ""
+
+            for rtp_char in payload_data:
+                hex_format = "{0:02x}".format(ord(rtp_char))
+                hex_string += hex_format + " "
+
+            rtp_data += " " + hex_string
+            seg_counter += 33
+
+            #_logger.error("payload length: " + str( len(hex_string.replace(" ","") ) ) )
+            
+            send_data = rtp_data.replace(" ","").decode('hex')
+                        
+            packet_count += 1
+            clientsocket.send(send_data)
+
+            if packet_count % 10 == 0:
+                _logger.error("payload data length: " + str( len( hex_string.replace(" ","") )) )
+               
+            #Only loop for a small bit during testing
+            if packet_count < 300:
+                threading.Timer(0.20,self.send_audio_stream_packet, [clientsocket, input_data, sequence_number, seg_counter, timestamp, packet_count] ).start()
+                
+        except Exception as e:
+            _logger.error(e)
+    
     def rtp_server_listener(self, port):
         
         try:
@@ -62,8 +123,16 @@ class VoipAccount(models.Model):
             hex_string = ""
             joined_payload = ""
             packet_count = 0
-            while stage == "LISTEN":
 
+            #Send audio data out every 20ms
+            sequence_number = randint(29161, 30000)
+            seg_counter = 0
+            timestamp = 0
+            in_file = open("/odoo/input.gsm", "rb")
+            input_data = in_file.read()
+            in_file.close()
+
+            while stage == "LISTEN":
 
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
@@ -79,53 +148,81 @@ class VoipAccount(models.Model):
                 payload = ' '.join(d[13:])
                 joined_payload += payload + " "
                 packet_count += 1
-                
-                #only inspect every 100th packet otherwise we would flood the log file
-                if packet_count % 100 == 0:
-                    payload_type = int(d[2])
-                    _logger.error("payload type: " + str(payload_type) )
-                
-                    sequence_number = int( d[3] + d[4], 16)
-                    _logger.error("sequence number: " + str(sequence_number) )
-                    
-                    timestamp = int( d[5] + d[6] + d[7] + d[8], 32)
-                    _logger.error("timestamp: " + str(timestamp) )
-                    
-                    synchronization_source_identifier = int( d[9] + d[10] + d[11] + d[12], 32)
 
-                    _logger.error("synchronization source identifier: " + str(synchronization_source_identifier) )
-                    _logger.error("payload length: " + str(len(payload)) )
-                    _logger.error("payload: " + str(payload) )
 
-                #For testing we only need a small amount of data
-                if packet_count > 300:
-                    break
-                
-                #rtp_data = ""
+
+                #---------------------Send Audio Packet-----------
+                rtp_data = ""
 
                 #---- Compose RTP packet to send back (TODO) ---
                 #10.. .... = Version: RFC 1889 Version (2)
                 #..0. .... = Padding: False
                 #...0 .... = Extension: False
                 #.... 0000 = Contributing source identifiers count: 0
-                #rtp_data += "80"
+                rtp_data += "80"
 
-                #1... .... = Marker: True
-                #Payload type: ITU-T G.722 (9)
-                #rtp_data += " 09"
+                #0... .... = Marker: False
+                #Payload type: GSM (3)
+                if packet_count == 0:
+                    rtp_data += " 83"
+                else:
+                    rtp_data += " 03"
 
-                #Sequence number: 29161
-                #rtp_data += " 71 e9"
+                rtp_data += " " + format( sequence_number, '04x')
+                sequence_number += 1
+                #_logger.error("sequence number: " + str(sequence_number) )
 
-                #Timestamp: 1152425936
-                #rtp_data += " 44 b0 9f d0"
-
+                #timestamp = int(time.time())
+                rtp_data += " " + format( timestamp, '08x')
+                timestamp += 160 #8000 / (1000ms / 20ms)
+                #_logger.error("timestamp: " + str(timestamp) )
+            
                 #Synchronization Source identifier: 0x1222763d (304248381)
-                #rtp_data += " 12 22 76 3d"
+                rtp_data += " 12 22 76 3d"
 
                 #Payload:
-                #rtp_data += " fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa f7 f7 f7 f7 f7 f7 f7 f8 f7 fa f7 f8 f8 fa fa f7 f7 f8 f7 fa f8 f7 fa f8 f7 fa f7 f8 f8 fa db f0 f8 f8 f8 f8 fa 58 f1 ba 78 9e b3 9c b8 b8 f8 f1 5c f1 da b2 52 b2 5b b3 fb fa e7 cd b8 d8 55 2a b9 db b9 70 dc 9b da d7 ee 32 9c fa 58 ad 14 9b 7b 56 ea 5b ba 7c ff db b6 78 dc 7a d9 d8 ec de 78 f6 29 88 0d a4 a0 04 04 ad 36 5d 30 b1 0b b8 a3 04 bf 3b"
+                payload_data = input_data[seg_counter : seg_counter + 33]
+                hex_string = ""
 
+                for rtp_char in payload_data:
+                    hex_format = "{0:02x}".format(ord(rtp_char))
+                    hex_string += hex_format + " "
+
+                rtp_data += " " + hex_string
+                seg_counter += 33
+
+                #_logger.error("payload length: " + str( len(hex_string.replace(" ","") ) ) )
+            
+                send_data = rtp_data.replace(" ","").decode('hex')
+                        
+                rtpsocket.sendto(send_data, addr)
+                #---------------------END Send Audio Packet-----------
+
+
+
+
+                
+                #Only inspect every 100th packet otherwise we would flood the log file
+                if packet_count % 100 == 0:
+                    payload_type = int(d[2])
+                    _logger.error("payload type: " + str(payload_type) )
+
+                    sequence_number = int( d[3] + d[4], 16)
+                    _logger.error("sequence number: " + str(sequence_number) )
+                    
+                    #timestamp = int( d[5] + d[6] + d[7] + d[8], 32)
+                    _logger.error("timestamp: " + str(timestamp) )
+                    
+                    synchronization_source_identifier = int( d[9] + d[10] + d[11] + d[12], 32)
+
+                    _logger.error("synchronization source identifier: " + str(synchronization_source_identifier) )
+                    _logger.error("payload length: " + str(len(payload.replace(" ","") )) )
+                    _logger.error("payload: " + str(payload) )
+
+                #For testing we only need a small amount of data
+                if packet_count > 60000:
+                    break
+            
         except Exception as e:
             _logger.error(e)
 
@@ -136,6 +233,56 @@ class VoipAccount(models.Model):
             f = open('/odoo/mygsmcall.gsm', 'w')
             f.write( joined_payload.replace(" ","").decode('hex') )
             f.close()
+        except Exception as e:
+            _logger.error(e)
+
+    def test_audio_split(self):
+        try:
+
+            seg = AudioSegment.from_file("/odoo/input.gsm", "gsm")
+            
+            seg_counter = 0
+            sequence_number = randint(29161, 30000)
+            
+            rtp_data = ""
+
+            #---- Compose RTP packet to send back (TODO) ---
+            #10.. .... = Version: RFC 1889 Version (2)
+            #..0. .... = Padding: False
+            #...0 .... = Extension: False
+            #.... 0000 = Contributing source identifiers count: 0
+            rtp_data += "80"
+
+            #1... .... = Marker: True
+            #Payload type: GSM (3)
+            rtp_data += " 03"
+
+            rtp_data += " " + format( sequence_number, '04x')
+            sequence_number + 1
+
+            timestamp = int(time.time())
+            rtp_data += " " + format( timestamp, '08x')
+
+            #Synchronization Source identifier: 0x1222763d (304248381)
+            rtp_data += " 12 22 76 3d"
+
+            split_seg = seg[seg_counter : seg_counter + 20]
+            fh = split_seg.export()
+            data = fh.read()
+            hex_string = ""
+            
+            for audio_char in data:
+                hex_format = "{0:02x}".format( ord(audio_char) )
+                hex_string += hex_format + " "
+            
+            seg_counter += 20
+
+            #Payload:
+            rtp_data += " " + hex_string
+            
+            rtp_data.replace(" ","").decode('hex')
+
+            _logger.error("Split Complete")
         except Exception as e:
             _logger.error(e)
 
@@ -176,7 +323,7 @@ class VoipAccount(models.Model):
 
         rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(media_port,))
         rtc_listener_starter.start()
-
+            
         to_address = "stevewright2009@sythiltech.onsip.com"
         #to_address = "steven@sythiltech.onsip.com"
 
@@ -302,8 +449,22 @@ class VoipAccount(models.Model):
             elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
 
                 contact_header = re.findall(r'Contact: <(.*?)>\r\n', data)[0]
+                rtp_ip = re.findall(r'\*(.*?)!', contact_header)[0]
                 record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
-                listen_media_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
+                send_media_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
+
+                #Send audio data out every 20ms
+                sequence_number = randint(29161, 30000)
+                seg_counter = 0
+                timestamp = 0
+ 
+                in_file = open("/odoo/input.gsm", "rb")
+                input_data = in_file.read()
+                in_file.close()
+                    
+                #clientsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                #clientsocket.connect( (rtp_ip, send_media_port) )
+                #self.send_audio_stream_packet(clientsocket, input_data, sequence_number, seg_counter, timestamp)                    
         
                 #Send the ACK
                 reply = ""
