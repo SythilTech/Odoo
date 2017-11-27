@@ -1,3 +1,7 @@
+v1.6.0
+======
+* SIP calling via server actions
+
 v1.5.0
 ======
 * SIP messaging via python and compose window

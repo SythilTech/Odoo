@@ -507,7 +507,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
         if (this.get("effective_readonly")) {
 
 
-            if (this.get("value")) {
+            if (this.get("value") && window.userAgent) {
                 console.log("Listening for " + this.get("value") + " presence information");
                 window.chatSubscription = window.userAgent.subscribe(this.get("value"), 'presence');
 

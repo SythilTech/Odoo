@@ -49,75 +49,15 @@ class VoipAccount(models.Model):
 
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
-
-    def send_audio_stream_packet(self, clientsocket, input_data, sequence_number, seg_counter, timestamp, packet_count=0):
-
-        try:
-            
-            rtp_data = ""
-
-            #---- Compose RTP packet to send back (TODO) ---
-            #10.. .... = Version: RFC 1889 Version (2)
-            #..0. .... = Padding: False
-            #...0 .... = Extension: False
-            #.... 0000 = Contributing source identifiers count: 0
-            rtp_data += "80"
-
-            #0... .... = Marker: False
-            #Payload type: GSM (3)
-            if packet_count == 0:
-                rtp_data += " 83"
-            else:
-                rtp_data += " 03"
-
-            rtp_data += " " + format( sequence_number, '04x')
-            sequence_number += 1
-            #_logger.error("sequence number: " + str(sequence_number) )
-
-            #timestamp = int(time.time())
-            rtp_data += " " + format( timestamp, '08x')
-            timestamp += 160 #8000 / (1000ms / 20ms)
-            #_logger.error("timestamp: " + str(timestamp) )
-            
-            #Synchronization Source identifier: 0x1222763d (304248381)
-            rtp_data += " 12 22 76 3d"
-
-            #Payload:
-            payload_data = input_data[seg_counter : seg_counter + 33]
-            hex_string = ""
-
-            for rtp_char in payload_data:
-                hex_format = "{0:02x}".format(ord(rtp_char))
-                hex_string += hex_format + " "
-
-            rtp_data += " " + hex_string
-            seg_counter += 33
-
-            #_logger.error("payload length: " + str( len(hex_string.replace(" ","") ) ) )
-            
-            send_data = rtp_data.replace(" ","").decode('hex')
-                        
-            packet_count += 1
-            clientsocket.send(send_data)
-
-            if packet_count % 10 == 0:
-                _logger.error("payload data length: " + str( len( hex_string.replace(" ","") )) )
-               
-            #Only loop for a small bit during testing
-            if packet_count < 300:
-                threading.Timer(0.20,self.send_audio_stream_packet, [clientsocket, input_data, sequence_number, seg_counter, timestamp, packet_count] ).start()
-                
-        except Exception as e:
-            _logger.error(e)
     
-    def rtp_server_listener(self, port):
+    def rtp_server_listener(self, media_port, audio_stream, model=False, record_id=False):
         
         try:
 
-            _logger.error("Start RTP Listening on Port " + str(port) )
+            _logger.error("Start RTP Listening on Port " + str(media_port) )
                 
             rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            rtpsocket.bind(('', port));
+            rtpsocket.bind(('', media_port));
 
             stage = "LISTEN"
             hex_string = ""
@@ -128,9 +68,6 @@ class VoipAccount(models.Model):
             sequence_number = randint(29161, 30000)
             seg_counter = 0
             timestamp = 0
-            in_file = open("/odoo/input.gsm", "rb")
-            input_data = in_file.read()
-            in_file.close()
 
             while stage == "LISTEN":
 
@@ -138,7 +75,7 @@ class VoipAccount(models.Model):
                 data, addr = rtpsocket.recvfrom(2048)
                 
                 d = ['FF']
-                #TODO make loop stop when BYE is received on other port
+                #TODO make loop stop when BYE is received on other port                
 
                 #Convert to hex so we can human interpret each byte
                 for rtp_char in data:
@@ -149,12 +86,10 @@ class VoipAccount(models.Model):
                 joined_payload += payload + " "
                 packet_count += 1
 
-
-
                 #---------------------Send Audio Packet-----------
                 rtp_data = ""
 
-                #---- Compose RTP packet to send back (TODO) ---
+                #---- Compose RTP packet to send back---
                 #10.. .... = Version: RFC 1889 Version (2)
                 #..0. .... = Padding: False
                 #...0 .... = Extension: False
@@ -170,18 +105,15 @@ class VoipAccount(models.Model):
 
                 rtp_data += " " + format( sequence_number, '04x')
                 sequence_number += 1
-                #_logger.error("sequence number: " + str(sequence_number) )
-
-                #timestamp = int(time.time())
+ 
                 rtp_data += " " + format( timestamp, '08x')
                 timestamp += 160 #8000 / (1000ms / 20ms)
-                #_logger.error("timestamp: " + str(timestamp) )
             
                 #Synchronization Source identifier: 0x1222763d (304248381)
                 rtp_data += " 12 22 76 3d"
 
                 #Payload:
-                payload_data = input_data[seg_counter : seg_counter + 33]
+                payload_data = audio_stream[seg_counter : seg_counter + 33]
                 hex_string = ""
 
                 for rtp_char in payload_data:
@@ -190,107 +122,23 @@ class VoipAccount(models.Model):
 
                 rtp_data += " " + hex_string
                 seg_counter += 33
-
-                #_logger.error("payload length: " + str( len(hex_string.replace(" ","") ) ) )
             
                 send_data = rtp_data.replace(" ","").decode('hex')
                         
                 rtpsocket.sendto(send_data, addr)
                 #---------------------END Send Audio Packet-----------
 
-
-
-
-                
-                #Only inspect every 100th packet otherwise we would flood the log file
-                if packet_count % 100 == 0:
-                    payload_type = int(d[2])
-                    _logger.error("payload type: " + str(payload_type) )
-
-                    sequence_number = int( d[3] + d[4], 16)
-                    _logger.error("sequence number: " + str(sequence_number) )
-                    
-                    #timestamp = int( d[5] + d[6] + d[7] + d[8], 32)
-                    _logger.error("timestamp: " + str(timestamp) )
-                    
-                    synchronization_source_identifier = int( d[9] + d[10] + d[11] + d[12], 32)
-
-                    _logger.error("synchronization source identifier: " + str(synchronization_source_identifier) )
-                    _logger.error("payload length: " + str(len(payload.replace(" ","") )) )
-                    _logger.error("payload: " + str(payload) )
-
-                #For testing we only need a small amount of data
-                if packet_count > 60000:
-                    break
-            
         except Exception as e:
             _logger.error(e)
 
         try:
-            _logger.error("packet count: " + str(packet_count) )
-            _logger.error("payload length: " + str(len(joined_payload)) )
-            _logger.error("Write payload to file")
-            f = open('/odoo/mygsmcall.gsm', 'w')
+            #Write the received audio out to a file, TODO use temporary files
+            f = open('/odoo/export.gsm', 'w')
             f.write( joined_payload.replace(" ","").decode('hex') )
             f.close()
-        except Exception as e:
-            _logger.error(e)
 
-    def test_audio_split(self):
-        try:
-
-            seg = AudioSegment.from_file("/odoo/input.gsm", "gsm")
-            
-            seg_counter = 0
-            sequence_number = randint(29161, 30000)
-            
-            rtp_data = ""
-
-            #---- Compose RTP packet to send back (TODO) ---
-            #10.. .... = Version: RFC 1889 Version (2)
-            #..0. .... = Padding: False
-            #...0 .... = Extension: False
-            #.... 0000 = Contributing source identifiers count: 0
-            rtp_data += "80"
-
-            #1... .... = Marker: True
-            #Payload type: GSM (3)
-            rtp_data += " 03"
-
-            rtp_data += " " + format( sequence_number, '04x')
-            sequence_number + 1
-
-            timestamp = int(time.time())
-            rtp_data += " " + format( timestamp, '08x')
-
-            #Synchronization Source identifier: 0x1222763d (304248381)
-            rtp_data += " 12 22 76 3d"
-
-            split_seg = seg[seg_counter : seg_counter + 20]
-            fh = split_seg.export()
-            data = fh.read()
-            hex_string = ""
-            
-            for audio_char in data:
-                hex_format = "{0:02x}".format( ord(audio_char) )
-                hex_string += hex_format + " "
-            
-            seg_counter += 20
-
-            #Payload:
-            rtp_data += " " + hex_string
-            
-            rtp_data.replace(" ","").decode('hex')
-
-            _logger.error("Split Complete")
-        except Exception as e:
-            _logger.error(e)
-
-    def test_audio_transcode(self):
-        try:
-
-            seg = AudioSegment.from_file("/odoo/mygsmcall.gsm", "gsm")
-            
+            #Transcode the file to mp3
+            seg = AudioSegment.from_file("/odoo/export.gsm", "gsm")            
             export_filename = "/odoo/export.mp3"
             seg.export(export_filename, format="mp3")
 
@@ -304,16 +152,29 @@ class VoipAccount(models.Model):
                     encoded_string = base64.b64encode(audio_file.read())
                     self.env['voip.call'].create({'to_audio_filename':  "call.mp3", 'to_audio': encoded_string })
 
+                if model:
+                    #Add to the chatter
+                    #TODO add SIP subtype
+                    self.env[model].browse( int(record_id) ).message_post(body="Call Made", subject="Call Made", message_type="comment")
+
                 #Have to manually commit the new cursor?
                 self.env.cr.commit()
         
                 self._cr.close()
 
-            _logger.error("Export Complete")
+
         except Exception as e:
             _logger.error(e)
     
     def test_sip_call(self):
+        in_file = open("/odoo/input.gsm", "rb")
+        audio_stream = in_file.read()
+        in_file.close()
+        to_address = "stevewright2009@sythiltech.onsip.com"
+
+        self.make_call(to_address, audio_stream)
+
+    def make_call(self, to_address, audio_stream, model=False, record_id=False):
 
         port = random.randint(6000,7000)
         media_port = random.randint(55000,56000)
@@ -321,12 +182,9 @@ class VoipAccount(models.Model):
         call_id = random.randint(50000,60000)
         from_tag = random.randint(8000000,9000000)
 
-        rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(media_port,))
+        rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(media_port, audio_stream, model, record_id,))
         rtc_listener_starter.start()
-            
-        to_address = "stevewright2009@sythiltech.onsip.com"
-        #to_address = "steven@sythiltech.onsip.com"
-
+        
         #----Generate SDP of audio call that the server can work with e.g. limited codex support----
         sdp = ""
         
@@ -342,30 +200,18 @@ class VoipAccount(models.Model):
         sdp += "s= \r\n"
         
         #Connection Information
-        #sdp += "c=IN IP4 192.168.1.133\r\n"
+        sdp += "c=IN IP4 " + local_ip + "\r\n"
 
         #Timing ("t=") https://tools.ietf.org/html/rfc4566#section-5.9 (For now sessions are infinite but we may use this if for example a company charges a price for a fixed 30 minute consultation)        
         sdp += "t=0 0\r\n"
 
         #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
-        audio_codec = "9" #Use G722 Audio Profile
+        audio_codec = "3" #Use GSM Audio Profile
         sdp += "m=audio " + str(media_port) + " RTP/AVP " + audio_codec + "\r\n"
 
         #Two way call because later we may use voice reconisation to control assistant menus        
         sdp += "a=sendrecv\r\n"
 
-        #Hack just use X-Lite SDP (GSM)
-        sdp = ""
-        sdp += "v=0\r\n"
-        sdp += "o=- " + str(sess_id) + " 1 IN IP4 " + local_ip + "\r\n"
-        sdp += "s=X-Lite release 5.0.1 stamp 86895\r\n"
-        sdp += "c=IN IP4 " + local_ip + "\r\n"
-        sdp += "t=0 0\r\n"
-        sdp += "m=audio " + str(media_port) + " RTP/AVP 3 101\r\n"
-        sdp += "a=rtpmap:101 telephone-event/8000\r\n"
-        sdp += "a=fmtp:101 0-15\r\n"
-        sdp += "a=sendrecv\r\n"
-         
         invite_string = ""
         invite_string += "INVITE sip:" + to_address + " SIP/2.0\r\n"
         invite_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
@@ -395,11 +241,7 @@ class VoipAccount(models.Model):
             data, addr = sipsocket.recvfrom(2048)
  
             #Send auth response if challenged
-            #_logger.error(data)
             if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required":
-
-
-                #sipsocket.sendto(reply, addr)
                 
                 authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
                          
@@ -452,19 +294,6 @@ class VoipAccount(models.Model):
                 rtp_ip = re.findall(r'\*(.*?)!', contact_header)[0]
                 record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
                 send_media_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
-
-                #Send audio data out every 20ms
-                sequence_number = randint(29161, 30000)
-                seg_counter = 0
-                timestamp = 0
- 
-                in_file = open("/odoo/input.gsm", "rb")
-                input_data = in_file.read()
-                in_file.close()
-                    
-                #clientsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                #clientsocket.connect( (rtp_ip, send_media_port) )
-                #self.send_audio_stream_packet(clientsocket, input_data, sequence_number, seg_counter, timestamp)                    
         
                 #Send the ACK
                 reply = ""
@@ -487,7 +316,7 @@ class VoipAccount(models.Model):
 
                 return True
  
-    def send_simple_message(self, to_address, message_body, model=False, record_id=False):
+    def send_message(self, to_address, message_body, model=False, record_id=False):
   
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 
@@ -507,8 +336,6 @@ class VoipAccount(models.Model):
         message_string += "Content-Length: " + str(len(message_body)) + "\r\n"
         message_string += "\r\n"
         message_string += message_body
-
-        _logger.error("MESSAGE: " + message_string)
         
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sipsocket.bind(('', port));
@@ -516,13 +343,12 @@ class VoipAccount(models.Model):
         #Wait and send back the auth reply
         stage = "WAITING"
         while stage == "WAITING":
-
+            sipsocket.settimeout(10)
             sipsocket.sendto(message_string, (self.outbound_proxy, 5060) )
         
             data, addr = sipsocket.recvfrom(2048)
 
             #Send auth response if challenged
-            _logger.error(data)
             if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required":
             
                 authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]

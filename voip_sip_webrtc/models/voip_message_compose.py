@@ -20,51 +20,8 @@ class VoipMessageCompose(models.TransientModel):
     record_id = fields.Integer(string="Record ID")
     to_address = fields.Char(string="To Address")
     message = fields.Text(string="Message")
-
-    def xmpp_listener(self, to_address):
-                
-        _logger.error("Start XMMP Listening")
-
-        try:
-            account = to_address.split("@")[0]
-            domain = to_address.split("@")[1]
-            _logger.error(domain)
-
-            xmpp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-            xmpp_socket.connect( ('216.189.159.196', 5222) )
-            #xmpp_socket.connect((domain, 5222))
-            
-            send_data = ""
-            send_data += '<?xml version="1.0"?>'
-            #send_data += '<stream:stream xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" to="jabberzac.org" version="1.0">'
-            send_data += '<stream:stream xmlns="jabber:client" xmlns:stream="http://etherx.jabber.org/streams" to="' + str(domain) + '" version="1.0">'
-
-            xmpp_socket.send(send_data)
-            rec_data = xmpp_socket.recv(1024)
-            
-            _logger.error(rec_data)
-            
-            stream_id = re.findall(r"id='(.*?)'", rec_data)[0]
-            
-            send_data = '<starttls xmlns="urn:ietf:params:xml:ns:xmpp-tls"/>'
-            xmpp_socket.send(send_data)
-            
-            rec_data = xmpp_socket.recv(1024)
-            _logger.error(rec_data)
-            
-            if "proceed" in rec_data:
-                _logger.error("We did it!!!")
-
-            xmpp_socket.close             
-
-        except Exception as e:
-            _logger.error(e)
-
         
     def send_message(self):
-        _logger.error("Send Message")
-
 
         method = '_send_%s_message' % (self.type,)
         action = getattr(self, method, None)
@@ -75,8 +32,8 @@ class VoipMessageCompose(models.TransientModel):
         action()
         
     def _send_sip_message(self):
-        _logger.error("Send SIP Message")
-        if self.sip_account_id.send_simple_message(self.to_address, self.message, model=self.model, record_id=self.record_id):
+
+        if self.sip_account_id.send_message(self.to_address, self.message, model=self.model, record_id=self.record_id):
             _logger.error("SIP Message Sent")
         else:
             _logger.error("SIP Message Failure")

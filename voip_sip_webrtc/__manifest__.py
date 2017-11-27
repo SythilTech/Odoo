@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication (BETA)",
-    'version': "1.5.0",
+    'version': "1.6.0",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -17,6 +17,7 @@
         'views/voip_settings_views.xml',
         'views/res_partner_views.xml',
         'views/voip_message_compose_views.xml',
+        'views/ir_actions_server_views.xml',
         'security/ir.model.access.csv',
         'data/voip_ringtone.xml',
         'data/voip_settings.xml',

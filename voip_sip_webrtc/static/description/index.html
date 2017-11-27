@@ -25,7 +25,16 @@ Make video calls with other users within your system<br/>
 5. Type a message and hit send<br/>
 <br/>
 
-The currently supported voice codecs are G.711, G.722, iLBC, and iSAC, and VP8 is the supported video codec
+<h2>Automated SIP Calling</h2>
+1. Setup a SIP account under CRM->VOIP->SIP Accounts<br/>
+2. Setup a call template under CRM->VOIP->VOIP Call Templates, you can use dynamic placeholders for the to address<br/>
+3. You will need to upload a raw GSM encoded file to the template, you can transcode MP3/FLAC, etc to GSM using online tools<br/>
+4. Create a new server action under Settings->Technicial->Actions->Server Actions, be sure to select make voip call as the action to do<br/>
+5. Create a new automated action under Settings->Technicial->Automation->Automated Actions, be sure to select the server action created earlier<br/>
+6. Create a new record, the module should work with leads, partner, employees or any other model<br/>
+<br/>
+
+webrtc currently supports the following audio codecs G.711, G.722, iLBC and iSAC / VP8 for video<br/>
 
 <h2>Future features</h2>
 1.  File sharing<br/>
