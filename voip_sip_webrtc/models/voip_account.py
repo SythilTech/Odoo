@@ -166,14 +166,6 @@ class VoipAccount(models.Model):
         except Exception as e:
             _logger.error(e)
     
-    def test_sip_call(self):
-        in_file = open("/odoo/input.gsm", "rb")
-        audio_stream = in_file.read()
-        in_file.close()
-        to_address = "stevewright2009@sythiltech.onsip.com"
-
-        self.make_call(to_address, audio_stream)
-
     def make_call(self, to_address, audio_stream, model=False, record_id=False):
 
         port = random.randint(6000,7000)
@@ -339,13 +331,13 @@ class VoipAccount(models.Model):
         
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sipsocket.bind(('', port));
+
+        sipsocket.sendto(message_string, (self.outbound_proxy, 5060) )
         
         #Wait and send back the auth reply
         stage = "WAITING"
         while stage == "WAITING":
-            sipsocket.settimeout(10)
-            sipsocket.sendto(message_string, (self.outbound_proxy, 5060) )
-        
+            sipsocket.settimeout(10)        
             data, addr = sipsocket.recvfrom(2048)
 
             #Send auth response if challenged
@@ -395,21 +387,37 @@ class VoipAccount(models.Model):
                     self.env[model].browse( int(record_id) ).message_post(body=message_body, subject="SIP Message Sent", message_type="comment")
 
                 return True
-                
+
+    def test_sip_listen(self):
+
+        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sipsocket.bind(('', 5060))
+
+        stage = "WAITING"
+        while stage == "WAITING":
+            sipsocket.settimeout(30)
+            data, addr = sipsocket.recvfrom(2048)
+            _logger.error(data)
+    
     def send_register(self):
   
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 
+        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sipsocket.bind(('', 0))
+        bind_port = sipsocket.getsockname()[1]
+
         register_string = ""
         register_string += "REGISTER sip:" + self.domain + " SIP/2.0\r\n"
-        register_string += "Via: SIP/2.0/UDP " + local_ip + "\r\n"
+        register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
         register_string += "Max-Forwards: 70\r\n"
-        register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":5060>\r\n" #:54443 XOR port mapping?
+        register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
         register_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">\r\n"
         register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
         register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
-        register_string += "Expires: 3600\r\n"
+        #register_string += "Expires: 3600\r\n"
+        register_string += "Expires: 60\r\n"
         register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
         register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
         register_string += "Content-Length: 0\r\n"
@@ -417,5 +425,55 @@ class VoipAccount(models.Model):
 
         _logger.error("REGISTER: " + register_string)
         
-        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serversocket.sendto(register_string, (self.outbound_proxy, 5060) )
+        sipsocket.sendto(register_string, (self.outbound_proxy, 5060) )
+
+        stage = "WAITING"
+        while stage == "WAITING":
+            sipsocket.settimeout(10)
+            data, addr = sipsocket.recvfrom(2048)
+
+            _logger.error(data)
+ 
+            #Send auth response if challenged
+            if data.split("\r\n")[0] == "SIP/2.0 401 Unauthorized":
+
+                authheader = re.findall(r'WWW-Authenticate: (.*?)\r\n', data)[0]
+                        
+                realm = re.findall(r'realm="(.*?)"', authheader)[0]
+                method = "REGISTER"
+                uri = "sip:" + self.domain
+                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
+                qop = re.findall(r'qop="(.*?)"', authheader)[0]
+                nc = "00000001"
+                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
+
+                #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
+                A1 = self.auth_username + ":" + realm + ":" + self.password
+                A2 = method + ":" + uri
+                response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
+
+                register_string = ""
+                register_string += "REGISTER sip:" + self.domain + " SIP/2.0\r\n"
+                register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
+                register_string += "Max-Forwards: 70\r\n"
+                register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
+                register_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">\r\n"
+                register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+                register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
+                register_string += "CSeq: 2 REGISTER\r\n"
+                #register_string += "Expires: 3600\r\n"
+                register_string += "Expires: 60\r\n"
+                register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+                register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                register_string += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + self.domain + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                register_string += "Content-Length: 0\r\n"
+                register_string += "\r\n"
+        
+                _logger.error(register_string)
+        
+                sipsocket.sendto(register_string, (self.outbound_proxy, 5060) )
+            elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
+                stage = "REGISTERED"
+
+                return True
+                
