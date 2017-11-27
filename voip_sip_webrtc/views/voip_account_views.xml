@@ -8,7 +8,6 @@
       	    <form>
       	        <header>
       	            <button name="send_register" type="object" string="Send Register"/>
-      	            <button name="test_sip_listen" type="object" string="SIP Listen"/>
       	        </header>
       	        <group>
       	            <field name="address"/>
@@ -18,7 +17,7 @@
       	            <field name="domain"/>
       	            <field name="wss"/>
       	            <field name="outbound_proxy"/>
-                    <!--<field name="verified"/>-->
+      	            <field name="gsm_media"/>
       	        </group>
       	    </form>
         </field>

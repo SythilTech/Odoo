@@ -36,6 +36,7 @@ class VoipAccount(models.Model):
     outbound_proxy = fields.Char(string="Outbound Proxy")
     verified = fields.Boolean(string="Verified")
     wss = fields.Char(string="WSS", default="wss://edge.sip.onsip.com")
+    gsm_media = fields.Binary(string="GSM Audio File")
     
     @api.onchange('address')
     def _onchange_address(self):
@@ -74,6 +75,9 @@ class VoipAccount(models.Model):
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
                 
+                if packet_count % 10 == 0:
+                    _logger.error(data)
+                    
                 d = ['FF']
                 #TODO make loop stop when BYE is received on other port                
 
@@ -388,16 +392,225 @@ class VoipAccount(models.Model):
 
                 return True
 
-    def test_sip_listen(self):
+    def rtp_server_sender(self, media_port, audio_stream, caller_addr, model=False, record_id=False):
+        
+        try:
 
-        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sipsocket.bind(('', 5060))
+            _logger.error("Start RTP Listening on Port " + str(media_port) )
+                
+            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            rtpsocket.bind(('', media_port));
 
-        stage = "WAITING"
-        while stage == "WAITING":
-            sipsocket.settimeout(30)
-            data, addr = sipsocket.recvfrom(2048)
-            _logger.error(data)
+            stage = "LISTEN"
+            hex_string = ""
+            joined_payload = ""
+            packet_count = 0
+
+            #Send audio data out every 20ms
+            sequence_number = randint(29161, 30000)
+            seg_counter = 0
+            timestamp = 0
+
+            while stage == "LISTEN":
+
+                #---------------------Send Audio Packet-----------
+                rtp_data = ""
+
+                #---- Compose RTP packet to send back---
+                #10.. .... = Version: RFC 1889 Version (2)
+                #..0. .... = Padding: False
+                #...0 .... = Extension: False
+                #.... 0000 = Contributing source identifiers count: 0
+                rtp_data += "80"
+
+                #0... .... = Marker: False
+                #Payload type: GSM (3)
+                if packet_count == 0:
+                    rtp_data += " 83"
+                else:
+                    rtp_data += " 03"
+
+                rtp_data += " " + format( sequence_number, '04x')
+                sequence_number += 1
+ 
+                rtp_data += " " + format( timestamp, '08x')
+                timestamp += 160 #8000 / (1000ms / 20ms)
+            
+                #Synchronization Source identifier: 0x1222763d (304248381)
+                rtp_data += " 12 22 76 3d"
+
+                #Payload:
+                payload_data = audio_stream[seg_counter : seg_counter + 33]
+                hex_string = ""
+
+                for rtp_char in payload_data:
+                    hex_format = "{0:02x}".format(ord(rtp_char))
+                    hex_string += hex_format + " "
+
+                rtp_data += " " + hex_string
+                seg_counter += 33
+            
+                send_data = rtp_data.replace(" ","").decode('hex')
+                        
+                rtpsocket.sendto(send_data, caller_addr)
+                #---------------------END Send Audio Packet-----------
+
+                rtpsocket.settimeout(10)
+                data, addr = rtpsocket.recvfrom(2048)
+                
+                    
+                d = ['FF']
+                #TODO make loop stop when BYE is received on other port                
+
+                #Convert to hex so we can human interpret each byte
+                for rtp_char in data:
+                    hex_format = "{0:02x}".format(ord(rtp_char))
+                    d.append(hex_format)
+
+                payload = ' '.join(d[13:])
+                joined_payload += payload + " "
+                packet_count += 1
+
+                if packet_count % 100 == 0:
+                    _logger.error(hex_format)
+
+        except Exception as e:
+            _logger.error(e)
+
+        try:
+            #Write the received audio out to a file, TODO use temporary files
+            f = open('/odoo/export.gsm', 'w')
+            f.write( joined_payload.replace(" ","").decode('hex') )
+            f.close()
+
+            #Transcode the file to mp3
+            seg = AudioSegment.from_file("/odoo/export.gsm", "gsm")            
+            export_filename = "/odoo/export.mp3"
+            seg.export(export_filename, format="mp3")
+
+            #Create the call with the audio
+            with api.Environment.manage():
+                # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+                new_cr = self.pool.cursor()
+                self = self.with_env(self.env(cr=new_cr))
+
+                with open(export_filename, "rb") as audio_file:
+                    encoded_string = base64.b64encode(audio_file.read())
+                    self.env['voip.call'].create({'to_audio_filename':  "call.mp3", 'to_audio': encoded_string })
+
+                if model:
+                    #Add to the chatter
+                    #TODO add SIP subtype
+                    self.env[model].browse( int(record_id) ).message_post(body="Call Made", subject="Call Made", message_type="comment")
+
+                #Have to manually commit the new cursor?
+                self.env.cr.commit()
+        
+                self._cr.close()
+
+
+        except Exception as e:
+            _logger.error(e)
+
+    def invite_listener(self, bind_port):
+
+        try:
+
+            #Set the environment before starting the main thread
+            with api.Environment.manage():
+                #As this function is in a new thread, i need to open a new cursor, because the old one may be closed
+                new_cr = self.pool.cursor()                
+                self = self.with_env(self.env(cr=new_cr))
+
+                _logger.error("Listen for invites on " + str(bind_port))
+
+                local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
+        
+                sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sipsocket.bind(('', bind_port))
+
+                stage = "WAITING"
+                while stage == "WAITING":
+                    sipsocket.settimeout(60)
+                    data, addr = sipsocket.recvfrom(2048)
+
+                    _logger.error(data)
+ 
+                    #Send auth response if challenged
+                    if data.startswith("INVITE"):
+                        _logger.error("GOT INVITE")
+
+                        call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
+                        _logger.error(call_id)
+                        from_address = re.findall(r'From: (.*?);', data)[0]
+                        _logger.error(from_address)
+
+                        reply = ""
+                        reply += "SIP/2.0 180 Ringing\r\n"
+                        for (via_heading) in re.findall(r'Via: (.*?)\r\n', data):
+                            reply += "Via: " + via_heading + "\r\n"
+                        record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
+                        reply += "Record-Route: " + record_route + "\r\n"
+                        reply += "Contact: <sip:" + self.address + "@" + local_ip + ":" + str(bind_port) + ";rinstance=0bd6d48a7ed3b6df>\r\n"                        
+                        reply += "To: <sip:" + from_address + ">;tag=e856725d\r\n"
+                        reply += "From: " + self.address + ";tag=8861321\r\n"
+                        reply += "Call-ID: " + call_id + "\r\n"
+                        reply += "CSeq: 2 INVITE\r\n"
+                        reply += "User-Agent: X-Lite release 5.0.1 stamp 86895\r\n"
+                        reply += "Allow-Events: talk, hold\r\n"
+                        reply += "Content-Length: 0\r\n"
+                        reply += "\r\n"
+                        
+                        sipsocket.sendto(reply, addr)
+                        
+                        media_port = random.randint(55000,56000)
+                        
+                        audio_stream = base64.decodestring(self.gsm_media)
+                        
+                        send_media_port = re.findall(r'm=audio (.*?) RTP', data)[0]
+                        _logger.error(send_media_port)
+                        
+                        rtp_ip = re.findall(r'\*(.*?)!', data)[0]
+                        _logger.error(rtp_ip)
+                
+                        caller_addr = (rtp_ip, int(send_media_port) )
+                        rtc_sender_starter = threading.Thread(target=self.rtp_server_sender, args=(media_port, audio_stream, caller_addr,))
+                        rtc_sender_starter.start()
+
+                        sdp = ""
+                        sdp += "v=0\r\n"
+                        sdp += "o=- 1759479422 3 IN IP4 " + local_ip + "\r\n"
+                        sdp += "s=X-Lite release 5.0.1 stamp 86895\r\n"
+                        sdp += "c=IN IP4 " + local_ip + "\r\n"
+                        sdp += "t=0 0\r\n"
+                        sdp += "m=audio " + str(media_port) + " RTP/AVP 3\r\n"
+                        sdp += "a=sendrecv\r\n"
+                        
+                        reply = ""
+                        reply += "SIP/2.0 200 OK\r\n"
+                        for (via_heading) in re.findall(r'Via: (.*?)\r\n', data):
+                            reply += "Via: " + via_heading + "\r\n"
+                        record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
+                        reply += "Record-Route: " + record_route + "\r\n"
+                        reply += "Contact: <sip:" + self.address + "@" + local_ip + ":" + str(bind_port) + ";rinstance=0bd6d48a7ed3b6df>\r\n"
+                        reply += "To: <sip:" + self.address + ">;tag=c8ff7c15\r\n"
+                        reply += "From: " + from_address + ";tag=8491272\r\n"
+                        reply += "Call-ID: " + str(call_id) + "\r\n"
+                        reply += "CSeq: 2 INVITE\r\n"
+                        reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+                        reply += "Content-Type: application/sdp\r\n"
+                        reply += "Supported: replaces\r\n"
+                        reply += "User-Agent: X-Lite release 5.0.1 stamp 86895\r\n"
+                        reply += "Content-Length: " + str(len(sdp)) + "\r\n"
+                        reply += "\r\n"
+                        reply += sdp
+
+                        sipsocket.sendto(reply, addr)                
+                
+                self._cr.close()
+                    
+        except Exception as e:
+            _logger.error(e)            
     
     def send_register(self):
   
@@ -473,7 +686,11 @@ class VoipAccount(models.Model):
         
                 sipsocket.sendto(register_string, (self.outbound_proxy, 5060) )
             elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
-                stage = "REGISTERED"
+                _logger.error("REGISTERED")
+                #Start a new thread so we can listen for invites
 
+                invite_listener_starter = threading.Thread(target=self.invite_listener, args=(bind_port,))
+                invite_listener_starter.start()
+        
+                stage = "REGISTERED"
                 return True
-                
