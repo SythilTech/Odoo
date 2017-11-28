@@ -242,10 +242,18 @@ class WebsiteSupportTicketMessage(models.Model):
 class WebsiteSupportTicketCategories(models.Model):
 
     _name = "website.support.ticket.categories"
+    _order = "sequence asc"
     
+    sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string='Category Name')
     cat_user_ids = fields.Many2many('res.users', string="Category Users")
 
+    @api.model
+    def create(self, values):
+        sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.categories')
+        values['sequence']=sequence
+        return super(WebsiteSupportTicketCategories, self).create(values)
+        
 class WebsiteSupportTicketSubCategories(models.Model):
 
     _name = "website.support.ticket.subcategory"

@@ -1,3 +1,7 @@
+v1.4.17
+=======
+* Category sequence
+
 v1.4.16
 =======
 * Closed by user field
