@@ -57,6 +57,7 @@ class WebsiteSupportTicket(models.Model):
     support_comment = fields.Text(string="Support Comment")
     close_comment = fields.Text(string="Close Comment")
     close_time = fields.Datetime(string="Close Time")
+    closed_by_id = fields.Many2one('res.users', string="Closed By")
     time_to_close = fields.Integer(string="Time to close (seconds)")
     
     @api.onchange('partner_id')
@@ -301,6 +302,7 @@ class WebsiteSupportTicketCompose(models.Model):
 
         self.ticket_id.state = closed_state.id
         self.ticket_id.close_comment = self.message
+        self.ticket_id.closed_by_id = self.env.user.id
         
         #Send an email notifing the customer  that the ticket has been closed
         setting_close_email_template_id = self.env['ir.values'].get_default('website.support.settings', 'close_ticket_email_template_id')

@@ -1,3 +1,7 @@
+v1.4.16
+=======
+* Closed by user field
+
 v1.4.15
 =======
 * Mail template field
