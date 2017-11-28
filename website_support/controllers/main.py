@@ -78,7 +78,14 @@ class SupportTicketController(http.Controller):
     @http.route('/support/help', type="http", auth="public", website=True)
     def support_help(self, **kw):
         """Displays all help groups and thier child help pages"""
-        return http.request.render('website_support.support_help_pages', {'help_groups': http.request.env['website.support.help.groups'].sudo().search([])})
+
+        permission_list = []
+        for perm_group in request.env.user.groups_id:
+            permission_list.append(perm_group.id)
+        
+        help_groups = http.request.env['website.support.help.groups'].sudo().search(['|', ('group_ids', '=', False ), ('group_ids', 'in', permission_list )])
+
+        return http.request.render('website_support.support_help_pages', {'help_groups': help_groups})
         
     @http.route('/support/ticket/submit', type="http", auth="public", website=True)
     def support_submit_ticket(self, **kw):

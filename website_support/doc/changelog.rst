@@ -1,3 +1,7 @@
+v1.4.18
+=======
+* Help group access groups
+
 v1.4.17
 =======
 * Category sequence
