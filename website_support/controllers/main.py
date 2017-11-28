@@ -75,6 +75,52 @@ class SupportTicketController(http.Controller):
             support_ticket.support_comment = values['comment']
             return http.request.render('website_support.support_survey_thank_you', {})
 
+    @http.route('/support/account/create', type="http", auth="public", website=True)
+    def support_account_create(self, **kw):
+        """  Create no permission account"""
+        
+        setting_allow_user_signup = request.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')
+
+        if setting_allow_user_signup:
+            return http.request.render('website_support.account_create', {})
+        else:
+            return "Account creation has been disabled"
+
+    @http.route('/support/account/create/process', type="http", auth="public", website=True)
+    def support_account_create_process(self, **kw):
+        """  Create no permission account"""
+
+        setting_allow_user_signup = request.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')
+
+        if setting_allow_user_signup:
+ 
+            values = {}
+	    for field_name, field_value in kw.items():
+	        values[field_name] = field_value
+	    
+	    #Create the new user
+	    new_user = request.env['res.users'].sudo().create({'name': values['name'], 'login': values['login'], 'email': values['login'], 'password': values['password'] })
+	
+	    #Remove all permissions
+	    new_user.groups_id = False
+	
+	    #Add the user to the support group
+	    support_group = request.env['ir.model.data'].sudo().get_object('website_support', 'support_group')
+            support_group.users = [(4, new_user.id)]
+
+	    #Also add them to the public group so they can access the website
+	    public_group = request.env['ir.model.data'].sudo().get_object('base', 'group_public')
+            public_group.users = [(4, new_user.id)]
+
+            #Automatically sign the new user in
+            request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
+	    request.session.authenticate(request.env.cr.dbname, values['login'], values['password'])
+
+            #Redirect them to the support page
+            return werkzeug.utils.redirect("/support/help")
+        else:
+            return "Account creation has been disabled"
+
     @http.route('/support/help', type="http", auth="public", website=True)
     def support_help(self, **kw):
         """Displays all help groups and thier child help pages"""
@@ -85,7 +131,9 @@ class SupportTicketController(http.Controller):
         
         help_groups = http.request.env['website.support.help.groups'].sudo().search(['|', ('group_ids', '=', False ), ('group_ids', 'in', permission_list )])
 
-        return http.request.render('website_support.support_help_pages', {'help_groups': help_groups})
+        setting_allow_user_signup = request.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')
+        
+        return http.request.render('website_support.support_help_pages', {'help_groups': help_groups, 'setting_allow_user_signup': setting_allow_user_signup})
         
     @http.route('/support/ticket/submit', type="http", auth="public", website=True)
     def support_submit_ticket(self, **kw):

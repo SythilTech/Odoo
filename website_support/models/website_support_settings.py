@@ -18,6 +18,18 @@ class WebsiteSupportSettings(models.Model):
     email_default_category_id = fields.Many2one('website.support.ticket.categories', string="Email Default Category")
     max_ticket_attachments = fields.Integer(string="Max Ticket Attachments")
     max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
+    allow_user_signup = fields.Boolean(string="Allow User Signup")
+
+    #-----Allow User Signup-----
+
+    @api.multi
+    def get_default_allow_user_signup(self, fields):
+        return {'allow_user_signup': self.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')}
+
+    @api.multi
+    def set_default_allow_user_signup(self):
+        for record in self:
+            self.env['ir.values'].set_default('website.support.settings', 'allow_user_signup', record.allow_user_signup)
     
     #-----Change User Email Template-----
 

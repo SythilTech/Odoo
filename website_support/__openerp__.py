@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.4.18",
+    'version': "1.4.19",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -27,6 +27,7 @@
         'data/website.menu.csv',
         'data/website.support.ticket.priority.xml',
         'data/website.support.settings.xml',
+        'data/res.groups.csv',
         'security/ir.model.access.csv',
     ],
     'demo': [],
