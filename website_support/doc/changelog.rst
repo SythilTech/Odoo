@@ -1,3 +1,7 @@
+v1.4.21
+=======
+* Sub category sequence
+
 v1.4.20
 =======
 * Help group access only to certain contacts

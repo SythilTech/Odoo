@@ -257,10 +257,18 @@ class WebsiteSupportTicketCategories(models.Model):
 class WebsiteSupportTicketSubCategories(models.Model):
 
     _name = "website.support.ticket.subcategory"
-    
+    _order = "sequence asc"
+
+    sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string='Sub Category Name')   
     parent_category_id = fields.Many2one('website.support.ticket.categories', required=True, string="Parent Category")
-   
+ 
+    @api.model
+    def create(self, values):
+        sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.subcategory')
+        values['sequence']=sequence
+        return super(WebsiteSupportTicketSubCategories, self).create(values)
+        
 class WebsiteSupportTicketStates(models.Model):
 
     _name = "website.support.ticket.states"

@@ -19,6 +19,7 @@
           <field name="model">website.support.ticket.subcategory</field>
           <field name="arch" type="xml">
       	      <tree>
+                  <field name="sequence" widget="handle"/>      	      
                   <field name="parent_category_id"/>
       	          <field name="name"/>
       	      </tree>
@@ -35,7 +36,14 @@
 	  </field>
       </record>
 
-      <menuitem id="website_support_ticket_subcategory_menu" name="Sub Categoriee" parent="website_support_config_parent_menu" action="website_support_ticket_subcategory_action" sequence="30"/>
+      <record id="sequence_supp_subcategory_seq" model="ir.sequence">
+          <field name="name">website.support.ticket.subcategory sequence</field>
+          <field name="code">website.support.ticket.subcategory</field>
+          <field eval="1" name="number_next"/>
+          <field eval="1" name="number_increment"/>
+      </record>
+      
+      <menuitem id="website_support_ticket_subcategory_menu" name="Sub Categories" parent="website_support_config_parent_menu" action="website_support_ticket_subcategory_action" sequence="30"/>
 
     </data>
 </openerp>
