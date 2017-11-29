@@ -16,7 +16,8 @@ class WebsiteSupportHelpGroups(models.Model):
     page_ids = fields.One2many('website.support.help.page','group_id',string="Pages")
     page_count = fields.Integer(string="Number of Pages", compute='_page_count')
     group_ids = fields.Many2many('res.groups', string="Privilege Groups")
-    
+    partner_ids = fields.Many2many('res.partner', string="Privilege Contacts")
+
     @api.one
     @api.depends('page_ids')
     def _page_count(self):

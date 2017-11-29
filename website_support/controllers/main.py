@@ -129,7 +129,7 @@ class SupportTicketController(http.Controller):
         for perm_group in request.env.user.groups_id:
             permission_list.append(perm_group.id)
         
-        help_groups = http.request.env['website.support.help.groups'].sudo().search(['|', ('group_ids', '=', False ), ('group_ids', 'in', permission_list )])
+        help_groups = http.request.env['website.support.help.groups'].sudo().search(['|', ('partner_ids', '=', False ), ('partner_ids', '=', request.env.user.partner_id.id )])
 
         setting_allow_user_signup = request.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')
         

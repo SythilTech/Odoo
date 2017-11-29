@@ -1,3 +1,7 @@
+v1.4.20
+=======
+* Help group access only to certain contacts
+
 v1.4.19
 =======
 * Create user account setting
