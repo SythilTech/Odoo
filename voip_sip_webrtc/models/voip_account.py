@@ -114,16 +114,7 @@ class VoipAccount(models.Model):
                 if packet_count % 10 == 0:
                     _logger.error(data)
                     
-                d = ['FF']
-                #TODO make loop stop when BYE is received on other port                
-
-                #Convert to hex so we can human interpret each byte
-                for rtp_char in data:
-                    hex_format = "{0:02x}".format(ord(rtp_char))
-                    d.append(hex_format)
-
-                payload = ' '.join(d[13:])
-                joined_payload += payload + " "
+                joined_payload += data
                 packet_count += 1
 
                 #---------------------Send Audio Packet-----------
@@ -143,8 +134,9 @@ class VoipAccount(models.Model):
                 new_cr = self.pool.cursor()
                 self = self.with_env(self.env(cr=new_cr))
 
-                encoded_string = base64.b64encode( joined_payload.replace(" ","").decode('hex') )
-                self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })
+                #Start off with the raw audio stream
+                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': codec.id}
+                self.process_audio_stream( create_dict )
 
                 if model:
                     #Add to the chatter
@@ -477,21 +469,8 @@ class VoipAccount(models.Model):
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
                 
-                    
-                d = ['FF']
-                #TODO make loop stop when BYE is received on other port                
-
-                #Convert to hex so we can human interpret each byte
-                for rtp_char in data:
-                    hex_format = "{0:02x}".format(ord(rtp_char))
-                    d.append(hex_format)
-
-                payload = ' '.join(d[13:])
-                joined_payload += payload + " "
+                joined_payload += data
                 packet_count += 1
-
-                if packet_count % 100 == 0:
-                    _logger.error(hex_format)
 
         except Exception as e:
             _logger.error(e)
@@ -504,9 +483,9 @@ class VoipAccount(models.Model):
                 new_cr = self.pool.cursor()
                 self = self.with_env(self.env(cr=new_cr))
 
-                self.process_audio_stream( joined_payload.replace(" ","").decode('hex') )
-                #encoded_string = base64.b64encode( joined_payload.replace(" ","").decode('hex') )
-                #self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })                
+                #Start off with the raw audio stream
+                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': self.codec_id.id}
+                self.process_audio_stream( create_dict )
 
                 if model:
                     #Add to the chatter
@@ -522,18 +501,22 @@ class VoipAccount(models.Model):
         except Exception as e:
             _logger.error(e)
 
-    def process_audio_stream(self, joined_payload):
+    def process_audio_stream(self, create_dict):
         _logger.error("Process File")
-        #Use RIFF wrapper so we can play the audio in the browser
-	header = "52 49 46 46"
-	header += " " + struct.pack('<I', len(joined_payload) - 8 ).encode('hex')
-	header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
-	header += " " + struct.pack('<I', len(joined_payload) - 44 ).encode('hex')
+        
+        #Add a RIFF wrapper to the raw file so we can play the audio in the browser, this won't be needed if transcoding is installed
+        if create_dict['media_filename'] == "call.raw":
+	    header = "52 49 46 46"
+	    header += " " + struct.pack('<I', len(create_dict['media']) - 8 ).encode('hex')
+	    header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
+	    header += " " + struct.pack('<I', len(create_dict['media']) - 44 ).encode('hex')
+            create_dict['media'] = header.replace(" ","").decode('hex') + create_dict['media']
+            create_dict['media_filename'] = "call.wav"
 	
-        joined_payload_with_header = header.replace(" ","").decode('hex') + joined_payload
-        encoded_string = base64.b64encode( joined_payload_with_header)
-        #TODO remove to_audio
-        self.env['voip.call'].create({'to_audio_filename':  "call.wav", 'to_audio': encoded_string, 'media': encoded_string })        
+        #Finally convert it to base64 so we can store it in Odoo
+        create_dict['media'] = base64.b64encode( create_dict['media'] )
+
+        self.env['voip.call'].create(create_dict)        
 
     def invite_listener(self, bind_port):
 

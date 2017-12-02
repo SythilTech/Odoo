@@ -48,6 +48,7 @@ class VoipCall(models.Model):
     media = fields.Binary(string="Media")
     media_filename = fields.Char(string="Media Filename")
     media_url = fields.Char(string="Media URL", compute="_compute_media_url")
+    codec_id = fields.Many2one('voip.codec', string="Codec")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
     ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
@@ -61,8 +62,12 @@ class VoipCall(models.Model):
         """ Delete recorded phone call to clear up space """
 
         for voip_call in self.env['voip.call'].search([('to_audio','!=', False)]):
+            #TODO remove to_audio
             voip_call.to_audio = False
-            to_audio_filename = False
+            voip_call.to_audio_filename = False
+            
+            voip_call.media = False
+            voip_call.media_filename = False
 
     def start_call(self):
         """ Process the ICE queue now """

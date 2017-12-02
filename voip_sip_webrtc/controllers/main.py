@@ -48,7 +48,7 @@ class VoipController(http.Controller):
         voip_call = request.env['voip.call'].browse( int(voip_call_id) )
         
         headers = []
-        media_base64 = base64.b64decode(voip_call.to_audio)
+        media_base64 = base64.b64decode(voip_call.media)
         headers.append(('Content-Length', len(media_base64)))
         headers.append(('Content-Type', 'audio/x-wav'))
         response = request.make_response(media_base64, headers)

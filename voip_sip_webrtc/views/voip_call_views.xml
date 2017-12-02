@@ -16,9 +16,7 @@
       	            <field name="duration"/>
       	            <field name="transcription"/>
       	            <field name="notes"/>
-      	            <!--<field name="to_audio" filename="to_audio_filename"/>
-      	            <field name="to_audio_filename" invisible="1"/>
-      	            <field name="media" filename="media_filename"/>
+      	            <!--<field name="media" filename="media_filename"/>
       	            <field name="media_filename" invisible="1"/>-->
       	            <field name="media_url" widget="url"/>      	            
       	            <field name="client_ids">
