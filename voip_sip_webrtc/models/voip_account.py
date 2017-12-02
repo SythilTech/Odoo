@@ -210,10 +210,10 @@ class VoipAccount(models.Model):
             header += " " + format( (len(audio_stream) - 44) / 3 , '08x')
 
 
-	    header = "52 49 46 46"
-	    header += " " + format(len(audio_stream) - 8, '08x')
+	    header = "52 49 46 46"	    
+	    header += " " + struct.pack('<I', len(audio_stream) - 8 ).encode('hex')
 	    header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
-	    header += " " + format( (len(audio_stream) - 44) / 3 , '08x')
+	    header += " " + struct.pack('<I', len(audio_stream) - 44 ).encode('hex')
             
             joined_payload_with_header = header.replace(" ","").decode('hex') + audio_stream
 
@@ -504,9 +504,9 @@ class VoipAccount(models.Model):
                 new_cr = self.pool.cursor()
                 self = self.with_env(self.env(cr=new_cr))
 
-                #self.process_audio_stream( joined_payload.replace(" ","").decode('hex') )
-                encoded_string = base64.b64encode( joined_payload.replace(" ","").decode('hex') )
-                self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })                
+                self.process_audio_stream( joined_payload.replace(" ","").decode('hex') )
+                #encoded_string = base64.b64encode( joined_payload.replace(" ","").decode('hex') )
+                #self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })                
 
                 if model:
                     #Add to the chatter
@@ -523,11 +523,17 @@ class VoipAccount(models.Model):
             _logger.error(e)
 
     def process_audio_stream(self, joined_payload):
-	header = "52 49 46 46 54 48 18 00 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61 00 48 18 00"
+        _logger.error("Process File")
+        #Use RIFF wrapper so we can play the audio in the browser
+	header = "52 49 46 46"
+	header += " " + struct.pack('<I', len(joined_payload) - 8 ).encode('hex')
+	header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
+	header += " " + struct.pack('<I', len(joined_payload) - 44 ).encode('hex')
 	
         joined_payload_with_header = header.replace(" ","").decode('hex') + joined_payload
         encoded_string = base64.b64encode( joined_payload_with_header)
-        self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })        
+        #TODO remove to_audio
+        self.env['voip.call'].create({'to_audio_filename':  "call.wav", 'to_audio': encoded_string, 'media': encoded_string })        
 
     def invite_listener(self, bind_port):
 
