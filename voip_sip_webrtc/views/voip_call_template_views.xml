@@ -11,7 +11,8 @@
       	            <field name="model_id"/>
       	            <field name="voip_account_id"/>
       	            <field name="to_address"/>
-      	            <field name="gsm_media"/>
+      	            <field name="media"/>
+      	            <field name="codec_id"/>
       	        </group>
       	    </form>
         </field>

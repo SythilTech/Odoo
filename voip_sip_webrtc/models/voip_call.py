@@ -49,6 +49,14 @@ class VoipCall(models.Model):
     ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
 
+    @api.model
+    def clear_messagebank(self):
+        """ Delete recorded phone call to clear up space """
+
+        for voip_call in self.env['voip.call'].search([('to_audio','!=', False)]):
+            voip_call.to_audio = False
+            to_audio_filename = False
+
     def start_call(self):
         """ Process the ICE queue now """
                 

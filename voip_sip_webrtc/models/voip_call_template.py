@@ -58,13 +58,15 @@ class VoipCallTemplate(models.Model):
     model_id = fields.Many2one('ir.model', string="Applies to", help="The kind of document with with this template can be used")
     voip_account_id = fields.Many2one('voip.account', string="VOIP Account")
     to_address = fields.Char(string="To Address", help="Use placeholders")
-    gsm_media = fields.Binary(string="GSM Audio File")
-    
+    gsm_media = fields.Binary(string="(OBSOLETE)GSM Audio File")
+    media = fields.Binary(string="Raw Audio File")
+    codec_id = fields.Many2one('voip.codec', string="Codec")
+
     def make_call(self, record_id):
         _logger.error("Make Call")
         to_address = self.render_template(self.to_address, self.model_id.model, record_id)
-        decoded_gsm_media = base64.decodestring(self.gsm_media)
-        self.voip_account_id.make_call(to_address, decoded_gsm_media, self.model_id.model, record_id)
+        decoded_media = base64.decodestring(self.media)
+        self.voip_account_id.make_call(to_address, decoded_media, self.codec_id, self.model_id.model, record_id)
         
     def render_template(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``

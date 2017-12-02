@@ -36,7 +36,9 @@ class VoipAccount(models.Model):
     outbound_proxy = fields.Char(string="Outbound Proxy")
     verified = fields.Boolean(string="Verified")
     wss = fields.Char(string="WSS", default="wss://edge.sip.onsip.com")
-    gsm_media = fields.Binary(string="GSM Audio File")
+    gsm_media = fields.Binary(string="(OBSOLETE)GSM Audio File")
+    media = fields.Binary(string="Raw Audio File")
+    codec_id = fields.Many2one('voip.codec', string="Codec")
     
     @api.onchange('address')
     def _onchange_address(self):
@@ -44,14 +46,49 @@ class VoipAccount(models.Model):
             if "@" in self.address:
                 self.username = self.address.split("@")[0]
                 self.domain = self.address.split("@")[1]
-
+            
     def H(self, data):
         return hashlib.md5(data).hexdigest()
 
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
     
-    def rtp_server_listener(self, media_port, audio_stream, model=False, record_id=False):
+    def generate_rtp_packet(self, audio_stream, codec, sequence_number):
+
+        rtp_data = ""
+
+        #---- Compose RTP packet to send back---
+        #10.. .... = Version: RFC 1889 Version (2)
+        #..0. .... = Padding: False
+        #...0 .... = Extension: False
+        #.... 0000 = Contributing source identifiers count: 0
+        rtp_data += "80"
+
+        #0... .... = Marker: False
+        #Payload type: G.711 aLaw or GSM
+        rtp_data += " " + format( codec.payload_type, '02x')
+
+        rtp_data += " " + format( sequence_number, '04x')
+        
+        timestamp = codec.sample_rate / (1000 / codec.sample_interval) * sequence_number
+        rtp_data += " " + format( timestamp, '08x')
+            
+        #Synchronization Source identifier: 0x1222763d (304248381)
+        rtp_data += " 12 22 76 3d"
+
+        #Payload:
+        payload_data = audio_stream[sequence_number * codec.payload_size : sequence_number * codec.payload_size + codec.payload_size]
+        hex_string = ""
+
+        for rtp_char in payload_data:
+            hex_format = "{0:02x}".format(ord(rtp_char))
+            hex_string += hex_format + " "
+
+        rtp_data += " " + hex_string
+            
+        return rtp_data.replace(" ","").decode('hex')
+            
+    def rtp_server_listener(self, media_port, audio_stream, codec, model=False, record_id=False):
         
         try:
 
@@ -66,10 +103,9 @@ class VoipAccount(models.Model):
             packet_count = 0
 
             #Send audio data out every 20ms
-            sequence_number = randint(29161, 30000)
-            seg_counter = 0
-            timestamp = 0
-
+            #sequence_number = randint(29161, 30000)
+            sequence_number = 0
+            
             while stage == "LISTEN":
 
                 rtpsocket.settimeout(10)
@@ -91,60 +127,15 @@ class VoipAccount(models.Model):
                 packet_count += 1
 
                 #---------------------Send Audio Packet-----------
-                rtp_data = ""
-
-                #---- Compose RTP packet to send back---
-                #10.. .... = Version: RFC 1889 Version (2)
-                #..0. .... = Padding: False
-                #...0 .... = Extension: False
-                #.... 0000 = Contributing source identifiers count: 0
-                rtp_data += "80"
-
-                #0... .... = Marker: False
-                #Payload type: GSM (3)
-                if packet_count == 0:
-                    rtp_data += " 83"
-                else:
-                    rtp_data += " 03"
-
-                rtp_data += " " + format( sequence_number, '04x')
-                sequence_number += 1
- 
-                rtp_data += " " + format( timestamp, '08x')
-                timestamp += 160 #8000 / (1000ms / 20ms)
-            
-                #Synchronization Source identifier: 0x1222763d (304248381)
-                rtp_data += " 12 22 76 3d"
-
-                #Payload:
-                payload_data = audio_stream[seg_counter : seg_counter + 33]
-                hex_string = ""
-
-                for rtp_char in payload_data:
-                    hex_format = "{0:02x}".format(ord(rtp_char))
-                    hex_string += hex_format + " "
-
-                rtp_data += " " + hex_string
-                seg_counter += 33
-            
-                send_data = rtp_data.replace(" ","").decode('hex')
-                        
+                send_data = self.generate_rtp_packet(audio_stream, codec, sequence_number)
                 rtpsocket.sendto(send_data, addr)
+                sequence_number += 1
                 #---------------------END Send Audio Packet-----------
 
         except Exception as e:
             _logger.error(e)
 
         try:
-            #Write the received audio out to a file, TODO use temporary files
-            f = open('/odoo/export.gsm', 'w')
-            f.write( joined_payload.replace(" ","").decode('hex') )
-            f.close()
-
-            #Transcode the file to mp3
-            seg = AudioSegment.from_file("/odoo/export.gsm", "gsm")            
-            export_filename = "/odoo/export.mp3"
-            seg.export(export_filename, format="mp3")
 
             #Create the call with the audio
             with api.Environment.manage():
@@ -152,9 +143,8 @@ class VoipAccount(models.Model):
                 new_cr = self.pool.cursor()
                 self = self.with_env(self.env(cr=new_cr))
 
-                with open(export_filename, "rb") as audio_file:
-                    encoded_string = base64.b64encode(audio_file.read())
-                    self.env['voip.call'].create({'to_audio_filename':  "call.mp3", 'to_audio': encoded_string })
+                encoded_string = base64.b64encode( joined_payload.replace(" ","").decode('hex') )
+                self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })
 
                 if model:
                     #Add to the chatter
@@ -169,8 +159,75 @@ class VoipAccount(models.Model):
 
         except Exception as e:
             _logger.error(e)
+
+    def test_add_header(self):
+        #G.711
+        with open("/odoo/call.raw", "rb") as audio_file:
+            audio_stream = audio_file.read()
+	    #header = "52 49 46 46 54 48 18 00 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61 00 48 18 00"
+
+            header = ""
+	    #"RIFF"
+	    header += "52 49 46 46"
+	    
+	    #File Size (Integer)?
+	    header += " " + format(len(audio_stream) - 8, '08x')
+	    
+	    #"WAVE"
+	    header += " 57 41 56 45"
+	    
+	    #"fmt "
+	    header += " 66 6D 74 20"
+	    
+	    #Format data length (18)?
+	    header + "12 00 00 00"
+	    
+	    #Type of format (6)?
+	    header += " 06 00"
+	    
+	    #Channels (mono)
+	    header += " 01 00"
+	    
+	    #Sample rate (1 milion???)
+	    header += " 40 1F 00 00 40"
+	    
+	    #c?
+	    header += " 1F 00 00 01"
+	    
+	    #c2?
+	    header += " 00 08 00 00"
+	    
+	    #Bits per sample (102?)
+	    header += " 00 66"
+	    
+	    #no idea...
+	    header += " 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00"
+            
+            #"data"
+            header += " 64 61 74 61"
+            
+            #Data length
+            header += " " + format( (len(audio_stream) - 44) / 3 , '08x')
+
+
+	    header = "52 49 46 46"
+	    header += " " + format(len(audio_stream) - 8, '08x')
+	    header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
+	    header += " " + format( (len(audio_stream) - 44) / 3 , '08x')
+            
+            joined_payload_with_header = header.replace(" ","").decode('hex') + audio_stream
+
+        with open("/odoo/call.wav", "wb") as audio_file:            
+            audio_file.write(joined_payload_with_header)
     
-    def make_call(self, to_address, audio_stream, model=False, record_id=False):
+    def test_make_call(self):
+
+        with open("/odoo/input.raw", "rb") as audio_file:
+            audio_stream = audio_file.read()
+            codec = self.env['voip.codec'].browse(2)
+            self.make_call("stevewright2009@sythiltech.onsip.com", audio_stream, codec)
+            
+    def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
 
         port = random.randint(6000,7000)
         media_port = random.randint(55000,56000)
@@ -178,7 +235,7 @@ class VoipAccount(models.Model):
         call_id = random.randint(50000,60000)
         from_tag = random.randint(8000000,9000000)
 
-        rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(media_port, audio_stream, model, record_id,))
+        rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(media_port, audio_stream, codec, model, record_id,))
         rtc_listener_starter.start()
         
         #----Generate SDP of audio call that the server can work with e.g. limited codex support----
@@ -202,8 +259,7 @@ class VoipAccount(models.Model):
         sdp += "t=0 0\r\n"
 
         #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
-        audio_codec = "3" #Use GSM Audio Profile
-        sdp += "m=audio " + str(media_port) + " RTP/AVP " + audio_codec + "\r\n"
+        sdp += "m=audio " + str(media_port) + " RTP/AVP " + str(codec.payload_type) + "\r\n"
 
         #Two way call because later we may use voice reconisation to control assistant menus        
         sdp += "a=sendrecv\r\n"
@@ -294,7 +350,7 @@ class VoipAccount(models.Model):
                 #Send the ACK
                 reply = ""
                 reply += "ACK " + contact_header + " SIP/2.0\r\n"
-                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + "\r\n"
+                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---41291a6583a6634f;rport\r\n"
                 reply += "Max-Forwards: 70\r\n"
                 reply += "Route: " + record_route + "\r\n"
                 reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
@@ -407,52 +463,15 @@ class VoipAccount(models.Model):
             packet_count = 0
 
             #Send audio data out every 20ms
-            sequence_number = randint(29161, 30000)
-            seg_counter = 0
-            timestamp = 0
-
+            #sequence_number = randint(29161, 30000)
+            sequence_number = 0
+            
             while stage == "LISTEN":
 
                 #---------------------Send Audio Packet-----------
-                rtp_data = ""
-
-                #---- Compose RTP packet to send back---
-                #10.. .... = Version: RFC 1889 Version (2)
-                #..0. .... = Padding: False
-                #...0 .... = Extension: False
-                #.... 0000 = Contributing source identifiers count: 0
-                rtp_data += "80"
-
-                #0... .... = Marker: False
-                #Payload type: GSM (3)
-                if packet_count == 0:
-                    rtp_data += " 83"
-                else:
-                    rtp_data += " 03"
-
-                rtp_data += " " + format( sequence_number, '04x')
-                sequence_number += 1
- 
-                rtp_data += " " + format( timestamp, '08x')
-                timestamp += 160 #8000 / (1000ms / 20ms)
-            
-                #Synchronization Source identifier: 0x1222763d (304248381)
-                rtp_data += " 12 22 76 3d"
-
-                #Payload:
-                payload_data = audio_stream[seg_counter : seg_counter + 33]
-                hex_string = ""
-
-                for rtp_char in payload_data:
-                    hex_format = "{0:02x}".format(ord(rtp_char))
-                    hex_string += hex_format + " "
-
-                rtp_data += " " + hex_string
-                seg_counter += 33
-            
-                send_data = rtp_data.replace(" ","").decode('hex')
-                        
+                send_data = self.generate_rtp_packet(audio_stream, self.codec_id, sequence_number)
                 rtpsocket.sendto(send_data, caller_addr)
+                sequence_number += 1
                 #---------------------END Send Audio Packet-----------
 
                 rtpsocket.settimeout(10)
@@ -478,15 +497,6 @@ class VoipAccount(models.Model):
             _logger.error(e)
 
         try:
-            #Write the received audio out to a file, TODO use temporary files
-            f = open('/odoo/export.gsm', 'w')
-            f.write( joined_payload.replace(" ","").decode('hex') )
-            f.close()
-
-            #Transcode the file to mp3
-            seg = AudioSegment.from_file("/odoo/export.gsm", "gsm")            
-            export_filename = "/odoo/export.mp3"
-            seg.export(export_filename, format="mp3")
 
             #Create the call with the audio
             with api.Environment.manage():
@@ -494,9 +504,9 @@ class VoipAccount(models.Model):
                 new_cr = self.pool.cursor()
                 self = self.with_env(self.env(cr=new_cr))
 
-                with open(export_filename, "rb") as audio_file:
-                    encoded_string = base64.b64encode(audio_file.read())
-                    self.env['voip.call'].create({'to_audio_filename':  "call.mp3", 'to_audio': encoded_string })
+                #self.process_audio_stream( joined_payload.replace(" ","").decode('hex') )
+                encoded_string = base64.b64encode( joined_payload.replace(" ","").decode('hex') )
+                self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })                
 
                 if model:
                     #Add to the chatter
@@ -511,6 +521,13 @@ class VoipAccount(models.Model):
 
         except Exception as e:
             _logger.error(e)
+
+    def process_audio_stream(self, joined_payload):
+	header = "52 49 46 46 54 48 18 00 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61 00 48 18 00"
+	
+        joined_payload_with_header = header.replace(" ","").decode('hex') + joined_payload
+        encoded_string = base64.b64encode( joined_payload_with_header)
+        self.env['voip.call'].create({'to_audio_filename':  "call.raw", 'to_audio': encoded_string })        
 
     def invite_listener(self, bind_port):
 
@@ -556,7 +573,7 @@ class VoipAccount(models.Model):
                         reply += "From: " + self.address + ";tag=8861321\r\n"
                         reply += "Call-ID: " + call_id + "\r\n"
                         reply += "CSeq: 2 INVITE\r\n"
-                        reply += "User-Agent: X-Lite release 5.0.1 stamp 86895\r\n"
+                        reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
                         reply += "Allow-Events: talk, hold\r\n"
                         reply += "Content-Length: 0\r\n"
                         reply += "\r\n"
@@ -565,7 +582,7 @@ class VoipAccount(models.Model):
                         
                         media_port = random.randint(55000,56000)
                         
-                        audio_stream = base64.decodestring(self.gsm_media)
+                        audio_stream = base64.decodestring(self.media)
                         
                         send_media_port = re.findall(r'm=audio (.*?) RTP', data)[0]
                         _logger.error(send_media_port)
@@ -583,7 +600,7 @@ class VoipAccount(models.Model):
                         sdp += "s=X-Lite release 5.0.1 stamp 86895\r\n"
                         sdp += "c=IN IP4 " + local_ip + "\r\n"
                         sdp += "t=0 0\r\n"
-                        sdp += "m=audio " + str(media_port) + " RTP/AVP 3\r\n"
+                        sdp += "m=audio " + str(media_port) + " RTP/AVP " + str(self.codec_id.payload_type) + "\r\n"
                         sdp += "a=sendrecv\r\n"
                         
                         reply = ""
@@ -600,7 +617,7 @@ class VoipAccount(models.Model):
                         reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
                         reply += "Content-Type: application/sdp\r\n"
                         reply += "Supported: replaces\r\n"
-                        reply += "User-Agent: X-Lite release 5.0.1 stamp 86895\r\n"
+                        reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
                         reply += "Content-Length: " + str(len(sdp)) + "\r\n"
                         reply += "\r\n"
                         reply += sdp

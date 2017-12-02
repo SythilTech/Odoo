@@ -22,6 +22,7 @@
         'data/voip_ringtone.xml',
         'data/voip_settings.xml',
         'data/voip.codec.csv',
+        'data/ir.cron.csv',
     ],
     'demo': [],
     'depends': ['web','crm','bus'],

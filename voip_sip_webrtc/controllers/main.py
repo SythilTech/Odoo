@@ -40,7 +40,21 @@ class VoipController(http.Controller):
         response = request.make_response(ringtone_base64, headers)
 
         return response
-                    
+
+    @http.route('/voip/messagebank/<voip_call_id>.wav', type="http", auth="user")
+    def voip_messagebank(self, voip_call_id):
+        """ Allow listen to call in browser """
+        
+        voip_call = request.env['voip.call'].browse( int(voip_call_id) )
+        
+        headers = []
+        media_base64 = base64.b64decode(voip_call.to_audio)
+        headers.append(('Content-Length', len(media_base64)))
+        headers.append(('Content-Type', 'audio/x-wav'))
+        response = request.make_response(media_base64, headers)
+
+        return response
+            
     @http.route('/voip/miss/<voip_call_id>.mp3', type="http", auth="user")
     def voip_miss_message(self, voip_call_id):
         """ Play the missed call mp3 of the callee """

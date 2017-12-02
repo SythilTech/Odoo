@@ -8,6 +8,8 @@
       	    <form>
       	        <header>
       	            <button name="send_register" type="object" string="Send Register"/>
+      	            <button name="test_make_call" type="object" string="Test Call"/>
+      	            <button name="test_add_header" type="object" string="Test Add Header"/>
       	        </header>
       	        <group>
       	            <field name="address"/>
@@ -17,7 +19,8 @@
       	            <field name="domain"/>
       	            <field name="wss"/>
       	            <field name="outbound_proxy"/>
-      	            <field name="gsm_media"/>
+      	            <field name="media"/>
+      	            <field name="codec_id"/>
       	        </group>
       	    </form>
         </field>
