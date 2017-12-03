@@ -68,26 +68,30 @@ class WebsiteSupportTicket(models.Model):
     def message_new(self, msg, custom_values=None):
         """ Create new support ticket upon receiving new email"""
 
-        from_email = msg.get('from')
-        from_name = msg.get('from')
+        defaults = {'support_email': msg.get('to'), 'subject': msg.get('subject')}
+
+        #Extract the name from the from email if you can        
         if "<" in msg.get('from') and ">" in msg.get('from'):
             start = msg.get('from').rindex( "<" ) + 1
             end = msg.get('from').rindex( ">", start )
             from_email = msg.get('from')[start:end]
             from_name = msg.get('from').split("<")[0].strip()
+            defaults['person_name'] = from_name
+        else:
+            from_email = msg.get('from')
 
-        search_partner = self.env['res.partner'].sudo().search([('email','=', from_email )])
-
-        partner_id = False
+        defaults['email'] = from_email
+        
+        #Try to find the partner using the from email
+        search_partner = self.env['res.partner'].sudo().search([('email','=', from_email)])
         if len(search_partner) > 0:
-            partner_id = search_partner[0].id
-            from_name = search_partner[0].name
+            defaults['partner_id'] = search_partner[0].id
+            defaults['person_name'] = search_partner[0].name
 
-        body_short = tools.html_sanitize(msg.get('body'))
-        #body_short = tools.html_email_clean(msg.get('body'), shorten=True, remove=True)
+        defaults['description'] = tools.html_sanitize(msg.get('body'))
         
         portal_access_key = randint(1000000000,2000000000)
-        defaults = {'partner_id': partner_id, 'person_name': from_name, 'email': msg.get('from'), 'support_email': msg.get('to'), 'subject': msg.get('subject'), 'description': body_short, 'portal_access_key': portal_access_key}
+        defaults['portal_access_key'] = portal_access_key
 
         #Assign to default category
         setting_email_default_category_id = self.env['ir.values'].get_default('website.support.settings', 'email_default_category_id')
@@ -163,15 +167,16 @@ class WebsiteSupportTicket(models.Model):
 
         #Add one to the next ticket number
         new_id.company_id.next_support_ticket_number += 1
-        
-        #Send autoreply back to customer
-        new_ticket_email_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_new')
-        values = new_ticket_email_template.generate_email(new_id.id)
-        values['email_to'] = values['email_to'].replace("&lt;","<").replace("&gt;",">")
-        send_mail = self.env['mail.mail'].create(values)
-        send_mail.send(True)
-        
-        #send an email out to everyone in the category
+
+        #(BACK COMPATABILITY) Fail safe if no template is selected, future versions will allow disabling email by removing template
+        ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
+        if ticket_open_email_template == False:
+            ticket_open_email_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_new')
+            ticket_open_email_template.send_mail(new_id.id, True)
+        else:
+            ticket_open_email_template.send_mail(new_id.id, True)
+
+        #Send an email out to everyone in the category
         notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
         support_ticket_menu = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
         support_ticket_action = self.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
@@ -195,6 +200,10 @@ class WebsiteSupportTicket(models.Model):
 
         update_rec = super(WebsiteSupportTicket, self).write(values)
 
+        if 'state' in values:
+            if self.state.mail_template_id:
+                self.state.mail_template_id.send_mail(self.id, True)
+                
         #Email user if category has changed
         if 'category' in values:
             change_category_email = self.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category_change')
@@ -274,7 +283,7 @@ class WebsiteSupportTicketStates(models.Model):
     _name = "website.support.ticket.states"
     
     name = fields.Char(required=True, translate=True, string='State Name')
-    mail_template_id = fields.Many2one('mail.template', string="Mail Template")
+    mail_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Mail Template")
 
 class WebsiteSupportTicketPriority(models.Model):
 
@@ -316,19 +325,16 @@ class WebsiteSupportTicketCompose(models.Model):
         message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
         self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
 
-        self.ticket_id.state = closed_state.id
         self.ticket_id.close_comment = self.message
         self.ticket_id.closed_by_id = self.env.user.id
+        self.ticket_id.state = closed_state.id
         
-        #Send an email notifing the customer  that the ticket has been closed
-        setting_close_email_template_id = self.env['ir.values'].get_default('website.support.settings', 'close_ticket_email_template_id')
-        
-        if setting_close_email_template_id:
-            setting_close_email_template = self.env['mail.template'].browse(setting_close_email_template_id)
-            setting_close_email_template.send_mail(self.ticket_id.id, True)
-        else:
-            ticket_closed_email = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
-            ticket_closed_email.send_mail(self.ticket_id.id, True)
+        #(BACK COMPATABILITY) Fail safe if no template is selected
+        closed_state_mail_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed').mail_template_id
+
+        if closed_state_mail_template == False:
+            closed_state_mail_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
+            closed_state_mail_template.send_mail(self.ticket_id.id, True)
     
 class WebsiteSupportTicketCompose(models.Model):
 

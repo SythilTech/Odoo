@@ -130,7 +130,9 @@
             <field name="auto_delete" eval="False"/>
             <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
-                <p>Dear ${object.person_name},</p>
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
                 <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
                 <hr/>
                 <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.portal_access_key}">here</a><br/>

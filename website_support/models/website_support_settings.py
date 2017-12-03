@@ -12,7 +12,7 @@ class WebsiteSupportSettings(models.Model):
     _name = "website.support.settings"
     _inherit = 'res.config.settings'
             
-    close_ticket_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Close Ticket Email Template")
+    close_ticket_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="(OBSOLETE)Close Ticket Email Template")
     change_user_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Change User Email Template")
     staff_reply_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket.compose')]", string="Staff Reply Email Template")
     email_default_category_id = fields.Many2one('website.support.ticket.categories', string="Email Default Category")

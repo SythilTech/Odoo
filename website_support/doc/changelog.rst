@@ -1,3 +1,7 @@
+v1.4.22
+=======
+* State assignable email
+
 v1.4.21
 =======
 * Sub category sequence

@@ -8,7 +8,7 @@
       	      <form>
       	          <group>
       	              <field name="name"/>
-      	              <field name="mail_template_id"/>
+      	              <field name="mail_template_id" context="{'default_model':'website.support.ticket'}"/>
       	          </group>
       	      </form>
       	  </field>
