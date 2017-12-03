@@ -1,3 +1,8 @@
+v1.4.23
+=======
+* Read only rating and comment
+* Readd portal key for logged in users since it's used by survey
+
 v1.4.22
 =======
 * State assignable email

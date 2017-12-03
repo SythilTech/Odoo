@@ -11,7 +11,9 @@
             <field name="auto_delete" eval="False"/>
             <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
-                <p>Dear ${object.person_name},</p>
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
                 <p>We would like to get your feedback on the support</p>
                 <p><a href="_survey_url_">here</a></p>
                 <hr/>
