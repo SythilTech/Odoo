@@ -55,8 +55,11 @@ class VoipCall(models.Model):
 
     @api.one
     def _compute_media_url(self):
-        self.media_url = "/voip/messagebank/" + str(self.id) + ".wav"
-    
+        if self.media:
+            self.media_url = "/voip/messagebank/" + str(self.id) + ".wav"
+        else:
+            self.media_url = ""
+            
     @api.model
     def clear_messagebank(self):
         """ Delete recorded phone call to clear up space """
