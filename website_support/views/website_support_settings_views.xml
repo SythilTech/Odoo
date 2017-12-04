@@ -17,6 +17,7 @@
                     <field name="max_ticket_attachments"/>
                     <field name="max_ticket_attachment_filesize"/>
                     <field name="allow_user_signup"/>
+                    <field name="auto_send_survey"/>
                 </group>
       	    </form>
         </field>

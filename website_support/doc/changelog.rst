@@ -1,3 +1,7 @@
+v1.4.24
+=======
+* Auto send survey setting
+
 v1.4.23
 =======
 * Read only rating and comment

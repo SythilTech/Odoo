@@ -19,7 +19,19 @@ class WebsiteSupportSettings(models.Model):
     max_ticket_attachments = fields.Integer(string="Max Ticket Attachments")
     max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
     allow_user_signup = fields.Boolean(string="Allow User Signup")
+    auto_send_survey = fields.Boolean(string="Auto Send Survey")
 
+    #-----Auto Send Survey-----
+
+    @api.multi
+    def get_default_auto_send_survey(self, fields):
+        return {'auto_send_survey': self.env['ir.values'].get_default('website.support.settings', 'auto_send_survey')}
+
+    @api.multi
+    def set_default_auto_send_survey(self):
+        for record in self:
+            self.env['ir.values'].set_default('website.support.settings', 'auto_send_survey', record.auto_send_survey)
+    
     #-----Allow User Signup-----
 
     @api.multi

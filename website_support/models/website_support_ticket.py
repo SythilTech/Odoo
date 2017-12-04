@@ -333,6 +333,11 @@ class WebsiteSupportTicketCompose(models.Model):
         self.ticket_id.close_comment = self.message
         self.ticket_id.closed_by_id = self.env.user.id
         self.ticket_id.state = closed_state.id
+
+        #Auto send out survey
+        setting_auto_send_survey = self.env['ir.values'].get_default('website.support.settings', 'auto_send_survey')
+        if setting_auto_send_survey:
+            self.ticket_id.send_survey()
         
         #(BACK COMPATABILITY) Fail safe if no template is selected
         closed_state_mail_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed').mail_template_id
