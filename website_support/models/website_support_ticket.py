@@ -57,6 +57,7 @@ class WebsiteSupportTicket(models.Model):
     support_comment = fields.Text(string="Support Comment")
     close_comment = fields.Text(string="Close Comment")
     close_time = fields.Datetime(string="Close Time")
+    close_date = fields.Date(string="Close Date")
     closed_by_id = fields.Many2one('res.users', string="Closed By")
     time_to_close = fields.Integer(string="Time to close (seconds)")
     
@@ -316,6 +317,10 @@ class WebsiteSupportTicketCompose(models.Model):
     def close_ticket(self):
 
         self.ticket_id.close_time = datetime.datetime.now()
+        
+        #Also set the date for gamification
+        self.ticket_id.close_date = datetime.date.today()
+        
         diff_time = datetime.datetime.strptime(self.ticket_id.close_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(self.ticket_id.create_date, DEFAULT_SERVER_DATETIME_FORMAT)            
         self.ticket_id.time_to_close = diff_time.seconds
 

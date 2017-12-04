@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket - Gamification",
-    'version': "1.0.0",
+    'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -11,7 +11,7 @@
         'data/gamification_data.xml',
     ],
     'demo': [],
-    'depends': ['website_support_analytic_timesheets'],
+    'depends': ['website_support_analytic_timesheets', 'gamification'],
     'images':[
     ],
     'installable': True,
