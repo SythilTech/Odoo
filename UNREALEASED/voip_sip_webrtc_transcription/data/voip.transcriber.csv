@@ -1,0 +1,8 @@
+"id","name","internal_code"
+"cmu_sphinx","CMU Sphinx","cmu_sphinx"
+"google_speech_recognition","Google Speech Recognition","google_speech_recognition"
+"google_cloud_speech_api","Google Cloud Speech API","google_cloud_speech_api"
+"wit_ai","Wit.ai","wit_ai"
+"microsoft_bing_voice_recognition","Microsoft Bing Voice Recognition","microsoft_bing_voice_recognition"
+"houndify_api","Houndify API","houndify_api"
+"ibm_speech_to_text","IBM Speech to Text","ibm_speech_to_text"

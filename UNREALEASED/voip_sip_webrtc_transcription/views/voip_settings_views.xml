@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_settings_view_form_inherit_transcription" model="ir.ui.view">
+        <field name="name">voip.settings.view.form</field>
+        <field name="model">voip.settings</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_settings_view_form"/>
+        <field name="arch" type="xml">
+            <field name="server_ip" position="after">
+                <field name="transcriber_id"/>
+                <field name="google_speech_recognition_api_key"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_sip_call_view_form_inherit_transcription" model="ir.ui.view">
+        <field name="name">voip.call form view inherit transcription</field>
+        <field name="model">voip.call</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_call_view_form"/>
+        <field name="arch" type="xml">
+            <form position="inside">
+                <header>
+                    <button name="test_transcribe" type="object" string="Test Transcribe"/>
+                </header>
+            </form>
+        </field>
+    </record>
+
+</odoo>
