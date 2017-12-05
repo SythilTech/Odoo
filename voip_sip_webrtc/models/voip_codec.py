@@ -11,4 +11,4 @@ class VoipCodec(models.Model):
     sample_rate = fields.Integer(string="Sample Rate")
     payload_size = fields.Integer(string="Payload Size")
     sample_interval = fields.Integer(string="Sample Interval")
-    supported = fields.Boolean(string="Supported")    
+    supported = fields.Boolean(string="Supported")

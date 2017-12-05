@@ -16,11 +16,6 @@ import time
 import struct
 import base64
 from random import randint
-
-try:
-    from pydub import AudioSegment
-except Exception as e:
-    _logger.error(e)
             
 class VoipAccount(models.Model):
 
