@@ -1,6 +1,6 @@
 {
     'name': "CRM Custom Fields",
-    'version': "1.3.2",
+    'version': "1.4.0",
     'author': "Sythil Tech",
     'category': "CRM",
     'support': "steven@sythiltech.com.au",
@@ -9,6 +9,7 @@
     'data': [
         'views/res_partner_views.xml',
         'views/ir_model_views.xml',
+        'views/sale_config_settings_convert_views.xml',
         'security/ir.model.access.csv',
         'data/crm.custom.fields.widget.csv',
     ],

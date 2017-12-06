@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        
+        <record id="sale_config_settings_convert_tree_view" model="ir.ui.view">
+            <field name="name">sale.config.settings.convert tree view</field>
+            <field name="model">sale.config.settings.convert</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="lead_field_id"/>
+                    <field name="partner_field_id"/>
+                </tree>
+            </field>
+       </record>
+
+    <record id="sale_config_settings_convert_action" model="ir.actions.act_window">
+        <field name="name">Lead to Partner Convert Fields</field>
+	<field name="res_model">sale.config.settings.convert</field>
+	<field name="view_mode">tree</field>
+	<field name="help" type="html">
+	    <p>
+	        Select fields to carry over from leads
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="sale_config_settings_convert_menu" name="Lead Convert Fields" parent="sales_team.menu_sale_config" action="sale_config_settings_convert_action" sequence="20"/>
+       
+   </data>
+</openerp>

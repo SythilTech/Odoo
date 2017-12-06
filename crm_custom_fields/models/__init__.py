@@ -1,1 +1,1 @@
-import ir_model, ir_model_fields, res_partner
+import ir_model, ir_model_fields, res_partner, crm_lead, sale_config_settings

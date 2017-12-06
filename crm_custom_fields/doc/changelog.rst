@@ -1,3 +1,7 @@
+v1.4.0
+======
+* Choose additional fields to carry over to partner
+
 v1.3.2
 ======
 * Base field name on description rather then next id
