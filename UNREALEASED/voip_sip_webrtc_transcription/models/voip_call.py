@@ -7,22 +7,24 @@ import speech_recognition as sr
     
 from openerp import api, fields, models
 from odoo.exceptions import UserError
+import subprocess
 
 class VoipCallTranscription(models.Model):
 
     _inherit = 'voip.call'
 
-    def test_transcribe(self):
-        _logger.error("TEST Transcribe")
-        setting_transcriber = self.env['voip.transcriber'].browse( self.env['ir.values'].get_default('voip.settings', 'transcriber_id') )
-        self.transcribe(setting_transcriber)
-        
     def transcribe(self, transcriber):
-        
+
+
         r = sr.Recognizer()
 
         tmp = tempfile.NamedTemporaryFile()
         tmp.write(base64.decodestring(self.media))        
+
+        #subprocess.call(['sox', tmp.name, "--rate", str(self.codec_id.sample_rate), "--channels", "1", "--encoding", self.codec_id.encoding, "--type","raw", output_filepath])  
+
+        output_filepath = tempfile.gettempdir() + "/output.flac"        
+        subprocess.call(['sox', "--rate", str(self.codec_id.sample_rate), "--channels", "1", "--encoding", self.codec_id.encoding, "--type","raw", tmp.name, output_filepath])  
 
         #with sr.AudioFile(tmp.name) as source:
         with sr.AudioFile("/odoo/english.wav") as source:

@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <form position="inside">
                 <header>
-                    <button name="test_transcribe" type="object" string="Test Transcribe"/>
+                    <button name="%(voip_transcriber_wizard_action)d" type="action" string="Transcribe Call"/>                
                 </header>
             </form>
         </field>

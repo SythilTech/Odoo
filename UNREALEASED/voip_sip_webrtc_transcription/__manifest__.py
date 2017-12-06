@@ -9,6 +9,7 @@
     'license':'LGPL-3',
     'data': [
         'views/voip_settings_views.xml',
+        'views/voip_transcriber_wizard_views.xml',
         'views/voip_call_views.xml',
         'data/voip.transcriber.csv',
         'data/voip_settings.xml',
