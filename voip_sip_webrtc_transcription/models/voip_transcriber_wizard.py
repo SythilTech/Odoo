@@ -9,4 +9,4 @@ class VoipTranscriberWizard(models.TransientModel):
     transcriber_id = fields.Many2one('voip.transcriber', string="Transcriber")
     
     def wizard_transcribe(self):
-        self.call_id.transcribe(self.transcriber_id.id)
+        self.call_id.transcribe(self.transcriber_id)

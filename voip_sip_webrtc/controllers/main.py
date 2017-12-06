@@ -11,6 +11,7 @@ import werkzeug
 import base64
 import socket
 from ast import literal_eval
+import struct
 
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools import ustr
@@ -49,6 +50,15 @@ class VoipController(http.Controller):
         
         headers = []
         media_base64 = base64.b64decode(voip_call.media)
+
+        #Add a RIFF wrapper to the raw file so we can play the audio in the browser, this is just a crude solution for those that don't have transcoding installed        
+        if voip_call.media_filename == "call.raw":
+            riff_wrapper = "52 49 46 46"
+	    riff_wrapper += " " + struct.pack('<I', len(media_base64) - 8 ).encode('hex')
+	    riff_wrapper += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
+	    riff_wrapper += " " + struct.pack('<I', len(media_base64) - 44 ).encode('hex')
+	    media_base64 = riff_wrapper.replace(" ","").decode('hex') + media_base64
+
         headers.append(('Content-Length', len(media_base64)))
         headers.append(('Content-Type', 'audio/x-wav'))
         response = request.make_response(media_base64, headers)

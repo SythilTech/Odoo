@@ -211,7 +211,7 @@ class VoipAccount(models.Model):
 
         with open("/odoo/input.raw", "rb") as audio_file:
             audio_stream = audio_file.read()
-            codec = self.env['voip.codec'].browse(2)
+            codec = self.env['voip.codec'].browse(1)
             self.make_call("stevewright2009@sythiltech.onsip.com", audio_stream, codec)
             
     def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
@@ -463,7 +463,10 @@ class VoipAccount(models.Model):
 
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
-                
+
+                if packet_count % 10 == 0:
+                    _logger.error(data)
+                    
                 joined_payload += data
                 packet_count += 1
 
@@ -498,19 +501,11 @@ class VoipAccount(models.Model):
 
     def process_audio_stream(self, create_dict):
         _logger.error("Process File")
-        
-        #Add a RIFF wrapper to the raw file so we can play the audio in the browser, this won't be needed if transcoding is installed
-        if create_dict['media_filename'] == "call.raw":
-	    header = "52 49 46 46"
-	    header += " " + struct.pack('<I', len(create_dict['media']) - 8 ).encode('hex')
-	    header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
-	    header += " " + struct.pack('<I', len(create_dict['media']) - 44 ).encode('hex')
-            create_dict['media'] = header.replace(" ","").decode('hex') + create_dict['media']
-            create_dict['media_filename'] = "call.wav"
-	
-        #Finally convert it to base64 so we can store it in Odoo
+        	
+        #Convert it to base64 so we can store it in Odoo
         create_dict['media'] = base64.b64encode( create_dict['media'] )
 
+        _logger.error(create_dict)
         self.env['voip.call'].create(create_dict)        
 
     def invite_listener(self, bind_port):
@@ -620,14 +615,16 @@ class VoipAccount(models.Model):
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sipsocket.bind(('', 0))
         bind_port = sipsocket.getsockname()[1]
-
+        from_tag = random.randint(8000000,9000000)
+        
         register_string = ""
         register_string += "REGISTER sip:" + self.domain + " SIP/2.0\r\n"
         register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
         register_string += "Max-Forwards: 70\r\n"
         register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
         register_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">\r\n"
-        register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+        #register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+        register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
         register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
         #register_string += "Expires: 3600\r\n"
@@ -672,7 +669,8 @@ class VoipAccount(models.Model):
                 register_string += "Max-Forwards: 70\r\n"
                 register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
                 register_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">\r\n"
-                register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+                #register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+                register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
                 register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
                 register_string += "CSeq: 2 REGISTER\r\n"
                 #register_string += "Expires: 3600\r\n"

@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="call_id"/>
+                    <field name="call_id" invisible="1"/>
                     <field name="transcriber_id"/>
                 </group>
                 <button name="wizard_transcribe" type="object" string="Transcribe"/>

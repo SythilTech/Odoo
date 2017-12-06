@@ -27,7 +27,7 @@ class VoipCallTranscription(models.Model):
         subprocess.call(['sox', "--rate", str(self.codec_id.sample_rate), "--channels", "1", "--encoding", self.codec_id.encoding, "--type","raw", tmp.name, output_filepath])  
 
         #with sr.AudioFile(tmp.name) as source:
-        with sr.AudioFile("/odoo/english.wav") as source:
+        with sr.AudioFile(output_filepath) as source:
             audio = r.record(source)  # read the entire audio file
 
         #each field type has it's own function that way we can make plugin modules with new field types

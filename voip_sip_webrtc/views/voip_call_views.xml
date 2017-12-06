@@ -6,6 +6,9 @@
         <field name="model">voip.call</field>
         <field name="arch" type="xml">
       	    <form>
+      	        <header>
+      	        
+      	        </header>
       	        <group>
       	            <field name="status"/>
       	            <field name="from_partner_id"/>
