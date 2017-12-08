@@ -1,3 +1,7 @@
+v1.0.24
+=======
+* Use build in country.phone_code to circumvent issue where systems with deleted countries could not install module
+
 v1.0.23
 =======
 * Fix from / to character encoding issue

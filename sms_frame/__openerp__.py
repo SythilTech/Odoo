@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework",
-    'version': "1.0.23",
+    'version': "1.0.24",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -9,7 +9,6 @@
     'license':'LGPL-3',
     'data': [
         'data/ir.cron.csv',
-        'data/res.country.csv',
         'data/ir.model.access.csv',
         'data/sms.gateway.csv',
         'data/mail.message.subtype.csv',
