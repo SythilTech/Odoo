@@ -1,3 +1,7 @@
+v1.6.1
+======
+* Support for voice synth
+
 v1.6.0
 ======
 * SIP calling via server actions

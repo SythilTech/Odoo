@@ -7,16 +7,30 @@
         <field name="arch" type="xml">
       	    <form>
       	        <header>
-      	        
+      	            <button name="%(voip_call_template_preview_action)d" type="action" string="Test Template"/>
       	        </header>
       	        <group>
       	            <field name="name"/>
       	            <field name="model_id"/>
       	            <field name="voip_account_id"/>
       	            <field name="to_address"/>
-      	            <field name="media"/>
       	            <field name="codec_id"/>
+      	            <field name="type"/>
       	        </group>
+      	        <notebook>
+		    <page string="Media" attrs="{'invisible': [('type', '!=', 'prerecorded')]}">
+		        <field name="media"/>
+		    </page>
+		    <page string="Dynamic Placeholder Generator">
+		        <group>
+		            <field name="model_object_field_id" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]"/>
+		            <field name="sub_object_id" readonly="1"/>
+		            <field name="sub_model_object_field_id" domain="[('model_id','=',sub_object_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object_id','=',False)],'required':[('sub_object_id','!=',False)]}"/>
+		            <field name="null_value"/>
+		            <field name="copyvalue"/>
+		        </group>
+		    </page>
+                </notebook>
       	    </form>
         </field>
     </record>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <function id="default_voice_synth_id"
+            model="ir.values" name="set_default"
+            eval="('voip.settings', 'voice_synth_id', ref('synth_pyttsx') )"/>
+    
+    </data>     
+</odoo>

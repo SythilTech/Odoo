@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_sip_call_template_view_form_inherit_voice" model="ir.ui.view">
+        <field name="name">voip.call.template form view inherit voice</field>
+        <field name="model">voip.call.template</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_call_template_view_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Voice Synthesis" attrs="{'invisible': [('type', '!=', 'synth')]}">
+                    <group>
+                        <field name="voice_synth_id"/>
+                        <field name="synth_text"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>

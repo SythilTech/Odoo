@@ -1,1 +1,1 @@
-import voip_voip, res_users, res_partner, voip_call, voip_ringtone, voip_settings, voip_server, voip_account, voip_message_compose, voip_codec, voip_call_template, ir_actions_server
+import voip_voip, res_users, res_partner, voip_call, voip_ringtone, voip_settings, voip_server, voip_account, voip_message_compose, voip_codec, voip_call_template, ir_actions_server, voip_call_template_preview
