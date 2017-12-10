@@ -4,7 +4,7 @@
 
         <function id="default_voice_synth_id"
             model="ir.values" name="set_default"
-            eval="('voip.settings', 'voice_synth_id', ref('synth_pyttsx') )"/>
+            eval="('voip.settings', 'voice_synth_id', ref('synth_espeak') )"/>
     
     </data>     
 </odoo>
