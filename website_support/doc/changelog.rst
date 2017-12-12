@@ -1,3 +1,7 @@
+v1.5.0
+======
+* Departments which are a grouping of support users with assigned managers for reporting
+
 v1.4.24
 =======
 * Auto send survey setting

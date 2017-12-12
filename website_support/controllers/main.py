@@ -133,7 +133,28 @@ class SupportTicketController(http.Controller):
 
         setting_allow_user_signup = request.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')
         
-        return http.request.render('website_support.support_help_pages', {'help_groups': help_groups, 'setting_allow_user_signup': setting_allow_user_signup})
+        manager = False
+        if request.env['website.support.department.contact'].search_count([('user_id','=',request.env.user.id)]) == 1:
+            manager = True
+        
+        return http.request.render('website_support.support_help_pages', {'help_groups': help_groups, 'setting_allow_user_signup': setting_allow_user_signup, 'manager': manager})
+
+    @http.route('/support/ticket/reporting', type="http", auth="user", website=True)
+    def support_ticket_reporting(self, **kw):
+        """ Displays stats related to tickets in the department """
+        
+        #Just get the first department, managers in multiple departments are not supported
+        department = request.env['website.support.department.contact'].search([('user_id','=',request.env.user.id)])[0].wsd_id
+
+        extra_access = []
+        for extra_permission in department.partner_ids:
+            extra_access.append(extra_permission.id)
+        
+        support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])        
+        
+        support_ticket_count = len(support_tickets)
+                
+        return http.request.render('website_support.support_ticket_reporting', {'department': department, 'support_ticket_count': support_ticket_count})
         
     @http.route('/support/ticket/submit', type="http", auth="public", website=True)
     def support_submit_ticket(self, **kw):
