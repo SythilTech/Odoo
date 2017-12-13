@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-
+    
         <record id="support_ticket_survey" model="mail.template">
             <field name="name">Support Ticket Survey</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
@@ -538,16 +538,48 @@ $(document).ready(function() {
             Total Support Tickets: <t t-esc="support_ticket_count"/><br/>
             <hr/>
             <div class="col-md-6">
-                <h3>Top 5 Sub Categories of all time</h3>
+                <h3>Sub Category Usage (Top 5)</h3>
+                <b>All Time</b>
                 <ul>
                     <t t-foreach="department.sub_category_ids" t-as="sub_category">
                         <li><t t-esc="sub_category.subcategory_id.name"/> - <t t-esc="sub_category.count"/> </li>
                     </t>
                 </ul>
+                <b>Last 30 Days</b><br/>                
+                <ul>
+                    <t t-foreach="department.sub_category_month_ids" t-as="sub_category">
+                        <li><t t-esc="sub_category.subcategory_id.name"/> - <t t-esc="sub_category.count"/> </li>
+                    </t>
+                </ul>
+                <b>Last 7 Days</b><br/>
+                <ul>
+                    <t t-foreach="department.sub_category_week_ids" t-as="sub_category">
+                        <li><t t-esc="sub_category.subcategory_id.name"/> - <t t-esc="sub_category.count"/> </li>
+                    </t>
+                </ul>                
             </div>
             <div class="col-md-6">
-            .
+                <h3>Contact Submitted Tickets (Top 5)</h3>
+                <b>All Time</b>
+                <ul>
+                    <t t-foreach="department.submit_ticket_contact_ids" t-as="contact">
+                        <li><t t-esc="contact.partner_id.name"/> - <t t-esc="contact.count"/> </li>
+                    </t>
+                </ul>
+                <b>Last 30 Days</b><br/>
+                <ul>
+                    <t t-foreach="department.submit_ticket_contact_month_ids" t-as="contact">
+                        <li><t t-esc="contact.partner_id.name"/> - <t t-esc="contact.count"/> </li>
+                    </t>
+                </ul>
+                <b>Last 7 Days</b><br/>
+                <ul>
+                    <t t-foreach="department.submit_ticket_contact_week_ids" t-as="contact">
+                        <li><t t-esc="contact.partner_id.name"/> - <t t-esc="contact.count"/> </li>
+                    </t>
+                </ul>
             </div>
+
         </div>
     </t>
 </template>

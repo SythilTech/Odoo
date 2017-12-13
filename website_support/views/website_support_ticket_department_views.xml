@@ -22,6 +22,12 @@
       	                      <field name="count"/>
       	                  </tree>
       	              </field>
+      	              <field name="submit_ticket_contact_ids">
+      	                  <tree>
+      	                      <field name="partner_id"/>
+      	                      <field name="count"/>
+      	                  </tree>
+      	              </field>
       	          </group>
       	      </form>
       	  </field>

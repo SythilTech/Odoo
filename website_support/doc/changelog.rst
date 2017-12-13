@@ -1,3 +1,7 @@
+v1.5.1
+======
+* Few extra report stats
+
 v1.5.0
 ======
 * Departments which are a grouping of support users with assigned managers for reporting
