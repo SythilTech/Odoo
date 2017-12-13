@@ -34,6 +34,7 @@ class VoipAccount(models.Model):
     gsm_media = fields.Binary(string="(OBSOLETE)GSM Audio File")
     media = fields.Binary(string="Raw Audio File")
     codec_id = fields.Many2one('voip.codec', string="Codec")
+    action_ids = fields.One2many('voip.account.action', 'account_id', string="Call Actions")
     
     @api.onchange('address')
     def _onchange_address(self):
@@ -146,75 +147,32 @@ class VoipAccount(models.Model):
 
         except Exception as e:
             _logger.error(e)
-
-    def test_add_header(self):
-        #G.711
-        with open("/odoo/call.raw", "rb") as audio_file:
-            audio_stream = audio_file.read()
-	    #header = "52 49 46 46 54 48 18 00 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61 00 48 18 00"
-
-            header = ""
-	    #"RIFF"
-	    header += "52 49 46 46"
-	    
-	    #File Size (Integer)?
-	    header += " " + format(len(audio_stream) - 8, '08x')
-	    
-	    #"WAVE"
-	    header += " 57 41 56 45"
-	    
-	    #"fmt "
-	    header += " 66 6D 74 20"
-	    
-	    #Format data length (18)?
-	    header + "12 00 00 00"
-	    
-	    #Type of format (6)?
-	    header += " 06 00"
-	    
-	    #Channels (mono)
-	    header += " 01 00"
-	    
-	    #Sample rate (1 milion???)
-	    header += " 40 1F 00 00 40"
-	    
-	    #c?
-	    header += " 1F 00 00 01"
-	    
-	    #c2?
-	    header += " 00 08 00 00"
-	    
-	    #Bits per sample (102?)
-	    header += " 00 66"
-	    
-	    #no idea...
-	    header += " 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00"
-            
-            #"data"
-            header += " 64 61 74 61"
-            
-            #Data length
-            header += " " + format( (len(audio_stream) - 44) / 3 , '08x')
-
-
-	    header = "52 49 46 46"	    
-	    header += " " + struct.pack('<I', len(audio_stream) - 8 ).encode('hex')
-	    header += " 57 41 56 45 66 6D 74 20 12 00 00 00 06 00 01 00 40 1F 00 00 40 1F 00 00 01 00 08 00 00 00 66 61 63 74 04 00 00 00 00 48 18 00 4C 49 53 54 1A 00 00 00 49 4E 46 4F 49 53 46 54 0E 00 00 00 4C 61 76 66 35 35 2E 33 33 2E 31 30 30 00 64 61 74 61"
-	    header += " " + struct.pack('<I', len(audio_stream) - 44 ).encode('hex')
-            
-            joined_payload_with_header = header.replace(" ","").decode('hex') + audio_stream
-
-        with open("/odoo/call.wav", "wb") as audio_file:            
-            audio_file.write(joined_payload_with_header)
-    
-    def test_make_call(self):
-
-        with open("/odoo/input.raw", "rb") as audio_file:
-            audio_stream = audio_file.read()
-            codec = self.env['voip.codec'].browse(1)
-            self.make_call("stevewright2009@sythiltech.onsip.com", audio_stream, codec)
-            
+           
     def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
+
+
+        #INVITE sip:61437111111@sipm2.voipline.net.au:7060 SIP/2.0
+        #Via: SIP/2.0/UDP 10.0.0.70:6000;branch=z9hG4bK-524287-1---b9e3ff21215fb438;rport
+        #Max-Forwards: 70
+        #Contact: <sip:255892@121.214.22.600:57819;rinstance=a72aba5d70fdaa48>
+        #To: <sip:61437111111@sipm2.voipline.net.au:7060>
+        #From: "Steven Wright"<sip:255892@sipm2.voipline.net.au:7060>;tag=3b4e5c78
+        #Call-ID: 86895ZTAxY2Y2OWRjNTkwOTVjZTZjYjVlMTEyOGY0ZWYxYjg
+        #CSeq: 2 INVITE
+        #Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE
+        #Content-Type: application/sdp
+        #Supported: replaces
+        #User-Agent: X-Lite release 5.0.1 stamp 86895
+        #Content-Length: 208
+        #
+        #v=0
+        #o=- 13157622340424504 1 IN IP4 10.0.0.70
+        #s=X-Lite release 5.0.1 stamp 86895
+        #t=0 0
+        #m=audio 52795 RTP/AVP 8 101
+        #a=rtpmap:101 telephone-event/8000
+        #a=fmtp:101 0-15
+        #a=sendrecv
 
         port = random.randint(6000,7000)
         media_port = random.randint(55000,56000)
@@ -693,3 +651,19 @@ class VoipAccount(models.Model):
         
                 stage = "REGISTERED"
                 return True
+                
+class VoipAccountAction(models.Model):
+
+    _name = "voip.account.action"
+    _description = "VOIP Account Action"
+
+    account_id = fields.Many2one('voip.account', string="HTML Form")
+    action_type_id = fields.Many2one('voip.account.action.type', string="Call Action")
+    
+class VoipAccountActionType(models.Model):
+
+    _name = "voip.account.action.type"
+    _description = "VOIP Account Action Type"
+
+    name = fields.Char(string="Name")
+    internal_name = fields.Char(string="Internal Name", help="function name of code")
