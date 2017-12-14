@@ -17,8 +17,10 @@
       	            <field name="auth_username"/>
       	            <field name="username"/>
       	            <field name="domain"/>
+      	            <field name="voip_display_name"/>
       	            <field name="wss"/>
       	            <field name="outbound_proxy"/>
+      	            <field name="port"/>
       	            <field name="media"/>
       	            <field name="codec_id"/>
       	        </group>

@@ -28,7 +28,9 @@ class VoipAccount(models.Model):
     auth_username = fields.Char(string="Auth Username")
     username = fields.Char(string="Username")
     domain = fields.Char(string="Domain")
+    voip_display_name = fields.Char(string="Display Name", default="Odoo")
     outbound_proxy = fields.Char(string="Outbound Proxy")
+    port = fields.Integer(string="Port", default="5060")
     verified = fields.Boolean(string="Verified")
     wss = fields.Char(string="WSS", default="wss://edge.sip.onsip.com")
     gsm_media = fields.Binary(string="(OBSOLETE)GSM Audio File")
@@ -151,12 +153,12 @@ class VoipAccount(models.Model):
     def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
 
 
-        #INVITE sip:61437111111@sipm2.voipline.net.au:7060 SIP/2.0
+        #INVITE sip:61437222222@sipm2.voipline.net.au:7060 SIP/2.0
         #Via: SIP/2.0/UDP 10.0.0.70:6000;branch=z9hG4bK-524287-1---b9e3ff21215fb438;rport
         #Max-Forwards: 70
-        #Contact: <sip:255892@121.214.22.600:57819;rinstance=a72aba5d70fdaa48>
-        #To: <sip:61437111111@sipm2.voipline.net.au:7060>
-        #From: "Steven Wright"<sip:255892@sipm2.voipline.net.au:7060>;tag=3b4e5c78
+        #Contact: <sip:255892@121.214.22.154:57819;rinstance=a72aba5d70fdaa48>
+        #To: <sip:6143222222@sipm2.voipline.net.au:7060>
+        #From: "Steven"<sip:999@sipm2.voipline.net.au:7060>;tag=3b4e5c78
         #Call-ID: 86895ZTAxY2Y2OWRjNTkwOTVjZTZjYjVlMTEyOGY0ZWYxYjg
         #CSeq: 2 INVITE
         #Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE
@@ -576,16 +578,14 @@ class VoipAccount(models.Model):
         from_tag = random.randint(8000000,9000000)
         
         register_string = ""
-        register_string += "REGISTER sip:" + self.domain + " SIP/2.0\r\n"
+        register_string += "REGISTER sip:" + self.domain + ":" + str(self.port) + " SIP/2.0\r\n"
         register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
         register_string += "Max-Forwards: 70\r\n"
         register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
-        register_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">\r\n"
-        #register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
-        register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+        register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ">\r\n"
+        register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
         register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
-        #register_string += "Expires: 3600\r\n"
         register_string += "Expires: 60\r\n"
         register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
         register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
@@ -594,7 +594,10 @@ class VoipAccount(models.Model):
 
         _logger.error("REGISTER: " + register_string)
         
-        sipsocket.sendto(register_string, (self.outbound_proxy, 5060) )
+        if self.outbound_proxy:
+            sipsocket.sendto(register_string, (self.outbound_proxy, self.port) )
+        else:
+            sipsocket.sendto(register_string, (self.domain, self.port) )
 
         stage = "WAITING"
         while stage == "WAITING":
@@ -622,16 +625,14 @@ class VoipAccount(models.Model):
                 response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
 
                 register_string = ""
-                register_string += "REGISTER sip:" + self.domain + " SIP/2.0\r\n"
+                register_string += "REGISTER sip:" + self.domain + ":" + str(self.port) + " SIP/2.0\r\n"
                 register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
                 register_string += "Max-Forwards: 70\r\n"
                 register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
-                register_string += 'To: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">\r\n"
-                #register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
-                register_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+                register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ">\r\n"
+                register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
                 register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
                 register_string += "CSeq: 2 REGISTER\r\n"
-                #register_string += "Expires: 3600\r\n"
                 register_string += "Expires: 60\r\n"
                 register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
                 register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
