@@ -49,7 +49,7 @@ class HtmlForm(models.Model):
     @api.one
     def generate_form(self):
         html_output = ""
-        html_output += "<form method=\"POST\" action=\"" + request.httprequest.host_url + "form/insert\" enctype=\"multipart/form-data\">\n"
+        html_output += "<form method=\"POST\" action=\"" + request.httprequest.host_url.replace("http:","") + "form/insert\" enctype=\"multipart/form-data\">\n"
         html_output += "  <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
 
         html_output += "  <h1>" + self.name + "</h1>\n"
@@ -67,7 +67,6 @@ class HtmlForm(models.Model):
 
         html_output += "  <input type=\"hidden\" name=\"form_id\" value=\"" + str(self.id) + "\"/>\n"
         html_output += "  <input type=\"submit\" value=\"Send\"/>\n"
-        html_output += "  <input type=\"hidden\" name=\"my_pie\" value=\"3.14\"/>\n"
         html_output += "</form>\n"
         self.output_html = html_output
 
