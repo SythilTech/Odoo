@@ -582,8 +582,8 @@ class VoipAccount(models.Model):
         register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
         register_string += "Max-Forwards: 70\r\n"
         register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
-        register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ">\r\n"
-        register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+        register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">\r\n"
+        register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
         register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
         register_string += "Expires: 60\r\n"
@@ -594,11 +594,14 @@ class VoipAccount(models.Model):
 
         _logger.error("REGISTER: " + register_string)
         
+        send_to = ""
         if self.outbound_proxy:
-            sipsocket.sendto(register_string, (self.outbound_proxy, self.port) )
+            send_to = self.outbound_proxy
         else:
-            sipsocket.sendto(register_string, (self.domain, self.port) )
+            send_to = self.domain
 
+        sipsocket.sendto(register_string, (send_to, self.port) )
+            
         stage = "WAITING"
         while stage == "WAITING":
             sipsocket.settimeout(10)
@@ -613,36 +616,42 @@ class VoipAccount(models.Model):
                         
                 realm = re.findall(r'realm="(.*?)"', authheader)[0]
                 method = "REGISTER"
-                uri = "sip:" + self.domain
+                uri = "sip:" + self.domain + ":" + str(self.port)
                 nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-                qop = re.findall(r'qop="(.*?)"', authheader)[0]
                 nc = "00000001"
                 cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
 
                 #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
                 A1 = self.auth_username + ":" + realm + ":" + self.password
                 A2 = method + ":" + uri
-                response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
 
                 register_string = ""
                 register_string += "REGISTER sip:" + self.domain + ":" + str(self.port) + " SIP/2.0\r\n"
                 register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
                 register_string += "Max-Forwards: 70\r\n"
                 register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n" #:54443 XOR port mapping?
-                register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ">\r\n"
-                register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+                register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">\r\n"
+                register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
                 register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
                 register_string += "CSeq: 2 REGISTER\r\n"
                 register_string += "Expires: 60\r\n"
                 register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
                 register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
-                register_string += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + self.domain + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                
+                if "qop=" in authheader:
+		    qop = re.findall(r'qop="(.*?)"', authheader)[0]
+		    response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )                
+                    register_string += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                else:
+		    response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
+                    register_string += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
+                    
                 register_string += "Content-Length: 0\r\n"
                 register_string += "\r\n"
         
                 _logger.error(register_string)
         
-                sipsocket.sendto(register_string, (self.outbound_proxy, 5060) )
+                sipsocket.sendto(register_string, (send_to, self.port) )
             elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
                 _logger.error("REGISTERED")
                 #Start a new thread so we can listen for invites
