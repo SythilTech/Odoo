@@ -1,3 +1,7 @@
+v1.0.24
+=======
+* Remove duplicate my_pie and proto nutural the process url
+
 v1.0.23
 =======
 * Form fields are forced required if they are backend required
