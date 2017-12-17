@@ -1,3 +1,7 @@
+v1.5.2
+======
+* Fix "Support Ticket Reply Wrapper (support@)" email from
+
 v1.5.1
 ======
 * Few extra report stats

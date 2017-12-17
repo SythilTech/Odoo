@@ -178,7 +178,7 @@
             <field name="name">Support Ticket Reply Wrapper (support@)</field>
             <field name="model_id" ref="model_website_support_ticket_compose"></field>
             <field name="subject">${object.subject}</field>
-            <field name="email_from">${object.ticket_id.support_email or object.ticket_id.company_id.email}|safe}</field>
+            <field name="email_from">${(object.ticket_id.support_email or object.ticket_id.company_id.email})|safe}</field>
             <field name="reply_to">${object.ticket_id.support_email|safe}</field>
             <field name="email_to">${object.email|safe}</field>
             <field name="auto_delete" eval="False"/>
