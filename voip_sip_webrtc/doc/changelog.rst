@@ -1,3 +1,7 @@
+v1.6.2
+======
+* Remove test buttons and update documentation
+
 v1.6.1
 ======
 * Support for voice synth

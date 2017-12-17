@@ -737,17 +737,19 @@ var VoipCallIncomingNotification = Notification.extend({
                 mySound.pause();
                 mySound.currentTime = 0;
 
-                //Constraints are slightly different for the callee e.g. for calle we don't need screen sharing access only audio
+                //Constraints are slightly different for the callee e.g. for callee we don't need screen sharing access only audio
                 var constraints = {};
                 if (mode == "videocall") {
                     constraints = {audio: true, video: true};
                 } else if (mode == "audiocall") {
                     constraints = {audio: true};
                 } else if (mode == "screensharing") {
-                    constraints = {audio: true};
+					//constraints = {'audio': true, 'OfferToReceiveVideo': true};
+					constraints = {'audio': true, 'video': {'mediaSource': "screen"}};
                 }
 
                 console.log(call_type);
+                console.log(constraints);
                 if (call_type == "external") {
 					console.log("Accept SIP Call");
 

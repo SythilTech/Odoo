@@ -60,7 +60,7 @@ var VOIPSystemTray = Widget.extend({
 
         var voip_call_client = new voip_notification.VoipCallClient(role, mode, call_type, to_partner_id);
 
-        var constraints = {'video': {'mediaSource': "screen"}};
+        var constraints = {'audio': true, 'video': {'mediaSource': "screen"}};
         voip_call_client.requestMediaAccess(constraints);
 
 	},
