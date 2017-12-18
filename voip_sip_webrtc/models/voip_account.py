@@ -194,7 +194,13 @@ class VoipAccount(models.Model):
         invite_string += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
         invite_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
         invite_string += "Max-Forwards: 70\r\n"
-        invite_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
+        
+        if self.outbound_proxy:
+            invite_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
+        else:
+            bd = self.env['voip.settings'].make_stun_request()
+            invite_string += "Contact: <sip:" + self.username + "@" + bd['ip'] + ":" + str(bd['port']) + ">\r\n"
+        
         invite_string += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
         invite_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
         invite_string += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"

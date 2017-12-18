@@ -14,6 +14,7 @@ from pprint import pprint
 from time import gmtime, mktime
 from os.path import exists, join
 import os
+import struct
 from hashlib import sha256
 
 from openerp import api, fields, models
@@ -154,3 +155,38 @@ class VoipSettings(models.Model):
                 fingerprint_format += ":"
         
         self.fingerprint = fingerprint_format[:-1]
+        
+    def make_stun_request(self):
+        
+        #----Compose binding request-----
+        send_data = ""
+        
+        #Message Type (Binding Request)
+        send_data += b'\x00\x01'
+
+        #Message Length
+        send_data += b'\x00\x00'
+
+        #Magic Cookie (always set to 0x2112A442)
+        send_data += b'\x21\x12\xA4\x42'
+
+        #96 bit (12 byte) transaction ID
+        send_data += os.urandom(12)
+                
+        stunsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                        
+        stunsocket.sendto( send_data, ("stun.voipline.net.au", 3478) )
+        stunsocket.settimeout(10)
+        try:
+            data, addr = stunsocket.recvfrom(1280)
+        except Exception as e:
+            _logger.error("failed to get stun:" + str(e) )
+        
+        mapped_port_binary = data[26:28]
+        mapped_port = struct.unpack('!H', mapped_port_binary)[0]
+     
+        mapped_address_binary = data[28:32]
+        ip = struct.unpack('BBBB', mapped_address_binary)
+        ip = str(ip[0]) + '.' + str(ip[1]) + '.' + str(ip[2]) + '.' + str(ip[3])
+        
+        return {'ip': ip, 'port': mapped_port}
