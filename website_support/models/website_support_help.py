@@ -11,8 +11,11 @@ from openerp.addons.website.models.website import slug
 class WebsiteSupportHelpGroups(models.Model):
 
     _name = "website.support.help.groups"
+    _order = "sequence asc"
     
     name = fields.Char(string="Help Group", translate=True)
+    sequence = fields.Integer(string="Sequence")
+    website_published = fields.Boolean(string="Published", default="True")
     page_ids = fields.One2many('website.support.help.page','group_id',string="Pages")
     page_count = fields.Integer(string="Number of Pages", compute='_page_count')
     group_ids = fields.Many2many('res.groups', string="Privilege Groups")
@@ -23,13 +26,21 @@ class WebsiteSupportHelpGroups(models.Model):
     def _page_count(self):
         """Amount of help pages in a help group"""
         self.page_count = self.env['website.support.help.page'].search_count([('group_id','=',self.id)])
+
+    @api.model
+    def create(self, values):
+        sequence=self.env['ir.sequence'].next_by_code('website.support.help.groups')
+        values['sequence']=sequence
+        return super(WebsiteSupportHelpGroups, self).create(values)
     
 class WebsiteSupportHelpPage(models.Model):
 
     _name = "website.support.help.page"
-    _order = "name asc"
+    _order = "sequence asc"
     
     name = fields.Char(string='Page Name', translate=True)
+    sequence = fields.Integer(string="Sequence")    
+    website_published = fields.Boolean(string="Published", default="True")
     url = fields.Char(string="Page URL")
     url_generated = fields.Char(string="URL", compute='_compute_url_generated')
     group_id = fields.Many2one('website.support.help.groups', string="Group")
@@ -60,6 +71,12 @@ class WebsiteSupportHelpPage(models.Model):
             self.feedback_average = average / len(self.feedback_ids)
         else:
            self.feedback_average = 0
+
+    @api.model
+    def create(self, values):
+        sequence=self.env['ir.sequence'].next_by_code('website.support.help.page')
+        values['sequence']=sequence
+        return super(WebsiteSupportHelpPage, self).create(values)
 
 
 class WebsiteSupportHelpPageFeedback(models.Model):

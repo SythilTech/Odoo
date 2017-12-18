@@ -8,7 +8,7 @@
         </record>
 
         <record id="normal" model="website.support.ticket.priority">
-            <field name="name">Low</field>
+            <field name="name">Normal</field>
             <field name="color">#000000</field>
         </record>
 

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 <data>
-    
+
+        <template id="support_front_assert" inherit_id="website.assets_frontend" name="Website Support Front Asserts">
+            <xpath expr="/t" position="inside">
+                <link rel="stylesheet" href="/website_support/static/src/css/support.css"/>
+            </xpath>
+        </template>
+        
         <record id="support_ticket_survey" model="mail.template">
             <field name="name">Support Ticket Survey</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
@@ -494,7 +500,7 @@ $(document).ready(function() {
 </script>
 
             <div class="mt16 mb16">
-                <h1 class="text-center">Help Pages</h1>
+                <h1 class="text-center support-main-title">Help Pages</h1>
                 
                 <div name="search_from_container" t-attf-class="form-group">
                     <div class="col-md-3"></div>
@@ -509,9 +515,11 @@ $(document).ready(function() {
             <div class="mt16 mb16 col-md-12">
                 <t t-foreach="help_groups" t-as="help_group">
                     <div class="col-md-4">
-                        <h2 t-field="help_group.name"></h2>
+                        <h2 class="support-help-group" t-field="help_group.name"></h2>
                         <t t-foreach="help_group.page_ids" t-as="help_page">
-                            <h3 class="mt8 mb8"><a t-attf-href="#{help_page.url_generated}" t-field="help_page.name"></a></h3>
+                            <t t-if="help_page.website_published">
+                                <h3 class="mt8 mb8 support-help-page"><a t-attf-href="#{help_page.url_generated}" t-field="help_page.name"></a></h3>
+                            </t>
                         </t>
                     </div>
                 </t>

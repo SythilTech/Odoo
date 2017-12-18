@@ -1,3 +1,12 @@
+v1.5.3
+======
+* Order help groups
+* Order help pages
+* Publish / unpublish help groups
+* Publish / unpublish help pages
+* Force style of help groups and helps pages so design is consistant across different themes
+* Limit access to help groups to particular groups
+
 v1.5.2
 ======
 * Fix "Support Ticket Reply Wrapper (support@)" email from
