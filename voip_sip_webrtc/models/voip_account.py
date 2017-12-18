@@ -152,30 +152,6 @@ class VoipAccount(models.Model):
            
     def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
 
-
-        #INVITE sip:61437222222@sipm2.voipline.net.au:7060 SIP/2.0
-        #Via: SIP/2.0/UDP 10.0.0.70:6000;branch=z9hG4bK-524287-1---b9e3ff21215fb438;rport
-        #Max-Forwards: 70
-        #Contact: <sip:255892@121.214.22.154:57819;rinstance=a72aba5d70fdaa48>
-        #To: <sip:6143222222@sipm2.voipline.net.au:7060>
-        #From: "Steven"<sip:999@sipm2.voipline.net.au:7060>;tag=3b4e5c78
-        #Call-ID: 86895ZTAxY2Y2OWRjNTkwOTVjZTZjYjVlMTEyOGY0ZWYxYjg
-        #CSeq: 2 INVITE
-        #Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE
-        #Content-Type: application/sdp
-        #Supported: replaces
-        #User-Agent: X-Lite release 5.0.1 stamp 86895
-        #Content-Length: 208
-        #
-        #v=0
-        #o=- 13157622340424504 1 IN IP4 10.0.0.70
-        #s=X-Lite release 5.0.1 stamp 86895
-        #t=0 0
-        #m=audio 52795 RTP/AVP 8 101
-        #a=rtpmap:101 telephone-event/8000
-        #a=fmtp:101 0-15
-        #a=sendrecv
-
         port = random.randint(6000,7000)
         media_port = random.randint(55000,56000)
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
@@ -211,13 +187,16 @@ class VoipAccount(models.Model):
         #Two way call because later we may use voice reconisation to control assistant menus        
         sdp += "a=sendrecv\r\n"
 
+        if "@" not in to_address:
+            to_address = to_address.replace("+","") + "@" + self.domain
+            
         invite_string = ""
-        invite_string += "INVITE sip:" + to_address + " SIP/2.0\r\n"
+        invite_string += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
         invite_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
         invite_string += "Max-Forwards: 70\r\n"
         invite_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-        invite_string += 'To: <sip:' + to_address + ">\r\n"
-        invite_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+        invite_string += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
+        invite_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
         invite_string += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
         invite_string += "CSeq: 1 INVITE\r\n"
         invite_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
@@ -231,13 +210,21 @@ class VoipAccount(models.Model):
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sipsocket.bind(('', port));
 
-        sipsocket.sendto(invite_string, (self.outbound_proxy, 5060) )
+        send_to = ""
+        if self.outbound_proxy:
+            send_to = self.outbound_proxy
+        else:
+            send_to = self.domain
+
+        _logger.error(invite_string)
+        sipsocket.sendto(invite_string, (send_to, self.port) )
         
         #Wait and send back the auth reply
         stage = "WAITING"
         while stage == "WAITING":
-
+            sipsocket.settimeout(10)
             data, addr = sipsocket.recvfrom(2048)
+            _logger.error(data)
  
             #Send auth response if challenged
             if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required":
@@ -258,12 +245,12 @@ class VoipAccount(models.Model):
                 response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
 
                 reply = ""
-                reply += "INVITE sip:" + to_address + " SIP/2.0\r\n"
+                reply += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
                 reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
                 reply += "Max-Forwards: 70\r\n"
                 reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-                reply += 'To: <sip:' + to_address + ">\r\n"
-                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+                reply += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
+                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
                 reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
                 reply += "CSeq: 2 INVITE\r\n"
                 reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
@@ -276,12 +263,52 @@ class VoipAccount(models.Model):
                 reply += sdp        
              
                 sipsocket.sendto(reply, addr)
-            elif data.split("\r\n")[0] == "SIP/2.0 404 Not Found":
-                stage = "Not Found"
-                return False
+            elif data.split("\r\n")[0] == "SIP/2.0 401 Unauthorized":
+                _logger.error("auth required")
+
+                authheader = re.findall(r'WWW-Authenticate: (.*?)\r\n', data)[0]
+                         
+                realm = re.findall(r'realm="(.*?)"', authheader)[0]
+                method = "INVITE"
+                uri = "sip:" + to_address + str(self.port)
+                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
+                nc = "00000001"
+                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
+ 
+                A1 = self.auth_username + ":" + realm + ":" + self.password
+                A2 = method + ":" + uri
+                response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
+
+                reply = ""
+                reply += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
+                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
+                reply += "Max-Forwards: 70\r\n"
+                reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
+                reply += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
+                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
+                reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
+                reply += "CSeq: 2 INVITE\r\n"
+                reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+                reply += "Content-Type: application/sdp\r\n"
+                reply += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"               
+                reply += "Supported: replaces\r\n"
+                reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                reply += "Content-Length: " + str(len(sdp)) + "\r\n"
+                reply += "\r\n"
+                reply += sdp
+             
+                sipsocket.sendto(reply, addr)
+                
             elif data.split("\r\n")[0] == "SIP/2.0 403 Forbidden":
                 #Likely means call was rejected
                 stage = "Forbidden"
+                return False
+            elif data.split("\r\n")[0] == "SIP/2.0 404 Not Found":
+                stage = "Not Found"
+                return False
+            elif data.split("\r\n")[0] == "SIP/2.0 486 Busy Here":
+                #Already on the phone
+                stage = "Busy"
                 return False
             elif data.startswith("BYE"):
                 #Do stuff when the call is ended by client
