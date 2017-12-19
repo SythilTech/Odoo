@@ -108,10 +108,7 @@ class VoipAccount(models.Model):
 
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
-                
-                if packet_count % 10 == 0:
-                    _logger.error(data)
-                    
+                                    
                 joined_payload += data
                 packet_count += 1
 
@@ -319,36 +316,8 @@ class VoipAccount(models.Model):
                 contact_header = re.findall(r'Contact: <(.*?)>\r\n', data)[0]
                 #rtp_ip = re.findall(r'\*(.*?)!', contact_header)[0]
                 record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
+                to_tag = re.findall(r'To: (.*?)\r\n', data)[0].split("tag=")[1]
                 #send_media_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
-
-                #OK message
-                #Via: SIP/2.0/UDP 10.0.0.70:6000;received=10.0.0.70;branch=z9hG4bK-524287-1---0130c520b1749971;rport=6000
-                #Record-Route: <sip:199.7.173.100:5060;lr;ftag=032d4206;did=bbf.a110e917>
-                #Contact: <sip:steven@sythiltech.onsip.com@13.54.58.172:34614;rinstance=0bd6d48a7ed3b6df>
-                #To: <sip:steven@sythiltech.onsip.com>;tag=c8ff7c15
-                #From: "Steven"<sip:stevewright2009@sythiltech.onsip.com>;tag=8491272
-                #Call-ID: 89322YjQ0YmY3ZjdiZDE4M2MwNzhhZTFkYmI3MTVmOWRkMGU
-                #CSeq: 2 INVITE
-                #Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE
-                #Content-Type: application/sdp
-                #Supported: replaces
-                #User-Agent: Sythil Tech Voip Client 1.0.0
-                #Content-Length: 146
-
-
-        
-                #It's from stevewright2009@sythiltech.onsip.com
-                #ACK sip:steven@sythiltech.onsip.com@13.54.58.172:55737;rinstance=0bd6d48a7ed3b6df SIP/2.0
-                #Via: SIP/2.0/UDP 10.0.0.70:6000;branch=z9hG4bK-524287-1---f8f31a1b6dc69801;rport
-                #Max-Forwards: 70
-                #Route: <sip:199.7.173.100:5060;lr;ftag=d8f6d543;did=383.11f3849>
-                #Contact: <sip:stevewright2009@10.0.0.70:6000;rinstance=683af9160ae82601>
-                #To: <sip:steven@sythiltech.onsip.com>;tag=c8ff7c15
-                #From: "Steven"<sip:stevewright2009@sythiltech.onsip.com>;tag=d8f6d543
-                #Call-ID: 89322NzRjNThiMWU0YWM4YjAwOTFjODM3NGEwZGMzNzczMTk
-                #CSeq: 2 ACK
-                #User-Agent: X-Lite release 5.1.0 stamp 89322
-                #Content-Length: 0
         
                 #Send the ACK
                 reply = ""
@@ -357,8 +326,8 @@ class VoipAccount(models.Model):
                 reply += "Max-Forwards: 70\r\n"
                 reply += "Route: " + record_route + "\r\n"
                 reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-                reply += 'To: <sip:' + to_address + ">;tag=fa68ca4e\r\n"
-                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=903df0a\r\n"
+                reply += 'To: <sip:' + to_address + ">;tag=" + str(to_tag) + "\r\n"
+                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
                 reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
                 reply += "CSeq: 1 ACK\r\n"
                 reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
@@ -479,9 +448,6 @@ class VoipAccount(models.Model):
 
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
-
-                if packet_count % 10 == 0:
-                    _logger.error(data)
                     
                 joined_payload += data
                 packet_count += 1
@@ -592,7 +558,7 @@ class VoipAccount(models.Model):
                         sdp = ""
                         sdp += "v=0\r\n"
                         sdp += "o=- 1759479422 3 IN IP4 " + local_ip + "\r\n"
-                        sdp += "s=X-Lite release 5.0.1 stamp 86895\r\n"
+                        sdp += "s= \r\n"
                         sdp += "c=IN IP4 " + local_ip + "\r\n"
                         sdp += "t=0 0\r\n"
                         sdp += "m=audio " + str(media_port) + " RTP/AVP " + str(self.codec_id.payload_type) + "\r\n"
