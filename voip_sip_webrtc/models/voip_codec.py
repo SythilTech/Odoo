@@ -12,3 +12,4 @@ class VoipCodec(models.Model):
     payload_size = fields.Integer(string="Payload Size")
     sample_interval = fields.Integer(string="Sample Interval")
     supported = fields.Boolean(string="Supported")
+    sdp_data = fields.Char(string="SDP Data")

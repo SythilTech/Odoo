@@ -183,12 +183,12 @@ class VoipAccount(models.Model):
 
         #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
         sdp += "m=audio " + str(media_port) + " RTP/AVP " + str(codec.payload_type) + "\r\n"
-
+        
         #Two way call because later we may use voice reconisation to control assistant menus        
         sdp += "a=sendrecv\r\n"
 
         if "@" not in to_address:
-            to_address = to_address.replace("+","") + "@" + self.domain
+            to_address = to_address + "@" + self.domain
             
         invite_string = ""
         invite_string += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
