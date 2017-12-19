@@ -227,13 +227,6 @@ class SupportTicketController(http.Controller):
         
         my_attachment = ""
         file_name = ""
-        if 'file' in values:
-            #Back compatablity for single attachment
-            my_attachment = base64.encodestring(values['file'].read() )
-            file_name = values['file'].filename
-            file_extension = os.path.splitext(file_name)[1]
-            if file_extension == ".exe":
-                return "exe files are not allowed"
         
         if "subcategory" in values:
             sub_category = values['subcategory']
@@ -261,19 +254,18 @@ class SupportTicketController(http.Controller):
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
 
         if 'file' in values:
-            try:
-                for c_file in request.httprequest.files.getlist('file'):
-                    data = c_file.read()
 
-                    request.env['ir.attachment'].create({
+            for c_file in request.httprequest.files.getlist('file'):
+                data = c_file.read()
+                
+                if c_file.filename:
+                    request.env['ir.attachment'].sudo().create({
                         'name': c_file.filename,
                         'datas': data.encode('base64'),
                         'datas_fname': c_file.filename,
                         'res_model': 'website.support.ticket',
                         'res_id': new_ticket_id.id
                     })
-            except Exception, e:
-                logger.exception("Failed to upload image to attachment")
 
         return werkzeug.utils.redirect("/support/ticket/thanks")
         

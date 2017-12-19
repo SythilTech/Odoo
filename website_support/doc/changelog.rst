@@ -1,3 +1,9 @@
+v1.5.4
+======
+* Fix blank attachments issue
+* Fix public no permision to create attachment issue
+* Allow download of attachments from backend
+
 v1.5.3
 ======
 * Order help groups

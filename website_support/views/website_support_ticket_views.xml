@@ -30,6 +30,7 @@
                           <field name="attachment_ids">
                               <tree>
                                   <field name="datas_fname"/>
+                                  <field name="datas"/>
                               </tree>
                           </field>
           	          <field name="description" widget="html"/>
