@@ -6,6 +6,9 @@
         <field name="model">voip.media</field>
         <field name="arch" type="xml">
       	    <form>
+      	        <header>
+      	        
+      	        </header>
       	        <group>
       	            <field name="name"/>
       	            <field name="media" filename="media_filename"/>

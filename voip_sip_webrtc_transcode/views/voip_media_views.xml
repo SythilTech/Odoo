@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_media_view_form_inherit_trancode" model="ir.ui.view">
+        <field name="name">voip.media form view inherit transcode</field>
+        <field name="model">voip.media</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_media_view_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="%(voip_media_transcode_wizard_action)d" type="action" string="Transcode Wizard"/>
+            </header>
+        </field>
+    </record>
+
+</odoo>

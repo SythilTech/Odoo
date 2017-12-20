@@ -7,12 +7,11 @@ import tempfile
 
 from openerp import api, fields, models
 
-class VoipAccountTranscodeWizard(models.TransientModel):
+class VoipMediaTranscodeWizard(models.TransientModel):
 
-    _name = 'voip.account.transcode.wizard'
-    _description = "OBSOLETE"
+    _name = 'voip.media.transcode.wizard'
 
-    account_id = fields.Many2one('voip.account', string="Account")
+    media_id = fields.Many2one('voip.media', string="Media")
     media = fields.Binary(string="Audio File", required="True")
     media_filename = fields.Char(string="Audio File Filename")
     codec_id = fields.Many2one('voip.codec', string="Codec", required="True")
@@ -31,9 +30,10 @@ class VoipAccountTranscodeWizard(models.TransientModel):
             #Read the transcoded file
             file_content = open(output_filepath, 'rb').read()
             
-            #Save the transcoded file to the call template
-            self.account_id.media = base64.encodestring(file_content)
-            self.account_id.codec_id = self.codec_id.id
+            #Save the transcoded file to the media template
+            self.media_id.media = base64.encodestring(file_content)
+            self.media_id.media_filename = self.media_filename
+            self.media_id.codec_id = self.codec_id.id
             
             #Clean up temp file
             tmp.close()

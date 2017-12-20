@@ -10,8 +10,8 @@
     'data': [
         'views/voip_call_template_transcode_wizard_views.xml',
         'views/voip_call_template_views.xml',
-        'views/voip_account_transcode_wizard_views.xml',
-        'views/voip_account_views.xml',
+        'views/voip_media_transcode_wizard_views.xml',
+        'views/voip_media_views.xml',
     ],
     'demo': [],
     'depends': ['voip_sip_webrtc'],
