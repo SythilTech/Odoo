@@ -19,6 +19,7 @@
       	            <field name="wss"/>
       	            <field name="outbound_proxy"/>
       	            <field name="port"/>
+      	            <field name="action_id" domain="[('account_id','=', active_id)]" ontext="{'default_account_id': active_id}"/>
       	            <field name="media"/>
       	            <field name="codec_id"/>
       	        </group>
@@ -48,6 +49,20 @@
         </field>
     </record>
 
+    <record id="voip_account_action_view_form" model="ir.ui.view">
+        <field name="name">voip.account.action form view</field>
+        <field name="model">voip.account.action</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="account_id" invisible="True"/>
+      	            <field name="action_type_id"/>
+      	            <field name="recorded_media_id"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+    
     <menuitem id="voip_account_menu" name="SIP Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>
 
 </odoo>

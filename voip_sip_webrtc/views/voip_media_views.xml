@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_media_view_form" model="ir.ui.view">
+        <field name="name">voip.media form view</field>
+        <field name="model">voip.media</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="media" filename="media_filename"/>
+      	            <field name="media_filename" invisible="True"/>
+      	            <field name="codec_id"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_media_view_tree" model="ir.ui.view">
+        <field name="name">voip.media tree view</field>
+        <field name="model">voip.media</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="name"/>
+      	        <field name="codec_id"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_media_action" model="ir.actions.act_window">
+        <field name="name">VOIP Media</field>
+	<field name="res_model">voip.media</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No VOIP Media
+	    </p>
+        </field>
+    </record>
+    
+    <menuitem id="voip_media_menu" name="Media" parent="voip_parent_menu" action="voip_media_action" sequence="80"/>
+
+</odoo>

@@ -16,11 +16,9 @@
       	            <field name="to_address"/>
       	            <field name="codec_id"/>
       	            <field name="type"/>
+		    <field name="media" attrs="{'invisible': [('type', '!=', 'prerecorded')]}"/>
       	        </group>
       	        <notebook>
-		    <page string="Media" attrs="{'invisible': [('type', '!=', 'prerecorded')]}">
-		        <field name="media"/>
-		    </page>
 		    <page string="Dynamic Placeholder Generator">
 		        <group>
 		            <field name="model_object_field_id" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]"/>
