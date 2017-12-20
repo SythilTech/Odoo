@@ -156,6 +156,16 @@ class VoipSettings(models.Model):
         
         self.fingerprint = fingerprint_format[:-1]
         
+    def invite_listener(self):
+        _logger.error("Invite listen")
+
+        #Need to get voip account from the to address
+        voip_account = self.env['voip.account'].search([('address','=', 'sythil@sythiltech.pstn.us1.twilio.com')])
+
+        #Twilio will only send to 5060 which kinda distroys the whole multi db setup
+        invite_listener_starter = threading.Thread(target=voip_account.invite_listener, args=(5060,))
+        invite_listener_starter.start()     
+            
     def make_stun_request(self):
         
         #----Compose binding request-----

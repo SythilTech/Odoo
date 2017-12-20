@@ -19,7 +19,7 @@
       	            <field name="wss"/>
       	            <field name="outbound_proxy"/>
       	            <field name="port"/>
-      	            <field name="action_id" domain="[('account_id','=', active_id)]" ontext="{'default_account_id': active_id}"/>
+      	            <field name="action_id" domain="[('account_id','=', active_id)]" context="{'default_account_id': active_id}"/>
       	            <field name="media"/>
       	            <field name="codec_id"/>
       	        </group>

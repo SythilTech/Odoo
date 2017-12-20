@@ -49,9 +49,12 @@ class VoipAccountAction(models.Model):
                 rtpsocket.sendto(send_data, caller_addr)
                 sequence_number += 1
                 #---------------------END Send Audio Packet-----------
-
+            
                 rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
+
+                if packet_count % 10 == 0:
+                    _logger.error(data)
                     
                 joined_payload += data
                 packet_count += 1
@@ -68,8 +71,8 @@ class VoipAccountAction(models.Model):
                 self = self.with_env(self.env(cr=new_cr))
 
                 #Start off with the raw audio stream
-                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': self.codec_id.id}
-                self.process_audio_stream( create_dict )
+                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': codec_id.id}
+                self.account_id.process_audio_stream( create_dict )
 
                 if model:
                     #Add to the chatter
@@ -97,7 +100,14 @@ class VoipAccountAction(models.Model):
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
         media_port = random.randint(55000,56000)
         rtp_ip = re.findall(r'\*(.*?)!', data)[0]
+        #rtp_ip = re.findall(r'IN IP4 (.*?)\r\n', data)[0]
+        #rtp_ip = re.findall(r'Record-Route: <sip:(.*?):', data)[0]
+        #rtp_ip = re.findall(r'Contact: <sip:(.*?):', data)[0].split("@")[1]
+        #rtp_ip = "sythiltech.pstn.twilio.com"
+        
+        _logger.error(rtp_ip)
         send_media_port = re.findall(r'm=audio (.*?) RTP', data)[0]
+        _logger.error(send_media_port)
 
         #Start sending out RTP data now
         caller_addr = (rtp_ip, int(send_media_port) )
@@ -133,6 +143,7 @@ class VoipAccountAction(models.Model):
         reply += "\r\n"
         reply += sdp
         
+        _logger.error(addr)
         sipsocket.sendto(reply, addr)
         
 class VoipAccountActionType(models.Model):
