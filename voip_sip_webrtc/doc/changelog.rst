@@ -1,3 +1,7 @@
+v1.6.3
+======
+* Add additional fields to deal with external calls from mobiles or other SIP clients
+
 v1.6.2
 ======
 * Remove test buttons and update documentation

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_call_view_form_inherit_twilio" model="ir.ui.view">
+        <field name="name">voip.call form view inherit twilio</field>
+        <field name="model">voip.call</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_call_view_form"/>
+        <field name="arch" type="xml">
+            <field name="status" position="before">
+                <field name="twilio_sid"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

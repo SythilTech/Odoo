@@ -29,10 +29,13 @@ class VoipCall(models.Model):
     _name = "voip.call"
     _order = 'create_date desc'
 
-    from_partner_id = fields.Many2one('res.partner', string="From", help="From can be blank if the call comes from outside of the system")
+    from_address = fields.Char(string="From Address")
+    from_partner_id = fields.Many2one('res.partner', string="From Partner", help="From can be blank if the call comes from outside of the system")
     from_partner_sdp = fields.Text(string="From Partner SDP")
-    partner_id = fields.Many2one('res.partner', string="To")
-    status = fields.Selection([('pending','Pending'), ('missed','Missed'), ('accepted','Accepted'), ('rejected','Rejected'), ('active','Active'), ('over','Complete')], string='Status', default="pending", help="Pending = Calling person\nActive = currently talking\nMissed = Call timed out\nOver = Someone hit end call\nRejected = Someone didn't want to answer the call")
+    partner_id = fields.Many2one('res.partner', string="(OBSOLETE)To Partner")
+    to_address = fields.Char(string="To Address")
+    to_partner_id = fields.Many2one('res.partner', string="To Partner", help="From can be blank if the call comes from outside of the system")
+    status = fields.Selection([('pending','Pending'), ('missed','Missed'), ('accepted','Accepted'), ('rejected','Rejected'), ('active','Active'), ('over','Complete'), ('failed','Failed'), ('busy','Busy'), ('cancelled','Cancelled')], string='Status', default="pending", help="Pending = Calling person\nActive = currently talking\nMissed = Call timed out\nOver = Someone hit end call\nRejected = Someone didn't want to answer the call")
     start_time = fields.Datetime(string="Answer Time", help="Time the call was answered, create_date is when it started dialing")
     end_time = fields.Datetime(string="End Time", help="Time the call end")
     duration = fields.Char(string="Duration", help="Length of the call")

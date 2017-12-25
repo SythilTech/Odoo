@@ -11,7 +11,10 @@
       	        </header>
       	        <group>
       	            <field name="status"/>
+      	            <field name="from_address"/>
       	            <field name="from_partner_id"/>
+      	            <field name="to_address"/>
+      	            <field name="to_partner_id"/>
       	            <field name="partner_id"/>
       	            <field name="create_date" string="Call Start"/>
       	            <field name="start_time"/>
@@ -19,16 +22,7 @@
       	            <field name="duration"/>
       	            <field name="transcription"/>
       	            <field name="notes"/>
-      	            <!--<field name="media" filename="media_filename"/>
-      	            <field name="media_filename" invisible="1"/>-->
-      	            <field name="media_url" widget="url"/>      	            
-      	            <field name="client_ids">
-      	                <tree>
-      	                    <field name="partner_id"/>
-      	                    <field name="sip_invite"/>
-      	                    <field name="sip_addr"/>
-      	                </tree>
-      	            </field>
+      	            <field name="media_url" widget="url"/>
       	        </group>
       	    </form>
         </field>
@@ -39,10 +33,12 @@
         <field name="model">voip.call</field>
         <field name="arch" type="xml">
       	    <tree>
+      	        <field name="from_address"/>
       	        <field name="from_partner_id"/>
-      	        <field name="partner_id"/>
+      	        <field name="to_address"/>
+      	        <field name="to_partner_id"/>
       	        <field name="status"/>
-      	        <field name="create_date"/>
+      	        <field name="start_time"/>
       	        <field name="duration"/>
       	    </tree>
         </field>
