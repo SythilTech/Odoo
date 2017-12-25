@@ -10,6 +10,7 @@ import random
 from openerp import api, fields, models
 import threading
 import time
+import datetime
 import struct
 import base64
 from random import randint
@@ -49,7 +50,7 @@ class VoipAccount(models.Model):
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
     
-    def generate_rtp_packet(self, audio_stream, codec, sequence_number):
+    def generate_rtp_packet(self, audio_stream, codec, packet_count, sequence_number, timestamp):
 
         rtp_data = ""
 
@@ -61,19 +62,22 @@ class VoipAccount(models.Model):
         rtp_data += "80"
 
         #0... .... = Marker: False
-        #Payload type: G.711 aLaw or GSM
-        rtp_data += " " + format( codec.payload_type, '02x')
+        #Payload type
+        if packet_count == 0:
+            #ulaw
+            rtp_data += " 80"
+        else:
+            rtp_data += " " + format( codec.payload_type, '02x')
 
         rtp_data += " " + format( sequence_number, '04x')
         
-        timestamp = codec.sample_rate / (1000 / codec.sample_interval) * sequence_number
-        rtp_data += " " + format( timestamp, '08x')
+        rtp_data += " " + format( int(timestamp), '08x')
             
-        #Synchronization Source identifier: 0x1222763d (304248381)
-        rtp_data += " 12 22 76 3d"
+        #Synchronization Source identifier: 0x1202763d
+        rtp_data += " 12 20 76 3d"
 
         #Payload:
-        payload_data = audio_stream[sequence_number * codec.payload_size : sequence_number * codec.payload_size + codec.payload_size]
+        payload_data = audio_stream[packet_count * codec.payload_size : packet_count * codec.payload_size + codec.payload_size]
         hex_string = ""
 
         for rtp_char in payload_data:
@@ -81,10 +85,9 @@ class VoipAccount(models.Model):
             hex_string += hex_format + " "
 
         rtp_data += " " + hex_string
-            
         return rtp_data.replace(" ","").decode('hex')
             
-    def rtp_server_listener(self, media_port, audio_stream, codec, model=False, record_id=False):
+    def rtp_server_listener(self, media_port, audio_stream, codec_id, model=False, record_id=False):
         
         try:
 
@@ -96,11 +99,11 @@ class VoipAccount(models.Model):
             stage = "LISTEN"
             hex_string = ""
             joined_payload = ""
-            packet_count = 0
 
             #Send audio data out every 20ms
-            #sequence_number = randint(29161, 30000)
-            sequence_number = 0
+            sequence_number = randint(29161, 30000)
+            packet_count = 0
+            timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
             
             while stage == "LISTEN":
 
@@ -108,12 +111,13 @@ class VoipAccount(models.Model):
                 data, addr = rtpsocket.recvfrom(2048)
                                     
                 joined_payload += data
-                packet_count += 1
 
                 #---------------------Send Audio Packet-----------
-                send_data = self.generate_rtp_packet(audio_stream, codec, sequence_number)
+                send_data = self.generate_rtp_packet(audio_stream, codec_id, packet_count, sequence_number, timestamp)
                 rtpsocket.sendto(send_data, addr)
+                packet_count += 1
                 sequence_number += 1
+                timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
                 #---------------------END Send Audio Packet-----------
 
         except Exception as e:
@@ -128,7 +132,7 @@ class VoipAccount(models.Model):
                 self = self.with_env(self.env(cr=new_cr))
 
                 #Start off with the raw audio stream
-                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': codec.id}
+                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': codec_id.id}
                 self.process_audio_stream( create_dict )
 
                 if model:
@@ -315,22 +319,25 @@ class VoipAccount(models.Model):
                 #rtp_ip = re.findall(r'\*(.*?)!', contact_header)[0]
                 record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
                 to_tag = re.findall(r'To: (.*?)\r\n', data)[0].split("tag=")[1]
+                call_from = re.findall(r'From: (.*?)\r\n', data)[0]
+                call_to = re.findall(r'To: (.*?)\r\n', data)[0]
                 #send_media_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
         
                 #Send the ACK
                 reply = ""
                 reply += "ACK " + contact_header + " SIP/2.0\r\n"
-                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---41291a6583a6634f;rport\r\n"
+                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=y9hG3bK-524287-1---41291a6583a6634f;rport\r\n"
                 reply += "Max-Forwards: 70\r\n"
                 reply += "Route: " + record_route + "\r\n"
-                reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-                reply += 'To: <sip:' + to_address + ">;tag=" + str(to_tag) + "\r\n"
-                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ">;tag=" + str(from_tag) + "\r\n"
+                reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ";rinstance=6f1dd3b5ff106b2b>\r\n"
+                reply += 'To: ' + call_to + "\r\n"
+                reply += "From: " + call_from + "\r\n"
                 reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
                 reply += "CSeq: 1 ACK\r\n"
                 reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
                 reply += "Content-Length: 0\r\n"
                 reply += "\r\n"
+                _logger.error(reply)
 
                 sipsocket.sendto(reply, addr)
                 

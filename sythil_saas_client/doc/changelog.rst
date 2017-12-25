@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Resolve uninstall issue
+
 v1.1.2
 ======
 * Allow admin login even after trial peroid has expired

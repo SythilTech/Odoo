@@ -21,7 +21,7 @@ class TwilioVoiceController(http.Controller):
 	twilio_xml += '<?xml version="1.0" encoding="UTF-8"?>' + "\n"
 	twilio_xml += "<Response>\n"
 	twilio_xml += "  <Dial>\n"
-	twilio_xml += "    <Sip>" + to_sip + ";region=au1</Sip>\n"
+	twilio_xml += "    <Sip>" + to_sip + ";region=gll</Sip>\n"
 	twilio_xml += "  </Dial>\n"
 	twilio_xml += "</Response>"
 
