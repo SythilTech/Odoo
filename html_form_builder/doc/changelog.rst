@@ -1,3 +1,7 @@
+v1.0.25
+=======
+* Encoding issue
+
 v1.0.24
 =======
 * Remove duplicate my_pie and proto nutural the process url

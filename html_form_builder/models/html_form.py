@@ -42,7 +42,7 @@ class HtmlForm(models.Model):
 
         required_string = ""
         for model_field in self.env['ir.model.fields'].search([('model_id', '=', self.model_id.id), ('required', '=', True)]):
-            required_string += model_field.field_description.encode("utf-8") + " (" + model_field.name.encode("utf-8") + ")\n"
+            required_string += model_field.field_description + " (" + model_field.name + ")\n"
 
         self.required_fields = required_string
 
@@ -52,7 +52,7 @@ class HtmlForm(models.Model):
         html_output += "<form method=\"POST\" action=\"" + request.httprequest.host_url + "form/insert\" enctype=\"multipart/form-data\">\n"
         html_output += "  <input style=\"display:none;\" name=\"my_pie\" value=\"3.14\"/>\n"
 
-        html_output += "  <h1>" + self.name.encode("utf-8") + "</h1>\n"
+        html_output += "  <h1>" + self.name + "</h1>\n"
 
         for fe in self.fields_ids:
 
@@ -81,7 +81,7 @@ class HtmlForm(models.Model):
 
     def _generate_html_file_select(self, fe):
         html_output = ""
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>\n"
         html_output += "  <input type=\"file\" id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required is True:
@@ -96,11 +96,11 @@ class HtmlForm(models.Model):
 
         html_output += "  <script>\n"
         html_output += "  $( function() {\n"
-        html_output += "    $( \"#" + fe.html_name.encode("utf-8") + "\" ).datepicker({ dateFormat: 'yy-mm-dd' });\n"
+        html_output += "    $( \"#" + fe.html_name + "\" ).datepicker({ dateFormat: 'yy-mm-dd' });\n"
         html_output += "  } );\n"
         html_output += "  </script>\n"
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
-        html_output += "  <input type=\"text\" id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>\n"
+        html_output += "  <input type=\"text\" id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required is True:
             html_output += " required=\"required\""
@@ -112,8 +112,8 @@ class HtmlForm(models.Model):
     def _generate_html_textbox(self, fe):
         html_output = ""
 
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
-        html_output += "  <input type=\"text\" id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>\n"
+        html_output += "  <input type=\"text\" id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required is True:
             html_output += " required=\"required\""
@@ -125,8 +125,8 @@ class HtmlForm(models.Model):
     def _generate_html_checkbox_boolean(self, fe):
         html_output = ""
 
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
-        html_output += "  <input type=\"checkbox\" id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>\n"
+        html_output += "  <input type=\"checkbox\" id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required is True:
             html_output += " required=\"required\""
@@ -138,23 +138,23 @@ class HtmlForm(models.Model):
     def _generate_html_radio_group_selection(self, fe):
         html_output = ""
 
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label><br/>\n"
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label><br/>\n"
 
         selection_list = dict(self.env[fe.field_id.model_id.model]._fields[fe.field_id.name].selection)
 
         for selection_value, selection_label in selection_list.items():
-            html_output += "  <input type=\"radio\" name=\"" + selection_value.encode("utf-8") + "\""
+            html_output += "  <input type=\"radio\" name=\"" + selection_value + "\""
 
-            html_output += "/> " + selection_label.encode("utf-8") + "<br/>\n"
+            html_output += "/> " + selection_label + "<br/>\n"
 
         return html_output
 
     def _generate_html_dropbox(self, fe):
         html_output = ""
 
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>\n"
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>\n"
 
-        html_output += "  <select id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+        html_output += "  <select id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required == True:
             html_output += " required=\"required\""
@@ -166,7 +166,7 @@ class HtmlForm(models.Model):
             selection_list = dict(self.env[fe.field_id.model_id.model]._fields[fe.field_id.name].selection)
 
             for selection_value, selection_label in selection_list.items():
-                html_output += "    <option value=\"" + selection_value.encode("utf-8") + "\">" + selection_label.encode("utf-8") + "</option>\n"
+                html_output += "    <option value=\"" + selection_value + "\">" + selection_label + "</option>\n"
 
         elif fe.field_id.ttype == "many2one":
 
@@ -181,9 +181,9 @@ class HtmlForm(models.Model):
 
     def _generate_html_textarea(self, fe):
         html_output = ""
-        html_output += "  <label for='" + fe.html_name.encode("utf-8") + "'>" + fe.field_label + "</label>"
+        html_output += "  <label for='" + fe.html_name + "'>" + fe.field_label + "</label>"
 
-        html_output += "  <textarea id=\"" + fe.html_name.encode("utf-8") + "\" name=\"" + fe.html_name.encode("utf-8") + "\""
+        html_output += "  <textarea id=\"" + fe.html_name + "\" name=\"" + fe.html_name + "\""
 
         if fe.field_id.required is True:
             html_output += " required=\"required\""
