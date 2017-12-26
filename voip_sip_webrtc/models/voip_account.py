@@ -453,44 +453,33 @@ class VoipAccount(models.Model):
 
                 stage = "WAITING"
                 while stage == "WAITING":
-                    sipsocket.settimeout(60)
-                    data, addr = sipsocket.recvfrom(2048)
+                    try:
+                        sipsocket.settimeout(600)
+                        data, addr = sipsocket.recvfrom(2048)
 
-                    _logger.error(data)
+                        _logger.error(data)
  
-                    #Send auth response if challenged
-                    if data.startswith("INVITE"):
-                        _logger.error("GOT INVITE")
+                        #Call action when call is received
+                        if data.startswith("INVITE"):
+                            _logger.error("GOT INVITE")
 
-                        call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
-                        from_address = re.findall(r'From: (.*?);', data)[0]
+                            #Execute the account action
+                            method = '_voip_action_%s' % (self.action_id.action_type_id.internal_name,)
+                            action = getattr(self.action_id, method, None)
 
-                        reply = ""
-                        reply += "SIP/2.0 180 Ringing\r\n"
-                        for (via_heading) in re.findall(r'Via: (.*?)\r\n', data):
-                            reply += "Via: " + via_heading + "\r\n"
-                        record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
-                        reply += "Record-Route: " + record_route + "\r\n"
-                        reply += "Contact: <sip:" + self.address + "@" + local_ip + ":" + str(bind_port) + ";rinstance=0bd6d48a7ed3b6df>\r\n"                        
-                        reply += "To: <sip:" + from_address + ">;tag=e856725d\r\n"
-                        reply += "From: " + self.address + ";tag=8861321\r\n"
-                        reply += "Call-ID: " + call_id + "\r\n"
-                        reply += "CSeq: 2 INVITE\r\n"
-                        reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
-                        reply += "Allow-Events: talk, hold\r\n"
-                        reply += "Content-Length: 0\r\n"
-                        reply += "\r\n"
-                        
-                        sipsocket.sendto(reply, addr)
- 
-                        #Execute the account action
-                        method = '_voip_action_%s' % (self.action_id.action_type_id.internal_name,)
-                        action = getattr(self.action_id, method, None)
+                            if not action:
+                                raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 
-                        if not action:
-                            raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
-
-                        action(sipsocket, addr, data)
+                            action(sipsocket, addr, data)
+                   
+                    except socket.timeout:
+                        #timeout has occured so reregister
+                        _logger.error("Reregister" + self.address)
+                        stage = "DEAD"
+                        self.send_register()
+                    except Exception as e:
+                        #Random error occured, log it but keep the thread alive so calls can still be received
+                        _logger.error(e)
             
                 self._cr.close()
                     
