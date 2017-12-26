@@ -1,3 +1,7 @@
+v1.6.4
+======
+* Voice synth on incoming call support
+
 v1.6.3
 ======
 * Add additional fields to deal with external calls from mobiles or other SIP clients

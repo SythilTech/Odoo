@@ -22,7 +22,7 @@ class VoipAccountAction(models.Model):
     _rec_name = "action_type_id"
 
     account_id = fields.Many2one('voip.account', string="VOIP Account")
-    action_type_id = fields.Many2one('voip.account.action.type', string="Call Action")
+    action_type_id = fields.Many2one('voip.account.action.type', string="Call Action", required="True")
     recorded_media_id = fields.Many2one('voip.media', string="Recorded Message")
 
     def rtp_server_sender(self, media_port, audio_stream, codec_id, caller_addr, model=False, record_id=False):
@@ -54,10 +54,10 @@ class VoipAccountAction(models.Model):
                 timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
                 #---------------------END Send Audio Packet-----------
                             
-                rtpsocket.settimeout(30)
+                rtpsocket.settimeout(10)
                 data, addr = rtpsocket.recvfrom(2048)
                     
-                if packet_count % 100 == 0 or packet_count == 0:
+                if packet_count % 500 == 0 or packet_count == 0:
                     _logger.error("GOT RTP DATA")
                     _logger.error(data)
                

@@ -112,7 +112,8 @@ class VoipCallTemplate(models.Model):
         elif self.type == "synth":
             rendered_text = self.render_template( self.synth_text, self.model_id.model, record_id)
             to_address = self.render_template( self.to_address, self.model_id.model, record_id)
-            self.voice_synth(rendered_text, to_address, record_id)
+            audio_stream = self.voice_synth_id.voice_synth(rendered_text, self.codec_id)
+            self.voip_account_id.make_call(to_address, audio_stream, self.codec_id, self.model_id.model, record_id)
         
     def render_template(self, template_txt, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``

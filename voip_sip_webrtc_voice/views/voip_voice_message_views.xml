@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_voice_message_view_form" model="ir.ui.view">
+        <field name="name">voip.voice.message form view</field>
+        <field name="model">voip.voice.message</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="voice_synth_id"/>
+      	            <field name="synth_text"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_voice_message_view_tree" model="ir.ui.view">
+        <field name="name">voip.voice.message tree view</field>
+        <field name="model">voip.voice.message</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="name"/>
+      	        <field name="voice_synth_id"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_voice_message_action" model="ir.actions.act_window">
+        <field name="name">Voip Voice Message</field>
+	<field name="res_model">voip.voice.message</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No Voip Voice Messages
+	    </p>
+        </field>
+    </record>
+    
+    <menuitem id="voip_voice_message_menu" name="Voice Messages" parent="voip_sip_webrtc.voip_parent_menu" action="voip_voice_message_action" sequence="100"/>
+
+</odoo>
