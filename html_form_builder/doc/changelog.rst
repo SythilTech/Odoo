@@ -1,3 +1,7 @@
+v1.0.26
+=======
+* Fix server action submit action
+
 v1.0.25
 =======
 * Encoding issue

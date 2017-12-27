@@ -18,9 +18,9 @@ class HtmlFieldResponse():
 
 class HtmlFormController(http.Controller):
 
-    def _html_action_custom_server_action(self, submit_action, history_data):
+    def _html_action_custom_server_action(self, submit_action, history_data, values):
         form_record = request.env[history_data.html_id.model_id.model].browse(history_data.record_id)
-        request.session.model('ir.actions.server').run(submit_action.custom_server_action.id, {'active_id': form_record.id, 'active_model': history_data.html_id.model_id.model})
+        submit_action.custom_server_action.with_context({'active_id': form_record.id, 'active_model': history_data.html_id.model_id.model}).run()
 
     @http.route('/form/thankyou', type="http", auth="public", website=True)
     def html_thanks(self, **kw):
