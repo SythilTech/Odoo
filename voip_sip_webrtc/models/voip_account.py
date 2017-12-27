@@ -333,7 +333,7 @@ class VoipAccount(models.Model):
                 reply += 'To: ' + call_to + "\r\n"
                 reply += "From: " + call_from + "\r\n"
                 reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
-                reply += "CSeq: 1 ACK\r\n"
+                reply += "CSeq: 2 ACK\r\n"
                 reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
                 reply += "Content-Length: 0\r\n"
                 reply += "\r\n"
@@ -454,17 +454,26 @@ class VoipAccount(models.Model):
                 stage = "WAITING"
                 while stage == "WAITING":
                     try:
-                        sipsocket.settimeout(600)
+                        sipsocket.settimeout(700)
                         data, addr = sipsocket.recvfrom(2048)
 
                         _logger.error(data)
  
                         #Call action when call is received
                         if data.startswith("INVITE"):
-                            _logger.error("GOT INVITE")
+                            _logger.error("GOT INVITE 2")
+
+                            #If the invite is sent to port 8060 we have to figure out the account from the to address
+                            domain = re.findall(r'From: (.*?)>', data)[0].split("@")[1]
+                            _logger.error(domain)
+                            call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
+                            call_to = re.findall(r'<sip:(.*?)@', call_to_full)[0] + "@" + domain
+                            _logger.error(call_to)
+                            
+                            voip_account = self.env['voip.account'].search([('address','=', call_to)])
 
                             #Execute the account action
-                            method = '_voip_action_%s' % (self.action_id.action_type_id.internal_name,)
+                            method = '_voip_action_%s' % (voip_account.action_id.action_type_id.internal_name,)
                             action = getattr(self.action_id, method, None)
 
                             if not action:
@@ -472,11 +481,6 @@ class VoipAccount(models.Model):
 
                             action(sipsocket, addr, data)
                    
-                    except socket.timeout:
-                        #timeout has occured so reregister
-                        _logger.error("Reregister" + self.address)
-                        stage = "DEAD"
-                        self.send_register()
                     except Exception as e:
                         #Random error occured, log it but keep the thread alive so calls can still be received
                         _logger.error(e)
@@ -485,7 +489,12 @@ class VoipAccount(models.Model):
                     
         except Exception as e:
             _logger.error(e)            
-    
+
+    @api.model
+    def register_accounts(self):
+        for voip_account in self.env['voip.account'].search([]):
+            voip_account.send_register()
+            
     def send_register(self):
   
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')

@@ -162,7 +162,7 @@ class VoipSettings(models.Model):
         #Need to get voip account from the to address
         voip_account = self.env['voip.account'].search([('address','=', 'sythil@sythiltech.pstn.us1.twilio.com')])
 
-        #Twilio will only send to 5060 which kinda distroys the whole multi db setup
+        #Twilio will only send to 5060 which kinda destroys the whole multi db setup
         invite_listener_starter = threading.Thread(target=voip_account.invite_listener, args=(5060,))
         invite_listener_starter.start()     
             

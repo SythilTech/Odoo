@@ -1,3 +1,8 @@
+v1.6.5
+======
+* Reregister scheduled action (10 minutes)
+* Fix outbound Twilio calls ending in 30 seconds
+
 v1.6.4
 ======
 * Voice synth on incoming call support

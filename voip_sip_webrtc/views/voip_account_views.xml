@@ -7,7 +7,6 @@
         <field name="arch" type="xml">
       	    <form>
       	        <header>
-      	            <button name="send_register" type="object" string="Send Register"/>
       	        </header>
       	        <group>
       	            <field name="address"/>
