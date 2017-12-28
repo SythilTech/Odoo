@@ -15,12 +15,17 @@ class VoipMessageCompose(models.TransientModel):
 
     type = fields.Char(string="Message Type")
     sip_account_id = fields.Many2one('voip.account', string="SIP Account")
-    partner_id = fields.Many2one('res.partner', string="Partner (Old)")
+    message_template_id = fields.Many2one('voip.message.template', string="Message Template")
+    partner_id = fields.Many2one('res.partner', string="Partner (OBSOLETE)")
     model = fields.Char(string="Model")
     record_id = fields.Integer(string="Record ID")
     to_address = fields.Char(string="To Address")
     message = fields.Text(string="Message")
-        
+    
+    @api.onchange('message_template_id')
+    def _onchange_message_template_id(self):
+        self.message = self.message_template_id.template_body
+    
     def send_message(self):
 
         method = '_send_%s_message' % (self.type,)

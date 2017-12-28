@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from openerp import api, fields, models
+from openerp.exceptions import UserError
 
 class ResPartnerVoip(models.Model):
 
@@ -27,9 +28,16 @@ class ResPartnerVoip(models.Model):
     @api.multi
     def sip_action(self):
         self.ensure_one()
+
+        my_context = {'default_type': 'sip', 'default_model':'res.partner', 'default_record_id':self.id, 'default_to_address': self.sip_address}        
         
-        default_voip_account = self.env['voip.account'].search([])[0]
-                
+        #Use the first SIP account you find
+        default_voip_account = self.env['voip.account'].search([])
+        if default_voip_account:
+            my_context['default_sip_account_id'] = default_voip_account[0].id
+        else:
+            raise UserError("No SIP accounts found, can not send message")
+           
         return {
             'name': 'SIP Compose',
             'view_type': 'form',
@@ -37,5 +45,5 @@ class ResPartnerVoip(models.Model):
             'res_model': 'voip.message.compose',
             'target': 'new',
             'type': 'ir.actions.act_window',
-            'context': {'default_type': 'sip', 'default_sip_account_id': default_voip_account.id, 'default_model':'res.partner', 'default_record_id':self.id, 'default_to_address': self.sip_address}
+            'context': my_context
          }

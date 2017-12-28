@@ -20,6 +20,7 @@
         'views/voip_media_views.xml',
         'views/voip_message_compose_views.xml',
         'views/ir_actions_server_views.xml',
+        'views/voip_message_template_views.xml',
         'security/ir.model.access.csv',
         'data/voip_ringtone.xml',
         'data/voip_settings.xml',

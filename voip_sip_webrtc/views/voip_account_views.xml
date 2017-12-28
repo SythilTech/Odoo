@@ -9,6 +9,7 @@
       	        <header>
       	        </header>
       	        <group>
+      	            <field name="name"/>
       	            <field name="address"/>
       	            <field name="password" password="True"/>
       	            <field name="auth_username"/>

@@ -30,7 +30,7 @@ class VoipSettings(models.Model):
     ringtone_filename = fields.Char("Ringtone Filename")
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
     message_bank_duration = fields.Integer(string="Message Bank Duration (Seconds)", help="The time before message bank automatically hangs up")
-    server_ip = fields.Char(string="Public IP")
+    server_ip = fields.Char(string="IP Address")
     cert_path = fields.Char(string="Cert Path", help="Used by message bank")
     key_path = fields.Char(string="Key Path", help="Used by message bank")
     fingerprint = fields.Char(string="Fingerprint", help="Used by message bank")
@@ -159,11 +159,12 @@ class VoipSettings(models.Model):
     def invite_listener(self):
         _logger.error("Invite listen")
 
-        #Need to get voip account from the to address
-        voip_account = self.env['voip.account'].search([('address','=', 'sythil@sythiltech.pstn.us1.twilio.com')])
-
+        #Kill the existing thread
+        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sipsocket.sendto( "DIE BOT DIE", ("", 5060) )
+        
         #Twilio will only send to 5060 which kinda destroys the whole multi db setup
-        invite_listener_starter = threading.Thread(target=voip_account.invite_listener, args=(5060,))
+        invite_listener_starter = threading.Thread(target=self.env['voip.account'].invite_listener, args=(5060, -1,))
         invite_listener_starter.start()     
             
     def make_stun_request(self):
