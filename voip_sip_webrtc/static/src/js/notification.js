@@ -103,6 +103,9 @@ function getUserMediaSuccess(stream) {
     window.peerConnection.onaddstream = gotRemoteStream;
     window.peerConnection.addStream(localStream);
 
+    console.log(role);
+    console.log(call_type);
+
     if (role == "caller") {
 		if (call_type == "external") {
 		    //Send the sdp now since we need it for the INVITE
@@ -143,9 +146,10 @@ WebClient.include({
         $(".s-voip-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
         $(".s-chat-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
 
-
+        /*
         var model = new Model("voip.server");
         model.call("get_user_agent", [[]]).then(function(result) {
+
 
             if (result.address != '') {
 				console.log("Signing in as " + result.address);
@@ -161,8 +165,9 @@ WebClient.include({
                 window.userAgent.on('invite', onInvite);
 		    }
 
-        });
 
+        });
+        */
 
 
         bus.on('notification', this, function (notifications) {
@@ -404,6 +409,7 @@ function createCall(description) {
 
         //Send the call notification to the callee
         var model = new Model("voip.server");
+        console.log(description);
         model.call("voip_call_notify", [[call_id]], {'mode': mode, 'to_partner_id': to_partner_id, 'call_type': call_type, 'sdp': description}).then(function(result) {
             console.log("Notify Callee of incoming phone call");
         });
@@ -515,11 +521,12 @@ var FieldSIP = form_widgets.FieldChar.extend({
                 window.chatSubscription.on('notify', onPresence);
 		    }
 
-		    //this.$el.html("<span class=\"o_text_overflow\" style=\"width: 1px !important;min-width: 100%;\">" + this.get("value") + "</span> <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
-		    this.$el.html("<span>" + this.get("value") + "</span> <i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i>");
+		    this.$el.html("<span style=\"float:right\"><i class=\"fa fa-comments sip-message\" aria-hidden=\"true\"></i> <i class=\"fa fa-phone sip-call\" aria-hidden=\"true\"></i> <i class=\"fa fa-video-camera sip-video\" aria-hidden=\"true\"></i></span><span style=\"display: block;width: 170px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;\">" + this.get("value") + "</span>");
 
         } else {
-			this.$input.val(this.get("value"));
+			if (this.get("value")) {
+			    this.$input.val(this.get("value"));
+		    }
         }
 
     },
@@ -529,7 +536,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         $(".s-voip-manager").css("opacity","1");
 
-        //here you determine whether the call has video and audio
+        //Here you determine if the call has audio and video
         var options = {
             media: {
                 constraints: {
@@ -555,7 +562,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         $(".s-voip-manager").css("opacity","1");
 
-        //here you determine whether the call has video and audio
+        //Here you determine if the call has audio and video
         var options = {
             media: {
                 constraints: {
@@ -612,24 +619,21 @@ var FieldSIPPSTN = form_widgets.FieldChar.extend({
 
         $(".s-voip-manager").css("opacity","1");
 
-        //here you determine whether the call has video and audio
-        var options = {
-            media: {
-                constraints: {
-                    audio: true
-                 },
-                render: {
-                    remote: document.getElementById('remoteVideo'),
-                    local: document.getElementById('localVideo')
-                }
-            }
-        };
-
         //Make the audio call
         console.log("PSTN audio calling: " + this.get("value"));
-        window.sip_session = window.userAgent.invite(this.get("value"), options);
 
-        window.sip_session.on('failed', sipOnError);
+        role = "caller";
+        mode = "audiocall";
+        call_type = "external";
+        to_partner_id = 7;
+
+        var contraints = {'audio': true};
+
+        if (navigator.webkitGetUserMedia) {
+		    navigator.webkitGetUserMedia(contraints, getUserMediaSuccess, getUserMediaError);
+		} else {
+            window.navigator.mediaDevices.getUserMedia(contraints).then(getUserMediaSuccess).catch(getUserMediaError);
+		}
 
     }
 });

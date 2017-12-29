@@ -24,7 +24,7 @@ class VoipMessageCompose(models.TransientModel):
     
     @api.onchange('message_template_id')
     def _onchange_message_template_id(self):
-        self.message = self.message_template_id.template_body
+        self.message = self.message_template_id.message
     
     def send_message(self):
 
@@ -38,8 +38,8 @@ class VoipMessageCompose(models.TransientModel):
         
     def _send_sip_message(self):
 
-        if self.sip_account_id.send_message(self.to_address, self.message, model=self.model, record_id=self.record_id):
-            _logger.error("SIP Message Sent")
-        else:
+        message_response = self.sip_account_id.send_message(self.to_address, self.message, model=self.model, record_id=self.record_id)
+        
+        if message_response != "OK":
             _logger.error("SIP Message Failure")
-            raise UserError("Failed to send SIP message")
+            raise UserError("Failed to send SIP message: " + message_response)

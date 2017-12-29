@@ -8,7 +8,7 @@
       	    <form>
       	        <group>
       	            <field name="name"/>
-      	            <field name="template_body"/>
+      	            <field name="message"/>
       	        </group>
       	    </form>
         </field>
@@ -20,6 +20,7 @@
         <field name="arch" type="xml">
       	    <tree>
       	        <field name="name"/>
+      	        <field name="message"/>
       	    </tree>
         </field>
     </record>
@@ -35,6 +36,6 @@
         </field>
     </record>
     
-    <menuitem id="voip_message_template_menu" name="Message Templates" parent="voip_parent_menu" action="voip_message_template_action" sequence="110"/>
+    <menuitem id="voip_message_template_menu" name="Message Templates" parent="voip_parent_menu" action="voip_message_template_action" sequence="30"/>
 
 </odoo>

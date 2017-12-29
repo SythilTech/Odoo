@@ -19,13 +19,14 @@ class VoipAccount(models.Model):
 
     _name = "voip.account"
 
-    name = fields.Char(string="Name")
+    name = fields.Char(string="Name", required="True")
+    state = fields.Selection([('new','New'), ('inactive','Inactive'), ('active','Active')], default="new", string="State")
     type = fields.Selection([('sip', 'SIP'), ('xmpp', 'XMPP')], default="sip", string="Account type")
-    address = fields.Char(string="SIP Address")
-    password = fields.Char(string="SIP Password")
+    address = fields.Char(string="SIP Address", required="True")
+    password = fields.Char(string="SIP Password", required="True")
     auth_username = fields.Char(string="Auth Username")
-    username = fields.Char(string="Username")
-    domain = fields.Char(string="Domain")
+    username = fields.Char(string="Username", required="True")
+    domain = fields.Char(string="Domain", required="True")
     voip_display_name = fields.Char(string="Display Name", default="Odoo")
     outbound_proxy = fields.Char(string="Outbound Proxy")
     port = fields.Integer(string="Port", default="5060")
@@ -37,7 +38,12 @@ class VoipAccount(models.Model):
     bind_port = fields.Integer(string="Bind Port")
     action_id = fields.Many2one('voip.account.action', string="Call Action")
     action_ids = fields.One2many('voip.account.action', 'account_id', string="Call Actions")
-    
+
+    @api.onchange('username','domain')
+    def _onchange_username(self):
+        if self.username and self.domain:
+            self.address = self.username + "@" + self.domain
+
     @api.onchange('address')
     def _onchange_address(self):
         if self.address:
@@ -196,13 +202,13 @@ class VoipAccount(models.Model):
         invite_string += "Max-Forwards: 70\r\n"
         invite_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
         invite_string += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
-        invite_string += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
+        invite_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
         invite_string += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
         invite_string += "CSeq: 1 INVITE\r\n"
         invite_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
         invite_string += "Content-Type: application/sdp\r\n"
         invite_string += "Supported: replaces\r\n"
-        invite_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+        invite_string += "User-Agent: Sythil Tech SIP Client\r\n"
         invite_string += "Content-Length: " + str(len(sdp)) + "\r\n"
         invite_string += "\r\n"
         invite_string += sdp
@@ -240,7 +246,7 @@ class VoipAccount(models.Model):
                 cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
  
                 #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
-                A1 = self.auth_username + ":" + realm + ":" + self.password
+                A1 = self.username + ":" + realm + ":" + self.password
                 A2 = method + ":" + uri
                 response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
 
@@ -255,9 +261,9 @@ class VoipAccount(models.Model):
                 reply += "CSeq: 2 INVITE\r\n"
                 reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
                 reply += "Content-Type: application/sdp\r\n"
-                reply += 'Proxy-Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                reply += 'Proxy-Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
                 reply += "Supported: replaces\r\n"
-                reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                reply += "User-Agent: Sythil Tech SIP Client\r\n"
                 reply += "Content-Length: " + str(len(sdp)) + "\r\n"
                 reply += "\r\n"
                 reply += sdp        
@@ -275,7 +281,7 @@ class VoipAccount(models.Model):
                 nc = "00000001"
                 cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
  
-                A1 = self.auth_username + ":" + realm + ":" + self.password
+                A1 = self.username + ":" + realm + ":" + self.password
                 A2 = method + ":" + uri
                 response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
 
@@ -290,9 +296,9 @@ class VoipAccount(models.Model):
                 reply += "CSeq: 2 INVITE\r\n"
                 reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
                 reply += "Content-Type: application/sdp\r\n"
-                reply += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"               
+                reply += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"               
                 reply += "Supported: replaces\r\n"
-                reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                reply += "User-Agent: Sythil Tech SIP Client\r\n"
                 reply += "Content-Length: " + str(len(sdp)) + "\r\n"
                 reply += "\r\n"
                 reply += sdp
@@ -335,7 +341,7 @@ class VoipAccount(models.Model):
                 reply += "From: " + call_from + "\r\n"
                 reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
                 reply += "CSeq: 2 ACK\r\n"
-                reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                reply += "User-Agent: Sythil Tech SIP Client\r\n"
                 reply += "Content-Length: 0\r\n"
                 reply += "\r\n"
                 _logger.error(reply)
@@ -347,7 +353,7 @@ class VoipAccount(models.Model):
                 return True
  
     def send_message(self, to_address, message_body, model=False, record_id=False):
-
+  
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
         
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -364,7 +370,7 @@ class VoipAccount(models.Model):
         message_string += "CSeq: 1 MESSAGE\r\n"
         message_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
         message_string += "Content-Type: text/html\r\n"
-        message_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+        message_string += "User-Agent: Sythil Tech SIP Client\r\n"
         message_string += "Content-Length: " + str(len(message_body)) + "\r\n"
         message_string += "\r\n"
         message_string += message_body
@@ -415,9 +421,6 @@ class VoipAccount(models.Model):
                 reply = reply[:idx] + insert_text + reply[idx:]
                 _logger.error(reply)
                 sipsocket.sendto(reply, addr)
-            elif data.split("\r\n")[0] == "SIP/2.0 404 Not Found":
-                stage = "FAILURE"
-                return False
             elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
                 stage = "SENT"
                 
@@ -426,7 +429,10 @@ class VoipAccount(models.Model):
                     #TODO add SIP subtype
                     self.env[model].browse( int(record_id) ).message_post(body=message_body, subject="SIP Message Sent", message_type="comment")
 
-                return True
+                return "OK"
+            else:
+                stage = "FAILURE"
+                return data.split("\r\n")[0]
 
     def process_audio_stream(self, create_dict):
         _logger.error("Process File")
@@ -464,7 +470,7 @@ class VoipAccount(models.Model):
  
                     #Call action when call is received
                     if data.startswith("INVITE"):
-                        _logger.error("GOT INVITE 3")
+                        _logger.error("GOT INVITE 4")
 
                         #TODO find a way to deal with multiple accounts with the same username but different providers
                         call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
@@ -487,14 +493,16 @@ class VoipAccount(models.Model):
                     
         except Exception as e:
             _logger.error(e)            
-
+        
     @api.model
     def register_accounts(self):
         for voip_account in self.env['voip.account'].search([]):
             voip_account.send_register()
             
     def send_register(self):
-  
+        
+        self.state = "inactive"
+        
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -512,9 +520,9 @@ class VoipAccount(models.Model):
         register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
         register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
-        register_string += "Expires: 600\r\n"
+        register_string += "Expires: 700\r\n"
         register_string += "Allow: NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-        register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+        register_string += "User-Agent: Sythil Tech SIP Client\r\n"
         register_string += "Content-Length: 0\r\n"
         register_string += "\r\n"
 
@@ -560,17 +568,17 @@ class VoipAccount(models.Model):
                 register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
                 register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
                 register_string += "CSeq: 2 REGISTER\r\n"
-                register_string += "Expires: 600\r\n"
+                register_string += "Expires: 700\r\n"
                 register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-                register_string += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
+                register_string += "User-Agent: Sythil Tech SIP Client\r\n"
                 
                 if "qop=" in authheader:
 		    qop = re.findall(r'qop="(.*?)"', authheader)[0]
 		    response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )                
-                    register_string += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                    register_string += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
                 else:
 		    response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
-                    register_string += 'Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
+                    register_string += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
                     
                 register_string += "Content-Length: 0\r\n"
                 register_string += "\r\n"
@@ -610,8 +618,10 @@ class VoipAccount(models.Model):
                 sipsocket.sendto(reply, (send_to, self.port) )            
             elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
                 _logger.error("REGISTERED")
+                
+                self.state = "active"
+                
                 #Start a new thread so we can listen for invites
-
                 #Listen for 700 seconds which allows for some overlap with the 600 second reregister timer
                 invite_listener_starter = threading.Thread(target=self.invite_listener, args=(bind_port, 700,))
                 invite_listener_starter.start()

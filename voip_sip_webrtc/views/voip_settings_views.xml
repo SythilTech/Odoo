@@ -31,6 +31,6 @@
 	<field name="target">inline</field>
     </record>
 
-    <menuitem id="voip_settings_menu" name="Settings" parent="voip_parent_menu" action="voip_settings_action" sequence="30"/>
+    <menuitem id="voip_settings_menu" name="Settings" parent="voip_parent_menu" action="voip_settings_action" sequence="200"/>
 
 </odoo>

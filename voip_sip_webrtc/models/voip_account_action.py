@@ -23,7 +23,9 @@ class VoipAccountAction(models.Model):
 
     account_id = fields.Many2one('voip.account', string="VOIP Account")
     action_type_id = fields.Many2one('voip.account.action.type', string="Call Action", required="True")
+    action_type_internal_name = fields.Char(related="action_type_id.internal_name", string="Action Type Internal Name")
     recorded_media_id = fields.Many2one('voip.media', string="Recorded Message")
+    user_id = fields.Many2one('res.users', string="Call User")
 
     def rtp_server_sender(self, media_port, audio_stream, codec_id, caller_addr, model=False, record_id=False):
         
@@ -95,7 +97,6 @@ class VoipAccountAction(models.Model):
     def _voip_action_recorded_message(self, sipsocket, addr, data):
         _logger.error("Stream recorded message")
         
-        #Back compatability, moving forward voip.media will be standard for recorded messages
         audio_stream = base64.decodestring(self.recorded_media_id.media)
 
         bind_port = bind_port = sipsocket.getsockname()[1]
@@ -177,6 +178,9 @@ class VoipAccountAction(models.Model):
         reply += sdp
 
         sipsocket.sendto(reply, addr)
+
+    def _voip_action_call_user(self, sipsocket, addr, data):
+        _logger.error("Call User")        
         
 class VoipAccountActionType(models.Model):
 

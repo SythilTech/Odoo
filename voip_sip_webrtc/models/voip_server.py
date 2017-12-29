@@ -11,6 +11,7 @@ import time
 import string
 import socket
 import datetime
+import re
 
 from odoo import api, fields, models, registry
 from odoo.exceptions import UserError, ValidationError
@@ -120,33 +121,135 @@ class VoipVoip(models.Model):
             voip_account = self.env.user.voip_account_id
             voip_call.voip_account = voip_account
             voip_call.from_partner_sdp = sdp['sdp']
+            media_port = random.randint(55000,56000)
+            call_id = random.randint(50000,60000)
+            from_tag = random.randint(8000000,9000000)
 
+            sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sipsocket.bind(('', 6000))
+            bind_port = sipsocket.getsockname()[1]
+ 
             local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 
-            reply = ""
-            reply += "INVITE sip:" + voip_call.partner_id.sip_address.strip() + " SIP/2.0\r\n"
-            reply += "Via: SIP/2.0/UDP " + local_ip + "\r\n"
-            reply += "Max-Forwards: 70\r\n"
-            reply += "Contact: <sip:" + voip_account.username + "@" + local_ip + ":5060>\r\n"
-            reply += 'To: <sip:' + voip_call.partner_id.sip_address.strip() + ">\r\n"
-            reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + voip_account.address + ">;tag=903df0a\r\n"
-            reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(voip_call.id) + "\r\n"
-            reply += "CSeq: 1 INVITE\r\n"
-            reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-            reply += "Content-Type: application/sdp\r\n"
-            reply += "Supported: replaces\r\n"
-            reply += "User-Agent: Sythil Tech Voip Client 1.0.0\r\n"
-            reply += "Content-Length: " + str(len(sdp['sdp'])) + "\r\n"
-            reply += "\r\n"
-            reply += sdp['sdp']
-
-            _logger.error("INVITE: " + reply )
-                
-            serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            serversocket.sendto(reply, (voip_account.outbound_proxy, 5060) )        
+            #SDP from webrtc doesn't work?!?
+            sdp = sdp['sdp']
 
 
+            #Server SDP (Works)
+            sdp = ""         
+            sdp += "v=0\r\n" 
+            sess_id = int(time.time())
+            sess_version = 0
+            sdp += "o=- " + str(sess_id) + " " + str(sess_version) + " IN IP4 " + local_ip + "\r\n"         
+            sdp += "s= \r\n"
+            sdp += "c=IN IP4 " + local_ip + "\r\n"
+            sdp += "t=0 0\r\n"
+            sdp += "m=audio " + str(media_port) + " RTP/AVP 0\r\n"      
+            sdp += "a=sendrecv\r\n"
             
+            #Webrtc SDP Data (Fails)
+            sdp = ""
+            sdp += "v=0\r\n"
+            sdp += "o=mozilla...THIS_IS_SDPARTA-57.0 9175984511205677962 0 IN IP4 0.0.0.0\r\n"
+            sdp += "s=-\r\n"
+            sdp += "t=0 0\r\n"
+            sdp += "a=fingerprint:sha-256 3B:D9:87:A6:7F:E2:B3:F8:0D:92:9F:B7:4A:D7:84:17:E9:C9:5E:70:64:06:85:21:B9:7C:6D:5D:3D:78:36:6B\r\n"
+            sdp += "a=group:BUNDLE sdparta_0\r\n"
+            sdp += "a=ice-options:trickle\r\n"
+            sdp += "a=msid-semantic:WMS *\r\n"
+            sdp += "m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101\r\n"
+            sdp += "c=IN IP4 0.0.0.0\r\n"
+            sdp += "a=sendrecv\r\n"
+            sdp += "a=extmap:1/sendonly urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n"
+            sdp += "a=fmtp:109 maxplaybackrate=48000;stereo=1;useinbandfec=1\r\n"
+            sdp += "a=fmtp:101 0-15\r\n"
+            sdp += "a=ice-pwd:66f0aeeb56dd05307985a8715f7badcd\r\n"
+            sdp += "a=ice-ufrag:afa2841a\r\n"
+            sdp += "a=mid:sdparta_0\r\n"
+            sdp += "a=msid:{83486b07-4708-46d3-92c7-909f5a598edc} {d04078f0-2166-4d12-b657-c7ca1bb5041b}\r\n"
+            sdp += "a=rtcp-mux\r\n"
+            sdp += "a=rtpmap:109 opus/48000/2\r\n"
+            sdp += "a=rtpmap:9 G722/8000/1\r\n"
+            sdp += "a=rtpmap:0 PCMU/8000\r\n"
+            sdp += "a=rtpmap:8 PCMA/8000\r\n"
+            sdp += "a=rtpmap:101 telephone-event/8000/1\r\n"
+            sdp += "a=setup:actpass\r\n"
+            sdp += "a=ssrc:645231268 cname:{b132b6ce-4687-4a65-9796-f82caca3ab92}\r\n"
+            
+            to_address = voip_call.partner_id.mobile.strip()
+            
+            if "@" not in to_address:
+                to_address = to_address + "@" + voip_account.domain
+            
+            invite_string = ""
+            invite_string += "INVITE sip:" + to_address + ":" + str(voip_account.port) + " SIP/2.0\r\n"
+            invite_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
+            invite_string += "Max-Forwards: 70\r\n"
+            invite_string += "Contact: <sip:" + voip_account.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n"
+            invite_string += 'To: <sip:' + to_address + ":" + str(voip_account.port) + ">\r\n"
+            invite_string += 'From: "' + voip_account.voip_display_name + '"<sip:' + voip_account.address + ":" + str(voip_account.port) + ">;tag=" + str(from_tag) + "\r\n"
+            invite_string += "Call-ID: " + request.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
+            invite_string += "CSeq: 1 INVITE\r\n"
+            invite_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+            invite_string += "Content-Type: application/sdp\r\n"
+            invite_string += "Supported: replaces\r\n"
+            invite_string += "User-Agent: Sythil Tech SIP Client\r\n"
+            invite_string += "Content-Length: " + str( len(sdp) ) + "\r\n"
+            invite_string += "\r\n"
+            invite_string += sdp
+            
+            _logger.error(invite_string )                
+
+            if voip_account.outbound_proxy:
+                sipsocket.sendto(invite_string, (voip_account.outbound_proxy, voip_account.port) )
+            else:
+                sipsocket.sendto(invite_string, (voip_account.domain, voip_account.port) )
+
+            stage = "WAITING"
+            while stage == "WAITING":
+                sipsocket.settimeout(10)
+                data, addr = sipsocket.recvfrom(2048)
+
+                _logger.error(data)
+
+                #Send auth response if challenged
+                if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required" or data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication required":
+                
+                    authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
+                         
+                    realm = re.findall(r'realm="(.*?)"', authheader)[0]
+                    method = "INVITE"
+                    uri = "sip:" + to_address
+                    nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
+                    qop = re.findall(r'qop="(.*?)"', authheader)[0]
+                    nc = "00000001"
+                    cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
+ 
+                    #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
+                    A1 = voip_account.username + ":" + realm + ":" + voip_account.password
+                    A2 = method + ":" + uri
+                    response = voip_account.KD( voip_account.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + voip_account.H(A2) )
+
+                    reply = ""
+                    reply += "INVITE sip:" + to_address + ":" + str(voip_account.port) + " SIP/2.0\r\n"
+                    reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
+                    reply += "Max-Forwards: 70\r\n"
+                    reply += "Contact: <sip:" + voip_account.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n"
+                    reply += 'To: <sip:' + to_address + ":" + str(voip_account.port) + ">\r\n"
+                    reply += 'From: "' + voip_account.voip_display_name + '"<sip:' + voip_account.address + ":" + str(voip_account.port) + ">;tag=" + str(from_tag) + "\r\n"
+                    reply += "Call-ID: " + request.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
+                    reply += "CSeq: 1 INVITE\r\n"
+                    reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+                    reply += "Content-Type: application/sdp\r\n"
+                    reply += 'Proxy-Authorization: Digest username="' + voip_account.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+                    reply += "Supported: replaces\r\n"
+                    reply += "User-Agent: Sythil Tech SIP Client\r\n"
+                    reply += "Content-Length: " + str( len(sdp) ) + "\r\n"
+                    reply += "\r\n"
+                    reply += sdp
+                    
+                    sipsocket.sendto(reply, addr)
+                
     @api.model
     def generate_server_ice(self, port, component_id):
 

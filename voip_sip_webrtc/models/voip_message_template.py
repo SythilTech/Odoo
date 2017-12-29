@@ -9,4 +9,4 @@ class VoipMessageTemplate(models.Model):
     _name = "voip.message.template"
 
     name = fields.Char(string="Name")
-    template_body = fields.Text(string="Body")
+    message = fields.Text(string="Message")
