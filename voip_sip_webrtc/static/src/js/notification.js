@@ -146,7 +146,7 @@ WebClient.include({
         $(".s-voip-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
         $(".s-chat-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
 
-        /*
+
         var model = new Model("voip.server");
         model.call("get_user_agent", [[]]).then(function(result) {
 
@@ -167,7 +167,7 @@ WebClient.include({
 
 
         });
-        */
+
 
 
         bus.on('notification', this, function (notifications) {

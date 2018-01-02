@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="voip_button_editor" inherit_id="website.assets_editor" name="Voip Button Editor Resources">
+            <xpath expr="/t" position="inside">
+                <script type="text/javascript" src="/voip_sip_webrtc_website/static/src/js/voip-button.editor.js" />
+            </xpath>
+        </template>
+        
+        <template id="voip_button_front_assert" inherit_id="website.assets_frontend" name="Voip Button Front Asserts">
+            <xpath expr="/t" position="inside">
+                <script type="text/javascript" src="/bus/static/src/js/bus.js"/>
+                <script type="text/javascript" src="/voip_sip_webrtc_website/static/src/js/voip-button.js" />
+                <link rel="stylesheet" href="/voip_sip_webrtc_website/static/src/css/voip-button.css"/>
+            </xpath>
+        </template>
+
+        <template id="website_voip_options" name="VOIP Button Options" inherit_id="website.snippet_options">
+            <xpath expr="//div" position="after">
+                <div data-js='voip_button'
+                    data-selector=".voip-button"
+                    data-drop-in=".oe_structure, [data-oe-type=html]">
+                </div>
+            </xpath>
+        </template>
+
+        <template id="voip_navbar" inherit_id="website.snippets" name="VOIP Navbar">
+            <xpath expr="//div[@id='snippet_content']/div[@class='o_panel_body']" position="inside">
+                <t t-snippet="voip_sip_webrtc_website.voip_button" t-thumbnail="/voip_sip_webrtc_website/static/src/img/ui/snippet_thumb_voip_button.jpg"/>
+            </xpath>
+        </template>
+
+        <template id="voip_button" name="VOIP Button">
+            <section class="voip-button">
+                <button type="button" class="btn btn-default voip-c2c">Call</button>
+            </section>
+        </template>
+
+    </data>
+</openerp>

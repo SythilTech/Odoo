@@ -1,0 +1,27 @@
+.s-front-voip-manager {
+    width: 300px;
+    height: auto;
+    z-index: 1100;
+    position:absolute;
+    bottom:10px;
+    right:10px;
+    resize: both;
+    opacity:0;
+    border: black 1px solid;
+    overflow: hidden;
+    background-color: #EEEEEE;
+    box-shadow: 0px 0px 5px 1px #4c4c4c;
+}
+
+.voip-front-controls-panel {
+    float:right;
+    width:100px;
+}
+
+.voip-front-video-container {
+    margin-right:110px;
+    margin-left:10px;
+    margin-top:10px;
+    margin-bottom:10px;
+    text-align:center;
+}

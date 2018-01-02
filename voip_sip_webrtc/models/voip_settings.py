@@ -160,13 +160,16 @@ class VoipSettings(models.Model):
         _logger.error("Invite listen")
 
         #Kill the existing thread
-        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sipsocket.sendto( "DIE BOT DIE", ("", 5060) )
+        #sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #sipsocket.sendto( "DIE BOT DIE", ("", 5060) )
         
         #Twilio will only send to 5060 which kinda destroys the whole multi db setup
-        invite_listener_starter = threading.Thread(target=self.env['voip.account'].invite_listener, args=(5060, -1,))
-        invite_listener_starter.start()     
-            
+        invite_listener_starter = threading.Thread(target=self.env['voip.account'].invite_listener, args=(5060, 60,))
+        invite_listener_starter.start()
+
+        #invite_listener_starter = threading.Thread(target=self.env['voip.account'].invite_listener, args=(5061, 60,))
+        #invite_listener_starter.start()
+        
     def make_stun_request(self):
         
         #----Compose binding request-----

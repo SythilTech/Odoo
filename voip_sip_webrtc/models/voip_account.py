@@ -520,7 +520,7 @@ class VoipAccount(models.Model):
         register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
         register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
-        register_string += "Expires: 700\r\n"
+        register_string += "Expires: 3600\r\n"
         register_string += "Allow: NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
         register_string += "User-Agent: Sythil Tech SIP Client\r\n"
         register_string += "Content-Length: 0\r\n"
@@ -568,7 +568,7 @@ class VoipAccount(models.Model):
                 register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
                 register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
                 register_string += "CSeq: 2 REGISTER\r\n"
-                register_string += "Expires: 700\r\n"
+                register_string += "Expires: 3600\r\n"
                 register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
                 register_string += "User-Agent: Sythil Tech SIP Client\r\n"
                 
@@ -622,8 +622,7 @@ class VoipAccount(models.Model):
                 self.state = "active"
                 
                 #Start a new thread so we can listen for invites
-                #Listen for 700 seconds which allows for some overlap with the 600 second reregister timer
-                invite_listener_starter = threading.Thread(target=self.invite_listener, args=(bind_port, 700,))
+                invite_listener_starter = threading.Thread(target=self.invite_listener, args=(bind_port, 3600,))
                 invite_listener_starter.start()
         
                 stage = "REGISTERED"

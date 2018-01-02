@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_button_view_form" model="ir.ui.view">
+        <field name="name">voip.button form view</field>
+        <field name="model">voip.button</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="url"/>
+                        <field name="user_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="voip_button_view_tree" model="ir.ui.view">
+        <field name="name">voip.button view tree</field>
+        <field name="model">voip.button</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="name"/>
+      	        <field name="url"/>
+      	        <field name="user_id"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_button_action" model="ir.actions.act_window">
+        <field name="name">VOIP Buttons</field>
+	<field name="res_model">voip.button</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No VOIP Buttons
+	    </p>
+        </field>
+    </record>
+    
+    <menuitem id="voip_button_menu" name="Call Buttons" parent="voip_sip_webrtc.voip_parent_menu" action="voip_button_action" sequence="120"/>
+
+</odoo>
