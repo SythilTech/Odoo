@@ -15,14 +15,18 @@
       	            <field name="from_partner_id"/>
       	            <field name="to_address"/>
       	            <field name="to_partner_id"/>
-      	            <field name="partner_id"/>
-      	            <field name="create_date" string="Call Start"/>
+      	            <field name="ring_time"/>
       	            <field name="start_time"/>
       	            <field name="end_time"/>
       	            <field name="duration"/>
       	            <field name="transcription"/>
-      	            <field name="notes"/>
       	            <field name="media_url" widget="url"/>
+      	            <field name="client_ids">
+      	                <tree>
+      	                    <field name="name"/>
+      	                    <field name="state"/>
+      	                </tree>
+      	            </field>
       	        </group>
       	    </form>
         </field>

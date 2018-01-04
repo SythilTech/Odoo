@@ -34,22 +34,24 @@ class VoipCall(models.Model):
     from_partner_sdp = fields.Text(string="From Partner SDP")
     partner_id = fields.Many2one('res.partner', string="(OBSOLETE)To Partner")
     to_address = fields.Char(string="To Address")
-    to_partner_id = fields.Many2one('res.partner', string="To Partner", help="From can be blank if the call comes from outside of the system")
+    to_partner_id = fields.Many2one('res.partner', string="To Partner", help="To partner can be blank if the source is external and no record with mobile or sip is found")
     status = fields.Selection([('pending','Pending'), ('missed','Missed'), ('accepted','Accepted'), ('rejected','Rejected'), ('active','Active'), ('over','Complete'), ('failed','Failed'), ('busy','Busy'), ('cancelled','Cancelled')], string='Status', default="pending", help="Pending = Calling person\nActive = currently talking\nMissed = Call timed out\nOver = Someone hit end call\nRejected = Someone didn't want to answer the call")
-    start_time = fields.Datetime(string="Answer Time", help="Time the call was answered, create_date is when it started dialing")
+    ring_time = fields.Datetime(string="Ring Time", help="Time the call starts dialing")
+    start_time = fields.Datetime(string="Start Time", help="Time the call was answered (if answered)")
     end_time = fields.Datetime(string="End Time", help="Time the call end")
     duration = fields.Char(string="Duration", help="Length of the call")
     transcription = fields.Text(string="Transcription", help="Automatic transcription of the call")
-    notes = fields.Text(string="Notes", help="Additional comments outside the transcription")
+    notes = fields.Text(string="(OBSOLETE)Notes", help="Additional comments outside the transcription (use the chatter instead of this field)")
     client_ids = fields.One2many('voip.call.client', 'vc_id', string="Client List")
     type = fields.Selection([('internal','Internal'),('external','External')], string="Type")
     mode = fields.Selection([('videocall','video call'), ('audiocall','audio call'), ('screensharing','screen sharing call')], string="Mode", help="This is only how the call starts, i.e a video call can turn into a screen sharing call mid way")
     sip_tag = fields.Char(string="SIP Tag")
     voip_account = fields.Many2one('voip.account', string="VOIP Account")
-    to_audio = fields.Binary(string="Audio")
-    to_audio_filename = fields.Char(string="Audio Filename")
+    to_audio = fields.Binary(string="(OBSOLETE)Audio")
+    to_audio_filename = fields.Char(string="(OBSOLETE)Audio Filename")
     media = fields.Binary(string="Media")
     media_filename = fields.Char(string="Media Filename")
+    server_stream_data = fields.Binary(string="Server Stream Data", help="Stream data sent by the server, e.g. automated call")    
     media_url = fields.Char(string="Media URL", compute="_compute_media_url")
     codec_id = fields.Many2one('voip.codec', string="Codec")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
@@ -59,7 +61,7 @@ class VoipCall(models.Model):
     @api.one
     def _compute_media_url(self):
         if self.media:
-            self.media_url = "/voip/messagebank/" + str(self.id) + ".wav"
+            self.media_url = "/voip/messagebank/" + str(self.id)
         else:
             self.media_url = ""
             
@@ -72,8 +74,14 @@ class VoipCall(models.Model):
             voip_call.to_audio = False
             voip_call.to_audio_filename = False
             
+            voip_call.server_stream_data = False
+            
             voip_call.media = False
             voip_call.media_filename = False
+            
+        #Also remove the media attached to the client
+        for voip_client in self.env['voip.call.client'].search([('audio_stream','!=', False)]):
+            voip_client.audio_stream = False
 
     def start_call(self):
         """ Process the ICE queue now """
@@ -421,9 +429,12 @@ class VoipCallClient(models.Model):
     vc_id = fields.Many2one('voip.call', string="VOIP Call")
     partner_id = fields.Many2one('res.partner', string="Partner")
     name = fields.Char(string="Name", help="Can be a number if the client is from outside the system")
+    model = fields.Char(string="Model")
+    record_id = fields.Integer(string="Record ID")
     state = fields.Selection([('invited','Invited'),('joined','joined'),('media_access','Media Access')], string="State", default="invited")
     sdp = fields.Char(string="SDP")
     sip_invite = fields.Char(string="SIP INVITE Message")
     sip_addr = fields.Char(string="Address")
     sip_addr_host = fields.Char(string="SIP Address Host")
     sip_addr_port = fields.Char(string="SIP Address Port")
+    audio_stream = fields.Binary(string="Audio Stream")

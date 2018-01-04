@@ -27,6 +27,7 @@
         'data/voip.codec.csv',
         'data/voip.account.action.type.csv',
         'data/ir.cron.csv',
+        'data/mail.message.subtype.csv',
     ],
     'demo': [],
     'depends': ['web','crm','bus'],

@@ -8,8 +8,11 @@ import re
 import hashlib
 import random
 from openerp import api, fields, models
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 import threading
+from threading import Timer
 import time
+from time import sleep
 import datetime
 import struct
 import base64
@@ -57,7 +60,7 @@ class VoipAccount(models.Model):
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
     
-    def generate_rtp_packet(self, audio_stream, codec, packet_count, sequence_number, timestamp):
+    def generate_rtp_packet(self, audio_stream, codec_id, packet_count, sequence_number, timestamp):
 
         rtp_data = ""
 
@@ -74,7 +77,7 @@ class VoipAccount(models.Model):
             #ulaw
             rtp_data += " 80"
         else:
-            rtp_data += " " + format( codec.payload_type, '02x')
+            rtp_data += " " + format( codec_id.payload_type, '02x')
 
         rtp_data += " " + format( sequence_number, '04x')
         
@@ -84,7 +87,7 @@ class VoipAccount(models.Model):
         rtp_data += " 12 20 76 3d"
 
         #Payload:
-        payload_data = audio_stream[packet_count * codec.payload_size : packet_count * codec.payload_size + codec.payload_size]
+        payload_data = audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size]
         hex_string = ""
 
         for rtp_char in payload_data:
@@ -94,68 +97,103 @@ class VoipAccount(models.Model):
         rtp_data += " " + hex_string
         return rtp_data.replace(" ","").decode('hex')
             
-    def rtp_server_listener(self, media_port, audio_stream, codec_id, model=False, record_id=False):
-        
-        try:
+    def rtp_server_listener(self, rtc_sender_thread, rtpsocket, voip_call_client_id, model=False, record_id=False):
+        #Create the call with the audio
+        with api.Environment.manage():
+            # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+            new_cr = self.pool.cursor()
+            self = self.with_env(self.env(cr=new_cr))
 
-            _logger.error("Start RTP Listening on Port " + str(media_port) )
+            audio_stream = ""
                 
-            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            rtpsocket.bind(('', media_port));
+            try:
+                
+                _logger.error("Start RTP Listening")
+                            
+                stage = "LISTEN"                
+                while stage == "LISTEN":
 
-            stage = "LISTEN"
-            hex_string = ""
-            joined_payload = ""
+                    rtpsocket.settimeout(10)
+                    data, addr = rtpsocket.recvfrom(2048)
+                    #Add the RTP payload to the received data
+                    audio_stream += data[12:]
 
-            #Send audio data out every 20ms
-            sequence_number = randint(29161, 30000)
-            packet_count = 0
-            timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
-            
-            while stage == "LISTEN":
+            except Exception as e:
+                #Timeout
+                _logger.error(e)
 
-                rtpsocket.settimeout(10)
-                data, addr = rtpsocket.recvfrom(2048)
-                                    
-                joined_payload += data
-
-                #---------------------Send Audio Packet-----------
-                send_data = self.generate_rtp_packet(audio_stream, codec_id, packet_count, sequence_number, timestamp)
-                rtpsocket.sendto(send_data, addr)
-                packet_count += 1
-                sequence_number += 1
-                timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
-                #---------------------END Send Audio Packet-----------
-
-        except Exception as e:
-            _logger.error(e)
-
-        try:
-
-            #Create the call with the audio
-            with api.Environment.manage():
-                # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
-                new_cr = self.pool.cursor()
-                self = self.with_env(self.env(cr=new_cr))
-
-                #Start off with the raw audio stream
-                create_dict = {'media': joined_payload, 'media_filename': "call.raw", 'codec_id': codec_id.id}
-                self.process_audio_stream( create_dict )
+            try:
+                #Kill the sending thread
+                rtc_sender_thread.stream_active = False
+                rtc_sender_thread.join()
+                
+                #Update call after the stream times out
+                voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
+                voip_call_client.vc_id.write({'media': base64.b64encode(audio_stream), 'status': 'over', 'media_filename': "call.raw", 'end_time': datetime.datetime.now()})
+                diff_time = datetime.datetime.strptime(voip_call_client.vc_id.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(voip_call_client.vc_id.start_time, DEFAULT_SERVER_DATETIME_FORMAT)
+                voip_call_client.vc_id.duration = str(diff_time.seconds) + " Seconds"
+                
+                #Add the stream data to this client
+                voip_call_client.write({'audio_stream': base64.b64encode(audio_stream)})
 
                 if model:
                     #Add to the chatter
-                    #TODO add SIP subtype
-                    self.env[model].browse( int(record_id) ).message_post(body="Call Made", subject="Call Made", message_type="comment")
+                    self.env[model].browse( int(record_id) ).message_post(body="Call Made", subject="Call Made", message_type="comment", subtype='voip_sip_webrtc.voip_call')
+                    
+            except Exception as e:
+                _logger.error(e)
 
-                #Have to manually commit the new cursor?
-                self.env.cr.commit()
+            #Have to manually commit the new cursor?
+            self.env.cr.commit()
         
-                self._cr.close()
+            self._cr.close()
 
+    def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, audio_stream, codec_id, voip_call_client_id):
 
-        except Exception as e:
-            _logger.error(e)
-           
+        #Create the call with the audio
+        with api.Environment.manage():
+            # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+            new_cr = self.pool.cursor()
+            self = self.with_env(self.env(cr=new_cr))
+        
+            server_stream_data = ""
+        
+            try:
+
+                packet_count = 0
+                sequence_number = randint(29161, 30000)
+                timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()                
+                
+                t = threading.currentThread()
+                while getattr(t, "stream_active", True):
+            
+                    #Send audio data out every 20ms
+                    server_stream_data += audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size]
+
+                    send_data = self.generate_rtp_packet(audio_stream, codec_id, packet_count, sequence_number, timestamp)
+                    rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
+
+                    packet_count += 1
+                    sequence_number += 1
+                    timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
+                    sleep(0.02)
+
+            except Exception as e:
+                #Sudden Disconnect
+                _logger.error(e)
+
+            try:
+                #Add the stream data to the call
+                voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
+                voip_call_client.vc_id.write({'server_stream_data': base64.b64encode(server_stream_data)})                    
+            except Exception as e:
+                _logger.error(e)
+
+            #Have to manually commit the new cursor?
+            self.env.cr.commit()
+        
+            self._cr.close()    
+            
     def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
 
         port = random.randint(6000,7000)
@@ -164,10 +202,16 @@ class VoipAccount(models.Model):
         call_id = random.randint(50000,60000)
         from_tag = random.randint(8000000,9000000)
 
-        rtc_listener_starter = threading.Thread(target=self.rtp_server_listener, args=(media_port, audio_stream, codec, model, record_id,))
-        rtc_listener_starter.start()
+        #Create the call now so we can make it has missed or rejected
+        create_dict = {'from_address': self.address, 'to_address': to_address, 'codec_id': codec.id, 'ring_time': datetime.datetime.now()}
+        #if model == "res.partner":
+        #    create_dict['to_partner_id'] = self.env['res.partner'].browse( int(record_id) )
+        voip_call = self.env['voip.call'].create(create_dict)
         
-        #----Generate SDP of audio call that the server can work with e.g. limited codex support----
+        #Also create the client list
+        voip_call_client = self.env['voip.call.client'].create({'vc_id': voip_call.id, 'name': to_address})
+        
+        #----Generate SDP of audio call that the server can work with e.g. limited codec support----
         sdp = ""
         
         #Protocol Version ("v=") https://tools.ietf.org/html/rfc4566#section-5.1 (always 0 for us)
@@ -190,7 +234,7 @@ class VoipAccount(models.Model):
         #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
         sdp += "m=audio " + str(media_port) + " RTP/AVP " + str(codec.payload_type) + "\r\n"
         
-        #Two way call because later we may use voice reconisation to control assistant menus        
+        #Two way call      
         sdp += "a=sendrecv\r\n"
 
         if "@" not in to_address:
@@ -322,14 +366,28 @@ class VoipAccount(models.Model):
                 return True
             elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
 
+                voip_call.write({'status':"active", 'start_time': datetime.datetime.now()})
+ 
                 contact_header = re.findall(r'Contact: <(.*?)>\r\n', data)[0]
-                #rtp_ip = re.findall(r'\*(.*?)!', contact_header)[0]
                 record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
                 to_tag = re.findall(r'To: (.*?)\r\n', data)[0].split("tag=")[1]
                 call_from = re.findall(r'From: (.*?)\r\n', data)[0]
                 call_to = re.findall(r'To: (.*?)\r\n', data)[0]
-                #send_media_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
-        
+                rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
+                rtp_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
+
+                #The call was accepted so start listening for / sending RTP data
+                rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                rtpsocket.bind(('', media_port));
+
+                rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_port, audio_stream, codec, voip_call_client.id,))
+                rtc_sender_thread.start()
+                
+                rtc_listener_thread = threading.Thread(target=self.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, model, record_id,))
+                rtc_listener_thread.start()
+
+
+
                 #Send the ACK
                 reply = ""
                 reply += "ACK " + contact_header + " SIP/2.0\r\n"

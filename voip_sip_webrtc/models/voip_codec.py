@@ -13,3 +13,4 @@ class VoipCodec(models.Model):
     sample_interval = fields.Integer(string="Sample Interval")
     supported = fields.Boolean(string="Supported")
     sdp_data = fields.Char(string="SDP Data")
+    riff_audio_encoding_value = fields.Integer("RIFF Audio Encoding Value")
