@@ -16,6 +16,7 @@ from time import sleep
 import datetime
 import struct
 import base64
+import sdp
 from random import randint
             
 class VoipAccount(models.Model):
@@ -211,31 +212,8 @@ class VoipAccount(models.Model):
         #Also create the client list
         voip_call_client = self.env['voip.call.client'].create({'vc_id': voip_call.id, 'name': to_address})
         
-        #----Generate SDP of audio call that the server can work with e.g. limited codec support----
-        sdp = ""
-        
-        #Protocol Version ("v=") https://tools.ietf.org/html/rfc4566#section-5.1 (always 0 for us)
-        sdp += "v=0\r\n"
-
-        #Origin ("o=") https://tools.ietf.org/html/rfc4566#section-5.2 (Should come up with a better session id...)
-        sess_id = int(time.time()) #Not perfect but I don't expect more then one call a second
-        sess_version = 0 #Will always start at 0
-        sdp += "o=- " + str(sess_id) + " " + str(sess_version) + " IN IP4 " + local_ip + "\r\n"
-        
-        #Session Name ("s=") https://tools.ietf.org/html/rfc4566#section-5.3 (We don't need a session name, information about the call is all displayed in the UI)
-        sdp += "s= \r\n"
-        
-        #Connection Information
-        sdp += "c=IN IP4 " + local_ip + "\r\n"
-
-        #Timing ("t=") https://tools.ietf.org/html/rfc4566#section-5.9 (For now sessions are infinite but we may use this if for example a company charges a price for a fixed 30 minute consultation)        
-        sdp += "t=0 0\r\n"
-
-        #Media Descriptions ("m=") https://tools.ietf.org/html/rfc4566#section-5.14 (Message bank is audio only for now)
-        sdp += "m=audio " + str(media_port) + " RTP/AVP " + str(codec.payload_type) + "\r\n"
-        
-        #Two way call      
-        sdp += "a=sendrecv\r\n"
+        call_sdp = sdp.generate_sdp(self, local_ip, media_port, [codec.payload_type])
+        _logger.error(call_sdp)
 
         if "@" not in to_address:
             to_address = to_address + "@" + self.domain
@@ -253,9 +231,9 @@ class VoipAccount(models.Model):
         invite_string += "Content-Type: application/sdp\r\n"
         invite_string += "Supported: replaces\r\n"
         invite_string += "User-Agent: Sythil Tech SIP Client\r\n"
-        invite_string += "Content-Length: " + str(len(sdp)) + "\r\n"
+        invite_string += "Content-Length: " + str(len(call_sdp)) + "\r\n"
         invite_string += "\r\n"
-        invite_string += sdp
+        invite_string += call_sdp
          
         sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sipsocket.bind(('', port));
@@ -308,9 +286,9 @@ class VoipAccount(models.Model):
                 reply += 'Proxy-Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
                 reply += "Supported: replaces\r\n"
                 reply += "User-Agent: Sythil Tech SIP Client\r\n"
-                reply += "Content-Length: " + str(len(sdp)) + "\r\n"
+                reply += "Content-Length: " + str(len(call_sdp)) + "\r\n"
                 reply += "\r\n"
-                reply += sdp        
+                reply += call_sdp        
              
                 sipsocket.sendto(reply, addr)
             elif data.split("\r\n")[0] == "SIP/2.0 401 Unauthorized":
@@ -343,9 +321,9 @@ class VoipAccount(models.Model):
                 reply += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"               
                 reply += "Supported: replaces\r\n"
                 reply += "User-Agent: Sythil Tech SIP Client\r\n"
-                reply += "Content-Length: " + str(len(sdp)) + "\r\n"
+                reply += "Content-Length: " + str(len(call_sdp)) + "\r\n"
                 reply += "\r\n"
-                reply += sdp
+                reply += call_sdp
              
                 sipsocket.sendto(reply, addr)
                 
