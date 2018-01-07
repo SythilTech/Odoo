@@ -47,7 +47,7 @@ class VoipCall(models.Model):
     mode = fields.Selection([('videocall','video call'), ('audiocall','audio call'), ('screensharing','screen sharing call')], string="Mode", help="This is only how the call starts, i.e a video call can turn into a screen sharing call mid way")
     sip_tag = fields.Char(string="SIP Tag")
     voip_account = fields.Many2one('voip.account', string="VOIP Account")
-    to_audio = fields.Binary(string="(OBSOLETE)Audio")
+    to_audio = fields.Binary(string="Audio")
     to_audio_filename = fields.Char(string="(OBSOLETE)Audio Filename")
     media = fields.Binary(string="Media")
     media_filename = fields.Char(string="Media Filename")
@@ -55,6 +55,7 @@ class VoipCall(models.Model):
     media_url = fields.Char(string="Media URL", compute="_compute_media_url")
     codec_id = fields.Many2one('voip.codec', string="Codec")
     direction = fields.Selection([('internal','Internal'), ('incoming','Incoming'), ('outgoing','Outgoing')], string="Direction")
+    sip_call_id = fields.Char(string="SIP Call ID")
     ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
 
@@ -428,6 +429,7 @@ class VoipCallClient(models.Model):
     
     vc_id = fields.Many2one('voip.call', string="VOIP Call")
     partner_id = fields.Many2one('res.partner', string="Partner")
+    sip_address = fields.Char(string="SIP Address")
     name = fields.Char(string="Name", help="Can be a number if the client is from outside the system")
     model = fields.Char(string="Model")
     record_id = fields.Integer(string="Record ID")
@@ -437,4 +439,5 @@ class VoipCallClient(models.Model):
     sip_addr = fields.Char(string="Address")
     sip_addr_host = fields.Char(string="SIP Address Host")
     sip_addr_port = fields.Char(string="SIP Address Port")
+    audio_media_port = fields.Integer(string="Audio Media Port")
     audio_stream = fields.Binary(string="Audio Stream")

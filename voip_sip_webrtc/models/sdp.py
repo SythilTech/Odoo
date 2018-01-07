@@ -30,5 +30,7 @@ def generate_sdp(self, ip, audio_port, rtp_profiles, session_description=" "):
     for rtp_profile in rtp_profiles:
         sdp += " " + str(rtp_profile)
     sdp += "\r\n"
-        
+
+    sdp += "a=sendrecv\r\n"
+
     return sdp

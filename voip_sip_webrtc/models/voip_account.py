@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import socket
-import logging
 from openerp.exceptions import UserError
+import logging
 _logger = logging.getLogger(__name__)
 from openerp.http import request
 import re
@@ -17,6 +17,7 @@ import datetime
 import struct
 import base64
 import sdp
+import sip
 from random import randint
             
 class VoipAccount(models.Model):
@@ -25,7 +26,7 @@ class VoipAccount(models.Model):
 
     name = fields.Char(string="Name", required="True")
     state = fields.Selection([('new','New'), ('inactive','Inactive'), ('active','Active')], default="new", string="State")
-    type = fields.Selection([('sip', 'SIP'), ('xmpp', 'XMPP')], default="sip", string="Account type")
+    type = fields.Selection([('sip', 'SIP'), ('xmpp', 'XMPP')], default="sip", string="Account Type")
     address = fields.Char(string="SIP Address", required="True")
     password = fields.Char(string="SIP Password", required="True")
     auth_username = fields.Char(string="Auth Username")
@@ -104,15 +105,20 @@ class VoipAccount(models.Model):
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
-
+            
             audio_stream = ""
-                
+            call_start_time = datetime.datetime.now()            
+            
             try:
+
+                #Call starts now
+                #voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
+                #voip_call_client.vc_id.write({'status':"active", 'start_time': datetime.datetime.now()})
                 
                 _logger.error("Start RTP Listening")
-                            
-                stage = "LISTEN"                
-                while stage == "LISTEN":
+
+                t = threading.currentThread()                            
+                while getattr(t, "stream_active", True):
 
                     rtpsocket.settimeout(10)
                     data, addr = rtpsocket.recvfrom(2048)
@@ -124,30 +130,30 @@ class VoipAccount(models.Model):
                 _logger.error(e)
 
             try:
-                #Kill the sending thread
-                rtc_sender_thread.stream_active = False
-                rtc_sender_thread.join()
                 
                 #Update call after the stream times out
                 voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
-                voip_call_client.vc_id.write({'media': base64.b64encode(audio_stream), 'status': 'over', 'media_filename': "call.raw", 'end_time': datetime.datetime.now()})
-                diff_time = datetime.datetime.strptime(voip_call_client.vc_id.end_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(voip_call_client.vc_id.start_time, DEFAULT_SERVER_DATETIME_FORMAT)
+                voip_call_client.vc_id.write({'media': base64.b64encode(audio_stream), 'status': 'over', 'media_filename': "call.raw", 'start_time': call_start_time, 'end_time': datetime.datetime.now()})
+                diff_time = datetime.datetime.now() - call_start_time
                 voip_call_client.vc_id.duration = str(diff_time.seconds) + " Seconds"
                 
                 #Add the stream data to this client
                 voip_call_client.write({'audio_stream': base64.b64encode(audio_stream)})
 
-                if model:
-                    #Add to the chatter
-                    self.env[model].browse( int(record_id) ).message_post(body="Call Made", subject="Call Made", message_type="comment", subtype='voip_sip_webrtc.voip_call')
-                    
+                #Have to manually commit the new cursor?
+                self._cr.commit()
+                self._cr.close()
+            
+                #if model:
+                #    self.env[model].browse( int(record_id) ).message_post(body="Call Made", subject="Call Made", message_type="comment", subtype='voip_sip_webrtc.voip_call')
+                
+                #Kill the sending thread
+                rtc_sender_thread.stream_active = False
+                rtc_sender_thread.join()
+                                
             except Exception as e:
                 _logger.error(e)
 
-            #Have to manually commit the new cursor?
-            self.env.cr.commit()
-        
-            self._cr.close()
 
     def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, audio_stream, codec_id, voip_call_client_id):
 
@@ -195,198 +201,74 @@ class VoipAccount(models.Model):
         
             self._cr.close()    
             
-    def make_call(self, to_address, audio_stream, codec, model=False, record_id=False):
+    def call_accepted(self, session, data):
+        _logger.error("Call Accepted")
 
-        port = random.randint(6000,7000)
-        media_port = random.randint(55000,56000)
+        with api.Environment.manage():
+	    #As this function is in a new thread, i need to open a new cursor, because the old one may be closed
+	    new_cr = self.pool.cursor()                
+            self = self.with_env(self.env(cr=new_cr))
+            
+            voip_call = self.env['voip.call'].search([('sip_call_id','=', session.call_id)])[0]
+            
+            #Find the voip client to the call was to
+            voip_call_client = self.env['voip.call.client'].search([('vc_id','=', voip_call.id), ('sip_address','=', session.to_address)])[0]
+        
+            rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
+            rtp_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
+
+            #The call was accepted so start listening for / sending RTP data
+            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            rtpsocket.bind(('', voip_call_client.audio_media_port));
+        
+            rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_port, voip_call.to_audio, voip_call.codec_id, voip_call_client.id,))
+            rtc_sender_thread.start()
+
+            rtc_listener_thread = threading.Thread(target=self.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, voip_call_client.model, voip_call_client.record_id,))
+            rtc_listener_thread.start()
+
+            #session.rtp_threads.append(rtc_sender_thread)
+            #session.rtp_threads.append(rtc_listener_thread)
+            
+            #self._cr.close()
+                
+    def call_rejected(self, session, data):
+        _logger.error("Call Rejected")
+
+    def call_ended(self, session, data):
+        _logger.error("Call Ended")
+        
+        for rtp_stream in session.rtp_threads:
+            rtp_stream.stream_active = False
+            rtp_stream.join()
+
+    def call_error(self, session, data):
+        _logger.error("Call Error")
+        _logger.error(data)
+        
+    def make_call(self, to_address, audio_stream, audio_codec, model=False, record_id=False):
+
+        audio_media_port = random.randint(55000,56000)
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
-        call_id = random.randint(50000,60000)
-        from_tag = random.randint(8000000,9000000)
-
-        #Create the call now so we can make it has missed or rejected
-        create_dict = {'from_address': self.address, 'to_address': to_address, 'codec_id': codec.id, 'ring_time': datetime.datetime.now()}
-        #if model == "res.partner":
-        #    create_dict['to_partner_id'] = self.env['res.partner'].browse( int(record_id) )
-        voip_call = self.env['voip.call'].create(create_dict)
-        
-        #Also create the client list
-        voip_call_client = self.env['voip.call.client'].create({'vc_id': voip_call.id, 'name': to_address})
-        
-        call_sdp = sdp.generate_sdp(self, local_ip, media_port, [codec.payload_type])
-        _logger.error(call_sdp)
 
         if "@" not in to_address:
             to_address = to_address + "@" + self.domain
             
-        invite_string = ""
-        invite_string += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
-        invite_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
-        invite_string += "Max-Forwards: 70\r\n"
-        invite_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-        invite_string += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
-        invite_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
-        invite_string += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
-        invite_string += "CSeq: 1 INVITE\r\n"
-        invite_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-        invite_string += "Content-Type: application/sdp\r\n"
-        invite_string += "Supported: replaces\r\n"
-        invite_string += "User-Agent: Sythil Tech SIP Client\r\n"
-        invite_string += "Content-Length: " + str(len(call_sdp)) + "\r\n"
-        invite_string += "\r\n"
-        invite_string += call_sdp
-         
-        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sipsocket.bind(('', port));
+        call_sdp = sdp.generate_sdp(self, local_ip, audio_media_port, [audio_codec.payload_type])
 
-        send_to = ""
-        if self.outbound_proxy:
-            send_to = self.outbound_proxy
-        else:
-            send_to = self.domain
+        sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
+        sip_session.call_accepted += self.call_accepted
+        sip_session.call_rejected += self.call_rejected
+        sip_session.call_ended += self.call_ended
+        sip_session.call_error += self.call_error
+        sip_session.send_sip_invite(to_address, call_sdp)
 
-        _logger.error(invite_string)
-        sipsocket.sendto(invite_string, (send_to, self.port) )
-        
-        #Wait and send back the auth reply
-        stage = "WAITING"
-        while stage == "WAITING":
-            sipsocket.settimeout(10)
-            data, addr = sipsocket.recvfrom(2048)
-            _logger.error(data)
- 
-            #Send auth response if challenged
-            if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required" or data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication required":
-                
-                authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
-                         
-                realm = re.findall(r'realm="(.*?)"', authheader)[0]
-                method = "INVITE"
-                uri = "sip:" + to_address
-                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-                qop = re.findall(r'qop="(.*?)"', authheader)[0]
-                nc = "00000001"
-                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
- 
-                #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
-                A1 = self.username + ":" + realm + ":" + self.password
-                A2 = method + ":" + uri
-                response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
+        #Create the call now so we can make it has missed or rejected
+        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': audio_stream, 'codec_id': audio_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': sip_session.call_id }
+        voip_call = self.env['voip.call'].create(create_dict)
 
-                reply = ""
-                reply += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
-                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
-                reply += "Max-Forwards: 70\r\n"
-                reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-                reply += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
-                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
-                reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
-                reply += "CSeq: 2 INVITE\r\n"
-                reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-                reply += "Content-Type: application/sdp\r\n"
-                reply += 'Proxy-Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
-                reply += "Supported: replaces\r\n"
-                reply += "User-Agent: Sythil Tech SIP Client\r\n"
-                reply += "Content-Length: " + str(len(call_sdp)) + "\r\n"
-                reply += "\r\n"
-                reply += call_sdp        
-             
-                sipsocket.sendto(reply, addr)
-            elif data.split("\r\n")[0] == "SIP/2.0 401 Unauthorized":
-                _logger.error("auth required")
-
-                authheader = re.findall(r'WWW-Authenticate: (.*?)\r\n', data)[0]
-                         
-                realm = re.findall(r'realm="(.*?)"', authheader)[0]
-                method = "INVITE"
-                uri = "sip:" + to_address + str(self.port)
-                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-                nc = "00000001"
-                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
- 
-                A1 = self.username + ":" + realm + ":" + self.password
-                A2 = method + ":" + uri
-                response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
-
-                reply = ""
-                reply += "INVITE sip:" + to_address + ":" + str(self.port) + " SIP/2.0\r\n"
-                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
-                reply += "Max-Forwards: 70\r\n"
-                reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ">\r\n"
-                reply += 'To: <sip:' + to_address + ":" + str(self.port) + ">\r\n"
-                reply += 'From: "' + self.env.user.partner_id.name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
-                reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
-                reply += "CSeq: 2 INVITE\r\n"
-                reply += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-                reply += "Content-Type: application/sdp\r\n"
-                reply += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"               
-                reply += "Supported: replaces\r\n"
-                reply += "User-Agent: Sythil Tech SIP Client\r\n"
-                reply += "Content-Length: " + str(len(call_sdp)) + "\r\n"
-                reply += "\r\n"
-                reply += call_sdp
-             
-                sipsocket.sendto(reply, addr)
-                
-            elif data.split("\r\n")[0] == "SIP/2.0 403 Forbidden":
-                #Likely means call was rejected
-                stage = "Forbidden"
-                return False
-            elif data.split("\r\n")[0] == "SIP/2.0 404 Not Found":
-                stage = "Not Found"
-                return False
-            elif data.split("\r\n")[0] == "SIP/2.0 486 Busy Here":
-                #Already on the phone
-                stage = "Busy"
-                return False
-            elif data.startswith("BYE"):
-                #Do stuff when the call is ended by client
-                stage = "BYE"
-                return True
-            elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
-
-                voip_call.write({'status':"active", 'start_time': datetime.datetime.now()})
- 
-                contact_header = re.findall(r'Contact: <(.*?)>\r\n', data)[0]
-                record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
-                to_tag = re.findall(r'To: (.*?)\r\n', data)[0].split("tag=")[1]
-                call_from = re.findall(r'From: (.*?)\r\n', data)[0]
-                call_to = re.findall(r'To: (.*?)\r\n', data)[0]
-                rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
-                rtp_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
-
-                #The call was accepted so start listening for / sending RTP data
-                rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                rtpsocket.bind(('', media_port));
-
-                rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_port, audio_stream, codec, voip_call_client.id,))
-                rtc_sender_thread.start()
-                
-                rtc_listener_thread = threading.Thread(target=self.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, model, record_id,))
-                rtc_listener_thread.start()
-
-
-
-                #Send the ACK
-                reply = ""
-                reply += "ACK " + contact_header + " SIP/2.0\r\n"
-                reply += "Via: SIP/2.0/UDP " + local_ip + ":" + str(port) + ";branch=y9hG3bK-524287-1---41291a6583a6634f;rport\r\n"
-                reply += "Max-Forwards: 70\r\n"
-                reply += "Route: " + record_route + "\r\n"
-                reply += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(port) + ";rinstance=6f1dd3b5ff106b2b>\r\n"
-                reply += 'To: ' + call_to + "\r\n"
-                reply += "From: " + call_from + "\r\n"
-                reply += "Call-ID: " + self.env.cr.dbname + "-call-" + str(call_id) + "\r\n"
-                reply += "CSeq: 2 ACK\r\n"
-                reply += "User-Agent: Sythil Tech SIP Client\r\n"
-                reply += "Content-Length: 0\r\n"
-                reply += "\r\n"
-                _logger.error(reply)
-
-                sipsocket.sendto(reply, addr)
-                
-                stage = "SENT"
-
-                return True
+        #Also create the client list
+        voip_call_client = self.env['voip.call.client'].create({'vc_id': voip_call.id, 'audio_media_port': audio_media_port, 'sip_address': to_address, 'name': to_address, 'model': model, 'record_id': record_id})        
  
     def send_message(self, to_address, message_body, model=False, record_id=False):
   
