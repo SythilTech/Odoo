@@ -209,10 +209,14 @@ class VoipAccount(models.Model):
 	    new_cr = self.pool.cursor()                
             self = self.with_env(self.env(cr=new_cr))
             
-            voip_call = self.env['voip.call'].search([('sip_call_id','=', session.call_id)])[0]
+            call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
+            call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
+            call_to = re.findall(r'<sip:(.*?):', call_to_full)[0]
+            
+            voip_call = self.env['voip.call'].search([('sip_call_id','=', call_id)])[0]
             
             #Find the voip client to the call was to
-            voip_call_client = self.env['voip.call.client'].search([('vc_id','=', voip_call.id), ('sip_address','=', session.to_address)])[0]
+            voip_call_client = self.env['voip.call.client'].search([('vc_id','=', voip_call.id), ('sip_address','=', call_to)])[0]
         
             rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
             rtp_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
@@ -261,10 +265,10 @@ class VoipAccount(models.Model):
         sip_session.call_rejected += self.call_rejected
         sip_session.call_ended += self.call_ended
         sip_session.call_error += self.call_error
-        sip_session.send_sip_invite(to_address, call_sdp)
+        call_id = sip_session.send_sip_invite(to_address, call_sdp)
 
         #Create the call now so we can make it has missed or rejected
-        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': audio_stream, 'codec_id': audio_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': sip_session.call_id }
+        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': audio_stream, 'codec_id': audio_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id }
         voip_call = self.env['voip.call'].create(create_dict)
 
         #Also create the client list
@@ -360,188 +364,33 @@ class VoipAccount(models.Model):
 
         _logger.error(create_dict)
         self.env['voip.call'].create(create_dict)        
-
-    @api.model
-    def invite_listener(self, bind_port, listen_time):
-
-        try:
-
-            #Set the environment before starting the main thread
-            with api.Environment.manage():
-                #As this function is in a new thread, i need to open a new cursor, because the old one may be closed
-                new_cr = self.pool.cursor()                
-                self = self.with_env(self.env(cr=new_cr))
-
-                _logger.error("Listen for invites on " + str(bind_port))
-
-                local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
         
-                sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sipsocket.bind(('', bind_port))
+    def call_ringing(self, session, data):
+        _logger.error("Call Ringing")
 
-                stage = "WAITING"
-                while stage == "WAITING":
-                    sipsocket.settimeout(listen_time)
-                    data, addr = sipsocket.recvfrom(2048)
-
-                    _logger.error(data)
- 
-                    #Call action when call is received
-                    if data.startswith("INVITE"):
-                        _logger.error("GOT INVITE 4")
-
-                        #TODO find a way to deal with multiple accounts with the same username but different providers
-                        call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
-                        call_to = re.findall(r'<sip:(.*?)@', call_to_full)[0]
-                        voip_account = self.env['voip.account'].search([('username','=', call_to)])[0]
-
-                        #Execute the account action
-                        method = '_voip_action_%s' % (voip_account.action_id.action_type_id.internal_name,)
-                        action = getattr(self.action_id, method, None)
-
-                        if not action:
-                            raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
-
-                        action(sipsocket, addr, data)                   
-                    elif data.startswith("DIE BOT DIE"):
-                        #Backdoor way of killing off the listener
-                        stage = "DEAD"
-
-                self._cr.close()
-                    
-        except Exception as e:
-            _logger.error(e)            
-        
-    @api.model
-    def register_accounts(self):
-        for voip_account in self.env['voip.account'].search([]):
-            voip_account.send_register()
+        with api.Environment.manage():
+            # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+            new_cr = self.pool.cursor()
+            self = self.with_env(self.env(cr=new_cr))
             
-    def send_register(self):
+            voip_account = self.env['voip.account'].search([('username','=', session.username), ('domain','=', session.domain) ])[0]
+
+            #Execute the account action
+            method = '_voip_action_%s' % (voip_account.action_id.action_type_id.internal_name,)
+            action = getattr(self.action_id, method, None)
+
+            if not action:
+                raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+
+            action(session, data)
+
+            self._cr.close()
         
-        self.state = "inactive"
-        
+    sip_session = ""
+    def uac_register(self):
+    
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
 
-        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sipsocket.bind(('', 0))
-        bind_port = sipsocket.getsockname()[1]
-        self.bind_port = bind_port
-        from_tag = random.randint(8000000,9000000)
-        
-        register_string = ""
-        register_string += "REGISTER sip:" + self.domain + ":" + str(self.port) + " SIP/2.0\r\n"
-        register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
-        register_string += "Max-Forwards: 70\r\n"
-        register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n"
-        register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">\r\n"
-        register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
-        register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
-        register_string += "CSeq: 1 REGISTER\r\n"
-        register_string += "Expires: 3600\r\n"
-        register_string += "Allow: NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-        register_string += "User-Agent: Sythil Tech SIP Client\r\n"
-        register_string += "Content-Length: 0\r\n"
-        register_string += "\r\n"
-
-        _logger.error("REGISTER: " + register_string)
-        
-        send_to = ""
-        if self.outbound_proxy:
-            send_to = self.outbound_proxy
-        else:
-            send_to = self.domain
-
-        sipsocket.sendto(register_string, (send_to, self.port) )
-            
-        stage = "WAITING"
-        while stage == "WAITING":
-            sipsocket.settimeout(10)
-            data, addr = sipsocket.recvfrom(2048)
-
-            _logger.error(data)
- 
-            #Send auth response if challenged
-            if data.split("\r\n")[0] == "SIP/2.0 401 Unauthorized":
-
-                authheader = re.findall(r'WWW-Authenticate: (.*?)\r\n', data)[0]
-                        
-                realm = re.findall(r'realm="(.*?)"', authheader)[0]
-                method = "REGISTER"
-                uri = "sip:" + self.domain + ":" + str(self.port)
-                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-                nc = "00000001"
-                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
-
-                #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
-                A1 = self.auth_username + ":" + realm + ":" + self.password
-                A2 = method + ":" + uri
-
-                register_string = ""
-                register_string += "REGISTER sip:" + self.domain + ":" + str(self.port) + " SIP/2.0\r\n"
-                register_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---0d0dce78a0c26252;rport\r\n"
-                register_string += "Max-Forwards: 70\r\n"
-                register_string += "Contact: <sip:" + self.username + "@" + local_ip + ":" + str(bind_port) + ">\r\n"
-                register_string += 'To: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">\r\n"
-                register_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(self.port) + ">;tag=" + str(from_tag) + "\r\n"
-                register_string += "Call-ID: " + self.env.cr.dbname + "-account-" + str(self.id) + "\r\n"
-                register_string += "CSeq: 2 REGISTER\r\n"
-                register_string += "Expires: 3600\r\n"
-                register_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-                register_string += "User-Agent: Sythil Tech SIP Client\r\n"
-                
-                if "qop=" in authheader:
-		    qop = re.findall(r'qop="(.*?)"', authheader)[0]
-		    response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )                
-                    register_string += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
-                else:
-		    response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
-                    register_string += 'Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
-                    
-                register_string += "Content-Length: 0\r\n"
-                register_string += "\r\n"
-                
-                sipsocket.sendto(register_string, (send_to, self.port) )
-            elif data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication required":
-                authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
-                        
-                realm = re.findall(r'realm="(.*?)"', authheader)[0]
-                method = "REGISTER"
-                uri = "sip:" + self.domain + ":" + str(self.port)
-                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-                nc = "00000001"
-                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
-
-                #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
-                A1 = self.username + ":" + realm + ":" + self.password
-                A2 = method + ":" + uri
-
-                reply = register_string
-                
-                #Add one to sequence number
-                reply = reply.replace("CSeq: 1 REGISTER", "CSeq: 2 REGISTER")
-
-                #Add the Proxy Authorization line before the user agent line
-                idx = reply.index("User-Agent:")
-
-                if "qop=" in authheader:
-		    qop = re.findall(r'qop="(.*?)"', authheader)[0]
-		    response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )                
-                    insert_text = 'Proxy-Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
-                else:
-		    response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
-                    insert_text = 'Proxy-Authorization: Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
-                reply = reply[:idx] + insert_text + reply[idx:]
-                                
-                sipsocket.sendto(reply, (send_to, self.port) )            
-            elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
-                _logger.error("REGISTERED")
-                
-                self.state = "active"
-                
-                #Start a new thread so we can listen for invites
-                invite_listener_starter = threading.Thread(target=self.invite_listener, args=(bind_port, 3600,))
-                invite_listener_starter.start()
-        
-                stage = "REGISTERED"
-                return True
+        sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
+        sip_session.call_ringing += self.call_ringing
+        sip_session.send_sip_register(self.address)
