@@ -274,87 +274,21 @@ class VoipAccount(models.Model):
         #Also create the client list
         voip_call_client = self.env['voip.call.client'].create({'vc_id': voip_call.id, 'audio_media_port': audio_media_port, 'sip_address': to_address, 'name': to_address, 'model': model, 'record_id': record_id})        
  
+    def message_sent(self, session, data):
+        _logger.error("Message Sent")
+        
     def send_message(self, to_address, message_body, model=False, record_id=False):
-  
+
         local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
         
-        sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sipsocket.bind(('', 0))
-        bind_port = sipsocket.getsockname()[1]
+        sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
+        sip_session.message_sent += self.message_sent
+        call_id = sip_session.send_sip_message(to_address, message_body)
 
-        message_string = ""
-        message_string += "MESSAGE sip:" + self.address + " SIP/2.0\r\n"
-        message_string += "Via: SIP/2.0/UDP " + local_ip + ":" + str(bind_port) + ";branch=z9hG4bK-524287-1---60245a218c8cff0a;rport\r\n"
-        message_string += "Max-Forwards: 70\r\n"
-        message_string += 'To: <sip:' + to_address + ">;messagetype=IM\r\n"
-        message_string += 'From: "' + self.voip_display_name + '"<sip:' + self.address + ":" + str(bind_port) + ">;tag=903df0a\r\n"
-        message_string += "Call-ID: 86895YTZlZGM3MzFkZTk4MzA2NGE0NjU3ZGExNmU5NTE1ZDM\r\n"
-        message_string += "CSeq: 1 MESSAGE\r\n"
-        message_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
-        message_string += "Content-Type: text/html\r\n"
-        message_string += "User-Agent: Sythil Tech SIP Client\r\n"
-        message_string += "Content-Length: " + str(len(message_body)) + "\r\n"
-        message_string += "\r\n"
-        message_string += message_body
-
-        send_to = ""
-        if self.outbound_proxy:
-            send_to = self.outbound_proxy
-        else:
-            send_to = self.domain
-            
-        _logger.error(message_string)
-        sipsocket.sendto(message_string, (send_to, self.port) )
+        if model:
+            self.env[model].browse( int(record_id) ).message_post(body=message_body, subject="SIP Message Sent", message_type="comment", subtype='voip_sip_webrtc.voip_call')
         
-        #Wait and send back the auth reply
-        stage = "WAITING"
-        while stage == "WAITING":
-            sipsocket.settimeout(10)        
-            data, addr = sipsocket.recvfrom(2048)
-
-            _logger.error(data)
-            
-            #Send auth response if challenged
-            if data.split("\r\n")[0] == "SIP/2.0 407 Proxy Authentication Required":
-            
-                authheader = re.findall(r'Proxy-Authenticate: (.*?)\r\n', data)[0]
-                        
-                realm = re.findall(r'realm="(.*?)"', authheader)[0]
-                method = "MESSAGE"
-                uri = "sip:" + to_address
-                nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
-                qop = re.findall(r'qop="(.*?)"', authheader)[0]
-                nc = "00000001"
-                cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
-
-                #For now we assume qop is present (https://tools.ietf.org/html/rfc2617#section-3.2.2.1)
-                A1 = self.auth_username + ":" + realm + ":" + self.password
-                A2 = method + ":" + uri
-                response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
-
-                reply = message_string
-                
-                #Add one to sequence number
-                reply = reply.replace("CSeq: 1 MESSAGE", "CSeq: 2 MESSAGE")
-
-                #Add the Proxy Authorization line before the user agent line
-                idx = reply.index("User-Agent:")
-                insert_text = 'Proxy-Authorization: Digest username="' + self.auth_username + '",realm="' + realm + '",nonce="' + nonce + '",uri="sip:' + to_address + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
-                reply = reply[:idx] + insert_text + reply[idx:]
-                _logger.error(reply)
-                sipsocket.sendto(reply, addr)
-            elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
-                stage = "SENT"
-                
-                if model:
-                    #Add to the chatter
-                    #TODO add SIP subtype
-                    self.env[model].browse( int(record_id) ).message_post(body=message_body, subject="SIP Message Sent", message_type="comment")
-
-                return "OK"
-            else:
-                stage = "FAILURE"
-                return data.split("\r\n")[0]
+        return "OK"
 
     def process_audio_stream(self, create_dict):
         _logger.error("Process File")
@@ -386,6 +320,10 @@ class VoipAccount(models.Model):
 
             self._cr.close()
         
+    def message_received(self, session, data, message):
+        _logger.error("Message Received")
+        _logger.error(message)
+        
     sip_session = ""
     def uac_register(self):
     
@@ -393,4 +331,5 @@ class VoipAccount(models.Model):
 
         sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
         sip_session.call_ringing += self.call_ringing
+        sip_session.message_received += self.message_received
         sip_session.send_sip_register(self.address)

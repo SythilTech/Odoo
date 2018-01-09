@@ -14,9 +14,9 @@
       	            <field name="model_id"/>
       	            <field name="voip_account_id"/>
       	            <field name="to_address"/>
-      	            <field name="codec_id"/>
+      	            <field name="codec_id" attrs="{'invisible': [('type', '=', 'prerecorded')]}"/>
       	            <field name="type"/>
-		    <field name="media" attrs="{'invisible': [('type', '!=', 'prerecorded')]}"/>
+		    <field name="media_id" attrs="{'invisible': [('type', '!=', 'prerecorded')]}"/>
       	        </group>
       	        <notebook>
 		    <page string="Dynamic Placeholder Generator">

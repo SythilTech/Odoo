@@ -10,7 +10,8 @@ from openerp import api, fields, models
 class VoipCallTemplateTranscodeWizard(models.TransientModel):
 
     _name = 'voip.call.template.transcode.wizard'
-
+    _description = "OBSOLETE"
+    
     call_template_id = fields.Many2one('voip.call.template', string="Call Template")
     media = fields.Binary(string="Audio File", required="True")
     media_filename = fields.Char(string="Audio File Filename")

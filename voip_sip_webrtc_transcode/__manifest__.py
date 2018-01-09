@@ -8,8 +8,6 @@
     'summary': "Transcodes audio into formats suitable for RTP transport",
     'license':'LGPL-3',
     'data': [
-        'views/voip_call_template_transcode_wizard_views.xml',
-        'views/voip_call_template_views.xml',
         'views/voip_media_transcode_wizard_views.xml',
         'views/voip_media_views.xml',
     ],

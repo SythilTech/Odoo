@@ -59,7 +59,8 @@ class VoipCallTemplate(models.Model):
     voip_account_id = fields.Many2one('voip.account', string="VOIP Account")
     to_address = fields.Char(string="To Address", help="Use placeholders")
     gsm_media = fields.Binary(string="(OBSOLETE)GSM Audio File")
-    media = fields.Binary(string="Raw Audio File")
+    media = fields.Binary(string="(OBSOLETE)Raw Audio File")
+    media_id = fields.Many2one('voip.media', string="Media")
     codec_id = fields.Many2one('voip.codec', string="Codec")
     type = fields.Selection([('prerecorded','Pre Recorded')], string="Template Type", default="prerecorded")
     model_object_field_id = fields.Many2one('ir.model.fields', string="Field", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
@@ -107,8 +108,14 @@ class VoipCallTemplate(models.Model):
         _logger.error("Make Call")
         if self.type == "prerecorded" or self.type == False:
             to_address = self.render_template( self.to_address, self.model_id.model, record_id)
-            decoded_media = base64.decodestring(self.media)
-            self.voip_account_id.make_call(to_address, decoded_media, self.codec_id, self.model_id.model, record_id)
+            
+            if self.media:
+                #BACK COMPATABILITY TODO remove in version 11
+                decoded_media = base64.decodestring(self.media)
+                self.voip_account_id.make_call(to_address, decoded_media, self.codec_id, self.model_id.model, record_id)
+            else:
+                decoded_media = base64.decodestring(self.media_id.media)
+                self.voip_account_id.make_call(to_address, decoded_media, self.media_id.codec_id, self.model_id.model, record_id)
         elif self.type == "synth":
             rendered_text = self.render_template( self.synth_text, self.model_id.model, record_id)
             to_address = self.render_template( self.to_address, self.model_id.model, record_id)

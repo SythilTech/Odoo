@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 import socket
 import re
 import random
@@ -27,6 +28,8 @@ class SIPSession:
         self.call_ended = EventHook()
         self.call_error = EventHook()        
         self.call_ringing = EventHook()
+        self.message_sent = EventHook()
+        self.message_received = EventHook()
         
         #Each account is bound to a different port
         self.sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -48,7 +51,13 @@ class SIPSession:
         uri = "sip:" + address
         nonce = re.findall(r'nonce="(.*?)"', authheader)[0]
 
-        A1 = self.username + ":" + realm + ":" + self.password
+
+        if self.auth_username:
+            username = self.auth_username
+        else:
+            username = self.username
+            
+        A1 = username + ":" + realm + ":" + self.password
         A2 = method + ":" + uri
 
         if "qop=" in authheader:
@@ -56,10 +65,10 @@ class SIPSession:
             nc = "00000001"
             cnonce = ''.join([random.choice('0123456789abcdef') for x in range(32)])
             response = self.KD( self.H(A1), nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.H(A2) )
-            return 'Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
+            return 'Digest username="' + username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",cnonce="' + cnonce + '",nc=' + nc + ',qop=auth,algorithm=MD5' + "\r\n"
         else:
             response = self.KD( self.H(A1), nonce + ":" + self.H(A2) )
-            return 'Digest username="' + self.username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
+            return 'Digest username="' + username + '",realm="' + realm + '",nonce="' + nonce + '",uri="' + uri + '",response="' + response + '",algorithm=MD5' + "\r\n"
 
     def answer_call(self, sip_invite, sdp):
 
@@ -88,6 +97,34 @@ class SIPSession:
 
         self.sipsocket.sendto(reply, (self.to_server, self.account_port) )    
 
+    def send_sip_message(self, to_address, message_body):
+        call_id = ''.join([random.choice('0123456789abcdef') for x in range(32)])
+
+        message_string = ""
+        message_string += "MESSAGE sip:" + str(self.username) + "@" + str(self.domain) + " SIP/2.0\r\n"
+        message_string += "Via: SIP/2.0/UDP " + str(self.ip) + ":" + str(self.bind_port) + ";rport\r\n"
+        message_string += "Max-Forwards: 70\r\n"
+        message_string += 'To: <sip:' + to_address + ">;messagetype=IM\r\n"
+        message_string += 'From: "' + str(self.display_name) + '"<sip:' + str(self.username) + "@" + str(self.domain) + ":" + str(self.account_port) + ">\r\n"
+        message_string += "Call-ID: " + str(call_id) + "\r\n"
+        message_string += "CSeq: 1 MESSAGE\r\n"
+        message_string += "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE\r\n"
+        message_string += "Content-Type: text/html\r\n"
+        message_string += "User-Agent: " + str(self.USER_AGENT) + "\r\n"
+        message_string += "Content-Length: " + str(len(message_body)) + "\r\n"
+        message_string += "\r\n"
+        message_string += message_body
+
+        if self.outbound_proxy:
+            to_server = self.outbound_proxy        
+        else:
+            to_server = self.domain
+
+        self.sipsocket.sendto(message_string, (to_server, self.account_port) )
+        self.sip_history[call_id] = []
+        self.sip_history[call_id].append(message_string)
+        return call_id
+        
     def send_sip_register(self, register_address, register_frequency=3600):
         
         call_id = ''.join([random.choice('0123456789abcdef') for x in range(32)])
@@ -176,7 +213,8 @@ class SIPSession:
                     cseq_number = cseq.split(" ")[0]
                     cseq_type = cseq.split(" ")[1]
                     call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
-                    call_to = re.findall(r'<sip:(.*?):', call_to_full)[0]
+                    call_to = re.findall(r'<sip:(.*?)>', call_to_full)[0]
+                    if ":" in call_to: call_to = call_to.split(":")[0]
                     
                     #Resend the initial message but with the auth_string
                     reply = self.sip_history[call_id][0]
@@ -198,8 +236,9 @@ class SIPSession:
                     cseq_number = cseq.split(" ")[0]
                     cseq_type = cseq.split(" ")[1]
                     call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
-                    call_to = re.findall(r'<sip:(.*?)@', call_to_full)[0]
-                        
+                    call_to = re.findall(r'<sip:(.*?)>', call_to_full)[0]
+                    if ":" in call_to: call_to = call_to.split(":")[0]
+                    
                     #Resend the initial message but with the auth_string
                     reply = self.sip_history[call_id][0]
                     auth_string = self.http_auth(authheader, cseq_type, call_to)
@@ -211,12 +250,18 @@ class SIPSession:
                     idx = reply.index("User-Agent:")
                     reply = reply[:idx] + "Authorization: " + auth_string + reply[idx:]
                              
+                    _logger.error(reply)
                     self.sipsocket.sendto(reply, addr)
                 elif data.split("\r\n")[0] == "SIP/2.0 403 Forbidden":
                     #Likely means call was rejected
                     self.call_rejected.fire(self, data)
                     stage = "Forbidden"
                     return False
+                elif data.startswith("MESSAGE"):
+                    #Extract the actual message to make things easier for devs
+                    message = data.split("\r\n\r\n")[1]
+                    if "<isComposing" not in message:
+                        self.message_received.fire(self, data, message)
                 elif data.startswith("INVITE"):
                     
                     call_from = re.findall(r'From: (.*?)\r\n', data)[0]
@@ -267,7 +312,7 @@ class SIPSession:
                     cseq = re.findall(r'CSeq: (.*?)\r\n', data)[0]
                     cseq_type = cseq.split(" ")[1]
                 
-                    #INVITE requires a ACK while REGISTER does not
+                    #200 OK is used by REGISTER, INVITE and MESSAGE, so the code logic gets split up
                     if cseq_type == "INVITE":
                         cseq_number = cseq.split(" ")[0]
                         contact_header = re.findall(r'Contact: <(.*?)>\r\n', data)[0]
@@ -294,11 +339,15 @@ class SIPSession:
                         self.sipsocket.sendto(reply, addr)
                 
                         self.call_accepted.fire(self, data)
+                    elif cseq_type == "MESSAGE":
+                        self.message_sent.fire(self, data)                    
                 elif data.split("\r\n")[0].startswith("SIP/2.0 4"):
                     self.call_error.fire(self, data)
         
         except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
             _logger.error(e)
+            _logger.error("Line: " + str(exc_tb.tb_lineno) )            
             
                 
 class EventHook(object):
