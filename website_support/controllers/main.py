@@ -15,6 +15,33 @@ from openerp.addons.website.models.website import slug
 
 class SupportTicketController(http.Controller):
 
+    @http.route('/support/subcategories/field/fetch', type='http', auth="public", website=True)
+    def support_subcategories_field_fetch(self, **kwargs):
+
+        values = {}
+	for field_name, field_value in kwargs.items():
+	    values[field_name] = field_value
+	            
+	sub_category_fields = request.env['website.support.ticket.subcategory.field'].sudo().search( [('wsts_id', '=', int(values['subcategory']) )])
+	
+	#Only return a dropdown if this category has subcategories
+	return_string = ""
+	
+	if sub_category_fields:
+	    for sub_category_field in sub_category_fields:
+            
+	        return_string += "<div class=\"form-group\">\n"
+	        return_string += "  <label class=\"col-md-3 col-sm-4 control-label\" for=\"efield_" + str(sub_category_field.id) + "\">" + sub_category_field.name + "</label>\n"
+	        return_string += "  <div class=\"col-md-7 col-sm-8\">\n"
+
+                if sub_category_field.type == "textbox":
+                    return_string += "    <input type=\"text\" required=\"True\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
+                
+                return_string += "  </div>\n"
+                return_string += "</div>\n"
+            
+        return return_string
+        
     @http.route('/support/subcategories/fetch', type='http', auth="public", website=True)
     def support_subcategories_fetch(self, **kwargs):
 
@@ -28,13 +55,11 @@ class SupportTicketController(http.Controller):
 	return_string = ""
 	
 	if sub_categories:
-            return_string = ""
-
 	    return_string += "<div class=\"form-group\">\n"
 	    return_string += "    <label class=\"col-md-3 col-sm-4 control-label\" for=\"subcategory\">Sub Category</label>\n"
 	    return_string += "    <div class=\"col-md-7 col-sm-8\">\n"
 
-            return_string += "        <select class=\"form-control\" name=\"subcategory\">\n"
+            return_string += "        <select class=\"form-control\" id=\"subcategory\" name=\"subcategory\">\n"
             for sub_category in request.env['website.support.ticket.subcategory'].sudo().search([('parent_category_id','=', int(values['category']) )]):
                 return_string += "            <option value=\"" + str(sub_category.id) + "\">" + sub_category.name.encode("utf-8") + "</option>\n"
 
@@ -229,7 +254,7 @@ class SupportTicketController(http.Controller):
         file_name = ""
         
         if "subcategory" in values:
-            sub_category = values['subcategory']
+            sub_category = values['subcategory']            
         else:
             sub_category = ""
             
@@ -253,6 +278,15 @@ class SupportTicketController(http.Controller):
                 portal_access_key = randint(1000000000,2000000000)
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
 
+        if "subcategory" in values:
+            #Also get the data from the extra fields
+            for extra_field in request.env['website.support.ticket.subcategory.field'].search([('wsts_id','=', int(sub_category) )]):
+                if "efield_" + str(extra_field.id) in values:
+                    request.env['website.support.ticket.field'].sudo().create({'wst_id': new_ticket_id.id, 'name': extra_field.name, 'value': values["efield_" + str(extra_field.id)] })
+                else:
+                    #All extra fields are required
+                    return "Extra field is missing"
+        
         if 'file' in values:
 
             for c_file in request.httprequest.files.getlist('file'):

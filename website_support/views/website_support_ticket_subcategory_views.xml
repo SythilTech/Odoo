@@ -9,6 +9,12 @@
       	          <group>
                       <field name="parent_category_id"/>
       	              <field name="name"/>
+      	              <field name="additional_field_ids">
+      	                  <tree editable="bottom">
+      	                      <field name="name"/>
+      	                      <field name="type"/>
+      	                  </tree>
+      	              </field>
       	          </group>
       	      </form>
       	  </field>

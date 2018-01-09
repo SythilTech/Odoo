@@ -25,12 +25,18 @@
           	          <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
           	          <field name="state"/>
           	          <field name="subject"/>
-          	          <field name="attachment" filename="attachment_filename"/>
+          	          <field name="attachment" filename="attachment_filename" attrs="{'invisible' :[('attachment', '=', False)]}"/>
           	          <field name="attachment_filename" invisible="True"/>
-                          <field name="attachment_ids">
+                          <field name="attachment_ids" attrs="{'invisible' :[('attachment_ids', '=', [])]}">
                               <tree>
                                   <field name="datas_fname"/>
                                   <field name="datas"/>
+                              </tree>
+                          </field>
+                          <field name="extra_field_ids" attrs="{'invisible' :[('extra_field_ids', '=', [])]}">
+                              <tree editable="bottom">
+                                  <field name="name"/>
+                                  <field name="value"/>
                               </tree>
                           </field>
           	          <field name="description" widget="html"/>

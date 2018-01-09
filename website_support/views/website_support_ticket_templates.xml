@@ -661,14 +661,29 @@ $(document).ready(function() {
            $(document).ready(function() {
 
                update_sub_categories()
-           
+               
+               
                $("#category").change(function() {
-
                     update_sub_categories()
-
                });
 
+               function update_sub_categories() {
+                   $.ajax({url: "/support/subcategories/fetch?category=" + $("#category").val(), success: function(result){
+                       $("#subcategoy_container").html(result);
+                       update_sub_category_fields();
+                   }});            
+               }
 
+               $(document).on('change',"#subcategory", function(){
+                   update_sub_category_fields();
+               });               
+               
+               function update_sub_category_fields() {
+                   $.ajax({url: "/support/subcategories/field/fetch?subcategory=" + $("#subcategory").val(), success: function(result){
+                       $("#subcategoy_fields").html(result);
+                   }});               
+               }
+               
                $('#file').change(function(){
                    if(this.files.length > <t t-esc="setting_max_ticket_attachments"/>) {
                        alert("You can only upload " + <t t-esc="setting_max_ticket_attachments"/> + " files");
@@ -685,13 +700,7 @@ $(document).ready(function() {
 
             });
 
-            function update_sub_categories() {
 
-                $.ajax({url: "/support/subcategories/fetch?category=" + $("#category").val(), success: function(result){
-                    $("#subcategoy").html(result);
-                }});
-            
-            }
 
 
             </script>
@@ -706,7 +715,10 @@ $(document).ready(function() {
                     </select>
                 </div>
             </div>
-            <div id="subcategoy">
+            <div id="subcategoy_container">
+            
+            </div>
+            <div id="subcategoy_fields">
             
             </div>
             <div name="subject_container" t-attf-class="form-group #{error and 'subject' in error and 'has-error' or ''}">

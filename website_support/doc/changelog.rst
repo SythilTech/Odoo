@@ -1,3 +1,8 @@
+v1.5.5
+======
+* Additional fields depending on selected sub category
+* Hide blank one2many fields to keep support ticket view small
+
 v1.5.4
 ======
 * Fix blank attachments issue

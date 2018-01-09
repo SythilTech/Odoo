@@ -60,6 +60,7 @@ class WebsiteSupportTicket(models.Model):
     close_date = fields.Date(string="Close Date")
     closed_by_id = fields.Many2one('res.users', string="Closed By")
     time_to_close = fields.Integer(string="Time to close (seconds)")
+    extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
     
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -240,6 +241,14 @@ class WebsiteSupportTicket(models.Model):
         values['body_html'] = values['body_html'].replace("_survey_url_",surevey_url)
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send(True)
+
+class WebsiteSupportTicketField(models.Model):
+
+    _name = "website.support.ticket.field"
+
+    wst_id = fields.Many2one('website.support.ticket.field', string="Support Ticket")
+    name = fields.Char(string="Label")
+    value = fields.Char(string="Value")
     
 class WebsiteSupportTicketMessage(models.Model):
 
@@ -272,13 +281,22 @@ class WebsiteSupportTicketSubCategories(models.Model):
     sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string='Sub Category Name')   
     parent_category_id = fields.Many2one('website.support.ticket.categories', required=True, string="Parent Category")
+    additional_field_ids = fields.One2many('website.support.ticket.subcategory.field', 'wsts_id', string="Additional Fields")
  
     @api.model
     def create(self, values):
         sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.subcategory')
         values['sequence']=sequence
         return super(WebsiteSupportTicketSubCategories, self).create(values)
+
+class WebsiteSupportTicketSubCategoryField(models.Model):
+
+    _name = "website.support.ticket.subcategory.field"
         
+    wsts_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
+    name = fields.Char(string="Label")
+    type = fields.Selection([('textbox','Textbox')], default="textbox", string="Type")
+    
 class WebsiteSupportTicketStates(models.Model):
 
     _name = "website.support.ticket.states"
