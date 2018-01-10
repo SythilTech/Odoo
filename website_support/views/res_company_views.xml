@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        
+        <record id="view_company_form_inherit_website_module" model="ir.ui.view">
+            <field name="name">res.company.support.ticket</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <field name="company_registry" position="after">
+                    <field name="next_support_ticket_number"/> 
+                </field>
+            </field>
+       </record>
+       
+   </data>
+</openerp>
