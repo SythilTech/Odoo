@@ -12,3 +12,5 @@ access_website_support_help_page_feedback,access.website.support.help.page.feedb
 access_website_support_ticket_priority,access.website.support.ticket.priority,model_website_support_ticket_priority,,1,0,0,0
 access_website_support_ticket_close,access website.support.ticket.close,model_website_support_ticket_close,,1,1,1,1
 access_website_support_department_contact,access website.support.department.contact,model_website_support_department_contact,,1,0,0,0
+access_website_support_ticket_subcategory_field,access website.support.ticket.subcategory.field,model_website_support_ticket_subcategory_field,,1,1,1,1
+access_website_support_ticket_field,access website.support.ticket.field,model_website_support_ticket_field,,1,1,1,1

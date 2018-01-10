@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.5.5",
+    'version': "1.5.6",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -8,6 +8,7 @@
     'description': "A helpdesk / support ticket system for your website",
     'license':'LGPL-3',
     'data': [
+        'data/res.groups.csv',
         'views/website_support_ticket_templates.xml',
         'views/website_support_ticket_compose_views.xml',
         'views/website_support_ticket_close_views.xml',
@@ -28,7 +29,6 @@
         'data/website.menu.csv',
         'data/website.support.ticket.priority.xml',
         'data/website.support.settings.xml',
-        'data/res.groups.csv',
         'data/website.support.department.role.csv',
         'security/ir.model.access.csv',
     ],

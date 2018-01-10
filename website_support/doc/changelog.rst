@@ -1,3 +1,8 @@
+v1.5.6
+======
+* Custom fields permission fix
+* Reduce font size of support headings
+
 v1.5.5
 ======
 * Additional fields depending on selected sub category

@@ -280,7 +280,7 @@ class SupportTicketController(http.Controller):
 
         if "subcategory" in values:
             #Also get the data from the extra fields
-            for extra_field in request.env['website.support.ticket.subcategory.field'].search([('wsts_id','=', int(sub_category) )]):
+            for extra_field in request.env['website.support.ticket.subcategory.field'].sudo().search([('wsts_id','=', int(sub_category) )]):
                 if "efield_" + str(extra_field.id) in values:
                     request.env['website.support.ticket.field'].sudo().create({'wst_id': new_ticket_id.id, 'name': extra_field.name, 'value': values["efield_" + str(extra_field.id)] })
                 else:
