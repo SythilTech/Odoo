@@ -333,7 +333,7 @@ msgstr "${object.subject}"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_settings_close_ticket_email_template_id
 msgid "(OBSOLETE)Close Ticket Email Template"
-msgstr "(OBSOLETE) Ticket E-Mail-Vorlage schließen"
+msgstr "(OBSOLETE) Ticket E-Mail-Vorlage schliessen"
 
 #. module: website_support
 #: model:ir.ui.view,arch_db:website_support.help_page
@@ -526,7 +526,7 @@ msgstr "Benutzer-E-Mail-Vorlage ändern"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_close_comment
 msgid "Close Comment"
-msgstr "Kommentar schließen"
+msgstr "Kommentar bei Abschluss"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_close_date
@@ -536,13 +536,13 @@ msgstr "Datum Beendigung"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_close_message
 msgid "Close Message"
-msgstr "Nachricht schließen"
+msgstr "Nachricht schliessen"
 
 #. module: website_support
 #: model:ir.ui.view,arch_db:website_support.website_support_ticket_close_view_form
 #: model:ir.ui.view,arch_db:website_support.website_support_ticket_view_form
 msgid "Close Ticket"
-msgstr "Ticket schließen"
+msgstr "Ticket schliessen"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_close_time
@@ -738,7 +738,7 @@ msgstr "Kunde geantwortet"
 #. module: website_support
 #: model:ir.ui.menu,name:website_support.website_support_parent_menu
 msgid "Customer Support"
-msgstr "Kunde Support"
+msgstr "Helpdesk"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_department_contact_wsd_id
@@ -980,7 +980,7 @@ msgstr "Managers"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_settings_max_ticket_attachment_filesize
 msgid "Max Ticket Attachment Filesize (KB)"
-msgstr "Max Ticketanhang Dateigröße (KB)"
+msgstr "Max Ticketanhang Dateigrösse (KB)"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_settings_max_ticket_attachments
