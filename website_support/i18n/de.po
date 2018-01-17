@@ -858,7 +858,7 @@ msgstr "Helpdesk  Seite"
 #: model:ir.ui.menu,name:website_support.website_support_help_page_menu
 #: model:ir.ui.view,arch_db:website_support.support_help_pages
 msgid "Help Pages"
-msgstr "Helpdesk Seiten"
+msgstr "Hilfeseiten"
 
 #. module: website_support
 #: model:website.support.ticket.priority,name:website_support.high
@@ -1035,7 +1035,7 @@ msgstr "Neuer Anlass"
 #: model:ir.ui.view,arch_db:website_support.content_new_help
 #, python-format
 msgid "New Help Group"
-msgstr "Neue Helpdesk Gruppe"
+msgstr "Neue Hilfeseite Gruppe"
 
 #. module: website_support
 #. openerp-web
@@ -1043,7 +1043,7 @@ msgstr "Neue Helpdesk Gruppe"
 #: model:ir.ui.view,arch_db:website_support.content_new_help
 #, python-format
 msgid "New Help Page"
-msgstr "Neue Helpdesk Seite"
+msgstr "Neue Hilfeseite Seite"
 
 #. module: website_support
 #: model:mail.template,subject:website_support.new_support_ticket_category
