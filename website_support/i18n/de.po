@@ -814,7 +814,7 @@ msgstr "Feedback Durchschnittliche Bewertung"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_help_page_feedback_count
 msgid "Feedback Count"
-msgstr "Feedback Zahl"
+msgstr "Feedback Anzahl"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_help_page_feedback_feedback_rating
@@ -842,23 +842,23 @@ msgstr "Gruppe"
 #: model:ir.model.fields,field_description:website_support.field_website_support_help_groups_name
 #, python-format
 msgid "Help Group"
-msgstr "Help Gruppe"
+msgstr "Helpdesk Gruppe"
 
 #. module: website_support
 #: model:ir.ui.menu,name:website_support.website_support_help_groups_menu
 msgid "Help Groups"
-msgstr "Help Gruppen"
+msgstr "Helpdesk Gruppen"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_help_page_feedback_hp_id
 msgid "Help Page"
-msgstr "Help Seite"
+msgstr "Helpdesk  Seite"
 
 #. module: website_support
 #: model:ir.ui.menu,name:website_support.website_support_help_page_menu
 #: model:ir.ui.view,arch_db:website_support.support_help_pages
 msgid "Help Pages"
-msgstr "Help Seiten"
+msgstr "Helpdesk Seiten"
 
 #. module: website_support
 #: model:website.support.ticket.priority,name:website_support.high
@@ -891,7 +891,7 @@ msgstr "ID"
 msgid ""
 "In 'Open' state or 'Customer Replied' state taken into consideration name "
 "changes"
-msgstr "Im Status \"Offen\" oder \"Kundenbeantwortet\" ändert sich der Name"
+msgstr "Im Status 'Offen' oder 'Kundenbeantwortet' ändert sich ev. der Name"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_department___last_update
@@ -985,12 +985,12 @@ msgstr "Max Ticketanhang Dateigröße (KB)"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_settings_max_ticket_attachments
 msgid "Max Ticket Attachments"
-msgstr "Max Anzahl Ticket Attachments"
+msgstr "Max Anzahl Ticket Anhänge"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_attachment_ids
 msgid "Media Attachments"
-msgstr "Media Attachments"
+msgstr "Media Anhänge"
 
 #. module: website_support
 #: model:ir.ui.view,arch_db:website_support.support_ticket_view
@@ -1035,7 +1035,7 @@ msgstr "Neuer Anlass"
 #: model:ir.ui.view,arch_db:website_support.content_new_help
 #, python-format
 msgid "New Help Group"
-msgstr "Neue Help Gruppe"
+msgstr "Neue Helpdesk Gruppe"
 
 #. module: website_support
 #. openerp-web
@@ -1043,7 +1043,7 @@ msgstr "Neue Help Gruppe"
 #: model:ir.ui.view,arch_db:website_support.content_new_help
 #, python-format
 msgid "New Help Page"
-msgstr "Neue Help Seite"
+msgstr "Neue Helpdesk Seite"
 
 #. module: website_support
 #: model:mail.template,subject:website_support.new_support_ticket_category
@@ -1064,7 +1064,7 @@ msgstr "Neue Ticketanzahl"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_res_company_next_support_ticket_number
 msgid "Next Support Ticket Number"
-msgstr "Next Support Ticket Number"
+msgstr "Nächste Support Ticket Nummer"
 
 #. module: website_support
 #: model:ir.actions.act_window,help:website_support.website_support_ticket_action
@@ -1193,7 +1193,7 @@ msgstr "Berichtswesen"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_department_contact_role
 msgid "Role"
-msgstr "Role"
+msgstr "Rolle"
 
 #. module: website_support
 #: model:ir.ui.view,arch_db:website_support.support_help_pages
@@ -1208,14 +1208,13 @@ msgstr "Senden"
 #. module: website_support
 #: model:ir.ui.view,arch_db:website_support.website_support_ticket_view_form
 msgid "Send Survey"
-msgstr "Send Survey"
+msgstr "Send Umfrage"
 
 #. module: website_support
 #: model:ir.model.fields,help:website_support.field_email_template_preview_built_in
 #: model:ir.model.fields,help:website_support.field_mail_template_built_in
 msgid "Seperates email templates created by modules and ones created by users"
-msgstr ""
-"E-Mail-Vorlagen, die von Modulen und von Benutzern erstellten erstellt wurden"
+msgstr "E-Mail-Vorlagen, die von Modulen und von Benutzern erstellten erstellt wurden"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_help_groups_sequence
@@ -1239,38 +1238,38 @@ msgstr "Registrieren"
 #. module: website_support
 #: selection:website.support.ticket.message,by:0
 msgid "Staff"
-msgstr "Staff"
+msgstr "Mitarbeiter"
 
 #. module: website_support
 #: model:website.support.ticket.states,name:website_support.website_ticket_state_staff_closed
 msgid "Staff Closed"
-msgstr "Staff Closed"
+msgstr "Durch Mitarbeiter geschlossen"
 
 #. module: website_support
 #: model:website.support.ticket.states,name:website_support.website_ticket_state_staff_replied
 msgid "Staff Replied"
-msgstr "Staff Replied"
+msgstr "Durch Mitarbeiter beantwortet"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_settings_staff_reply_email_template_id
 msgid "Staff Reply Email Template"
-msgstr "Staff Reply Email Template"
+msgstr "Mitarbeiter Antwort Email Template"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_state
 #: model:ir.ui.view,arch_db:website_support.support_ticket_view_list
 msgid "State"
-msgstr "Bundesland"
+msgstr "Ticket Status"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_states_name
 msgid "State Name"
-msgstr "Bundesland"
+msgstr "Status Name"
 
 #. module: website_support
 #: model:ir.ui.menu,name:website_support.website_support_ticket_states_menu
 msgid "States"
-msgstr "Staaten"
+msgstr "Status"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_department_sub_category_ids
