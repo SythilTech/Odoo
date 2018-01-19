@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Voip Communication (ALPHA)",
+    'name': "Voip Communication",
     'version': "1.6.5",
     'author': "Sythil Tech",
     'category': "Tools",
