@@ -20,6 +20,19 @@ class WebsiteSupportSettings(models.Model):
     max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
     allow_user_signup = fields.Boolean(string="Allow User Signup")
     auto_send_survey = fields.Boolean(string="Auto Send Survey")
+    auto_create_contact = fields.Boolean(string="Auto Create Contact", help="Auto create contact if one with that email does not exist")
+
+    #-----Auto Create Contact-----
+
+    @api.multi
+    def get_default_auto_create_contact(self, fields):
+        return {'auto_create_contact': self.env['ir.values'].get_default('website.support.settings', 'auto_create_contact')}
+
+    @api.multi
+    def set_default_auto_create_contact(self):
+        for record in self:
+            self.env['ir.values'].set_default('website.support.settings', 'auto_create_contact', record.auto_create_contact)
+
 
     #-----Auto Send Survey-----
 

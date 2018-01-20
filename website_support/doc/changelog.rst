@@ -1,3 +1,7 @@
+v1.5.7
+======
+* New setting to auto create contacts
+
 v1.5.6
 ======
 * Custom fields permission fix
