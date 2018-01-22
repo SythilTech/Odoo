@@ -640,7 +640,7 @@ msgstr "Erstellungsdatum"
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_create_user_id
 msgid "Create User"
-msgstr "Erstelle User"
+msgstr "Erstelle neuen User"
 
 #. module: website_support
 #: model:ir.actions.act_window,help:website_support.website_support_help_page_action
@@ -1090,7 +1090,7 @@ msgstr "Seitenzahl"
 #. module: website_support
 #: model:website.support.ticket.states,name:website_support.website_ticket_state_open
 msgid "Open"
-msgstr "Öffne"
+msgstr "Offen"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_help_page_name
