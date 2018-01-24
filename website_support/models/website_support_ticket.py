@@ -176,9 +176,9 @@ class WebsiteSupportTicket(models.Model):
         if setting_auto_create_contact and 'email' in vals:
             if self.env['res.partner'].search_count([('email','=',vals['email'])]) == 0:
                 if 'person_name' in vals:
-                    new_contact = self.env['res.partner'].create({'name':vals['person_name'], 'email': vals['email']})
+                    new_contact = self.env['res.partner'].create({'name':vals['person_name'], 'email': vals['email'], 'company_type': 'person'})
                 else:
-                    new_contact = self.env['res.partner'].create({'name':vals['email'], 'email': vals['email']})
+                    new_contact = self.env['res.partner'].create({'name':vals['email'], 'email': vals['email'], 'company_type': 'person'})
                     
                 new_id.partner_id = new_contact.id
                     

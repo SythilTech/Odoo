@@ -1,3 +1,7 @@
+v1.5.8
+======
+* New contacts are explicted a person (change to support partner_auto_parent_company)
+
 v1.5.7
 ======
 * New setting to auto create contacts
