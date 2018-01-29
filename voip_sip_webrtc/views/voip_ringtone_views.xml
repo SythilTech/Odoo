@@ -37,6 +37,4 @@
         </field>
     </record>
 
-    <menuitem id="voip_ringtone_menu" name="Ringtones" parent="voip_parent_menu" action="voip_ringtone_action" sequence="60"/>
-
 </odoo>

@@ -59,7 +59,4 @@
         </field>
     </record>
 
-    <menuitem id="voip_parent_menu" name="Voip" parent="sales_team.menu_base_partner" sequence="10"/>
-    <menuitem id="voip_call_menu" name="Call Log" parent="voip_parent_menu" action="voip_call_action" sequence="10"/>
-
 </odoo>

@@ -39,8 +39,6 @@
 	        No VOIP Media
 	    </p>
         </field>
-    </record>
-    
-    <menuitem id="voip_media_menu" name="Media" parent="voip_parent_menu" action="voip_media_action" sequence="50"/>
+    </record>    
 
 </odoo>

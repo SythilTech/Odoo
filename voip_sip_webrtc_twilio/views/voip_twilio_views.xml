@@ -14,6 +14,7 @@
       	            <field name="twilio_account_sid"/>
       	            <field name="twilio_auth_token"/>
       	            <field name="twilio_last_check_date"/>
+      	            <field name="margin"/>
       	        </group>
       	    </form>
         </field>

@@ -11,9 +11,9 @@
       	            <group>
       	                <field name="voip_ringtone" filename="voip_ringtone_filename"/>
       	                <field name="voip_ringtone_filename" invisible="1"/>
-      	                <field name="voip_account_id"/>
+      	                <!--<field name="voip_account_id"/>
                         <field name="voip_missed_call" filename="voip_missed_call_filename"/>
-                        <field name="voip_missed_call_filename" invisible="1"/>
+                        <field name="voip_missed_call_filename" invisible="1"/>-->
       	            </group>
       	        </page>
       	    </notebook>

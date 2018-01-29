@@ -1,3 +1,7 @@
+v1.6.6
+======
+* Reorder menus
+
 v1.6.5
 ======
 * Reregister scheduled action (10 minutes)

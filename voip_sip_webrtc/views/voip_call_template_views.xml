@@ -57,6 +57,4 @@
         </field>
     </record>
 
-    <menuitem id="voip_call_template_menu" name="Call Templates" parent="voip_parent_menu" action="voip_call_template_action" sequence="40"/>
-
 </odoo>

@@ -17,9 +17,9 @@ class VoipTwilio(models.Model):
     twilio_account_sid = fields.Char(string="Account SID")
     twilio_auth_token = fields.Char(string="Auth Token")
     twilio_last_check_date = fields.Datetime(string="Last Check Date")
+    margin = fields.Float(string="Margin", default="1.0")
     
     def fetch_call_history(self):
-        _logger.error("Fetch")
         
         payload = {}
 	if self.twilio_last_check_date:
@@ -42,6 +42,14 @@ class VoipTwilio(models.Model):
 	    to_partner = False
 	    create_dict = {}
 
+            create_dict['twilio_account_id'] = self.id
+            
+            if 'price' in call:
+                if call['price'] > 0:
+                    create_dict['currency_id'] = self.env['res.currency'].search([('name','=', call['price_unit'])])[0].id
+                    create_dict['price'] = -1.0 * float(call['price'])
+                    create_dict['margin'] = -1.0 * float(call['price']) * self.margin
+
             #Format the from address and find the from partner	    
 	    if "+" in from_address:
 	        #Mobiles should conform to E.164
@@ -54,7 +62,6 @@ class VoipTwilio(models.Model):
 	    
 	        if "@" not in from_address:
 	            #Get the full aor based on the domain of the to address
-	            _logger.error(to_address)
 	            domain = re.findall(r'@(.*?);', to_address)[0].replace(":5060","")
 	            from_address = from_address + "@" + domain
 	        

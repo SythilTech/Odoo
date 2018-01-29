@@ -35,7 +35,5 @@
 	    </p>
         </field>
     </record>
-    
-    <menuitem id="voip_message_template_menu" name="Message Templates" parent="voip_parent_menu" action="voip_message_template_action" sequence="30"/>
 
 </odoo>

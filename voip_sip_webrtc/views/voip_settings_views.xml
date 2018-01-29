@@ -14,9 +14,9 @@
                 <group>
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
-                    <!--<field name="message_bank_duration"/>-->
+                    <!--<field name="message_bank_duration"/>
                     <field name="server_ip"/>
-                    <!--<field name="cert_path"/>
+                    <field name="cert_path"/>
                     <field name="key_path"/>
                     <field name="fingerprint"/>-->
                 </group>
@@ -30,7 +30,5 @@
 	<field name="view_mode">form</field>
 	<field name="target">inline</field>
     </record>
-
-    <menuitem id="voip_settings_menu" name="Settings" parent="voip_parent_menu" action="voip_settings_action" sequence="200"/>
 
 </odoo>

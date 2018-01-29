@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="voip_parent_menu" name="Voip" parent="sales_team.menu_base_partner" sequence="10"/>
+    
+    <menuitem id="voip_call_menu" name="Call Log" parent="voip_parent_menu" action="voip_call_action" sequence="10"/>
+    <menuitem id="voip_ringtone_menu" name="Ringtones" parent="voip_parent_menu" action="voip_ringtone_action" sequence="20"/>    
+    <menuitem id="voip_settings_menu" name="Settings" parent="voip_parent_menu" action="voip_settings_action" sequence="30"/>
+    <menuitem id="voip_account_menu" name="SIP Accounts" parent="voip_parent_menu" action="voip_account_action" sequence="40"/>
+    <menuitem id="voip_message_template_menu" name="Message Templates" parent="voip_parent_menu" action="voip_message_template_action" sequence="50"/>
+    <menuitem id="voip_call_template_menu" name="Call Templates" parent="voip_parent_menu" action="voip_call_template_action" sequence="60"/>
+    <menuitem id="voip_media_menu" name="Media" parent="voip_parent_menu" action="voip_media_action" sequence="70"/>
+    
+</odoo>

@@ -1,3 +1,7 @@
+v1.0.2
+======
+* Get call price and set margin
+
 v1.0.1
 ======
 * Import call history from Twilio

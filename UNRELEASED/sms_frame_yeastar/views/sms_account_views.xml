@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id="sms_account_view_form_inherit_sms_frame_teastar" model="ir.ui.view">
+          <field name="name">sms.account.view.form</field>
+          <field name="model">sms.account</field>
+          <field name="inherit_id" ref="sms_frame.sms_account_view_form"/>
+          <field name="arch" type="xml">
+      	      <xpath expr="//h2[@id='gatewayhook']" position="after">
+      	          <div attrs="{'invisible': [('gateway_model', '!=', 'sms.gateway.yeastar')]}">
+		      <group>
+	                  <field name="yeastar_url"/>
+	                  <field name="yeastar_port"/>
+                          <field name="yeastar_username"/>
+                          <field name="yeastart_password" password="True"/>
+                      </group>
+    	          </div>
+      	      </xpath>
+      	  </field>
+      </record>
+
+    </data>
+</openerp>
