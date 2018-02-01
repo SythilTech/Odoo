@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Invoice the cost of the calls + margin
+
 v1.0.2
 ======
 * Get call price and set margin

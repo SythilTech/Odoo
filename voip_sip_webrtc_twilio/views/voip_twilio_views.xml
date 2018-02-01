@@ -8,13 +8,16 @@
       	    <form>
       	        <header>
       	            <button name="fetch_call_history" type="object" string="Fetch Call History"/>
+      	            <button name="create_invoice" type="object" string="Create Invoice"/>
       	        </header>
       	        <group>
       	            <field name="name"/>
       	            <field name="twilio_account_sid"/>
       	            <field name="twilio_auth_token"/>
       	            <field name="twilio_last_check_date"/>
-      	            <field name="margin"/>
+      	            <field name="resell_account"/>
+      	            <field name="margin" attrs="{'invisible': [('resell_account', '=', False)]}"/>
+      	            <field name="partner_id" attrs="{'invisible': [('resell_account', '=', False)]}"/>
       	        </group>
       	    </form>
         </field>

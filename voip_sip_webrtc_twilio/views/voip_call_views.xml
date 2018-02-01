@@ -10,7 +10,6 @@
                 <field name="twilio_account_id"/>
                 <field name="currency_id"/>
                 <field name="price" widget="monetery"/>
-                <field name="margin" widget="monetery"/>
             </field>
         </field>
     </record>
@@ -25,7 +24,6 @@
                 <field name="twilio_account_id"/>
                 <field name="currency_id"/>
                 <field name="price" widget="monetery"/>
-                <field name="margin" widget="monetery"/>
             </field>
         </field>
     </record>

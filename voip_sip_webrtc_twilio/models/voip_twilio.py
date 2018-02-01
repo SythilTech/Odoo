@@ -17,8 +17,24 @@ class VoipTwilio(models.Model):
     twilio_account_sid = fields.Char(string="Account SID")
     twilio_auth_token = fields.Char(string="Auth Token")
     twilio_last_check_date = fields.Datetime(string="Last Check Date")
-    margin = fields.Float(string="Margin", default="1.0")
-    
+    resell_account = fields.Boolean(string="Resell Account")
+    margin = fields.Float(string="Margin", default="1.1", help="Multiply the call price by this figure 0.7 * 1.1 = 0.77")
+    partner_id = fields.Many2one('res.partner', string="Customer")
+
+    @api.multi
+    def create_invoice(self):
+        self.ensure_one()
+        
+        return {
+            'name': 'Twilio Create Invoice',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'voip.twilio.invoice',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'context': {'default_twilio_account_id': self.id, 'default_margin': self.margin}
+         }
+         
     def fetch_call_history(self):
         
         payload = {}
@@ -48,8 +64,7 @@ class VoipTwilio(models.Model):
                 if call['price'] > 0:
                     create_dict['currency_id'] = self.env['res.currency'].search([('name','=', call['price_unit'])])[0].id
                     create_dict['price'] = -1.0 * float(call['price'])
-                    create_dict['margin'] = -1.0 * float(call['price']) * self.margin
-
+                    
             #Format the from address and find the from partner	    
 	    if "+" in from_address:
 	        #Mobiles should conform to E.164
@@ -122,3 +137,57 @@ class VoipTwilio(models.Model):
 	    self.env['voip.call'].create(create_dict)
 	
 	    self.twilio_last_check_date = datetime.utcnow()
+
+class VoipTwilioInvoice(models.Model):
+
+    _name = "voip.twilio.invoice"
+    _description = "Twilio Account Invoice"
+    
+    twilio_account_id = fields.Many2one('voip.twilio', string="Twilio Account")
+    start_date = fields.Date(string="Start Date")
+    end_date = fields.Date(string="End Date")
+    margin = fields.Float(string="Margin")
+    
+    @api.multi
+    def generate_invoice(self):
+        self.ensure_one()
+        
+        #invoice_account = self.twilio_account_id.partner_id.property_account_receivable_id.id
+        #invoice = self.env['account.invoice'].create({'type': 'out_invoice', 'journal_type': 'sale', 'partner_id': self.twilio_account_id.partner_id.id, 'account_id': invoice_account, 'fiscal_position_id': self.twilio_account_id.partner_id.property_account_position_id.id})
+
+        response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_id.twilio_account_sid + "/Calls.json?StartTime%3E=" + self.start_date + "&EndTime%3C=" + self.end_date, auth=(str(self.twilio_account_id.twilio_account_sid), str(self.twilio_account_id.twilio_auth_token)))
+                
+	json_call_list = json.loads(response_string.text)
+
+        call_total = 0.0
+	for call in json_call_list['calls']:
+	    if call['price'] > 0:
+	        call_total += -1.0 * float(call['price']) * self.margin
+
+        call_name = "VOIP Calls " + self.start_date + " - " + self.end_date
+
+        invoice = self.env['account.invoice'].create({
+            'partner_id': self.twilio_account_id.partner_id.id,
+            'account_id': self.twilio_account_id.partner_id.property_account_receivable_id.id,
+            'fiscal_position_id': self.twilio_account_id.partner_id.property_account_position_id.id
+        })
+            
+        line_values = {
+            'name': call_name,
+            'price_unit': call_total,
+            'invoice_id': invoice.id,
+            'account_id': invoice.journal_id.default_credit_account_id.id
+        }
+
+        #invoice_line = self.env['account.invoice.line'].new(line_values)
+        invoice.write({'invoice_line_ids': [(0, 0, line_values)]})
+        invoice.compute_taxes()
+
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.invoice',
+            'type': 'ir.actions.act_window',
+            'res_id': invoice.id,
+            'view_id': self.env['ir.model.data'].get_object('account', 'invoice_form').id
+         }        
