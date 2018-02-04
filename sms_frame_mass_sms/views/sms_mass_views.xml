@@ -123,8 +123,8 @@
       	  </field>
       </record>
 
-      <menuitem id="sms_mass_top_menu" name="Mass SMS" sequence="100"/>        
-      <menuitem id="sms_mass_sub_menu" name="Mass SMS" parent="sms_mass_top_menu" action="sms_mass_sms_action" />
+      <menuitem id="sms_mass_top_menu" name="Mass SMS" sequence="100"/>      
+      <menuitem id="sms_mass_sub_menu" name="Mass SMS" parent="sms_mass_top_menu" action="sms_mass_sms_action"/>
 
    </data>
 </openerp>

@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework - Mass SMS",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -9,6 +9,8 @@
     'license':'LGPL-3',
     'data': [
         'views/sms_mass_views.xml',
+        'data/res.groups.csv',
+        'security/ir.model.access.csv',
         #'data/base_action_rule.xml'
     ],
     'demo': [],

@@ -72,4 +72,5 @@ class SmsMass(models.Model):
             queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued', 'mass_sms_id': self.id})            
 
             #Turn the queue manager on
-            self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').active = True
+            sms_queue = self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check')
+            sms_queue.sudo().write({'active': True})
