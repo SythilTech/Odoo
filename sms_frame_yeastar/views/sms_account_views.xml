@@ -14,6 +14,9 @@
 	                  <field name="yeastar_port"/>
                           <field name="yeastar_username"/>
                           <field name="yeastart_password" password="True"/>
+                          <field name="yeastar_host"/>
+                          <field name="yeastar_api_port"/>
+                          <button name="yeastar_connect" type="object" string="Connect to Yeastar"/>
                       </group>
     	          </div>
       	      </xpath>

@@ -4,6 +4,11 @@ from datetime import datetime
 import logging
 _logger = logging.getLogger(__name__)
 import urllib
+import socket
+import telnetlib
+import threading
+from openerp.exceptions import UserError
+import re
 
 from openerp.http import request
 from openerp import api, fields, models
@@ -63,6 +68,57 @@ class SmsAccountYeastar(models.Model):
     _description = "Adds the yeastar specfic gateway settings to the sms gateway accounts"
     
     yeastar_url = fields.Char(string="Yeastar URL", default="http://localhost/cgi/WebCGI?1500101")
-    yeastar_port = fields.Integer(string="Port")
+    yeastar_port = fields.Integer(string="GSM Port")
     yeastar_username = fields.Char(string="Username")
     yeastart_password = fields.Char(string="Password")
+    yeastar_host = fields.Char(string="Host")
+    yeastar_api_port = fields.Integer(string="API Port", default="5038")
+    
+    def yeastar_connect(self):
+        _logger.error("Yeastar Connect")
+                
+        #Don't block the main thread with all the listening
+        yeastar_listener_starter = threading.Thread(target=self.yeastar_connect_thread, args=())
+        yeastar_listener_starter.start()
+
+    def yeastar_connect_thread(self):
+        _logger.error("Yeastar Connect Thread")
+
+        try:
+            with api.Environment.manage():
+                # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+                new_cr = self.pool.cursor()
+                self = self.with_env(self.env(cr=new_cr))
+
+                tn = telnetlib.Telnet(self.yeastar_host, self.yeastar_api_port)
+
+                tn.write("Action: Login\r\nUsername: " + self.yeastar_username.encode("utf-8") + "\r\nSecret: " + self.yeastart_password.encode("utf-8") + "\r\n\r\n")
+        
+                login_response = tn.read_until("\r\n\r\n")
+                if "Success" not in login_response:
+                    raise UserError("Login Failed")        
+        
+                stage = "WAIT"
+                while stage == "WAIT":
+                    sms_event_data = tn.read_until("\r\n\r\n")
+                    #sms_event_data = "Event: ReceivedSMS\r\nID: 768\r\nSender: +61437950593\r\nSmsc: +555\r\nRecvtime: 2013-11-27 09:39:46\r\nContent: Hello From Yeastar\r\n\r\n"
+                    _logger.error(sms_event_data)
+                    sms_event = re.findall(r'Event: (.*?)\r\n', sms_event_data)[0]
+                    if sms_event == "ReceivedSMS":
+                        sms_id = re.findall(r'ID: (.*?)\r\n', sms_event_data)[0]
+                        sms_sender = re.findall(r'Sender: (.*?)\r\n', sms_event_data)[0]
+                        sms_to = "?"
+                        sms_receive_time = re.findall(r'Recvtime: (.*?)\r\n', sms_event_data)[0]
+                        sms_content = re.findall(r'Content: (.*?)\r\n', sms_event_data)[0]
+                        sms_content = sms_content.replace("+"," ")
+            
+                        #Create the sms record in history without the model or record_id
+                        history_id = self.env['sms.message'].create({'account_id': self.id, 'status_code': "RECEIVED", 'from_mobile': sms_sender, 'to_mobile': sms_to, 'sms_gateway_message_id': sms_id, 'sms_content': sms_content, 'direction':'I', 'message_date': sms_receive_time})
+
+                #Have to manually commit the new cursor?
+                self.env.cr.commit()
+        
+                self._cr.close()
+
+        except Exception as e:
+            _logger.error(e)
