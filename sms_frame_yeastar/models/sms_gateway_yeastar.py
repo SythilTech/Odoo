@@ -33,11 +33,13 @@ class SmsGatewayTwilio(models.Model):
         
         #format the to number before sending
         format_to = to_number
-        format_to = format_to.replace(" ", "").replace("+","")
+        format_to = format_to.replace(" ", "").replace(u'\xa0', "").replace("+","00")
         
-        url = sms_account.yeastar_url + "=account=" + sms_account.yeastar_username + "&password=" + sms_account.yeastart_password + "&port=" + str(sms_account.yeastar_port) + "&destination=" + format_to + "&content=" + urllib.quote(sms_content)
+        url = sms_account.yeastar_url + "=account=" + sms_account.yeastar_username + "&password=" + sms_account.yeastart_password + "&port=" + str(sms_account.yeastar_port) + "&destination=" + urllib.quote(format_to) + "&content=" + urllib.quote(sms_content)
         _logger.error(url)
         response_string = requests.get(url)
+        
+        _logger.error(response_string.text)
 
         delivary_state = "successful"
         human_read_error = ""
