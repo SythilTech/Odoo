@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="sms_birthday_template" model="sms.template">
+            <field name="name">Birthday Template</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="sms_to">${object.mobile}</field>
+            <field name="template_body">Happy Birthday ${object.name}!!!</field>
+        </record>
+            
+    </data>     
+</odoo>

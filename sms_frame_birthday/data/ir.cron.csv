@@ -1,0 +1,2 @@
+id,name,model,function,interval_number,interval_type,numbercall,active
+"sms_birthday","SMS Birthday",res.partner,send_birthday_sms,24,hours,-1,true
