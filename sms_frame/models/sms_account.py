@@ -11,7 +11,7 @@ class SmsAccount(models.Model):
 
     def send_message(self, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None, media_filename=None):
         """Send a message from this account"""
-        return self.env[self.gateway_model].send_message(self.id, from_number, to_number, sms_content, my_model_name, my_record_id, media, queued_sms_message, media_filename)
+        return self.env[self.gateway_model].send_message(self.id, from_number, to_number, sms_content, my_model_name, my_record_id, media, queued_sms_message, media_filename=media_filename)
         
 
     @api.model
