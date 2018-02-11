@@ -1,3 +1,7 @@
+v1.0.27
+=======
+* Fix issue with scheduled sms sending too early
+
 v1.0.26
 =======
 * Add optional delivery date to sms compose

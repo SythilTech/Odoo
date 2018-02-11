@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp import api, fields, models
 
 class SmsMessage(models.Model):
@@ -46,7 +49,7 @@ class SmsMessage(models.Model):
     @api.model
     def process_sms_queue(self, queue_limit):
         #queue_limit = self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').args
-        for queued_sms in self.env['sms.message'].search([('status_code','=','queued')], limit=queue_limit):
+        for queued_sms in self.env['sms.message'].search([('status_code','=','queued'), ('message_date','<=', datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT) ) ], limit=queue_limit):
             gateway_model = queued_sms.account_id.account_gateway_id.gateway_model_name
             my_sms = queued_sms.account_id.send_message(queued_sms.from_mobile, queued_sms.to_mobile, queued_sms.sms_content.encode('utf-8'), queued_sms.model_id.model, queued_sms.record_id, queued_sms.media_id, queued_sms_message=queued_sms)
 
@@ -55,8 +58,3 @@ class SmsMessage(models.Model):
             
             #record the message in the communication log
 	    self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(body=queued_sms.sms_content.encode('utf-8'), subject="SMS")
-
-
-        #Turn the queue manager off if we are out of queued smses
-        #if ( self.env['sms.message'].search_count([('status_code','=','queued')]) ) == 0:
-        #    self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check').active = False
