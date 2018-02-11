@@ -1,3 +1,7 @@
+v1.0.25
+=======
+* Fix mms content type issue preventing mp4 from sending
+
 v1.0.24
 =======
 * Use build in country.phone_code to circumvent issue where systems with deleted countries could not install module

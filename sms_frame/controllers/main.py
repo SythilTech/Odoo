@@ -25,6 +25,12 @@ class TwilioController(http.Controller):
 
             content_base64 = base64.b64decode(attachment.datas)
             headers.append(('Content-Length', len(content_base64)))
+
+            #Special expection
+            _logger.error(attachment.datas_fname)
+            if ".mp4" in str(attachment.datas_fname):
+                headers.append(('Content-Type', 'video/mp4'))
+                
             response = request.make_response(content_base64, headers)
             
             #Disable public access since the mms could contain confidential information

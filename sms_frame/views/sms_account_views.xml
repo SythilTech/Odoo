@@ -29,7 +29,7 @@
       </record>
 
       <record id="sms_account_action" model="ir.actions.act_window">
-          <field name="name">sms.account.action</field>
+          <field name="name">SMS Gateway Account</field>
       	  <field name="res_model">sms.account</field>
       	  <field name="view_type">form</field>
       	  <field name="view_mode">tree,form</field>

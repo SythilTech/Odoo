@@ -9,9 +9,9 @@ class SmsAccount(models.Model):
     account_gateway_id = fields.Many2one('sms.gateway', string="Account Gateway", required=True)
     gateway_model = fields.Char(string="Gateway Model", related="account_gateway_id.gateway_model_name")
 
-    def send_message(self, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None):
+    def send_message(self, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None, media_filename=None):
         """Send a message from this account"""
-        return self.env[self.gateway_model].send_message(self.id, from_number, to_number, sms_content, my_model_name, my_record_id, media, queued_sms_message)
+        return self.env[self.gateway_model].send_message(self.id, from_number, to_number, sms_content, my_model_name, my_record_id, media, queued_sms_message, media_filename)
         
 
     @api.model

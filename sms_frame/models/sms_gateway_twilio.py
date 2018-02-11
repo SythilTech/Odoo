@@ -23,7 +23,7 @@ class SmsGatewayTwilio(models.Model):
     
     api_url = fields.Char(string='API URL')
     
-    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None):
+    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None, media_filename=False):
         """Actual Sending of the sms"""
         sms_account = self.env['sms.account'].search([('id','=',sms_gateway_id)])
         
@@ -41,12 +41,15 @@ class SmsGatewayTwilio(models.Model):
         #Create an attachment for the mms now since we need a url now
         if media:
 
-            attachment_id = self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True, 'mms': True})
+            attachment_id = self.env['ir.attachment'].sudo().create({'name': 'mms ' + str(my_record_id), 'type': 'binary', 'datas': media, 'public': True, 'mms': True, 'datas_fname': media_filename})
 
 	    #Force the creation of the new attachment before you make the request
 	    request.env.cr.commit()
             
-            media_url = base_url + "/sms/twilio/mms/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
+            if media_filename:
+                media_url = base_url + "/sms/twilio/mms/" + str(attachment_id.id) + "/" + media_filename
+            else:
+                media_url = base_url + "/sms/twilio/mms/" + str(attachment_id.id) + "/media." + attachment_id.mimetype.split("/")[1]
 	    
             
         #send the sms/mms
