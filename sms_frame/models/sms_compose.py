@@ -5,6 +5,13 @@ _logger = logging.getLogger(__name__)
 import base64
 from openerp import api, fields, models
 
+class sms_response():
+     delivary_state = ""
+     response_string = ""
+     human_read_error = ""
+     mms_url = ""
+     message_id = ""
+     
 class SmsCompose(models.Model):
 
     _name = "sms.compose"
@@ -18,6 +25,7 @@ class SmsCompose(models.Model):
     sms_content = fields.Text(string='SMS Content')
     media_id = fields.Binary(string="Media (MMS)")      
     media_filename = fields.Char(string="Media Filename")
+    delivery_time = fields.Datetime(string="Delivery Time")
     
     @api.onchange('sms_template_id')
     def _onchange_sms_template_id(self):
@@ -37,7 +45,23 @@ class SmsCompose(models.Model):
         self.ensure_one()
 
         gateway_model = self.from_mobile_id.account_id.account_gateway_id.gateway_model_name
-        my_sms = self.from_mobile_id.account_id.send_message(self.from_mobile_id.mobile_number, self.to_number, self.sms_content.encode('utf-8'), self.model, self.record_id, self.media_id, media_filename=self.media_filename)
+        
+        if self.delivery_time:
+            #Create the queued sms
+	    my_model = self.env['ir.model'].search([('model','=',self.model)])
+	    sms_message = self.env['sms.message'].create({'record_id': self.record_id,'model_id':my_model[0].id,'account_id':self.from_mobile_id.account_id.id,'from_mobile':self.from_mobile_id.mobile_number,'to_mobile':self.to_number,'sms_content':self.sms_content,'status_string':'queued', 'direction':'O','message_date':self.delivery_time, 'status_code':'queued', 'by_partner_id':self.env.user.partner_id.id})
+	    
+	    sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
+            attachments = []
+            
+            if self.media_id:
+                attachments.append((self.media_filename, base64.b64decode(self.media_id)) )
+	    
+	    self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id, attachments=attachments)
+            
+            return True
+        else:
+            my_sms = self.from_mobile_id.account_id.send_message(self.from_mobile_id.mobile_number, self.to_number, self.sms_content.encode('utf-8'), self.model, self.record_id, self.media_id, media_filename=self.media_filename)
         
         #use the human readable error message if present
         error_message = ""

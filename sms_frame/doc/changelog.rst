@@ -1,3 +1,7 @@
+v1.0.26
+=======
+* Add optional delivery date to sms compose
+
 v1.0.25
 =======
 * Fix mms content type issue preventing mp4 from sending
