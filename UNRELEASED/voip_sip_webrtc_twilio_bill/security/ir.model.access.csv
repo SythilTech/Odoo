@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_voip_call","access voip.call","model_voip_call","sales_team.group_sale_salesman_all_leads",1,0,0,0
+"access_voip_call_client","access voip.call.client","model_voip_call_client","sales_team.group_sale_salesman_all_leads",1,0,0,0

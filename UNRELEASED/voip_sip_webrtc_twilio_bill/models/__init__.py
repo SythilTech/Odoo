@@ -1,1 +1,1 @@
-import voip_twilio, voip_call
+import voip_twilio, voip_call, res_partner

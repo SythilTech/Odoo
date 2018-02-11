@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_inherit_voip" model="ir.ui.view">
+        <field name="name">res.partner SIP</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!--<field name="mobile" position="replace">
+                <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760" widget="sippstn"/>
+            </field>-->
+            <field name="mobile" position="after">
+                <field name="sip_address"/>
+            </field>
+      	</field>
+    </record>
+
+</odoo>

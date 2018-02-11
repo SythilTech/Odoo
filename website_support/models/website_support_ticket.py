@@ -258,7 +258,7 @@ class WebsiteSupportTicketField(models.Model):
 
     _name = "website.support.ticket.field"
 
-    wst_id = fields.Many2one('website.support.ticket.field', string="Support Ticket")
+    wst_id = fields.Many2one('website.support.ticket', string="Support Ticket")
     name = fields.Char(string="Label")
     value = fields.Char(string="Value")
     

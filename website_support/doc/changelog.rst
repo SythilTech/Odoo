@@ -1,3 +1,7 @@
+v1.5.9
+======
+* Fix mismapping of support ticket custom fields
+
 v1.5.8
 ======
 * New contacts are explicted a person (change to support partner_auto_parent_company)

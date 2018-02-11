@@ -1,14 +1,7 @@
-v1.0.3
-======
-* Invoice the cost of the calls + margin
-
-v1.0.2
-======
-* Get call price and set margin
-
 v1.0.1
 ======
-* Import call history from Twilio
+* Move sip_address field across
+* Add permissions
 
 v1.0.0
 ======
