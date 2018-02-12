@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Remove test code that disconnects session after single sms
+
 v1.1.2
 ======
 * Map received sms to partner record

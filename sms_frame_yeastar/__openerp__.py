@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework - Yeastar TG 100",
-    'version': "1.1.2",
+    'version': "1.1.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

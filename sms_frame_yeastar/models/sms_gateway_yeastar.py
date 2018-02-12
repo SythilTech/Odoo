@@ -21,14 +21,14 @@ class sms_response():
      mms_url = ""
      message_id = ""
 
-class SmsGatewayTwilio(models.Model):
+class SmsGatewayYeastar(models.Model):
 
     _name = "sms.gateway.yeastar"
     _description = "Yeastar SMS Gateway"
     
     api_url = fields.Char(string="API URL")
     
-    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None):
+    def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None, media_filename=False):
         """Actual Sending of the sms"""
         sms_account = self.env['sms.account'].search([('id','=',sms_gateway_id)])
         
@@ -137,9 +137,7 @@ class SmsAccountYeastar(models.Model):
 
                         #Have to manually commit the new cursor now since we are in a loop
                         self.env.cr.commit()
-                        
-                        stage = "END"
-        
+
                 self._cr.close()
 
         except Exception as e:

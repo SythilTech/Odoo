@@ -49,7 +49,7 @@ class SmsCompose(models.Model):
         if self.delivery_time:
             #Create the queued sms
 	    my_model = self.env['ir.model'].search([('model','=',self.model)])
-	    sms_message = self.env['sms.message'].create({'record_id': self.record_id,'model_id':my_model[0].id,'account_id':self.from_mobile_id.account_id.id,'from_mobile':self.from_mobile_id.mobile_number,'to_mobile':self.to_number,'sms_content':self.sms_content,'status_string':'queued', 'direction':'O','message_date':self.delivery_time, 'status_code':'queued', 'by_partner_id':self.env.user.partner_id.id})
+	    sms_message = self.env['sms.message'].create({'record_id': self.record_id,'model_id':my_model[0].id,'account_id':self.from_mobile_id.account_id.id,'from_mobile':self.from_mobile_id.mobile_number,'to_mobile':self.to_number,'sms_content':self.sms_content,'status_string':'-', 'direction':'O','message_date':self.delivery_time, 'status_code':'queued', 'by_partner_id':self.env.user.partner_id.id})
 	    
 	    sms_subtype = self.env['ir.model.data'].get_object('sms_frame', 'sms_subtype')
             attachments = []
