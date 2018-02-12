@@ -112,11 +112,33 @@ class SmsAccountYeastar(models.Model):
                         sms_content = re.findall(r'Content: (.*?)\r\n', sms_event_data)[0]
                         sms_content = sms_content.replace("+"," ")
             
-                        #Create the sms record in history without the model or record_id
-                        history_id = self.env['sms.message'].create({'account_id': self.id, 'status_code': "RECEIVED", 'from_mobile': sms_sender, 'to_mobile': sms_to, 'sms_gateway_message_id': sms_id, 'sms_content': sms_content, 'direction':'I', 'message_date': sms_receive_time})
+                        _logger.error(sms_sender)
+                        
+                        create_dict = {'account_id': self.id, 'status_code': "RECEIVED", 'from_mobile': sms_sender, 'to_mobile': sms_to, 'sms_gateway_message_id': sms_id, 'sms_content': sms_content, 'direction':'I', 'message_date': sms_receive_time}
 
-                #Have to manually commit the new cursor?
-                self.env.cr.commit()
+                        sender_partner = self.env['res.partner'].search([('mobile_without_spaces','=',sms_sender)])
+                        if sender_partner:
+                            model_id = self.env['ir.model'].search([('model','=', 'res.partner')])
+                            create_dict['model_id'] = model_id.id
+                            create_dict['record_id'] = int(sender_partner.id)
+                            create_dict['by_partner_id'] = sender_partner.id
+            
+                            discussion_subtype = self.env['ir.model.data'].get_object('mail', 'mt_comment')
+            
+                            my_message = sender_partner.message_post(body=sms_content, subject="SMS Received", subtype_id=discussion_subtype.id, author_id=sender_partner.id, message_type="comment")
+
+                            #Notify followers of this partner who are listenings to the 'discussions' subtype
+                            for notify_partner in self.env['mail.followers'].search([('res_model','=','res.partner'),('res_id','=',sender_partner.id), ('subtype_ids','=',discussion_subtype.id)]):
+                                my_message.needaction_partner_ids = [(4,notify_partner.partner_id.id)]
+
+                        
+                        #Create the sms record in history
+                        history_id = self.env['sms.message'].create(create_dict)
+
+                        #Have to manually commit the new cursor now since we are in a loop
+                        self.env.cr.commit()
+                        
+                        stage = "END"
         
                 self._cr.close()
 

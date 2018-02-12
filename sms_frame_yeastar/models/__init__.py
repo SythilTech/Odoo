@@ -1,1 +1,1 @@
-import sms_gateway_yeastar
+import sms_gateway_yeastar, res_partner
