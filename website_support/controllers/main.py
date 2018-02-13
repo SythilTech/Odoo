@@ -278,6 +278,10 @@ class SupportTicketController(http.Controller):
                 portal_access_key = randint(1000000000,2000000000)
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'portal_access_key': portal_access_key})
 
+        #Remove the Administrator follower
+        for ticket_follower in request.env['mail.followers'].sudo().search([('res_model','=','website.support.ticket'), ('res_id','=',new_ticket_id.id)]):
+            ticket_follower.unlink()
+
         if "subcategory" in values:
             #Also get the data from the extra fields
             for extra_field in request.env['website.support.ticket.subcategory.field'].sudo().search([('wsts_id','=', int(sub_category) )]):

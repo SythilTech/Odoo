@@ -1,3 +1,7 @@
+v1.5.10
+=======
+* Remove automatic mail followers of tickets
+
 v1.5.9
 ======
 * Fix mismapping of support ticket custom fields
