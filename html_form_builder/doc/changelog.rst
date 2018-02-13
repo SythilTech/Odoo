@@ -1,3 +1,7 @@
+v1.0.27
+=======
+* Fix casting issue with many2one fields
+
 v1.0.26
 =======
 * Fix server action submit action
