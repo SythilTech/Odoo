@@ -818,7 +818,7 @@ class HtmlFormController(http.Controller):
         elif field.field_id.ttype == "many2one":
 
             html_response.error = ""
-            html_response.return_data = field_data
+            html_response.return_data = int(field_data)
             html_response.history_data = field_data
 
             return html_response
