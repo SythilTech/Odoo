@@ -9,6 +9,7 @@ import telnetlib
 import threading
 from openerp.exceptions import UserError
 import re
+import urllib
 
 from openerp.http import request
 from openerp import api, fields, models
@@ -111,6 +112,7 @@ class SmsAccountYeastar(models.Model):
                         sms_receive_time = re.findall(r'Recvtime: (.*?)\r\n', sms_event_data)[0]
                         sms_content = re.findall(r'Content: (.*?)\r\n', sms_event_data)[0]
                         sms_content = sms_content.replace("+"," ")
+                        sms_content = urllib.unquote(sms_content)
             
                         _logger.error(sms_sender)
                         
@@ -136,7 +138,7 @@ class SmsAccountYeastar(models.Model):
                         history_id = self.env['sms.message'].create(create_dict)
 
                         #Have to manually commit the new cursor now since we are in a loop
-                        self.env.cr.commit()
+                        self.env.cr.commit()                        
 
                 self._cr.close()
 

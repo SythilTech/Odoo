@@ -1,3 +1,7 @@
+v1.1.4
+======
+* URL escape message content
+
 v1.1.3
 ======
 * Remove test code that disconnects session after single sms
