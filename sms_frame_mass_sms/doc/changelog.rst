@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Allow changing of stop message
+
 v1.0.2
 ======
 * Add new mass sms group

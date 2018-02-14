@@ -21,6 +21,7 @@ class SmsMass(models.Model):
     sub_object = fields.Many2one('ir.model', string='Sub-model', readonly=True, help="When a relationship field is selected as first field, this field shows the document model the relationship goes to.")
     sub_model_object_field = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")
     copyvalue = fields.Char(string='Placeholder Expression', help="Final placeholder expression, to be copy-pasted in the desired template field.")
+    stop_message = fields.Char(string="STOP message", default="reply STOP to unsubscribe", required="True")
     
     @api.onchange('model_object_field')
     def _onchange_model_object_field(self):
@@ -66,7 +67,7 @@ class SmsMass(models.Model):
 
             sms_rendered_content = self.env['sms.template'].render_template(self.message_text, 'res.partner', rec.id)
 
-            sms_rendered_content += "\n\nreply STOP to unsubscribe"
+            sms_rendered_content += "\n\n" + self.stop_message
             
             #Queue the SMS message and send them out at the limit
             queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued', 'mass_sms_id': self.id})            
