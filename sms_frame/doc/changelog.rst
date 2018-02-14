@@ -1,3 +1,7 @@
+v1.0.29
+=======
+* Fix encoding issue
+
 v1.0.28
 =======
 * Changed response string to - for queued messages since the gateway may not update the field after sending
