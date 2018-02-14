@@ -1,3 +1,7 @@
+v1.6.7
+======
+* Change css opacity to display to avoid invisible clicking div
+
 v1.6.6
 ======
 * Reorder menus

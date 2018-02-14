@@ -89,7 +89,7 @@ var VoipCallClient = Widget.extend({
 function getUserMediaSuccess(stream) {
     console.log("Got Media Access");
 
-    $(".s-voip-manager").css("opacity","1");
+    $(".s-voip-manager").css("display","block");
 
     localVideo = document.querySelector('#localVideo');
     remoteVideo = document.querySelector('#remoteVideo');
@@ -288,7 +288,7 @@ WebClient.include({
 					}
 
                     $("#voip_text").html("Starting Call...");
-                    $(".s-voip-manager").css("opacity","0");
+                    $(".s-voip-manager").css("display","none");
 
 
 
@@ -331,7 +331,7 @@ function resetCall() {
     }
 
     $("#voip_text").html("Starting Call...");
-    $(".s-voip-manager").css("opacity","0");
+    $(".s-voip-manager").css("display","none");
 
 	got_remote_description = false;
 
@@ -348,7 +348,7 @@ function onMessage(message) {
 	    console.log("Composing Message");
     } else {
         //Show the messenger
-        $(".s-chat-manager").css("opacity","1");
+        $(".s-chat-manager").css("display","block");
 
         //Add the message to the chat log
         $("#sip-message-log").append("<-" + message.body + "<br/>");
@@ -367,7 +367,7 @@ function onInvite(session) {
 
     console.log("Call Type: SIP");
 
-    $(".s-voip-manager").css("opacity","1");
+    $(".s-voip-manager").css("display","block");
 
     window.sip_session = session;
 
@@ -534,7 +534,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         console.log("Call Type: SIP");
 
-        $(".s-voip-manager").css("opacity","1");
+        $(".s-voip-manager").css("display","block");
 
         //Here you determine if the call has audio and video
         var options = {
@@ -560,7 +560,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
 
         console.log("Call Type: SIP Video");
 
-        $(".s-voip-manager").css("opacity","1");
+        $(".s-voip-manager").css("display","block");
 
         //Here you determine if the call has audio and video
         var options = {
@@ -588,7 +588,7 @@ var FieldSIP = form_widgets.FieldChar.extend({
         console.log(this.get("value"));
 
         window.to_sip = this.get("value");
-        $(".s-chat-manager").css("opacity","1");
+        $(".s-chat-manager").css("display","block");
 
     }
 
@@ -617,7 +617,7 @@ var FieldSIPPSTN = form_widgets.FieldChar.extend({
 
         console.log("Call Type: PSTN");
 
-        $(".s-voip-manager").css("opacity","1");
+        $(".s-voip-manager").css("display","block");
 
         //Make the audio call
         console.log("PSTN audio calling: " + this.get("value"));
