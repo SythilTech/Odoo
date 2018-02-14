@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_message_compose_view_form" model="ir.ui.view">
+        <field name="name">voip.message.compose form view</field>
+        <field name="model">voip.message.compose</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="type" invisible="True"/>
+      	            <field name="partner_id" invisible="True"/>
+                    <field name="sip_account_id"/>
+      	            <field name="message"/>
+      	        </group>
+                <group col="4">
+                    <field name="message_template_id"/>
+                </group>
+                <footer>
+                    <button type="object" name="send_message" string="Send Message"/>
+                </footer>
+      	    </form>
+        </field>
+    </record>
+
+</odoo>

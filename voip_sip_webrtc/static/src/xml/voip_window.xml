@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="voip_sip_webrtc.VoipWindow">
+        <div class="s-voip-manager">
+            <div class="voip-controls-panel">
+                <button id="voip_end_call" class="btn btn-danger" style="width:90px;margin:5px;" type="button">End Call</button>
+                <button id="voip_full_screen" class="btn btn-primary" style="width:90px;margin:5px;" type="button">Fullscreen</button>
+                <p id="voip_text" style="text-align:center;">Starting Call...</p>
+            </div>
+            <div class="voip-video-container">
+                <img id="toPartnerImage"/>
+                <video id="remoteVideo" autoplay="autoplay" style="height:100%;width:100%;display:none;"/>
+                <video id="localVideo" autoplay="autoplay" muted="muted" style="display:none;"/>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="voip_sip_webrtc.ChatWindow">
+        <div class="s-chat-manager">
+            <div id="sip-panel-uri"/>
+            <div id="sip-message-log" style="border: solid black 1px;height:calc(100% - 60px);margin-bottom:10px;overflow: auto;">
+  
+            </div>
+  
+            <input id="sip_address_textbox" style="width: calc(100% - 50px);display:inline;" type="text"/> <button id="sip_message_send_button" class="btn btn-default btn-xs">Send</button>
+        </div>
+    </t>
+    
+</templates>

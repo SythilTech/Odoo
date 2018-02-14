@@ -1,0 +1,4 @@
+"id","name","payload_type","sample_rate","payload_size","sample_interval","supported","encoding","sdp_data","riff_audio_encoding_value"
+"g_711_alaw","G.711 aLaw","8","8000","160","20","1","a-law","","6"
+"pcmu","G.711 uLaw","0","8000","160","20","1","u-law","a=rtpmap:0 PCMU/8000\r\na=ptime:20\r\n","7"
+"gsm","GSM","3","8000","33","20","1","gsm","","31"

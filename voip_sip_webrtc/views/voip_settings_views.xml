@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_settings_view_form" model="ir.ui.view">
+        <field name="name">voip.settings.view.form</field>
+        <field name="model">voip.settings</field>
+        <field name="arch" type="xml">
+            <form class="oe_form_configuration">
+                <header>
+                    <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                    <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    <!--<button type="object" name="generate_self_signed_certificate" string="Generate Self Signed Certificate"/>-->
+                </header>
+                <group>
+                    <field name="ringtone_id"/>
+                    <field name="ring_duration"/>
+                    <field name="server_ip"/>
+                </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_settings_action" model="ir.actions.act_window">
+        <field name="name">VOIP Settings</field>
+	<field name="res_model">voip.settings</field>
+	<field name="view_mode">form</field>
+	<field name="target">inline</field>
+    </record>
+
+</odoo>

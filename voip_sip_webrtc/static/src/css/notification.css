@@ -1,0 +1,49 @@
+.s-chat-manager {
+    width: 300px;
+    height: 300px;
+    z-index: 1100;
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    resize: both;
+    padding:5px;
+    display:none;
+    border: black 1px solid;
+    overflow: hidden;
+    background-color: #EEEEEE;
+    box-shadow: 0px 0px 5px 1px #4c4c4c;
+}
+
+.s-voip-manager {
+    width: 300px;
+    height: auto;
+    z-index: 1100;
+    position:absolute;
+    bottom:10px;
+    right:10px;
+    resize: both;
+    display:none;
+    border: black 1px solid;
+    overflow: hidden;
+    background-color: #EEEEEE;
+    box-shadow: 0px 0px 5px 1px #4c4c4c;
+}
+
+.voip-call-image {
+    width:100px;
+    height:100px;
+    margin-bottom:10px;
+}
+
+.voip-controls-panel {
+    float:right;
+    width:100px;
+}
+
+.voip-video-container {
+    margin-right:110px;
+    margin-left:10px;
+    margin-top:10px;
+    margin-bottom:10px;
+    text-align:center;
+}

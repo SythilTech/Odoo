@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_call_template_preview_form_view" model="ir.ui.view">
+        <field name="name">voip.call.template.preview form view</field>
+        <field name="model">voip.call.template.preview</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="call_template_id" invisible="1"/>
+                    <field name="rec_id"/>
+                </group>
+                <button name="test_call_template" type="object" string="Test Call Template"/>
+            </form>
+        </field>
+    </record>
+
+    <record id="voip_call_template_preview_action" model="ir.actions.act_window">
+        <field name="res_model">voip.call.template.preview</field>
+        <field name="view_type">form</field>
+        <field name="name">Test VOIP Call Template Wizard</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_call_template_id': active_id}</field>
+        <field name="target">new</field>
+    </record>
+        
+</odoo>

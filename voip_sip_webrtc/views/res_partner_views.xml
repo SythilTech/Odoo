@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sip_partner_more_menu_server_action" model="ir.actions.server">
+        <field name="name">SIP Message Partner</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sip_action()</field>
+    </record>
+
+    <record id="view_partner_form_inherit_voip" model="ir.ui.view">
+        <field name="name">res.partner SIP</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!--<field name="mobile" position="replace">
+                <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760" widget="sippstn"/>
+            </field>-->
+            <field name="mobile" position="replace">
+                <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760"/>
+            </field>
+            <field name="mobile" position="after">
+                <field name="sip_address" widget="sip"/>
+            </field>
+      	</field>
+    </record>
+
+</odoo>

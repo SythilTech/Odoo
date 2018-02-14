@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_message_template_view_form" model="ir.ui.view">
+        <field name="name">voip.message.template form view</field>
+        <field name="model">voip.message.template</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="message"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_message_template_view_tree" model="ir.ui.view">
+        <field name="name">voip.message.template tree view</field>
+        <field name="model">voip.message.template</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="name"/>
+      	        <field name="message"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_message_template_action" model="ir.actions.act_window">
+        <field name="name">VOIP Message Templates</field>
+	<field name="res_model">voip.message.template</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No VOIP Message Templates
+	    </p>
+        </field>
+    </record>
+
+</odoo>

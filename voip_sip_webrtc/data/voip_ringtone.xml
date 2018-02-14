@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="old_school" model="voip.ringtone">
+        <field name="name">Old School Ringtone</field>
+        <field name="media_filename">Old School Ringtone.mp3</field>
+        <field name="media" type="base64" file="voip_sip_webrtc/static/src/audio/old_school_ringtone.mp3"/>
+    </record>
+         
+</odoo>
