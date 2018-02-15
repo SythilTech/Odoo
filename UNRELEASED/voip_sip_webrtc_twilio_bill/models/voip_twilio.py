@@ -5,6 +5,7 @@ import json
 import requests
 from datetime import datetime
 import re
+from odoo.exceptions import UserError
 
 from openerp import api, fields, models
 
@@ -46,6 +47,11 @@ class VoipTwilio(models.Model):
                 
 	json_call_list = json.loads(response_string.text)
 	
+	_logger.error(response_string.text)
+	
+	if 'calls' not in json_call_list:
+	    raise UserError(response_string.text)
+	    
 	for call in json_call_list['calls']:
 	
 	    #Don't reimport the same record
@@ -55,6 +61,7 @@ class VoipTwilio(models.Model):
 	    from_partner = False
 	    from_address = call['from']
 	    to_address = call['to']
+	    to_address = to_address.replace("sip:","")
 	    to_partner = False
 	    create_dict = {}
 
@@ -76,8 +83,9 @@ class VoipTwilio(models.Model):
 	        from_address = from_address.replace("sip:","")
 	    
 	        if "@" not in from_address:
+	            _logger.error(to_address)
 	            #Get the full aor based on the domain of the to address
-	            domain = re.findall(r'@(.*?);', to_address)[0].replace(":5060","")
+	            domain = re.findall(r'@(.*?)', to_address)[0].replace(":5060","")
 	            from_address = from_address + "@" + domain
 	        
 	        from_partner = self.env['res.partner'].search([('sip_address','=', from_address)])
