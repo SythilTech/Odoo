@@ -22,11 +22,34 @@ var FieldXMPP = form_widgets.FieldChar.extend({
         'click .xmpp-message': 'start_xmpp_message',
     },
     render_value: function() {
+
+
+        if (this.get("effective_readonly")) {
+
+
+            if (this.get("value") && window.userAgent) {
+                console.log("Listening for " + this.get("value") + " presence information");
+                window.chatSubscription = window.userAgent.subscribe(this.get("value"), 'presence');
+
+                //We update the widget once we get presence information so a person doesn't try to call someone who isn't available
+                window.chatSubscription.on('notify', onPresence);
+		    }
+
+		    this.$el.html("<span style=\"float:right\"><i class=\"fa fa-comments xmpp-message\" aria-hidden=\"true\"></i> </span><span style=\"display: block;width: 170px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;\">" + this.get("value") + "</span>");
+
+        } else {
+			if (this.get("value")) {
+			    this.$input.val(this.get("value"));
+		    }
+        }
+
+/*
         if (this.get("effective_readonly")) {
 		    this.$el.html("" + this.get("value") + " <br/><a href=\"javascript:;\"class=\"fa fa-comments xmpp-message\" style=\"text-decoration: underline;\" aria-hidden=\"true\"> Message</a>");
         } else {
 			this.$input.val(this.get("value"));
         }
+        */
     },
     start_xmpp_message: function() {
 

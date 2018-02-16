@@ -13,6 +13,8 @@ class XMPPMessageCompose(models.TransientModel):
 
     _inherit = "voip.message.compose"
 
+    xmpp_account_id = fields.Many2one('xmpp.account', string="XMPP Account")
+
     def _send_xmpp_message(self):
 
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
@@ -23,7 +25,7 @@ class XMPPMessageCompose(models.TransientModel):
             reload(sys)
             sys.setdefaultencoding('utf8')
     
-        xmpp_account = self.env.user.xmpp_account_id
+        xmpp_account = self.xmpp_account_id
         
         if xmpp_account == False:
             raise UserError("Please set XMPP account for this user first")

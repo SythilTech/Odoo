@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <record id="xmpp_partner_more_menu_server_action" model="ir.actions.server">
+        <field name="name">XMPP Message Partner</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.xmpp_action()</field>
+    </record>
         
+    <record id="xmpp_partner_more_menu_client_action" model="ir.values">
+        <field name="key2" eval="'client_action_multi'" />
+	<field name="model" eval="'res.partner'"/>
+	<field name="name">XMPP Message Partner</field>
+	<field name="value" eval="'ir.actions.server,%d'%xmpp_partner_more_menu_server_action"/>
+    </record>
+    
     <record id="view_partner_form_inherit_xmpp" model="ir.ui.view">
         <field name="name">res.partner SIP</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <field name="mobile" position="after">
-                <field name="xmpp_address" widget="xmpp"/>
+                <field name="xmpp_address"/>
             </field>
       	</field>
     </record>

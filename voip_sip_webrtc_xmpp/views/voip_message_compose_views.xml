@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        
+    <record id="voip_message_compose_view_form_inherit_xampp" model="ir.ui.view">
+        <field name="name">voip.message.compose form view</field>
+        <field name="model">voip.message.compose</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_message_compose_view_form"/>
+        <field name="arch" type="xml">
+            <field name="sip_account_id" position="replace">
+                <field name="sip_account_id" attrs="{'invisible':[('type','!=','sip')]}"/>
+            </field>
+            <field name="sip_account_id" position="after">
+                <field name="xmpp_account_id" attrs="{'invisible':[('type','!=','xmpp')]}"/>
+            </field>
+      	</field>
+    </record>
+
+</odoo>
