@@ -16,6 +16,11 @@
       	                  </tree>
       	              </field>
       	              <field name="partner_ids"/>
+      	          </group>
+
+      	          <h2>Stats</h2>
+
+      	          <group>
       	              <field name="sub_category_ids">
       	                  <tree>
       	                      <field name="subcategory_id"/>

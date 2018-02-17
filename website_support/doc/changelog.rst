@@ -1,3 +1,7 @@
+v1.5.11
+=======
+* Fix missing field and department permissions
+
 v1.5.10
 =======
 * Remove automatic mail followers of tickets
