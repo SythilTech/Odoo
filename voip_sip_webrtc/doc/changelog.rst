@@ -1,3 +1,7 @@
+v1.6.8
+======
+* Notify user if there are no connected users
+
 v1.6.7
 ======
 * Change css opacity to display to avoid invisible clicking div

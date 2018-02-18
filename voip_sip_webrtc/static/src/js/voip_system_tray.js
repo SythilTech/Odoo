@@ -47,6 +47,10 @@ var VOIPSystemTray = Widget.extend({
 
 			}
 
+			if (result.length == 0) {
+                $("#voip_tray").append("<span style=\"padding:10px;text-align:center;\">No connected users</span>");
+			}
+
         });
 
     },
