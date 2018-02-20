@@ -64,7 +64,23 @@ var VOIPSystemTray = Widget.extend({
 
         var voip_call_client = new voip_notification.VoipCallClient(role, mode, call_type, to_partner_id);
 
-        var constraints = {'audio': true, 'video': {'mediaSource': "screen"}};
+
+        if (navigator.webkitGetUserMedia) {
+            var screen_constraints = {
+		        mandatory: {
+		            chromeMediaSource: 'screen',
+		            maxWidth: 1920,
+		            maxHeight: 1080,
+		            minAspectRatio: 1.77
+		        },
+		        optional: []
+            };
+
+            var constraints = {'audio': false, 'video': screen_constraints};
+	    } else {
+            var constraints = {'audio': true, 'video': {'mediaSource': "screen"}};
+		}
+
         voip_call_client.requestMediaAccess(constraints);
 
 	},

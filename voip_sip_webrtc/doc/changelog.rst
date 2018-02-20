@@ -1,3 +1,7 @@
+v1.6.9
+======
+* Screensharing fix for Google Chrome
+
 v1.6.8
 ======
 * Notify user if there are no connected users
