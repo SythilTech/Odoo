@@ -30,7 +30,6 @@
                           <field name="attachment_ids" attrs="{'invisible' :[('attachment_ids', '=', [])]}">
                               <tree>
                                   <field name="datas_fname"/>
-                                  <field name="datas"/>
                               </tree>
                           </field>
                           <field name="extra_field_ids" attrs="{'invisible' :[('extra_field_ids', '=', [])]}">

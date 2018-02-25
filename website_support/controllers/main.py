@@ -287,7 +287,7 @@ class SupportTicketController(http.Controller):
                 if c_file.filename:
                     request.env['ir.attachment'].sudo().create({
                         'name': c_file.filename,
-                        'datas': data.encode('base64'),
+                        'datas': base64.b64encode(data),
                         'datas_fname': c_file.filename,
                         'res_model': 'website.support.ticket',
                         'res_id': new_ticket_id.id

@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Fix website ticket attachment issue
+
 v1.0.2
 ======
 * Fix settings screen and move menu
