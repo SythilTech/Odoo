@@ -172,30 +172,6 @@
                 ${object.ticket_id.description|safe}
             ]]>
             </field>
-        </record>        
-        
-        <record id="support_ticket_reply_wrapper_support" model="mail.template">
-            <field name="name">Support Ticket Reply Wrapper (support@)</field>
-            <field name="model_id" ref="model_website_support_ticket_compose"></field>
-            <field name="subject">${object.subject}</field>
-            <field name="email_from">${(object.ticket_id.support_email or object.ticket_id.company_id.email})|safe}</field>
-            <field name="reply_to">${object.ticket_id.support_email|safe}</field>
-            <field name="email_to">${object.email|safe}</field>
-            <field name="auto_delete" eval="False"/>
-            <field name="built_in" eval="True"/>
-            <field name="body_html"><![CDATA[
-                ${object.body|safe}
-                <hr/>
-                 % if object.ticket_id.portal_access_key :
-                     <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
-                 % endif
-                <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
-                <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}
-                <br/>
-                <b>Ticket Description:</b><br/>
-                ${object.ticket_id.description|safe}
-            ]]>
-            </field>
         </record>
 
     </data>

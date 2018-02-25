@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Remove obsolete support@ reply wrapper
+
 v1.0.3
 ======
 * Fix website ticket attachment issue
