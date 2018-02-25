@@ -1,3 +1,7 @@
+v1.0.2
+======
+* Fix settings screen and move menu
+
 v1.0.1
 ======
 * Forward fix custom field mismatch
