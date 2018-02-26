@@ -120,6 +120,7 @@ class WebsiteSupportTicket(models.Model):
         else:
             self.ticket_number_display = self.id
 
+    @api.one
     @api.depends('state')
     def _compute_unattend(self):
         opened_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')

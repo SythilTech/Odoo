@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Fix multiple ticket delete issue
+
 v1.0.5
 ======
 * Change default email wrapper to user
