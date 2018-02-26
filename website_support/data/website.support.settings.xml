@@ -12,7 +12,7 @@
 
         <function id="default_staff_reply_email_template_id"
             model="ir.default" name="set"
-            eval="('website.support.settings', 'staff_reply_email_template_id', ref('website_support.support_ticket_reply_wrapper_support') )"/>
+            eval="('website.support.settings', 'staff_reply_email_template_id', ref('website_support.support_ticket_reply_wrapper') )"/>
 
         <function id="default_max_ticket_attachments"
             model="ir.default" name="set"

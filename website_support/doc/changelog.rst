@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Change default email wrapper to user
+
 v1.0.4
 ======
 * Remove obsolete support@ reply wrapper
