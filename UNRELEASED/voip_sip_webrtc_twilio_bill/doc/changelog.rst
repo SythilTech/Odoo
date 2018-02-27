@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Call history invoice attachment
+
 v1.0.2
 ======
 * Fix to address reassmble

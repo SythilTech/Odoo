@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication - Twilio Bill",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -12,6 +12,7 @@
         'views/voip_twilio_invoice_views.xml',
         'views/voip_twilio_views.xml',
         'views/res_partner_views.xml',
+        'views/voip_sip_webrtc_twilio_bill_templates.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],
