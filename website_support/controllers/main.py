@@ -22,8 +22,11 @@ class SupportTicketController(http.Controller):
 	for field_name, field_value in kwargs.items():
 	    values[field_name] = field_value
 	            
-	sub_category_fields = request.env['website.support.ticket.subcategory.field'].sudo().search( [('wsts_id', '=', int(values['subcategory']) )])
-	
+	if values['subcategory'] != 'undefined':
+	    sub_category_fields = request.env['website.support.ticket.subcategory.field'].sudo().search( [('wsts_id', '=', int(values['subcategory']) )])
+	else:
+	    return ""
+	    
 	#Only return a dropdown if this category has subcategories
 	return_string = ""
 	

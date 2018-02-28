@@ -1,3 +1,8 @@
+v1.5.12
+=======
+* Fix issue with extra fields not disappearing after category change
+* Change default staff repy to user and remove support
+
 v1.5.11
 =======
 * Fix missing field and department permissions
