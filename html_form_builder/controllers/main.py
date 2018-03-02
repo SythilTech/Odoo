@@ -586,7 +586,10 @@ class HtmlFormController(http.Controller):
                     elif df.default_value == "partner_id":
                         secure_values[df.field_id.name] = request.env.user.partner_id.id
                     else:
-                        secure_values[df.field_id.name] = df.default_value
+                        if df.field_id.ttype == "many2one":
+                            secure_values[df.field_id.name] = int(df.default_value)
+                        else:
+                            secure_values[df.field_id.name] = df.default_value
 
                 new_history.insert_data.sudo().create({'html_id': new_history.id, 'field_id': df.field_id.id, 'insert_value': df.default_value})
 

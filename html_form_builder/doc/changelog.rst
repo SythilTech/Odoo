@@ -1,3 +1,7 @@
+v1.0.28
+=======
+* Fix default values for many2one cast incorrectly
+
 v1.0.27
 =======
 * Fix casting issue with many2one fields
