@@ -3,11 +3,12 @@ import logging
 _logger = logging.getLogger(__name__)
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 from odoo.exceptions import UserError
 from dateutil import parser
 
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
 from openerp import api, fields, models
 
 class VoipTwilio(models.Model):
@@ -38,7 +39,7 @@ class VoipTwilio(models.Model):
             'res_model': 'voip.twilio.invoice',
             'target': 'new',
             'type': 'ir.actions.act_window',
-            'context': {'default_twilio_account_id': self.id, 'default_margin': self.margin}
+            'context': {'default_twilio_account_id': self.id, 'default_margin': self.margin, 'default_end_date': datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT), 'default_start_date': (datetime.now() - timedelta(days=30)).strftime(DEFAULT_SERVER_DATE_FORMAT) }
         }
 
     def fetch_call_history(self):
@@ -151,6 +152,100 @@ class VoipTwilio(models.Model):
 
             self.twilio_last_check_date = datetime.utcnow()
 
+    @api.multi
+    def generate_invoice_previous_month(self):
+        self.ensure_one()
+
+        if self.partner_id.id == False:
+            raise UserError("Please select a contact before creating the invoice")
+            return False
+
+        response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/Usage/Records/LastMonth.json", auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+        json_usage_list = json.loads(response_string.text)
+
+        invoice = self.env['account.invoice'].create({
+            'partner_id': self.partner_id.id,
+            'account_id': self.partner_id.property_account_receivable_id.id,
+            'fiscal_position_id': self.partner_id.property_account_position_id.id,
+        })
+
+        _logger.error( response_string.text )
+        start_date_string = json_usage_list['usage_records'][0]['start_date']
+        end_date_string = json_usage_list['usage_records'][0]['end_date']
+        invoice.comment = "Twilio Bill " + start_date_string + " - " + end_date_string
+
+        while True:
+
+            for usage_record in json_usage_list['usage_records']:
+                category = usage_record['category']
+                
+                #Exclude the umbrella categories otherwise the pricing will overlap
+                if float(usage_record['price']) > 0 and category != "calls" and category != "sms" and category != "phonenumbers" and category != "recordings" and category != "transcriptions" and category != "trunking-origination" and category != "totalprice":
+
+                    line_values = {
+                        'name': usage_record['description'],
+                        'price_unit': float(usage_record['price']) * self.margin,
+                        'invoice_id': invoice.id,
+                        'account_id': invoice.journal_id.default_credit_account_id.id
+                    }
+
+                    invoice.write({'invoice_line_ids': [(0, 0, line_values)]})
+                
+                    invoice.compute_taxes()
+        
+                #For debugging
+                if category == "totalprice":
+                    invoice.comment = invoice.comment + " (Total $" + usage_record['price'] + " USD) (Marign: $" + str(float(usage_record['price']) * self.margin) + " USD)"
+                    _logger.error(usage_record['price'])             
+
+            #Get the next page if there is one
+            next_page_uri = json_usage_list['next_page_uri']
+            if next_page_uri:
+                response_string = requests.get("https://api.twilio.com" + next_page_uri, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+                json_usage_list = json.loads(response_string.text)
+            else:
+                #End the loop if there are is no more pages
+                break
+
+
+        #Also generate a call log report
+        response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/Calls.json?StartTime%3E=" + start_date_string + "&EndTime%3C=" + end_date_string, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+        json_call_list = json.loads(response_string.text)
+
+        #Loop through all pages until you have reached the end
+        call_total = 0
+        while True:
+        
+            for call in json_call_list['calls']:
+                if call['price']:
+                    if float(call['price']) != 0:
+                        #Format the date depending on the language of the contact
+                        call_start = parser.parse(call['start_time'])
+                        call_cost = -1.0 * float(call['price']) * self.margin
+                        call_total += call_cost
+
+                        m, s = divmod( int(call['duration']) , 60)
+                        h, m = divmod(m, 60)
+                        self.env['account.invoice.voip.history'].create({'invoice_id': invoice.id, 'start_time': call_start, 'duration': "%d:%02d:%02d" % (h, m, s), 'cost':  call_cost, 'to_address': call['to'] })
+
+            #Get the next page if there is one
+            next_page_uri = json_call_list['next_page_uri']
+            if next_page_uri:
+                response_string = requests.get("https://api.twilio.com" + next_page_uri, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+                json_call_list = json.loads(response_string.text)
+            else:
+                #End the loop if there are is no more pages
+                break
+              
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.invoice',
+            'type': 'ir.actions.act_window',
+            'res_id': invoice.id,
+            'view_id': self.env['ir.model.data'].get_object('account', 'invoice_form').id
+         }
+
 class VoipTwilioInvoice(models.Model):
 
     _name = "voip.twilio.invoice"
@@ -192,11 +287,9 @@ class VoipTwilioInvoice(models.Model):
 
             #Get the next page if there is one
             next_page_uri = json_call_list['next_page_uri']
-            _logger.error(next_page_uri)
             if next_page_uri:
                 response_string = requests.get("https://api.twilio.com" + next_page_uri, auth=(str(self.twilio_account_id.twilio_account_sid), str(self.twilio_account_id.twilio_auth_token)))
                 json_call_list = json.loads(response_string.text)
-                _logger.error(response_string.text)
             else:
                 #End the loop if there are is no more pages
                 break
@@ -211,7 +304,7 @@ class VoipTwilioInvoice(models.Model):
 
         invoice.write({'invoice_line_ids': [(0, 0, line_values)]})
                 
-        invoice.compute_taxes()
+        invoice.compute_taxes()        
 
         return {
             'view_type': 'form',

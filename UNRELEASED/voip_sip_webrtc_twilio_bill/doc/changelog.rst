@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Revamp to use the Twilio usage API
+
 v1.0.3
 ======
 * Call history invoice attachment
