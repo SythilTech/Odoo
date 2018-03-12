@@ -1,3 +1,7 @@
+v1.5.13
+=======
+* Support ticket kanban view
+
 v1.5.12
 =======
 * Fix issue with extra fields not disappearing after category change
