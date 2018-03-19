@@ -1,3 +1,7 @@
+v1.0.30
+=======
+* Include from address in mail subject
+
 v1.0.29
 =======
 * Fix encoding issue

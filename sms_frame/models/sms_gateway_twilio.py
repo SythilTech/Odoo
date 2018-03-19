@@ -183,16 +183,18 @@ class SmsGatewayTwilio(models.Model):
                         attachments.append((media_filename, requests.get("https://api.twilio.com" + first_media_url).content) )
 
 
+            from_record = self.env['res.partner'].sudo().search([('mobile','=', sms_message.find('From').text)])
 
-            #Simulate MMS attachment
-            #media_filename = "test.jpg"            
-            #attachments.append((media_filename, requests.get("http://192.168.56.101:8069/web/image/542").content) )
-
+            if from_record:
+                message_subject = "SMS Received from " + from_record.name
+            else:
+                message_subject = "SMS Received from " + sms_message.find('From').text
+            
             if target['target_model'] == "res.partner":
                 model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
 
                 my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
-                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment", attachments=attachments)
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject=message_subject, subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment", attachments=attachments)
 
                 #Notify followers of this partner who are listenings to the 'discussions' subtype
                 for notify_partner in self.env['mail.followers'].search([('res_model','=','res.partner'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
@@ -204,7 +206,7 @@ class SmsGatewayTwilio(models.Model):
                 model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
 
                 my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
-                my_message = my_record.message_post(body=sms_message.find('Body').text, subject="SMS Received", subtype_id=discussion_subtype.id, message_type="comment", attachments=attachments)
+                my_message = my_record.message_post(body=sms_message.find('Body').text, subject=message_subject, subtype_id=discussion_subtype.id, message_type="comment", attachments=attachments)
 
                 #Notify followers of this lead who are listenings to the 'discussions' subtype
                 for notify_partner in self.env['mail.followers'].search([('res_model','=','crm.lead'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):

@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework",
-    'version': "1.0.29",
+    'version': "1.0.30",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

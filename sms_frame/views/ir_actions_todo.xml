@@ -5,7 +5,7 @@
         <!-- After installation of the module, open the related menu -->
         
         <record id="sms_account_action_twilio" model="ir.actions.act_window">
-            <field name="name">sms.account.action.twilio</field>
+            <field name="name">SMS Account Twilio</field>
             <field name="res_model">sms.account</field>
       	    <field name="view_type">form</field>
       	    <field name="view_mode">tree,form</field>
