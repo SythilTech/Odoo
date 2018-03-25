@@ -1,3 +1,7 @@
+v1.6.10
+=======
+* Showed voip account field under user form view
+
 v1.6.9
 ======
 * Screensharing fix for Google Chrome
