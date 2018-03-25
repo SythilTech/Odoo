@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<templates id="sms_widget" xml:space="preserve">
+    <t t-name="sms_compose" t-extend="mail.Chatter">
+        <t t-jquery="button" t-operation="after">
+            <button type="button" class="btn btn-sm btn-primary o_chatter_button_new_sms" title="Send a sms">
+                New SMS/MMS
+            </button>        
+        </t>
+    </t>
+</templates>

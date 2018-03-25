@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sms_account_user,sms.account.user,model_sms_account,base.group_user,1,0,0,0
+access_sms_account_system,sms.account.system,model_sms_account,base.group_system,1,1,1,1
+access_sms_compose_user,sms.compose.user,model_sms_compose,base.group_user,1,1,1,0
+access_sms_compose_system,sms.compose.system,model_sms_compose,base.group_system,1,1,1,0
+access_sms_gateway_user,sms.gateway.user,model_sms_gateway,base.group_user,1,0,0,0
+access_sms_gateway_system,sms.gateway.system,model_sms_gateway,base.group_system,1,1,1,1
+access_sms_message_user,sms.message.user,model_sms_message,base.group_user,1,0,1,0
+access_sms_message_system,sms.message.system,model_sms_message,base.group_system,1,1,1,1
+access_sms_number_user,sms.number.user,model_sms_number,base.group_user,1,0,0,0
+access_sms_number_system,sms.number.system,model_sms_number,base.group_system,1,1,1,1
+access_sms_template_user,sms.template.user,model_sms_template,base.group_user,1,1,1,0
+access_sms_template_system,sms.template.system,model_sms_template,base.group_system,1,1,1,1

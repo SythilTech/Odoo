@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record id="sms_message_view_form" model="ir.ui.view">
+          <field name="name">sms.message.view.form</field>
+          <field name="model">sms.message</field>
+          <field name="arch" type="xml">
+      	      <form create="false" edit="false" string="SMS Messages">
+      	          <group>
+      	              <field name="message_date"/>
+      	              <field name="sms_gateway_message_id"/>
+      	              <field name="account_id"/>
+      	              <field name="model_id"/>
+      	              <field name="record_id"/>
+      	              <field name="by_partner_id"/>
+      	              <field name="direction"/>
+      	              <field name="record_name"/>
+      	              <field name="from_mobile"/>
+      	              <field name="to_mobile"/>
+      	              <field name="status_string"/>
+      	              <field name="status_code"/>
+      	              <field name="sms_content"/>
+      	              <field name="attachment_ids"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="sms_message_view_tree" model="ir.ui.view">
+          <field name="name">sms.message.view.tree</field>
+          <field name="model">sms.message</field>
+          <field name="arch" type="xml">
+      	      <tree edit="false" create="false">
+      	          <field name="by_partner_id"/>
+      	          <field name="account_id"/>
+      	          <field name="record_name"/>
+      	          <field name="direction"/>
+      	          <field name="message_date"/>
+      	          <field name="from_mobile"/>
+      	          <field name="to_mobile"/>
+      	          <field name="status_code"/>
+      	          <field name="sms_content"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+        <record id="sms_message_view_kanban" model="ir.ui.view">
+            <field name="name">sms.message.view.kanban</field>
+            <field name="model">sms.message</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="record_name"/>
+                    <field name="sms_content"/>
+                    <field name="direction"/>
+                    <field name="record_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette oe_semantic_html_override esms_history_kanban" style="min-width:100%;">
+                                <a type="open">
+
+                                  <div t-if="record.direction.raw_value == 'I'" style="text-align:right;">
+                                      <span style="height:100%;float:right;margin-left:5px;">
+                                          <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                      </span>
+
+                                      <span class="oe_partner_heading">To: <field name="to_mobile"/></span><br/>
+				      <field name="sms_content"/>
+				      <br/><br/>
+				      By <field name="by_partner_id"/> <field name="message_date"/>
+                                  </div>
+
+                                  <div t-if="record.direction.raw_value == 'O'" style="text-align:left;">
+                                      <span style="height:100%;float:left;margin-right:5px;">
+                                          <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                      </span>
+
+                                      <span class="oe_partner_heading">To: <field name="record_name"/></span><br/>
+				      <field name="sms_content"/>
+				      <br/><br/>
+				      By <field name="by_partner_id"/> <field name="message_date"/>
+                                  </div>
+           
+                                </a>
+                                
+                                  
+                            </div>
+
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+      
+      <record id="sms_message_action" model="ir.actions.act_window">
+          <field name="name">SMS / MMS Messages</field>
+          <field name="res_model">sms.message</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS Messages</p>
+      	  </field>
+      </record>
+      
+      <menuitem id="sms_message_menu" name="Messages" parent="sms_parent_menu" action="sms_message_action" sequence="30"/>
+   
+   </data>
+</openerp>
