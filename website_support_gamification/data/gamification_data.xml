@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+    <!--<data noupdate="1">-->
+
+        <!-- Goal Definitions -->
+        <record model="gamification.goal.definition" id="definition_close_support_ticket">
+            <field name="name">Ticket Completed</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="domain">[('closed_by_id',"=",user.id)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_time_on_support_ticket">
+            <field name="name">Time on Support Ticket</field>
+            <field name="description"></field>
+            <field name="computation_mode">sum</field>
+            <field name="model_id" eval="ref('website_support_analytic_timesheets.model_account_analytic_line')" />
+            <field name="field_id" eval="ref('analytic.field_account_analytic_line_unit_amount')" />
+            <field name="domain">[('user_id',"=",user.id), ('support_ticket_id','!=', False)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_positive_feedback">
+            <field name="name">Positive Feedback</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="domain">[('user_id',"=",user.id), ('support_rating','>=', 4)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_perfect_feedback">
+            <field name="name">Perfect Feedback</field>
+            <field name="description">5 star rating</field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="field_date_id" eval="ref('website_support.field_website_support_ticket_close_date')" />
+            <field name="domain">[('user_id',"=",user.id), ('support_rating','=', 5)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_non_perfect_feedback">
+            <field name="name">Non Perfect Feedback</field>
+            <field name="description">1-4 star rating</field>
+            <field name="computation_mode">count</field>
+            <field name="condition">lower</field>            
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="field_date_id" eval="ref('website_support.field_website_support_ticket_close_date')" />
+            <field name="domain">[('user_id',"=",user.id), ('support_rating','>', 0), ('support_rating','&lt;', 5)]</field>
+        </record>
+        
+        <record model="gamification.goal.definition" id="definition_complete_less_then_15_minutes">
+            <field name="name">Ticket completed in less than 15 minutes of submission</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="domain">[('user_id',"=",user.id), ('close_time','!=', False), ('time_to_close','&lt;', 900)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_complete_less_then_10_minutes">
+            <field name="name">Ticket completed in less than 10 minutes of submission</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="domain">[('user_id',"=",user.id), ('close_time','!=', False), ('time_to_close','&lt;', 600)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_complete_less_then_5_minutes">
+            <field name="name">Ticket completed in less than 5 minutes of submission</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="domain">[('user_id',"=",user.id), ('close_time','!=', False), ('time_to_close','&lt;', 300)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_tickets_completed_in_a_day">
+            <field name="name">Tickets completed in a day</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="field_date_id" eval="ref('website_support.field_website_support_ticket_close_date')" />
+            <field name="domain">[('closed_by_id',"=",user.id)]</field>
+        </record>
+
+        <record model="gamification.goal.definition" id="definition_tickets_completed_in_a_week">
+            <field name="name">Tickets completed in a week</field>
+            <field name="description"></field>
+            <field name="computation_mode">count</field>
+            <field name="model_id" eval="ref('website_support.model_website_support_ticket')" />
+            <field name="field_date_id" eval="ref('website_support.field_website_support_ticket_close_date')" />
+            <field name="domain">[('closed_by_id',"=",user.id)]</field>
+        </record>
+        
+        <!-- First Ticket Completed Challenge -->
+        <record id="badge_first_closed_ticket" model="gamification.badge">
+            <field name="name">First Ticket Completed</field>
+            <field name="description">First Ticket Completed</field>
+            <field name="rule_auth">nobody</field>
+            <!--<field name="image" type="base64" file="gamification/static/img/badge_good_job-image.png"/>-->
+        </record>
+        <record model="gamification.challenge" id="challenge_first_closed_ticket">
+            <field name="name">First Ticket Completed</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="reward_id" eval="ref('badge_first_closed_ticket')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_first_closed_ticket1">
+            <field name="definition_id" eval="ref('definition_close_support_ticket')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_first_closed_ticket')" />
+        </record>
+
+        <!-- First Positive Feedback Challenge -->
+        <record id="badge_first_positive_feedback" model="gamification.badge">
+            <field name="name">First Positive Feedback</field>
+            <field name="description">First Positive Feedback</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_first_positive_feedback">
+            <field name="name">First Positive Feedback</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="reward_id" eval="ref('badge_first_positive_feedback')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_first_positive_feedback1">
+            <field name="definition_id" eval="ref('definition_positive_feedback')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_first_positive_feedback')" />
+        </record>
+
+        <!-- Spend 1 hour on support tickets -->
+        <record id="badge_one_hour_on_support_tickets" model="gamification.badge">
+            <field name="name">Spent 1 hour on support tickets</field>
+            <field name="description">Spent 1 hour on support tickets</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_one_hour_on_support_tickets">
+            <field name="name">Spend 1 hour on support tickets</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="reward_id" eval="ref('badge_one_hour_on_support_tickets')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_one_hour_on_support_tickets1">
+            <field name="definition_id" eval="ref('definition_time_on_support_ticket')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_one_hour_on_support_tickets')" />
+        </record>
+
+        <!-- Ticket completed in less than 15 minutes of submission -->
+        <record id="badge_complete_less_then_15_minutes" model="gamification.badge">
+            <field name="name">Ticket completed in less than 15 minutes of submission</field>
+            <field name="description">Ticket completed in less than 15 minutes of submission</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_complete_less_then_15_minutes">
+            <field name="name">Ticket completed in less than 15 minutes of submission</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="reward_id" eval="ref('badge_complete_less_then_15_minutes')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_complete_less_then_15_minutes">
+            <field name="definition_id" eval="ref('definition_complete_less_then_15_minutes')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_complete_less_then_15_minutes')" />
+        </record>
+
+        <!-- Ticket completed in less than 10 minutes of submission -->
+        <record id="badge_complete_less_then_10_minutes" model="gamification.badge">
+            <field name="name">Ticket completed in less than 10 minutes of submission</field>
+            <field name="description">Ticket completed in less than 10 minutes of submission</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_complete_less_then_10_minutes">
+            <field name="name">Ticket completed in less than 10 minutes of submission</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="reward_id" eval="ref('badge_complete_less_then_10_minutes')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_complete_less_then_10_minutes">
+            <field name="definition_id" eval="ref('definition_complete_less_then_10_minutes')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_complete_less_then_10_minutes')" />
+        </record>
+
+        <!-- Ticket completed in less than 5 minutes of submission -->
+        <record id="badge_complete_less_then_5_minutes" model="gamification.badge">
+            <field name="name">Ticket completed in less than 5 minutes of submission</field>
+            <field name="description">Ticket completed in less than 5 minutes of submission</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_complete_less_then_5_minutes">
+            <field name="name">Ticket completed in less than 5 minutes of submission</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="reward_id" eval="ref('badge_complete_less_then_5_minutes')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_complete_less_then_5_minutes">
+            <field name="definition_id" eval="ref('definition_complete_less_then_5_minutes')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_complete_less_then_5_minutes')" />
+        </record>
+
+        <!-- Seven tickets completed in a day -->
+        <record id="badge_tickets_seven_completed_in_a_day" model="gamification.badge">
+            <field name="name">Seven tickets completed in a day</field>
+            <field name="description">Seven tickets completed in a day</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_seven_tickets_completed_in_a_day">
+            <field name="name">Seven tickets completed in a day</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">daily</field>
+            <field name="reward_id" eval="ref('badge_tickets_seven_completed_in_a_day')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_seven_tickets_completed_in_a_day1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_day')" />
+            <field name="target_goal">7</field>
+            <field name="challenge_id" eval="ref('challenge_seven_tickets_completed_in_a_day')" />
+        </record>
+
+        <!-- Eight tickets completed in a day -->
+        <record id="badge_tickets_eight_completed_in_a_day" model="gamification.badge">
+            <field name="name">Eight tickets completed in a day</field>
+            <field name="description">Eight tickets completed in a day</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_eight_tickets_completed_in_a_day">
+            <field name="name">Eight tickets completed in a day</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">daily</field>
+            <field name="reward_id" eval="ref('badge_tickets_eight_completed_in_a_day')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_eight_tickets_completed_in_a_day1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_day')" />
+            <field name="target_goal">8</field>
+            <field name="challenge_id" eval="ref('challenge_eight_tickets_completed_in_a_day')" />
+        </record>
+
+        <!-- Nine tickets completed in a day -->
+        <record id="badge_tickets_nine_completed_in_a_day" model="gamification.badge">
+            <field name="name">Nine tickets completed in a day</field>
+            <field name="description">Nine tickets completed in a day</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_nine_tickets_completed_in_a_day">
+            <field name="name">Nine tickets completed in a day</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">daily</field>
+            <field name="reward_id" eval="ref('badge_tickets_nine_completed_in_a_day')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_nine_tickets_completed_in_a_day1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_day')" />
+            <field name="target_goal">9</field>
+            <field name="challenge_id" eval="ref('challenge_nine_tickets_completed_in_a_day')" />
+        </record>
+
+        <!-- Ten tickets completed in a day -->
+        <record id="badge_tickets_ten_completed_in_a_day" model="gamification.badge">
+            <field name="name">Ten tickets completed in a day</field>
+            <field name="description">Ten tickets completed in a day</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_ten_tickets_completed_in_a_day">
+            <field name="name">Ten tickets completed in a day</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">daily</field>
+            <field name="reward_id" eval="ref('badge_tickets_ten_completed_in_a_day')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_ten_tickets_completed_in_a_day1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_day')" />
+            <field name="target_goal">10</field>
+            <field name="challenge_id" eval="ref('challenge_ten_tickets_completed_in_a_day')" />
+        </record>
+
+        <!-- More than 10 tickets completed in a week -->
+        <record id="badge_more_than_10_tickets_completed_in_a_week" model="gamification.badge">
+            <field name="name">More than 10 tickets completed in a week</field>
+            <field name="description">More than 10 tickets completed in a week</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_more_than_10_tickets_completed_in_a_week">
+            <field name="name">More than 10 tickets completed in a week</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">weekly</field>
+            <field name="reward_id" eval="ref('badge_more_than_10_tickets_completed_in_a_week')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_more_than_10_tickets_completed_in_a_week1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_week')" />
+            <field name="target_goal">10</field>
+            <field name="challenge_id" eval="ref('challenge_more_than_10_tickets_completed_in_a_week')" />
+        </record>
+
+        <!-- More than 25 tickets completed in a week -->
+        <record id="badge_more_than_25_tickets_completed_in_a_week" model="gamification.badge">
+            <field name="name">More than 25 tickets completed in a week</field>
+            <field name="description">More than 25 tickets completed in a week</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_more_than_25_tickets_completed_in_a_week">
+            <field name="name">More than 25 tickets completed in a week</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">weekly</field>
+            <field name="reward_id" eval="ref('badge_more_than_25_tickets_completed_in_a_week')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_more_than_25_tickets_completed_in_a_week1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_week')" />
+            <field name="target_goal">25</field>
+            <field name="challenge_id" eval="ref('challenge_more_than_25_tickets_completed_in_a_week')" />
+        </record>
+
+        <!-- More than 30 tickets completed in a week -->
+        <record id="badge_more_than_30_tickets_completed_in_a_week" model="gamification.badge">
+            <field name="name">More than 30 tickets completed in a week</field>
+            <field name="description">More than 30 tickets completed in a week</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_more_than_30_tickets_completed_in_a_week">
+            <field name="name">More than 30 tickets completed in a week</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">weekly</field>
+            <field name="reward_id" eval="ref('badge_more_than_30_tickets_completed_in_a_week')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_more_than_30_tickets_completed_in_a_week1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_week')" />
+            <field name="target_goal">30</field>
+            <field name="challenge_id" eval="ref('challenge_more_than_30_tickets_completed_in_a_week')" />
+        </record>
+
+        <!-- More than 35 tickets completed in a week -->
+        <record id="badge_more_than_35_tickets_completed_in_a_week" model="gamification.badge">
+            <field name="name">More than 35 tickets completed in a week</field>
+            <field name="description">More than 35 tickets completed in a week</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_more_than_35_tickets_completed_in_a_week">
+            <field name="name">More than 35 tickets completed in a week</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">weekly</field>
+            <field name="reward_id" eval="ref('badge_more_than_35_tickets_completed_in_a_week')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_more_than_35_tickets_completed_in_a_week1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_week')" />
+            <field name="target_goal">35</field>
+            <field name="challenge_id" eval="ref('challenge_more_than_35_tickets_completed_in_a_week')" />
+        </record>
+
+        <!-- More than 40 tickets completed in a week -->
+        <record id="badge_more_than_40_tickets_completed_in_a_week" model="gamification.badge">
+            <field name="name">More than 40 tickets completed in a week</field>
+            <field name="description">More than 40 tickets completed in a week</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_more_than_40_tickets_completed_in_a_week">
+            <field name="name">More than 40 tickets completed in a week</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">weekly</field>
+            <field name="reward_id" eval="ref('badge_more_than_40_tickets_completed_in_a_week')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_challenge_more_than_40_tickets_completed_in_a_week1">
+            <field name="definition_id" eval="ref('definition_tickets_completed_in_a_week')" />
+            <field name="target_goal">40</field>
+            <field name="challenge_id" eval="ref('challenge_more_than_40_tickets_completed_in_a_week')" />
+        </record>
+
+        <!-- Nothing less than 5 star feedback for a week -->
+        <record id="badge_nothing_less_than_5_star_feedback_for_a_week" model="gamification.badge">
+            <field name="name">Nothing less than 5 star feedback for a week</field>
+            <field name="description">Nothing less than 5 star feedback for a week</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_nothing_less_than_5_star_feedback_for_a_week">
+            <field name="name">Nothing less than 5 star feedback for a week</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">weekly</field>
+            <field name="reward_id" eval="ref('badge_nothing_less_than_5_star_feedback_for_a_week')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_nothing_less_than_5_star_feedback_for_a_week1">
+            <field name="definition_id" eval="ref('definition_non_perfect_feedback')" />
+            <field name="target_goal">0</field>
+            <field name="challenge_id" eval="ref('challenge_nothing_less_than_5_star_feedback_for_a_week')" />
+        </record>
+        <record model="gamification.challenge.line" id="line_nothing_less_than_5_star_feedback_for_a_week2">
+            <field name="definition_id" eval="ref('definition_perfect_feedback')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_nothing_less_than_5_star_feedback_for_a_week')" />
+        </record>
+
+        <!-- Nothing less than 5 star feedback for a month -->
+        <record id="badge_nothing_less_than_5_star_feedback_for_a_month" model="gamification.badge">
+            <field name="name">Nothing less than 5 star feedback for a month</field>
+            <field name="description">Nothing less than 5 star feedback for a month</field>
+            <field name="rule_auth">nobody</field>
+        </record>
+        <record model="gamification.challenge" id="challenge_nothing_less_than_5_star_feedback_for_a_month">
+            <field name="name">Nothing less than 5 star feedback for a month</field>
+            <field name="user_domain" eval="str([('groups_id', '=', ref('base.group_user'))])" />
+            <field name="state">inprogress</field>
+            <field name="period">monthly</field>
+            <field name="reward_id" eval="ref('badge_nothing_less_than_5_star_feedback_for_a_month')"/>
+        </record>
+        <record model="gamification.challenge.line" id="line_nothing_less_than_5_star_feedback_for_a_month1">
+            <field name="definition_id" eval="ref('definition_non_perfect_feedback')" />
+            <field name="target_goal">0</field>
+            <field name="challenge_id" eval="ref('challenge_nothing_less_than_5_star_feedback_for_a_month')" />
+        </record>
+        <record model="gamification.challenge.line" id="line_nothing_less_than_5_star_feedback_for_a_month2">
+            <field name="definition_id" eval="ref('definition_perfect_feedback')" />
+            <field name="target_goal">1</field>
+            <field name="challenge_id" eval="ref('challenge_nothing_less_than_5_star_feedback_for_a_month')" />
+        </record>
+        
+    </data>
+</odoo>
