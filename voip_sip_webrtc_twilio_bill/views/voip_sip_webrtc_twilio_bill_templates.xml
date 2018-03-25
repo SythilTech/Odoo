@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+<template id="voip_call_history" name="Voip Call Log">
+    <t t-foreach="docs" t-as="o">
+        <t t-call="report.external_layout">
+            <div class="page">
+                <h1 style="text-align:center;">Call Log</h1>
+                <table style="width:100%;">
+                    <tr><th>Time</th><th>Duration</th><th>Address</th><th>Cost</th></tr>
+                
+                    <t t-foreach="o.voip_history_ids" t-as="voip_call">
+                        <tr><td><span t-field="voip_call.start_time"/></td><td><span t-field="voip_call.duration"/></td><td><span t-field="voip_call.to_address"/></td><td><span t-field="voip_call.cost"/></td></tr>
+                    </t>
+                </table>
+            </div>
+        </t>
+    </t>
+</template>
+
+
+</odoo>

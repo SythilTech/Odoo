@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_twilio_view_form" model="ir.ui.view">
+        <field name="name">voip.twilio form view</field>
+        <field name="model">voip.twilio</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <header>
+      	            <button name="fetch_call_history" type="object" string="Fetch Call History"/>
+      	            <!--<button name="create_invoice" type="object" string="Create Invoice"/>-->
+      	            <button name="generate_invoice_previous_month" type="object" string="Generate Previous Month Invoice"/>
+      	        </header>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="twilio_account_sid"/>
+      	            <field name="twilio_auth_token"/>
+      	            <field name="twilio_last_check_date"/>
+      	            <field name="resell_account"/>
+      	            <field name="margin" attrs="{'invisible': [('resell_account', '=', False)]}"/>
+      	            <field name="partner_id" attrs="{'invisible': [('resell_account', '=', False)]}"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_twilio_view_tree" model="ir.ui.view">
+        <field name="name">voip.twilio tree view</field>
+        <field name="model">voip.twilio</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="name"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_twilio_action" model="ir.actions.act_window">
+        <field name="name">Twilio Accounts</field>
+	<field name="res_model">voip.twilio</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No Twilio Accounts
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="voip_parent_menu" name="Voip" parent="crm.crm_menu_root" sequence="10"/>
+    
+    <menuitem id="voip_call_menu" name="Call Log" parent="voip_parent_menu" action="voip_call_action" sequence="10"/>
+    <menuitem id="voip_twilio_menu" name="Twilio Accounts" parent="voip_parent_menu" action="voip_twilio_action" sequence="20"/>
+
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="voip_call_history_report"
+        model="account.invoice"
+        string="Call History"
+        report_type="qweb-pdf"
+        name="voip_sip_webrtc_twilio_bill.voip_call_history"
+        file="voip_sip_webrtc_twilio_bill.voip_call_history"
+    />
+
+    <record id="voip_twilio_invoice_view_form" model="ir.ui.view">
+        <field name="name">voip.twilio.invoice form view</field>
+        <field name="model">voip.twilio.invoice</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="start_date"/>
+      	            <field name="end_date"/>
+      	            <field name="margin"/>
+      	            <button name="generate_invoice" type="object" string="Generate Invoice"/>
+      	        </group>
+      	    </form>
+        </field>
+    </record>
+
+</odoo>
