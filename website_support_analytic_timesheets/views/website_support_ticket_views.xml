@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_ticket_view_form_inherit_timesheets" model="ir.ui.view">
+          <field name="name">website.support.ticket.view.form.inherit.timesheets</field>
+          <field name="model">website.support.ticket</field>
+          <field name="inherit_id" ref="website_support.website_support_ticket_view_form"/>
+          <field name="arch" type="xml">
+              <field name="description" position="after">
+                  <field name="analytic_account_id" invisible="True"/>
+                  <field name="timesheet_project_id" invisible="True"/>
+                  <field name="analytic_timesheet_ids" context="{'default_project_id': timesheet_project_id, 'default_account_id': analytic_account_id}">
+                      <tree editable="bottom">
+                          <field name="date"/>
+                          <field name="user_id" required="1" options="{&quot;no_open&quot;: True}"/>
+                          <field name="name"/>
+                          <field name="account_id" invisible="True"/>
+                          <field name="project_id"/>
+                          <field name="task_id" context="{'default_project_id': project_id}" domain="[('project_id', '=', project_id)]"/>
+                          <field name="unit_amount" string="Duration" sum="Total time" widget="float_time"/>
+                      </tree>
+                  </field>
+              </field>
+          </field>
+      </record>
+      
+  </data>
+</openerp>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_ticket_view_form_inherit_hr_timesheet_line_tree" model="ir.ui.view">
+          <field name="name">account.analytic.line inherit support ticket</field>
+          <field name="model">account.analytic.line</field>
+          <field name="priority" eval="50"/>
+          <field name="arch" type="xml">
+              <tree create="false">
+                    <field name="date"/>
+                    <field name="user_id"/>
+                    <field name="person_name"/>
+                    <field name="name"/>
+                    <field name="project_id"/>
+                    <field name="ticket_number_display"/>
+                    <field name="task_id"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="unit_amount" string="Duration" sum="Total time" widget="float_time"/>
+                    <field name="state"/>
+                    <field name="open_time"/>
+                    <field name="close_time"/>
+                    <field name="planned_hours"/>
+                    <field name="remaining_hours"/>
+                    <field name="total_hours"/>
+                    <field name="effective_hours"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="website_support_analytics_action" model="ir.actions.act_window">
+          <field name="name">Support Ticket Timesheet Report</field>
+	  <field name="res_model">account.analytic.line</field>
+	  <field name="view_mode">tree</field>
+	  <field name="view_id" ref="website_support_ticket_view_form_inherit_hr_timesheet_line_tree"/>
+      </record>
+      
+      <menuitem id="website_support_analytics" name="Timesheet Reports" parent="website_support.website_support_parent_menu" action="website_support_analytics_action" sequence="30"/>
+      
+  </data>
+</openerp>
