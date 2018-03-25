@@ -1,3 +1,7 @@
+v1.0.29
+=======
+* Add required class / attribute to checkbox, dropbox and more
+
 v1.0.28
 =======
 * Fix default values for many2one cast incorrectly

@@ -164,7 +164,7 @@ class HtmlFormController(http.Controller):
         html_output += "  <label class=\"control-label"
         
         if field.setting_general_required is True:
-            html_output += "  required"
+            html_output += " required"
         
         html_output += "\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
         html_output += "  <input type=\""
@@ -288,11 +288,18 @@ class HtmlFormController(http.Controller):
         html_output = ""
         html_output += "<div class=\"hff hff_radio_group form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
 
-        if field.setting_radio_group_layout_type == "multi":
-            html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>\n"
-        if field.setting_radio_group_layout_type == "single":
-            html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label><br/>\n"
+        html_output += "  <label class=\"control-label"
 
+        if field.setting_general_required is True:
+            html_output += " required"
+            
+        html_output += "\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label + "</label>"            
+
+        if field.setting_radio_group_layout_type == "single":
+            html_output += "  <br/>"
+
+        html_output += "\n"
+        
         selection_list = dict(request.env[field.field_id.model_id.model].fields_get(allfields=[field.field_id.name])[field.field_id.name]['selection'])
 
         for selection_value, selection_label in selection_list.items():
@@ -301,7 +308,12 @@ class HtmlFormController(http.Controller):
             if field.setting_radio_group_layout_type == "single":
                 html_output += "  <div class=\"radio-inline\">\n"
 
-            html_output += "    <label><input type=\"radio\" name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/>" + selection_label.encode("utf-8") + "</label>\n"
+            html_output += "    <label><input type=\"radio\""
+
+            if field.setting_general_required is True:
+                html_output += " required=\"required\""
+            
+            html_output += " name=\"" + field.html_name.encode("utf-8") + "\" value=\"" + selection_value.encode("utf-8") + "\"/>" + selection_label.encode("utf-8") + "</label>\n"
             html_output += "  </div>\n"
 
         html_output += "\n"
@@ -333,7 +345,12 @@ class HtmlFormController(http.Controller):
         if field.setting_general_required is True:
             html_output += " class=\"required\""
         
-        html_output += "><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\"/>" + field.field_label + "</label>\n"
+        html_output += "><input type=\"checkbox\" name=\"" + field.html_name.encode("utf-8") + "\""
+        
+        if field.setting_general_required is True:
+            html_output += " required=\"required\""
+        
+        html_output += "/>" + field.field_label + "</label>\n"
         html_output += "</div>\n"
 
         return html_output
@@ -343,7 +360,12 @@ class HtmlFormController(http.Controller):
         html_output = ""
 
         html_output += "<div class=\"hff hff_dropbox form-group\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
-        html_output += "  <label class=\"control-label\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
+        html_output += "  <label class=\"control-label"
+
+        if field.setting_general_required is True:
+            html_output += " required"
+        
+        html_output += "\" for=\"" + field.html_name.encode("utf-8") + "\">" + field.field_label
         html_output += "</label>\n"
         html_output += "  <select class=\"form-control\" name=\"" + field.html_name.encode("utf-8") + "\""
 
