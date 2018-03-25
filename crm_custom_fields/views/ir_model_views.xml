@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        
+        <record id="ir_model_view_form_custom_crm_fields" model="ir.ui.view">
+            <field name="name">Custom CRM fields Form View</field>
+            <field name="model">ir.model</field>
+            <field name="priority">200</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name" readonly="True"/>
+                        <field name="custom_field_ids" context="{'default_model_id': active_id, 'default_crm_custom_field': True}">
+                            <form>
+                                <group>
+                                    <field name="model_id" invisible="1"/>
+                                    <field name="ttype" invisible="1"/>
+                                    <field name="field_description" invisible="1"/>
+                                    <field name="selection" invisible="1"/>
+                                    <field name="name"  invisible="1"/>
+                                    <field name="field_description" required="True"/>
+                                    <field name="crm_limited_types"/>
+                                    <field name="crm_custom_field_selection_ids" attrs="{'invisible': [('crm_limited_types', '!=', 'selection')]}">
+                                        <tree editable="bottom">
+                                            <field name="internal_name"/>
+                                            <field name="name"/>
+                                        </tree>
+                                    </field>
+                                    <field name="crm_custom_field_widget"/>
+                                    <field name="help" string="Help Text"/>
+                                </group>
+                                <notebook>
+                                    <page string="Base Properties">
+                                        <group>
+                                            <field name="required"/>
+                                            <field name="translate"/>
+                                            <field name="size"/>
+                                            <field name="crm_custom_field" invisible="True"/>
+                                        </group>
+                                    </page>
+                                </notebook>
+                            </form>
+                            <tree>
+                                <field name="field_description"/>
+                                <field name="crm_limited_types"/>
+                            </tree>            
+                        </field>
+                    
+                    </group>
+                    <footer>
+		        <button name="fake_save" type="object" string="Save" class="btn-primary"/>
+		        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+       </record>
+       
+   </data>
+</openerp>
