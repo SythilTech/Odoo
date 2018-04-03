@@ -107,15 +107,9 @@ class VoipCallTemplate(models.Model):
     def make_call(self, record_id):
         _logger.error("Make Call")
         if self.type == "prerecorded" or self.type == False:
-            to_address = self.render_template( self.to_address, self.model_id.model, record_id)
-            
-            if self.media:
-                #BACK COMPATABILITY TODO remove in version 11
-                decoded_media = base64.decodestring(self.media)
-                self.voip_account_id.make_call(to_address, decoded_media, self.codec_id, self.model_id.model, record_id)
-            else:
-                decoded_media = base64.decodestring(self.media_id.media)
-                self.voip_account_id.make_call(to_address, decoded_media, self.media_id.codec_id, self.model_id.model, record_id)
+            to_address = self.render_template( self.to_address, self.model_id.model, record_id)            
+            decoded_media = base64.decodestring(self.media_id.media)
+            self.voip_account_id.make_call(to_address, decoded_media, self.media_id.codec_id, self.model_id.model, record_id)
         elif self.type == "synth":
             rendered_text = self.render_template( self.synth_text, self.model_id.model, record_id)
             to_address = self.render_template( self.to_address, self.model_id.model, record_id)

@@ -41,7 +41,7 @@ class SIPSession:
         sip_listener_starter.start()
 
     def H(self, data):
-        return hashlib.md5(data).hexdigest()
+        return hashlib.md5( data.encode() ).hexdigest()
 
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
@@ -94,7 +94,7 @@ class SIPSession:
         reply += "\r\n"
         reply += sdp
 
-        self.sipsocket.sendto(reply, (self.to_server, self.account_port) )    
+        self.sipsocket.sendto(reply.encode(), (self.to_server, self.account_port) )    
 
     def send_sip_message(self, to_address, message_body):
         call_id = ''.join([random.choice('0123456789abcdef') for x in range(32)])
@@ -119,7 +119,7 @@ class SIPSession:
         else:
             to_server = self.domain
 
-        self.sipsocket.sendto(message_string, (to_server, self.account_port) )
+        self.sipsocket.sendto(message_string.encode(), (to_server, self.account_port) )
         self.sip_history[call_id] = []
         self.sip_history[call_id].append(message_string)
         return call_id
@@ -156,9 +156,16 @@ class SIPSession:
         reregister_starter.start()
 
     def reregister(self, register_string, register_frequency):
-        self.sipsocket.sendto(register_string, (self.to_server, self.account_port) )
-        time.sleep(register_frequency)
-        self.reregister(register_string, register_frequency)
+        try:
+            _logger.error(register_string)
+            self.sipsocket.sendto(register_string.encode(), (self.to_server, self.account_port) )
+            time.sleep(register_frequency)
+            self.reregister(register_string, register_frequency)
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            _logger.error(e)
+            _logger.error("Line: " + str(exc_tb.tb_lineno) )
+        
 
     def send_sip_invite(self, to_address, call_sdp):
 
@@ -187,7 +194,9 @@ class SIPSession:
         else:
             to_server = self.domain
 
-        self.sipsocket.sendto(invite_string, (to_server, self.account_port) )
+        _logger.error(invite_string)
+
+        self.sipsocket.sendto(invite_string.encode(), (to_server, self.account_port) )
         self.sip_history[call_id] = []
         self.sip_history[call_id].append(invite_string)
         return call_id
@@ -196,10 +205,16 @@ class SIPSession:
 
         try:
 
+            _logger.error("Listening for SIP messages on " + str(self.bind_port) )
+            
             #Wait and send back the auth reply
             stage = "WAITING"
             while stage == "WAITING":
+                
                 data, addr = self.sipsocket.recvfrom(2048)
+                
+                data = data.decode()
+                
                 _logger.error(data)
 
                 #Send auth response if challenged
@@ -225,7 +240,7 @@ class SIPSession:
                     idx = reply.index("User-Agent:")
                     reply = reply[:idx] + "Proxy-Authorization: " + auth_string + reply[idx:]
 
-                    self.sipsocket.sendto(reply, addr)
+                    self.sipsocket.sendto(reply.encode(), addr)
                 elif data.split("\r\n")[0] == "SIP/2.0 401 Unauthorized":
 
                     authheader = re.findall(r'WWW-Authenticate: (.*?)\r\n', data)[0]
@@ -249,7 +264,7 @@ class SIPSession:
                     reply = reply[:idx] + "Authorization: " + auth_string + reply[idx:]
 
                     _logger.error(reply)
-                    self.sipsocket.sendto(reply, addr)
+                    self.sipsocket.sendto(reply.encode(), addr)
                 elif data.split("\r\n")[0] == "SIP/2.0 403 Forbidden":
                     #Likely means call was rejected
                     self.call_rejected.fire(self, data)
@@ -278,7 +293,7 @@ class SIPSession:
                     trying += "Content-Length: 0\r\n"
                     trying += "\r\n"
 
-                    self.sipsocket.sendto(trying, addr)
+                    self.sipsocket.sendto(trying.encode(), addr)
 
                     #Even automated calls can take a second to get ready to answer
                     ringing = ""
@@ -297,12 +312,12 @@ class SIPSession:
                     ringing += "Content-Length: 0\r\n"
                     ringing += "\r\n"
 
-                    self.sipsocket.sendto(ringing, addr)
+                    self.sipsocket.sendto(ringing.encode(), addr)
 
                     self.call_ringing.fire(self, data)
                 elif data.startswith("BYE"):
                     #Do stuff when the call is ended by client
-                    self.call_ended.fire(data)
+                    self.call_ended.fire(self, data)
                     stage = "BYE"
                     return True
                 elif data.split("\r\n")[0] == "SIP/2.0 200 OK":
@@ -334,7 +349,7 @@ class SIPSession:
                         reply += "Content-Length: 0\r\n"
                         reply += "\r\n"
 
-                        self.sipsocket.sendto(reply, addr)
+                        self.sipsocket.sendto(reply.encode(), addr)
 
                         self.call_accepted.fire(self, data)
                     elif cseq_type == "MESSAGE":

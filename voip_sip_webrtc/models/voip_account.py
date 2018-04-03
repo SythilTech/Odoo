@@ -58,7 +58,7 @@ class VoipAccount(models.Model):
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
 
-    def generate_rtp_packet(self, audio_stream, codec_id, packet_count, sequence_number, timestamp):
+    def generate_rtp_packet(self, audio_stream, payload_type, payload_size, packet_count, sequence_number, timestamp):
 
         rtp_data = ""
 
@@ -75,7 +75,7 @@ class VoipAccount(models.Model):
             #ulaw
             rtp_data += " 80"
         else:
-            rtp_data += " " + format( codec_id.payload_type, '02x')
+            rtp_data += " " + format( payload_type, '02x')
 
         rtp_data += " " + format( sequence_number, '04x')
 
@@ -85,15 +85,15 @@ class VoipAccount(models.Model):
         rtp_data += " 12 20 76 3d"
 
         #Payload:
-        payload_data = audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size]
+        payload_data = audio_stream[packet_count * payload_size : packet_count * payload_size + payload_size]
         hex_string = ""
 
         for rtp_char in payload_data:
-            hex_format = "{0:02x}".format(ord(rtp_char))
+            hex_format = "{0:02x}".format(rtp_char)
             hex_string += hex_format + " "
 
         rtp_data += " " + hex_string
-        return rtp_data.replace(" ","").decode('hex')
+        return bytes.fromhex( rtp_data.replace(" ","") )
 
     def rtp_server_listener(self, rtc_sender_thread, rtpsocket, voip_call_client_id, model=False, record_id=False):
         #Create the call with the audio
@@ -118,13 +118,16 @@ class VoipAccount(models.Model):
 
                     rtpsocket.settimeout(10)
                     data, addr = rtpsocket.recvfrom(2048)
+                    data = data.decode()
                     #Add the RTP payload to the received data
                     audio_stream += data[12:]
 
             except Exception as e:
                 #Timeout
+                #exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
-
+                #_logger.error("Line: " + str(exc_tb.tb_lineno) )
+                
             try:
 
                 #Update call after the stream times out
@@ -148,60 +151,62 @@ class VoipAccount(models.Model):
                 rtc_sender_thread.join()
 
             except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
 
     def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, audio_stream, codec_id, voip_call_client_id):
 
-        #Create the call with the audio
-        with api.Environment.manage():
-            # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
-            new_cr = self.pool.cursor()
-            self = self.with_env(self.env(cr=new_cr))
+        try:
 
             server_stream_data = ""
 
-            try:
+            _logger.error("Start RTP Sender")
+                
+            packet_count = 0
+            sequence_number = randint(29161, 30000)
+            timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
 
-                packet_count = 0
-                sequence_number = randint(29161, 30000)
-                timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
+            t = threading.currentThread()
+            while getattr(t, "stream_active", True):
+                
+                #Send audio data out every 20ms
+                server_stream_data += str(audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size])
+                    
+                send_data = self.generate_rtp_packet(audio_stream, codec_id.payload_type, codec_id.payload_size, packet_count, sequence_number, timestamp)
+                rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
 
-                t = threading.currentThread()
-                while getattr(t, "stream_active", True):
+                packet_count += 1
+                sequence_number += 1
+                timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
+                sleep(0.02)
+                    
+        except Exception as e:
+            #Timeout
+            #exc_type, exc_obj, exc_tb = sys.exc_info()
+            _logger.error(e)
+            #_logger.error("Line: " + str(exc_tb.tb_lineno) )
 
-                    #Send audio data out every 20ms
-                    server_stream_data += audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size]
-
-                    send_data = self.generate_rtp_packet(audio_stream, codec_id, packet_count, sequence_number, timestamp)
-                    rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
-
-                    packet_count += 1
-                    sequence_number += 1
-                    timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
-                    sleep(0.02)
-
-            except Exception as e:
-                #Sudden Disconnect
-                _logger.error(e)
-
+        with api.Environment.manage():
+            # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+            new_cr = self.pool.cursor()
+            self = self.with_env(self.env(cr=new_cr))            
+        
             try:
                 #Add the stream data to the call
                 voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
                 voip_call_client.vc_id.write({'server_stream_data': base64.b64encode(server_stream_data)})
             except Exception as e:
+                #exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
-
-            #Have to manually commit the new cursor?
-            self.env.cr.commit()
-
-            self._cr.close()
+                #_logger.error("Line: " + str(exc_tb.tb_lineno) )
 
     def call_accepted(self, session, data):
         _logger.error("Call Accepted")
 
         with api.Environment.manage():
-            #As this function is in a new thread, i need to open a new cursor, because the old one may be closed
+            #As this function is in a new thread, I need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
 
@@ -221,6 +226,8 @@ class VoipAccount(models.Model):
             rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             rtpsocket.bind(('', voip_call_client.audio_media_port));
 
+            _logger.error(voip_call.codec_id.name)
+
             rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_port, voip_call.to_audio, voip_call.codec_id, voip_call_client.id,))
             rtc_sender_thread.start()
 
@@ -230,7 +237,7 @@ class VoipAccount(models.Model):
             #session.rtp_threads.append(rtc_sender_thread)
             #session.rtp_threads.append(rtc_listener_thread)
 
-            #self._cr.close()
+            self._cr.close()
 
     def call_rejected(self, session, data):
         _logger.error("Call Rejected")
@@ -325,7 +332,10 @@ class VoipAccount(models.Model):
 
         local_ip = self.env['ir.default'].get('voip.settings', 'server_ip')
 
-        sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
-        sip_session.call_ringing += self.call_ringing
-        sip_session.message_received += self.message_received
-        sip_session.send_sip_register(self.address)
+        if local_ip:
+            sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
+            sip_session.call_ringing += self.call_ringing
+            sip_session.message_received += self.message_received
+            sip_session.send_sip_register(self.address)
+        else:
+            raise UserError("Please enter your IP under settings first")
