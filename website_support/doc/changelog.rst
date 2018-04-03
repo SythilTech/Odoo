@@ -1,3 +1,10 @@
+v1.5.14
+=======
+* Remove read only from state to allow custom states management (dont bypass the automation...)
+* Kanban group by state
+* Kanban render html
+* Custom fields add yes / no type
+
 v1.5.13
 =======
 * Support ticket kanban view

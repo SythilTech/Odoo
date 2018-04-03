@@ -39,7 +39,14 @@ class SupportTicketController(http.Controller):
 
                 if sub_category_field.type == "textbox":
                     return_string += "    <input type=\"text\" required=\"True\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
-                
+                elif sub_category_field.type == "polar":
+                    return_string += "    <label class=\"radio-inline\">\n"
+                    return_string += "      <input type=\"radio\" value=\"Yes\" name=\"efield_" + str(sub_category_field.id) + "\">Yes\n"
+                    return_string += "    </label>\n"
+                    return_string += "    <label class=\"radio-inline\">\n"
+                    return_string += "      <input type=\"radio\" value=\"No\" name=\"efield_" + str(sub_category_field.id) + "\">No\n"
+                    return_string += "    </label>\n"
+                    
                 return_string += "  </div>\n"
                 return_string += "</div>\n"
             

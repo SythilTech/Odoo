@@ -5,6 +5,7 @@ from HTMLParser import HTMLParser
 from random import randint
 import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
+from odoo import SUPERUSER_ID
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -24,25 +25,43 @@ class WebsiteSupportTicket(models.Model):
     _rec_name = "subject"
     _inherit = ['mail.thread','ir.needaction_mixin']
 
+    @api.model
+    def _read_group_state(self, states, domain, order):
+        """ Read group customization in order to display all the states in the
+            kanban view, even if they are empty
+        """
+        
+        staff_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_replied')
+        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
+        customer_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_closed')
+        staff_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed')
+        
+        exclude_states = [staff_replied_state.id, customer_replied_state.id, customer_closed.id, staff_closed.id]
+        
+        #state_ids = states._search([('id','not in',exclude_states)], order=order, access_rights_uid=SUPERUSER_ID)
+        state_ids = states._search([], order=order, access_rights_uid=SUPERUSER_ID)
+        
+        return states.browse(state_ids)
+        
     def _default_state(self):
         return self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
 
     def _default_priority_id(self):
         default_priority = self.env['website.support.ticket.priority'].search([('sequence','=','1')])
         return default_priority[0]
-
+    
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
     partner_id = fields.Many2one('res.partner', string="Partner")
     user_id = fields.Many2one('res.users', string="Assigned User")
-    person_name = fields.Char(string='Person Name')
+    person_name = fields.Char(string="Person Name")
     email = fields.Char(string="Email")
     support_email = fields.Char(string="Support Email")
     category = fields.Many2one('website.support.ticket.categories', string="Category", track_visibility='onchange')
     sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     subject = fields.Char(string="Subject")
     description = fields.Text(string="Description")
-    state = fields.Many2one('website.support.ticket.states', readonly=True, default=_default_state, string="State")
+    state = fields.Many2one('website.support.ticket.states', default=_default_state, group_expand='_read_group_state', string="State")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
@@ -307,7 +326,7 @@ class WebsiteSupportTicketSubCategoryField(models.Model):
         
     wsts_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     name = fields.Char(string="Label")
-    type = fields.Selection([('textbox','Textbox')], default="textbox", string="Type")
+    type = fields.Selection([('textbox','Textbox'), ('polar','Yes / No')], default="textbox", string="Type")
     
 class WebsiteSupportTicketStates(models.Model):
 
