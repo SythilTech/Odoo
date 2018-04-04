@@ -61,7 +61,7 @@ class SupportTicketController(http.Controller):
 
             return_string += "        <select class=\"form-control\" id=\"subcategory\" name=\"subcategory\">\n"
             for sub_category in request.env['website.support.ticket.subcategory'].sudo().search([('parent_category_id','=', int(values['category']) )]):
-                return_string += "            <option value=\"" + str(sub_category.id) + "\">" + sub_category.name.encode("utf-8") + "</option>\n"
+                return_string += "            <option value=\"" + str(sub_category.id) + "\">" + sub_category.name + "</option>\n"
 
             return_string += "        </select>\n"
             return_string += "    </div>\n"

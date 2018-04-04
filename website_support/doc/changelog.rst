@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Fix subcategories
+
 v1.0.6
 ======
 * Fix multiple ticket delete issue
