@@ -58,6 +58,37 @@
           </field>
       </record>
 
+      <record id="website_support_ticket_view_kanban" model="ir.ui.view">
+          <field name="name">website.support.ticket.kanban.view</field>
+          <field name="model">website.support.ticket</field>
+          <field name="arch" type="xml">
+              <kanban class="o_res_partner_kanban" default_group_by="state">
+                  <field name="subject"/>
+                  <field name="priority_id"/>
+                  <field name="state"/>
+                  <field name="category"/>
+                  <field name="description"/>
+                  <templates>
+                      <t t-name="kanban-box">
+                          <div class="oe_kanban_global_click o_res_partner_kanban">
+                              <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                              <div class="oe_kanban_details">
+                                  <strong class="oe_partner_heading"><field name="subject"/></strong>
+                                  <ul>
+                                      <li t-if="record.priority_id.raw_value"><field name="priority_id"/></li>
+                                      <li t-if="record.state.raw_value"><field name="state"/></li>
+                                      <li t-if="record.category.raw_value"><field name="category"/></li>
+                                      <li t-if="record.description.raw_value"><t t-raw="record.description.raw_value"/></li>
+                                  </ul>
+                                  <div class="oe_kanban_partner_links"/>
+                              </div>
+                          </div>
+                      </t>
+                  </templates>
+              </kanban>
+          </field>
+      </record>
+      
       <record id="website_support_ticket_view_search" model="ir.ui.view">
           <field name="name">website.support.ticket.form.search</field>
           <field name="model">website.support.ticket</field>
@@ -102,7 +133,7 @@
       <record id="website_support_ticket_action_partner" model="ir.actions.act_window">
           <field name="name">Support Tickets</field>
           <field name="res_model">website.support.ticket</field>
-          <field name="view_mode">tree,form,graph</field>
+          <field name="view_mode">tree,kanban,form,graph</field>
           <field name="help" type="html">
               <p>
                   No Support Tickets found
@@ -113,7 +144,7 @@
       <record id="website_support_ticket_action" model="ir.actions.act_window">
           <field name="name">Support Tickets</field>
           <field name="res_model">website.support.ticket</field>
-          <field name="view_mode">tree,form,graph</field>
+          <field name="view_mode">tree,kanban,form,graph</field>
           <field name="context">{"search_default_unattended_tickets":1, 'auto_refresh': 1, 'default_create_user_id': uid}</field>
           <field name="help" type="html">
               <p>

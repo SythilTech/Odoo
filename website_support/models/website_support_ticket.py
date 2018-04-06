@@ -6,6 +6,7 @@ import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 import logging
 _logger = logging.getLogger(__name__)
+from odoo import SUPERUSER_ID
 
 class WebsiteSupportTicket(models.Model):
 
@@ -13,6 +14,24 @@ class WebsiteSupportTicket(models.Model):
     _description = "Website Support Ticket"
     _rec_name = "subject"
     _inherit = ['mail.thread']
+
+    @api.model
+    def _read_group_state(self, states, domain, order):
+        """ Read group customization in order to display all the states in the
+            kanban view, even if they are empty
+        """
+        
+        staff_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_replied')
+        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
+        customer_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_closed')
+        staff_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed')
+        
+        exclude_states = [staff_replied_state.id, customer_replied_state.id, customer_closed.id, staff_closed.id]
+        
+        #state_ids = states._search([('id','not in',exclude_states)], order=order, access_rights_uid=SUPERUSER_ID)
+        state_ids = states._search([], order=order, access_rights_uid=SUPERUSER_ID)
+        
+        return states.browse(state_ids)
 
     def _default_state(self):
         return self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
@@ -32,7 +51,7 @@ class WebsiteSupportTicket(models.Model):
     sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     subject = fields.Char(string="Subject")
     description = fields.Text(string="Description")
-    state = fields.Many2one('website.support.ticket.states', readonly=True, default=_default_state, string="State")
+    state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state, string="State")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")

@@ -1,3 +1,9 @@
+v1.0.8
+======
+* Fix subcategory change not disappearing
+* States no longer readonly
+* Move Kanban view over from Odoo 10
+
 v1.0.7
 ======
 * Fix subcategories
