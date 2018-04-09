@@ -9,6 +9,7 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been closed</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>            
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been closed by our staff, here is the final comment</p>
