@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Remove kanban "+" and create since it isn't really compatable
+
 v1.0.8
 ======
 * Fix subcategory change not disappearing

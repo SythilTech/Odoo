@@ -9,11 +9,13 @@
             <field name="email_to">${object.email|safe}</field>
             <field name="subject">Your support ticket has been closed</field>
             <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been closed by our staff, here is the final comment</p>
                 <p>${object.close_comment or ''}</p>
 
+                % if object.analytic_timesheet_ids :
                 <h2>Time Sheet</h2>
                 <table>
                     <tr><th>Staff Member</th><th>Time</th></tr>
@@ -27,7 +29,8 @@
 
                     % endfor
                 </table>
-
+                % endif
+                
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> 
