@@ -1,3 +1,8 @@
+v1.0.10
+=======
+* Show extra fields incase someone wants to manuall add the data
+* Add new channel field which tracks the source of the ticket (website / email)
+
 v1.0.9
 ======
 * Remove kanban "+" and create since it isn't really compatable

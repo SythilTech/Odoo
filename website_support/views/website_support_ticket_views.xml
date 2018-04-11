@@ -16,6 +16,7 @@
                       <group>
                           <field name="create_user_id" invisble="True"/>
                           <field name="ticket_number"/>
+                          <field name="channel"/>
                           <field name="priority_id"/>
                           <field name="user_id"/>
                           <field name="partner_id"/>
@@ -32,7 +33,7 @@
                                   <field name="datas_fname"/>
                               </tree>
                           </field>
-                          <field name="extra_field_ids" attrs="{'invisible' :[('extra_field_ids', '=', [])]}">
+                          <field name="extra_field_ids">
                               <tree editable="bottom">
                                   <field name="name"/>
                                   <field name="value"/>

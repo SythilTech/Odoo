@@ -40,6 +40,7 @@ class WebsiteSupportTicket(models.Model):
         default_priority = self.env['website.support.ticket.priority'].search([('sequence','=','1')])
         return default_priority[0]
 
+    channel = fields.Char(string="Channel", default="Manual")
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
     partner_id = fields.Many2one('res.partner', string="Partner")
@@ -92,6 +93,7 @@ class WebsiteSupportTicket(models.Model):
             from_email = msg.get('from')
 
         defaults['email'] = from_email
+        defaults['channel'] = "Email"
 
         #Try to find the partner using the from email
         search_partner = self.env['res.partner'].sudo().search([('email','=', from_email)])

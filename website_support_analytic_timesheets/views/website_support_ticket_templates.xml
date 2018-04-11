@@ -10,37 +10,36 @@
             <field name="subject">Your support ticket has been closed</field>
             <field name="auto_delete" eval="False"/>
             <field name="built_in" eval="True"/>
-            <field name="body_html"><![CDATA[
-                <p>Dear ${object.person_name},</p>
-                <p>Your support ticket has been closed by our staff, here is the final comment</p>
-                <p>${object.close_comment or ''}</p>
-
-                % if object.analytic_timesheet_ids :
-                <h2>Time Sheet</h2>
-                <table>
-                    <tr><th>Staff Member</th><th>Time</th></tr>
-                    
-                    % for timeslot in object.analytic_timesheet_ids:
-
-                        <tr>
-                            <td>${timeslot.user_id.name}</td>
-                            <td>${timeslot.unit_amount}</td>
-                        </tr>
-
-                    % endfor
-                </table>
-                % endif
-                
-                <hr/>
-                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
-                <b>Ticket Category:</b> 
-                % if object.category.name :
-                    ${object.category.name}
-                % endif
-                <br/>
-                <b>Ticket Description:</b><br/>
-                ${object.description|safe}
-                
+            <field name="body_html">
+                <![CDATA[
+<p>Dear ${object.person_name},</p>
+<p>Your support ticket has been closed by our staff, here is the final comment</p>
+<p>${object.close_comment or ''}</p>
+% if object.analytic_timesheet_ids:
+    <h2>Time Sheet</h2>
+    <div style="display:table">
+        <div style="display:table-header-group;">
+            <div style="display:table-row;">
+                <div style="display:table-cell;">Staff Member</div>
+                <div style="display:table-cell;">Time</div>
+            </div>
+        </div>
+        <div style="display:table-row-group;">
+        % for timeslot in object.analytic_timesheet_ids:
+            <div style="display:table-row;">
+                <div style="display:table-cell;">${timeslot.user_id.name}</div>
+                <div style="display:table-cell;">${timeslot.unit_amount}</div>
+            </div>
+        % endfor
+        </div>
+    </div>
+% endif
+<hr/>
+<b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
+<b>Ticket Category:</b> ${object.category.name or ''}
+<br/>
+<b>Ticket Description:</b><br/>
+${object.description|safe}
             ]]>
             </field>
         </record>

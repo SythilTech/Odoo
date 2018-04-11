@@ -1,3 +1,7 @@
+v1.0.2
+======
+* Fix email Jinja for loop getting messed up inside table
+
 v1.0.1
 ======
 * Filter out closed email template from compose window
