@@ -1,3 +1,7 @@
+v1.0.11
+=======
+* Extra field type and label is required
+
 v1.0.10
 =======
 * Show extra fields incase someone wants to manuall add the data

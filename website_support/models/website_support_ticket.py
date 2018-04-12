@@ -297,8 +297,8 @@ class WebsiteSupportTicketSubCategoryField(models.Model):
     _name = "website.support.ticket.subcategory.field"
 
     wsts_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
-    name = fields.Char(string="Label")
-    type = fields.Selection([('textbox','Textbox')], default="textbox", string="Type")
+    name = fields.Char(string="Label", required="True")
+    type = fields.Selection([('textbox','Textbox')], default="textbox", required="True", string="Type")
 
 class WebsiteSupportTicketStates(models.Model):
 
