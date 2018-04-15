@@ -1,3 +1,7 @@
+v1.0.12
+=======
+* Changing subcategory now automatically adds th extra fields
+
 v1.0.11
 =======
 * Extra field type and label is required

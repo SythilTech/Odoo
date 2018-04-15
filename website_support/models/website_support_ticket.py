@@ -72,6 +72,19 @@ class WebsiteSupportTicket(models.Model):
     time_to_close = fields.Integer(string="Time to close (seconds)")
     extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
 
+    @api.onchange('sub_category_id')
+    def _onchange_sub_category_id(self):
+        if self.sub_category_id:
+            
+            add_extra_fields = []
+            
+            for extra_field in self.sub_category_id.additional_field_ids:
+                add_extra_fields.append((0, 0, {'name': extra_field.name}))
+                
+            self.update({
+                'extra_field_ids': add_extra_fields,
+            })
+
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.person_name = self.partner_id.name
