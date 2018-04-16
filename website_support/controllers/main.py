@@ -51,7 +51,45 @@ class SupportTicketController(http.Controller):
                 return_string += "</div>\n"
             
         return return_string
+
+    @http.route('/support/approve/<ticket_id>', type='http', auth="public", website=True)
+    def support_approve(self, ticket_id, **kwargs):
+        support_ticket = request.env['website.support.ticket'].browse( int(ticket_id) )
+
+	awaiting_approval = request.env['ir.model.data'].get_object('website_support','awaiting_approval')
+	
+	if support_ticket.approval_id.id == awaiting_approval.id:
+	    #Change the ticket state to approved
+	    website_ticket_state_approval_accepted = request.env['ir.model.data'].get_object('website_support','website_ticket_state_approval_accepted')
+	    support_ticket.state = website_ticket_state_approval_accepted.id
+	
+	    #Also change the approval
+	    approval_accepted = request.env['ir.model.data'].get_object('website_support','approval_accepted')
+	    support_ticket.approval_id = approval_accepted.id        
+
+            return "Request Approved Successfully"
+        else:
+            return "Ticket does not need approval"
         
+    @http.route('/support/disapprove/<ticket_id>', type='http', auth="public", website=True)
+    def support_disapprove(self, ticket_id, **kwargs):
+        support_ticket = request.env['website.support.ticket'].browse( int(ticket_id) )
+
+	awaiting_approval = request.env['ir.model.data'].get_object('website_support','awaiting_approval')
+	
+	if support_ticket.approval_id.id == awaiting_approval.id:
+	    #Change the ticket state to disapproved
+	    website_ticket_state_approval_rejected = request.env['ir.model.data'].get_object('website_support','website_ticket_state_approval_rejected')
+	    support_ticket.state = website_ticket_state_approval_rejected.id
+	
+	    #Also change the approval
+	    approval_rejected = request.env['ir.model.data'].get_object('website_support','approval_rejected')
+	    support_ticket.approval_id = approval_rejected.id
+	
+            return "Request Rejected Successfully"
+        else:
+            return "Ticket does not need approval"
+            
     @http.route('/support/subcategories/fetch', type='http', auth="public", website=True)
     def support_subcategories_fetch(self, **kwargs):
 

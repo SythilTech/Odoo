@@ -49,7 +49,11 @@ class WebsiteSupportTicket(models.Model):
     def _default_priority_id(self):
         default_priority = self.env['website.support.ticket.priority'].search([('sequence','=','1')])
         return default_priority[0]
+
+    def _default_approval_id(self):
+        return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
     
+    approval_id = fields.Many2one('website.support.ticket.approval', default=_default_approval_id, string="Approval")
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
     partner_id = fields.Many2one('res.partner', string="Partner")
@@ -80,7 +84,17 @@ class WebsiteSupportTicket(models.Model):
     closed_by_id = fields.Many2one('res.users', string="Closed By")
     time_to_close = fields.Integer(string="Time to close (seconds)")
     extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
-    
+    approve_url = fields.Char(compute="_compute_approve_url", string="Approve URL")
+    disapprove_url = fields.Char(compute="_compute_disapprove_url", string="Disapprove URL")
+
+    @api.one
+    def _compute_approve_url(self):
+        self.approve_url = "/support/approve/" + str(self.id)
+
+    @api.one
+    def _compute_disapprove_url(self):
+        self.disapprove_url = "/support/disapprove/" + str(self.id)
+        
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.person_name = self.partner_id.name
@@ -155,12 +169,31 @@ class WebsiteSupportTicket(models.Model):
             
     @api.depends('state')
     def _compute_unattend(self):
-        opened_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
-        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
+        staff_replied = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_replied')
+        customer_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_closed')
+        staff_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed')
 
-        if self.state == opened_state or self.state == customer_replied_state:
+        #If not closed or replied to then consider all other states to be attended to
+        if self.state != staff_replied and self.state != customer_closed and self.state != staff_closed:
             self.unattended = True
 
+    @api.multi
+    def request_approval(self):
+
+        request_message = "Approval is required before we can proceed with this support request, please click the link below to accept<br/>"
+        request_message += '<a href="' + self.approve_url + '">Approve</a><br/>'
+        request_message += '<a href="' + self.disapprove_url + '"' + ">Don't Approve</a><br/>"
+        
+        return {
+            'name': "Request Approval",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket.compose',
+            'context': {'default_ticket_id': self.id, 'default_email': self.email, 'default_subject': self.subject, 'default_approval': True, 'default_body': request_message},
+            'target': 'new'
+        }
+        
     @api.multi
     def open_close_ticket_wizard(self):
 
@@ -272,6 +305,13 @@ class WebsiteSupportTicket(models.Model):
         values['body_html'] = values['body_html'].replace("_survey_url_",surevey_url)
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send(True)
+
+class WebsiteSupportTicketApproval(models.Model):
+
+    _name = "website.support.ticket.approval"
+
+    wst_id = fields.Many2one('website.support.ticket', string="Support Ticket")
+    name = fields.Char(string="Name", translate=True)
 
 class WebsiteSupportTicketField(models.Model):
 
@@ -394,17 +434,19 @@ class WebsiteSupportTicketCompose(models.Model):
         if closed_state_mail_template == False:
             closed_state_mail_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_closed')
             closed_state_mail_template.send_mail(self.ticket_id.id, True)
-    
+
 class WebsiteSupportTicketCompose(models.Model):
 
     _name = "website.support.ticket.compose"
 
     ticket_id = fields.Many2one('website.support.ticket', string='Ticket ID')
+    approval = fields.Boolean(string="Approval")
     partner_id = fields.Many2one('res.partner', string="Partner", readonly="True")
     email = fields.Char(string="Email", readonly="True")
     subject = fields.Char(string="Subject", readonly="True")
     body = fields.Text(string="Message Body")
     template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
+    planned_time = fields.Datetime(string="Planned Time")
     
     @api.onchange('template_id')
     def _onchange_template_id(self):
@@ -437,5 +479,15 @@ class WebsiteSupportTicketCompose(models.Model):
         #Post in message history
         #self.ticket_id.message_post(body=self.body, subject=self.subject, message_type='comment', subtype='mt_comment')
 	
-	staff_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')
-	self.ticket_id.state = staff_replied.id
+        if self.approval:
+	    #Change the ticket state to awaiting approval
+	    awaiting_approval_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_awaiting_approval')
+	    self.ticket_id.state = awaiting_approval_state.id
+	
+	    #Also change the approval
+	    awaiting_approval = self.env['ir.model.data'].get_object('website_support','awaiting_approval')
+	    self.ticket_id.approval_id = awaiting_approval.id        
+        else:
+	    #Change the ticket state to staff replied        
+	    staff_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')
+	    self.ticket_id.state = staff_replied.id

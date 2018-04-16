@@ -1,3 +1,10 @@
+v1.6.0
+======
+* Add approval field
+* Add request approval button
+* Add approve and disapprove links to email
+* Change unattended tickets filter to any state except closed or staff replied
+
 v1.5.14
 =======
 * Remove read only from state to allow custom states management (dont bypass the automation...)

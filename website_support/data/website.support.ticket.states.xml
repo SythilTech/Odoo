@@ -15,6 +15,18 @@
             <field name="name">Customer Replied</field>
         </record>
 
+        <record id="website_ticket_state_awaiting_approval" model="website.support.ticket.states">
+            <field name="name">Awaiting Approval</field>
+        </record>
+
+        <record id="website_ticket_state_approval_accepted" model="website.support.ticket.states">
+            <field name="name">Approval Accepted</field>
+        </record>
+
+        <record id="website_ticket_state_approval_rejected" model="website.support.ticket.states">
+            <field name="name">Approval Rejected</field>
+        </record>
+        
         <record id="website_ticket_state_customer_closed" model="website.support.ticket.states">
             <field name="name">Customer Closed</field>
             <field name="mail_template_id" ref="support_ticket_closed"/>

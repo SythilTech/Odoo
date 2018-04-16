@@ -9,8 +9,10 @@
       	      <form>
       	          <group>
       	              <field name="ticket_id" invisible="True"/>
+      	              <field name="approval" invisible="True"/>
           	      <field name="email"/>
           	      <field name="subject"/>
+          	      <field name="planned_time" attrs="{'invisible':[('approval','=', False)], 'required': [('approval','=', True)]}"/>
           	  </group>
           	  <field name="body" widget="html"/>
           	  <group>
