@@ -174,5 +174,48 @@
             </field>
         </record>
 
+        <record id="support_ticket_approval" model="mail.template">
+            <field name="name">Support Ticket Approval</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Approval (#${object.ticket_number or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                    <br/>
+                % endif
+
+                <p>Approval is required before we can proceed with this support request, please click the link below to accept</p>
+                <br/>
+                <p><a href="${object.approve_url}" style="color:green">Approve</a> | <a href="${object.disapprove_url}" style="color:red">Don't Approve</a></p>
+
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_approval_user" model="mail.template">
+            <field name="name">Support Ticket Approval (User)</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Approval (#${object.ticket_number or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear _user_name_,</p>
+                <p>A support ticket approval rating has changed</p>
+                <p>Person Name: ${object.person_name}</p>
+                <p>Category: ${object.category.name}</p>
+                <p>Subject: ${object.subject}</p>
+                <p>Approval: ${object.approval_id.name}</p>
+                <p>${object.description|safe}</p>
+                <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
+            ]]>
+            </field>
+        </record>
+        
     </data>
 </openerp>

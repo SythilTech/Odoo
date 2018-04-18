@@ -11,8 +11,9 @@
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply"/>
                       <button type="object" name="open_close_ticket_wizard" string="Close Ticket"/>
                       <button type="object" name="send_survey" string="Send Survey"/>
+                      <button type="object" name="request_approval" string="Request Approval"/>
                   </header>
-                  <sheet>  
+                  <sheet>
                       <group>
                           <field name="create_user_id" invisble="True"/>
                           <field name="ticket_number"/>
@@ -25,6 +26,7 @@
                           <field name="category"/>
                           <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
                           <field name="state"/>
+                          <field name="approval_id"/>
                           <field name="subject"/>
                           <field name="attachment" filename="attachment_filename" attrs="{'invisible' :[('attachment', '=', False)]}"/>
                           <field name="attachment_filename" invisible="True"/>

@@ -1,3 +1,10 @@
+v1.1.0
+======
+* Port approval system over from version 10
+* Add approvals to portal
+* Email notifacation on approval / rejection
+* Default approval compose email is now a email tempalte rather then hard coded.
+
 v1.0.12
 =======
 * Changing subcategory now automatically adds th extra fields

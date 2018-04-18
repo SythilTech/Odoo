@@ -15,6 +15,78 @@ from odoo.addons.http_routing.models.ir_http import slug
 
 class SupportTicketController(http.Controller):
 
+    @http.route('/support/approve/<ticket_id>', type='http', auth="public")
+    def support_approve(self, ticket_id, **kwargs):
+        support_ticket = request.env['website.support.ticket'].browse( int(ticket_id) )
+
+        awaiting_approval = request.env['ir.model.data'].get_object('website_support','awaiting_approval')
+
+        if support_ticket.approval_id.id == awaiting_approval.id:
+            #Change the ticket state to approved
+            website_ticket_state_approval_accepted = request.env['ir.model.data'].get_object('website_support','website_ticket_state_approval_accepted')
+            support_ticket.state = website_ticket_state_approval_accepted.id
+
+            #Also change the approval
+            approval_accepted = request.env['ir.model.data'].get_object('website_support','approval_accepted')
+            support_ticket.approval_id = approval_accepted.id
+
+            #Send an email out to everyone in the category notifing them the ticket has been approved
+            notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_approval_user')
+            support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
+            support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
+
+            for my_user in support_ticket.category.cat_user_ids:
+                values = notification_template.generate_email(support_ticket.id)
+                values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(support_ticket.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+                #values['body'] = values['body_html']
+                values['email_to'] = my_user.partner_id.email
+
+                send_mail = request.env['mail.mail'].create(values)
+                send_mail.send()
+
+                #Remove the message from the chatter since this would bloat the communication history by a lot
+                send_mail.mail_message_id.res_id = 0            
+
+            return "Request Approved Successfully"
+        else:
+            return "Ticket does not need approval"
+
+    @http.route('/support/disapprove/<ticket_id>', type='http', auth="public")
+    def support_disapprove(self, ticket_id, **kwargs):
+        support_ticket = request.env['website.support.ticket'].browse( int(ticket_id) )
+
+        awaiting_approval = request.env['ir.model.data'].get_object('website_support','awaiting_approval')
+
+        if support_ticket.approval_id.id == awaiting_approval.id:
+            #Change the ticket state to disapproved
+            website_ticket_state_approval_rejected = request.env['ir.model.data'].get_object('website_support','website_ticket_state_approval_rejected')
+            support_ticket.state = website_ticket_state_approval_rejected.id
+
+            #Also change the approval
+            approval_rejected = request.env['ir.model.data'].get_object('website_support','approval_rejected')
+            support_ticket.approval_id = approval_rejected.id
+
+            #Send an email out to everyone in the category notifing them the ticket has been approved
+            notification_template = request.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_approval_user')
+            support_ticket_menu = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_menu')
+            support_ticket_action = request.env['ir.model.data'].sudo().get_object('website_support', 'website_support_ticket_action')
+
+            for my_user in support_ticket.category.cat_user_ids:
+                values = notification_template.generate_email(support_ticket.id)
+                values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(support_ticket.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+                #values['body'] = values['body_html']
+                values['email_to'] = my_user.partner_id.email
+
+                send_mail = request.env['mail.mail'].create(values)
+                send_mail.send()
+
+                #Remove the message from the chatter since this would bloat the communication history by a lot
+                send_mail.mail_message_id.res_id = 0
+                
+            return "Request Rejected Successfully"
+        else:
+            return "Ticket does not need approval"
+
     @http.route('/support/subcategories/field/fetch', type='http', auth="public", website=True)
     def support_subcategories_field_fetch(self, **kwargs):
 
@@ -314,7 +386,10 @@ class SupportTicketController(http.Controller):
 
         support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])
 
-        return http.request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets)})
+        no_approval_required = request.env['ir.model.data'].get_object('website_support','no_approval_required')
+        change_requests = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False), ('approval_id','!=',no_approval_required.id) ], order="planned_time desc")
+
+        return http.request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets), 'change_requests': change_requests, 'request_count': len(change_requests)})
 
     @http.route('/support/ticket/view/<ticket>', type="http", auth="user", website=True)
     def support_ticket_view(self, ticket):

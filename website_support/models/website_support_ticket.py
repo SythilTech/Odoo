@@ -40,6 +40,9 @@ class WebsiteSupportTicket(models.Model):
         default_priority = self.env['website.support.ticket.priority'].search([('sequence','=','1')])
         return default_priority[0]
 
+    def _default_approval_id(self):
+        return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
+
     channel = fields.Char(string="Channel", default="Manual")
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
@@ -71,6 +74,19 @@ class WebsiteSupportTicket(models.Model):
     closed_by_id = fields.Many2one('res.users', string="Closed By")
     time_to_close = fields.Integer(string="Time to close (seconds)")
     extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
+    planned_time = fields.Datetime(string="Planned Time")
+    approval_id = fields.Many2one('website.support.ticket.approval', default=_default_approval_id, string="Approval")
+    approval_message = fields.Text(string="Approval Message")
+    approve_url = fields.Char(compute="_compute_approve_url", string="Approve URL")
+    disapprove_url = fields.Char(compute="_compute_disapprove_url", string="Disapprove URL")
+
+    @api.one
+    def _compute_approve_url(self):
+        self.approve_url = "/support/approve/" + str(self.id)
+
+    @api.one
+    def _compute_disapprove_url(self):
+        self.disapprove_url = "/support/disapprove/" + str(self.id)
 
     @api.onchange('sub_category_id')
     def _onchange_sub_category_id(self):
@@ -164,6 +180,25 @@ class WebsiteSupportTicket(models.Model):
             self.unattended = True
 
     @api.multi
+    def request_approval(self):
+
+        approval_email = self.env['ir.model.data'].get_object('website_support', 'support_ticket_approval')
+
+        values = self.env['mail.compose.message'].generate_email_for_composer(approval_email.id, [self.id])[self.id]
+
+        request_message = values['body']
+
+        return {
+            'name': "Request Approval",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket.compose',
+            'context': {'default_ticket_id': self.id, 'default_email': self.email, 'default_subject': self.subject, 'default_approval': True, 'default_body': request_message},
+            'target': 'new'
+        }
+        
+    @api.multi
     def open_close_ticket_wizard(self):
 
         return {
@@ -209,7 +244,7 @@ class WebsiteSupportTicket(models.Model):
             send_mail.send()
 
             #Remove the message from the chatter since this would bloat the communication history by a lot
-            send_mail.mail_message_id.unlink()
+            send_mail.mail_message_id.res_id = 0
 
         return new_id
 
@@ -257,6 +292,13 @@ class WebsiteSupportTicket(models.Model):
         values['body_html'] = values['body_html'].replace("_survey_url_",surevey_url)
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send(True)
+
+class WebsiteSupportTicketApproval(models.Model):
+
+    _name = "website.support.ticket.approval"
+
+    wst_id = fields.Many2one('website.support.ticket', string="Support Ticket")
+    name = fields.Char(string="Name", translate=True)
 
 class WebsiteSupportTicketField(models.Model):
 
@@ -388,6 +430,8 @@ class WebsiteSupportTicketCompose(models.Model):
     subject = fields.Char(string="Subject", readonly="True")
     body = fields.Text(string="Message Body")
     template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
+    approval = fields.Boolean(string="Approval")
+    planned_time = fields.Datetime(string="Planned Time")
 
     @api.onchange('template_id')
     def _onchange_template_id(self):
@@ -417,5 +461,19 @@ class WebsiteSupportTicketCompose(models.Model):
         #Post in message history
         #self.ticket_id.message_post(body=self.body, subject=self.subject, message_type='comment', subtype='mt_comment')
 
-        staff_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')
-        self.ticket_id.state = staff_replied.id
+        if self.approval:
+            #Change the ticket state to awaiting approval
+            awaiting_approval_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_awaiting_approval')
+            self.ticket_id.state = awaiting_approval_state.id
+
+            #Also change the approval
+            awaiting_approval = self.env['ir.model.data'].get_object('website_support','awaiting_approval')
+            self.ticket_id.approval_id = awaiting_approval.id
+            
+            #One support request per ticket...
+            self.ticket_id.planned_time = self.planned_time
+            self.ticket_id.approval_message = self.body
+        else:
+            #Change the ticket state to staff replied
+            staff_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')
+            self.ticket_id.state = staff_replied.id
