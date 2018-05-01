@@ -9,7 +9,7 @@
 
         <template id="html_builder_front_assert" inherit_id="website.assets_frontend" name="HTML Builder Front Asserts">
             <xpath expr="/t" position="inside">
-                <script src="https://www.google.com/recaptcha/api.js" async="async" defer="defer"/>
+                
                 <link rel="stylesheet" href="/html_form_builder/static/src/css/form.css"/>
                 <script type="text/javascript" src="/html_form_builder/static/src/js/html.form.builder.js" />
             </xpath>

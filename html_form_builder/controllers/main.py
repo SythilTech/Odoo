@@ -79,6 +79,7 @@ class HtmlFormController(http.Controller):
             html_form.captcha_secret_key = values['client_secret']
 
         html_string = ""
+        html_string += "<script src=\"https://www.google.com/recaptcha/api.js\" async=\"async\" defer=\"defer\"/>\n"
         html_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>"
 
         return {'html_string': html_string}
