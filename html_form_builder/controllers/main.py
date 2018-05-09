@@ -90,16 +90,16 @@ class HtmlFormController(http.Controller):
         html_output += "  <script>\n"
         html_output += "  $( function() {\n"
         html_output += "    $( \"#" + field.html_name + "\" ).removeClass(\"hasDatepicker\");\n"
-        html_output += "    $( \"#" + field.html_name + "\" ).datetimepicker({pickTime: false"
+        html_output += "    $( \"#" + field.html_name + "\" ).datetimepicker({"
 
         if field.setting_date_format == "years":
-            html_output += ", format: 'YYYY-01-01', minViewMode: 'years' });\n"
+            html_output += "format: 'YYYY-01-01'});\n"
         elif field.setting_date_format == "months":
-            html_output += ", format: 'YYYY-MM-01', minViewMode: 'months' });\n"
+            html_output += "format: 'YYYY-MM-01'});\n"
         elif field.setting_date_format == "days":
-            html_output += ", format: 'YYYY-MM-DD', minViewMode: 'days' });\n"
+            html_output += "format: 'YYYY-MM-DD'});\n"
         else:
-            html_output += ", format: 'YYYY-MM-DD', minViewMode: 'days' });\n"
+            html_output += "format: 'YYYY-MM-DD'});\n"
 
         html_output += "  } );\n"
         html_output += "  </script>\n"
@@ -129,7 +129,6 @@ class HtmlFormController(http.Controller):
 
         html_output += "    $(\"#" + field.html_name + "\").on('click', function(e) {\n"
         html_output += "      $(e.currentTarget).closest(\"div.date\").datetimepicker({\n"
-        html_output += "        useSeconds: true,\n"
         html_output += "        format: \"YYYY-MM-DD HH:mm:ss\",\n"
         html_output += "        icons : {\n"
         html_output += "          time: 'fa fa-clock-o',\n"
@@ -399,6 +398,7 @@ class HtmlFormController(http.Controller):
 
         if html_form.captcha:
             form_string += "<div class=\"html_form_captcha col-md-12 form-group\" data-captcha-id=\"" + str(html_form.captcha.id) + "\">\n"
+            form_string += "  <script src=\"https://www.google.com/recaptcha/api.js\" async=\"async\" defer=\"defer\"/>\n"
             form_string += "  <div class=\"g-recaptcha\" data-sitekey=\"" + str(html_form.captcha_client_key) + "\"></div>\n"
             form_string += "</div>\n"
 

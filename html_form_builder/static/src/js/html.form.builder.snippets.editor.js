@@ -1304,9 +1304,7 @@ options.registry.html_form_builder_captcha = options.Class.extend({
 
         });
     },
-    clean_for_save: function () {
-        this._super();
-        var self = this;
+    cleanForSave: function () {
 
 		var captcha_id = this.$target.attr('data-captcha-id');
 		var captcha_client_key = this.$target.attr('data-captcha-client-key');
@@ -1314,7 +1312,9 @@ options.registry.html_form_builder_captcha = options.Class.extend({
         var form_id = $(".html_form_captcha").parents().closest(".html_form").attr('data-form-id');
 
         //We can't use sync rpc, the page will refresh before it's got the data back, so just use the attribute data-captcha-client-key
-        return_string = "<div class=\"g-recaptcha\" data-sitekey=\"" + captcha_client_key + "\"></div>";
+        return_string = "";
+        return_string += "<script src=\"https://www.google.com/recaptcha/api.js\" async=\"async\" defer=\"defer\"/>\n";
+        return_string += "<div class=\"g-recaptcha\" data-sitekey=\"" + captcha_client_key + "\"></div>";
         $(".html_form_captcha").html(return_string);
 
     },

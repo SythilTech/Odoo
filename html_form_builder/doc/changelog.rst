@@ -1,3 +1,8 @@
+v1.0.4
+======
+* Fix Captcha not regenerating
+* Fix date and datetime picker having invalid parameters
+
 v1.0.3
 ======
 * Move recaptcha to inline to avoid bundling issues
