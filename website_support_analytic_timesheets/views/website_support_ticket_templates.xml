@@ -44,5 +44,36 @@ ${object.description|safe}
             </field>
         </record>
 
+<template id="support_tech_report_template" name="Support Tech Report">
+
+    <t t-call="web.html_container">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h1 style="text-align:center;">Productivity Report <span t-esc="test"/></h1>
+                <table style="width:100%;">
+                    <tr><th>Tech Name</th><th>Task</th><th>Ticket</th><th>Subject</th><th>Estimated Time</th><th>Time Available</th><th>Time Recorded</th><th>Status</th><th>Date Completed</th><th>Last Modified</th><th>Partner Name</th></tr>
+                    <t t-foreach="docs" t-as="o">
+                        <tr>
+                            <td><span t-esc="o.user_id.name"/></td>
+                            <td><span t-esc="o.task_id.name"/></td>
+                            <td><span t-esc="o.ticket_number_display"/></td>
+                        </tr>
+                    </t>
+                </table>
+            </div>
+        </t>
+    </t>
+    
+</template>        
+
+        <report
+            string="Support Tech Report"
+            id="support_tech_report"
+            model="account.analytic.line"
+            report_type="qweb-pdf"
+            name="website_support_analytic_timesheets.support_tech_report_template"
+            file="website_support_analytic_timesheets.support_tech_report_template"
+        />
+        
 </data>
 </openerp>
