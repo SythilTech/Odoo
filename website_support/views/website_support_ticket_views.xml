@@ -97,6 +97,7 @@
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
               <search>
+                  <field name="subject"/>
                   <field name="partner_id"/>
                   <filter string="Unattended Tickets" name="unattended_tickets" domain="[('unattended', '=', True )]" />
                   <filter name="group_by_category" string="Category" domain="[]"  context="{'group_by':'category'}"/>

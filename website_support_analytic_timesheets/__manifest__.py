@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket - Analytic Timesheets",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -11,6 +11,7 @@
         'views/website_support_ticket_templates.xml',
         'views/account_analytic_line_views.xml',
         'views/website_support_settings_views.xml',
+        'security/ir.rule.csv',
         'data/account.analytic.account.csv',
     ],
     'demo': [],

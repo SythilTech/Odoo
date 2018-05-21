@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Support ticket now defaultly searches by subject rather then partner...
+
 v1.1.0
 ======
 * Port approval system over from version 10
