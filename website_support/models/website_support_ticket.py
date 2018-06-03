@@ -79,6 +79,7 @@ class WebsiteSupportTicket(models.Model):
     approval_message = fields.Text(string="Approval Message")
     approve_url = fields.Char(compute="_compute_approve_url", string="Approve URL")
     disapprove_url = fields.Char(compute="_compute_disapprove_url", string="Disapprove URL")
+    tag_ids = fields.Many2many('website.support.ticket.tag', string="Tags")
 
     @api.one
     def _compute_approve_url(self):
@@ -376,6 +377,12 @@ class WebsiteSupportTicketPriority(models.Model):
         sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.priority')
         values['sequence']=sequence
         return super(WebsiteSupportTicketPriority, self).create(values)
+
+class WebsiteSupportTicketTag(models.Model):
+
+    _name = "website.support.ticket.tag"
+
+    name = fields.Char(required=True, translate=True, string="Tag Name")
 
 class WebsiteSupportTicketUsers(models.Model):
 

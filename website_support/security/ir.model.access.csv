@@ -10,6 +10,7 @@ access_website_support_help_groups,access.website.support.help.groups,model_webs
 access_website_support_help_page,access.website.support.help.page,model_website_support_help_page,,1,0,0,0
 access_website_support_help_page_feedback,access.website.support.help.page.feedback,model_website_support_help_page_feedback,,1,0,0,0
 access_website_support_ticket_priority,access.website.support.ticket.priority,model_website_support_ticket_priority,,1,0,0,0
+access_website_support_ticket_tag,access.website.support.ticket.tag,model_website_support_ticket_tag,,1,1,1,1
 access_website_support_ticket_close,access website.support.ticket.close,model_website_support_ticket_close,,1,1,1,1
 access_website_support_department_contact,access website.support.department.contact,model_website_support_department_contact,,1,0,0,0
 access_website_support_ticket_subcategory_field,access website.support.ticket.subcategory.field,model_website_support_ticket_subcategory_field,,1,1,1,1

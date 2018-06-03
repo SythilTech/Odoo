@@ -1,3 +1,7 @@
+v1.2.0
+======
+* Ability to tag support tickets
+
 v1.1.1
 ======
 * Support ticket now defaultly searches by subject rather then partner...

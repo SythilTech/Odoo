@@ -23,6 +23,7 @@
                           <field name="partner_id"/>
                           <field name="person_name"/>
                           <field name="email"/>
+                          <field name="tag_ids" widget="many2many_tags"/>
                           <field name="category"/>
                           <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
                           <field name="state"/>
@@ -98,6 +99,7 @@
           <field name="arch" type="xml">
               <search>
                   <field name="subject"/>
+                  <field name="tag_ids"/>
                   <field name="partner_id"/>
                   <filter string="Unattended Tickets" name="unattended_tickets" domain="[('unattended', '=', True )]" />
                   <filter name="group_by_category" string="Category" domain="[]"  context="{'group_by':'category'}"/>
