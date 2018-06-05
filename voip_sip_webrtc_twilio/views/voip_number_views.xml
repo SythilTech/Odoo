@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_number_view_form" model="ir.ui.view">
+        <field name="name">voip.number view form</field>
+        <field name="model">voip.number</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <sheet>
+      	            <group>
+      	                <field name="name"/>
+      	                <field name="number"/>
+      	                <field name="account_id"/>
+      	                <field name="capability_token_url" placeholder="https://xxxxxxxxx.twil.io/capability-token"/>
+      	            </group>
+      	        </sheet>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="voip_number_view_tree" model="ir.ui.view">
+        <field name="name">voip.number view tree</field>
+        <field name="model">voip.number</field>
+        <field name="arch" type="xml">
+      	    <tree>
+      	        <field name="name"/>
+      	        <field name="number"/>
+      	        <field name="account_id"/>
+      	    </tree>
+        </field>
+    </record>
+
+    <record id="voip_number_action" model="ir.actions.act_window">
+        <field name="name">VOIP Number</field>
+	<field name="res_model">voip.number</field>
+	<field name="view_mode">tree,form</field>
+	<field name="help" type="html">
+	    <p>
+	        No Voip Numbers
+	    </p>
+        </field>
+    </record>
+
+    <menuitem id="voip_number_menu" name="Stored Numbers" parent="voip_sip_webrtc.voip_parent_menu" action="voip_number_action" sequence="90"/>
+
+</odoo>

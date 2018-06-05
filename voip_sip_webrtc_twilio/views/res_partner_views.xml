@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="twilio_partner_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Twilio Call Mobile</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.twilio_mobile_action()</field>
+    </record>
+
+</odoo>

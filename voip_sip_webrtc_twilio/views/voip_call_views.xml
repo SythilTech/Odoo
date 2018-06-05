@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_call_view_tree_inherit_twilio" model="ir.ui.view">
+        <field name="name">voip.call tree view inherit twilio</field>
+        <field name="model">voip.call</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_call_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="duration" position="after">
+                <field name="twilio_account_id"/>
+                <field name="currency_id"/>
+                <field name="price" widget="monetery"/>
+            </field>
+        </field>
+    </record>
+    
+    <record id="voip_call_view_form_inherit_twilio" model="ir.ui.view">
+        <field name="name">voip.call form view inherit twilio</field>
+        <field name="model">voip.call</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_call_view_form"/>
+        <field name="arch" type="xml">
+            <field name="status" position="before">
+                <field name="twilio_sid"/>
+                <field name="twilio_account_id"/>
+                <field name="currency_id"/>
+                <field name="price" widget="monetery"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
