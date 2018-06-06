@@ -1,3 +1,7 @@
+v1.4.7
+======
+* Quick fix for autocreate field
+
 v1.4.6
 ======
 * Character set in DSN template

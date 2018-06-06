@@ -596,7 +596,7 @@ class MigrationImportOdbcTableField(models.Model):
         return valid
                 
     def auto_create_field(self):
-        if is_key == False:
+        if self.is_key == False:
             new_field = self.env['ir.model.fields'].create({'ttype': self.orm_type, 'name': self.orm_name, 'field_description':self.name, 'model_id':self.table_id.model_id.id})
             self.field_id = new_field.id
 
