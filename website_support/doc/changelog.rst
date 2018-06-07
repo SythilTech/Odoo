@@ -1,3 +1,7 @@
+v1.2.1
+======
+* Permission fix for approval system
+
 v1.2.0
 ======
 * Ability to tag support tickets
