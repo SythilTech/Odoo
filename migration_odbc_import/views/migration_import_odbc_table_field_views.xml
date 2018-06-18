@@ -16,6 +16,7 @@
       	            <field name="orm_type" invisible="True"/>
       	            <field name="orm_name" invisible="True"/>
       	            <field name="model_id" invisible="True"/>
+      	            <field name="is_key"/>
       	            <field name="valid"/>
       	            <field name="field_id"/>
       	            <field name="date_format" attrs="{'invisible':[('orm_type','!=','date')]}"/>

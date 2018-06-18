@@ -55,6 +55,10 @@ class MigrationImportOdbcTable(models.Model):
         import_log.finish_date = datetime.utcnow()
         
     def import_table_data(self, import_log):
+    
+        if self.select_sql == False:
+            raise UserError("SQL statement can not be blank, please select a model before importing")
+
         conn = pyodbc.connect(self.import_id.connection_string)
         cursor = conn.cursor()
 

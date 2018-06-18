@@ -1,3 +1,8 @@
+v1.4.8
+======
+* Error if trying to import before selecting model
+* Show Key field
+
 v1.4.7
 ======
 * Quick fix for autocreate field
