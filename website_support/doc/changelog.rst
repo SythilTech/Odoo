@@ -1,3 +1,7 @@
+v1.2.2
+======
+* Portal access key is generated when ticket is manually created or through email / website
+
 v1.2.1
 ======
 * Permission fix for approval system

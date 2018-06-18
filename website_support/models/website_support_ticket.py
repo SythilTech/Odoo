@@ -133,9 +133,6 @@ class WebsiteSupportTicket(models.Model):
 
         defaults['description'] = tools.html_sanitize(msg.get('body'))
 
-        portal_access_key = randint(1000000000,2000000000)
-        defaults['portal_access_key'] = portal_access_key
-
         #Assign to default category
         setting_email_default_category_id = self.env['ir.default'].get('website.support.settings', 'email_default_category_id')
 
@@ -222,6 +219,8 @@ class WebsiteSupportTicket(models.Model):
     def create(self, vals):
         new_id = super(WebsiteSupportTicket, self).create(vals)
 
+        new_id.portal_access_key = randint(1000000000,2000000000)
+        
         new_id.ticket_number = new_id.company_id.next_support_ticket_number
 
         #Add one to the next ticket number
