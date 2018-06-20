@@ -1,3 +1,7 @@
+v1.4.9
+======
+* Support for non English characters in data remapping
+
 v1.4.8
 ======
 * Error if trying to import before selecting model

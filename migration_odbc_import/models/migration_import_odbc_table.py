@@ -98,7 +98,7 @@ class MigrationImportOdbcTable(models.Model):
                                     
                         #Remap the values to the Odoo ones
                         for alter_value in import_field.alter_value_ids:
-                            if str(merged_dict[import_field.field_id.name]) == str(alter_value.old_value):
+                            if merged_dict[import_field.field_id.name] == alter_value.old_value:
                                 merged_dict[import_field.field_id.name] = alter_value.new_value
 
                         #So 0 is interperted as False
@@ -370,23 +370,23 @@ class MigrationImportOdbcTableField(models.Model):
                 #Convert to dictionary
                 row_dict = dict(zip(columns, row))
 
-                existing_remap_value = self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', str(row_dict['dis_value']) )])
+                existing_remap_value = self.env['migration.import.odbc.table.field.alter'].search_count([('field_id','=', self.id), ('old_value','=', row_dict['dis_value'] )])
                         
-                if existing_remap_value == 0 and str(row_dict['dis_value']) != "":
+                if existing_remap_value == 0 and row_dict['dis_value'] != "":
                 
                     #Go through all records and see if there is a name match
                     found_match = False
                     for rec in self.env[self.field_id.relation].search([]):
-                        if rec.name_get()[0][1] == str(row_dict['dis_value']):
+                        if rec.name_get()[0][1] == row_dict['dis_value']:
 
                             if existing_remap_value == 0:
-                                self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': rec.id})
+                                self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': row_dict['dis_value'], 'new_value': rec.id})
                                 found_match = True
                                 break
                 
                     #Record was not found so create placeholder
                     if found_match == False:
-                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': str(row_dict['dis_value']), 'new_value': '?'})                
+                        self.env['migration.import.odbc.table.field.alter'].create({'field_id': self.id, 'old_value': row_dict['dis_value'], 'new_value': '?'})                
                 
     def check_valid(self):
         """ Called after a person has remapped all the values """
@@ -587,8 +587,8 @@ class MigrationImportOdbcTableField(models.Model):
             #Convert to dictionary
             row_dict = dict(zip(columns, row))            
             
-            if str(row_dict['dis_value']) != "":
-                remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',str(row_dict['dis_value']))], limit=1)
+            if row_dict['dis_value'] != "":
+                remap_value = self.env['migration.import.odbc.table.field.alter'].search([('field_id','=',self.id), ('old_value','=',row_dict['dis_value'])], limit=1)
                 if remap_value.new_value != False:
                     if len(remap_value) == 0:
                         #All distinct values MUST be remapped to a record id
