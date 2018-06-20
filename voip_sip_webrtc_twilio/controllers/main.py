@@ -1,12 +1,28 @@
 # -*- coding: utf-8 -*-
 import openerp.http as http
 import werkzeug
+from odoo.http import request
 
 import logging
 _logger = logging.getLogger(__name__)
 
 class TwilioVoiceController(http.Controller):
 
+    @http.route('/voip/ringtone.mp3', type="http", auth="user")
+    def voip_ringtone_mp3(self):
+        """Return the ringtone file to be used by javascript"""
+
+        voip_ringtone_id = request.env['ir.default'].get('voip.settings', 'ringtone_id')
+        voip_ringtone = request.env['voip.ringtone'].browse( voip_ringtone_id )
+        ringtone_media = voip_ringtone.media
+
+        headers = []
+        ringtone_base64 = base64.b64decode(ringtone_media)
+        headers.append(('Content-Length', len(ringtone_base64)))
+        response = request.make_response(ringtone_base64, headers)
+
+        return response
+        
     @http.route('/twilio/voice', type='http', auth="public", csrf=False)
     def twilio_voice(self, **kwargs):
 
@@ -26,3 +42,43 @@ class TwilioVoiceController(http.Controller):
         twilio_xml += "</Response>"
 
         return twilio_xml
+
+    @http.route('/twilio/voice/route', type='http', auth="public", csrf=False)
+    def twilio_voice_route(self, **kwargs):
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            _logger.error(field_name)
+            _logger.error(field_value)
+            values[field_name] = field_value
+
+        from_number = values['From']
+        to_number = values['To']
+        _logger.error("Twilio Route")
+        _logger.error(to_number)
+        
+        to_stored_number = request.env['voip.number'].sudo().search([('number','=',to_number)])
+
+        twilio_xml = ""
+        twilio_xml += '<?xml version="1.0" encoding="UTF-8"?>' + "\n"
+        twilio_xml += "<Response>\n"
+        twilio_xml += '    <Dial callerId="' + from_number + '">' + "\n"
+        
+        #Call all the users assigned to this number
+        for call_route in to_stored_number.call_routing_ids:
+            twilio_xml += "        <Client>" + call_route.twilio_client_name + "</Client>\n"
+        
+        twilio_xml += "    </Dial>\n"
+        twilio_xml += "</Response>"
+
+        return twilio_xml
+        
+    @http.route('/twilio/capability-token', type='http', auth="public", csrf=False)
+    def twilio_capability_token(self, **kwargs):
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            values[field_name] = field_value
+
+        #TODO generate the capability token ourselves
+        return ""

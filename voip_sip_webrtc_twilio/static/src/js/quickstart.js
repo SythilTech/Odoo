@@ -25,18 +25,7 @@ $(function () {
 
 
 
-      Twilio.Device.incoming(function (conn) {
-        console.log('Incoming connection from ' + conn.parameters.From);
-        var archEnemyPhoneNumber = '+12093373517';
 
-        if (conn.parameters.From === archEnemyPhoneNumber) {
-          conn.reject();
-          console.log('It\'s your nemesis. Rejected call.');
-        } else {
-          // accept the incoming connection and start two-way audio
-          conn.accept();
-        }
-      });
 
       setClientNameUI(data.identity);
 

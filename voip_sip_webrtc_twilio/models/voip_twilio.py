@@ -7,6 +7,7 @@ from datetime import datetime
 import re
 from lxml import etree
 from dateutil import parser
+from openerp.http import request
 
 from openerp import api, fields, models
 from openerp.exceptions import UserError
@@ -56,12 +57,17 @@ class VoipTwilio(models.Model):
                 sid = my_from_number.xpath('//Sid')[0].text
 
                 #Create the application for the number and point it back to the server
-                #data = {'FriendlyName': 'Auto Setup Application for ' + str(friendly_name)}
+                #data = {'FriendlyName': 'Auto Setup Application for ' + str(friendly_name), 'VoiceUrl': request.httprequest.host_url + 'twilio/client-voice'}
                 #response_string = requests.post("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "twilio_account_sid/Applications.json", data=data, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
 
                 #Create a new mobile number
                 if self.env['voip.number'].search_count([('number','=',twilio_number)]) == 0:
                     voip_number = self.env['voip.number'].create({'name': friendly_name, 'number': twilio_number,'account_id':self.id})
+                    #voip_number.capability_token_url = request.httprequest.host_url + 'twilio/capability-token'
+
+                #Setup the Voice URL
+                payload = {'VoiceUrl': str(request.httprequest.host_url + "sms/voice/route")}
+                requests.post("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/IncomingPhoneNumbers/" + sid, data=payload, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
 
         else:
             raise UserError("Bad Credentials")    

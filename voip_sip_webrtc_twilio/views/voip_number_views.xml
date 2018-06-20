@@ -12,6 +12,7 @@
       	                <field name="number"/>
       	                <field name="account_id"/>
       	                <field name="capability_token_url" placeholder="https://xxxxxxxxx.twil.io/capability-token"/>
+      	                <field name="call_routing_ids"/>
       	            </group>
       	        </sheet>
       	    </form>
