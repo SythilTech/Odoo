@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+
+        <function id="default_inactivity_time"
+            model="ir.default" name="set"
+            eval="('voip.settings', 'inactivity_time', 10)"/>
     
         <function id="default_ring_duration"
             model="ir.default" name="set"

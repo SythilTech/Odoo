@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Setting to adjust presense detection
+
 v1.0.3
 ======
 * Remove borken SIP widget

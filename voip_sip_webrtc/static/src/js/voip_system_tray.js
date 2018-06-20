@@ -30,31 +30,41 @@ var VOIPSystemTray = Widget.extend({
         event.preventDefault();
 
         rpc.query({
-		    model: 'voip.server',
-		    method: 'user_list',
-		    args: [],
-		    context: weContext.get()
-		}).then(function(result){
+            model: 'voip.server',
+            method: 'user_list',
+            args: [],
+            context: weContext.get()
+        }).then(function(result){
 
             $("#voip_tray").html("");
 
-	        for (var voip_user in result) {
-				var voip_user = result[voip_user];
-				var drop_menu_html = "";
+            for (var voip_user in result) {
+                var voip_user = result[voip_user];
+                var drop_menu_html = "";
 
-				drop_menu_html += "<li>";
-				drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name +  " (" + voip_user.status + ")</a>" + " <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_video_call\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"/> Video Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_audio_call\"><i class=\"fa fa-volume-up\" aria-hidden=\"true\"/> Audio Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_screenshare_call\"><i class=\"fa fa-desktop\" aria-hidden=\"true\"/> Screenshare Call</a>";
-				drop_menu_html += "</li>";
+                drop_menu_html += "<li>";
 
-			    $("#voip_tray").append(drop_menu_html);
+                if (voip_user.status == "Online") {
+                    drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name +  " (" + voip_user.status + ")</a>" + " <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_video_call\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"/> Video Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_audio_call\"><i class=\"fa fa-volume-up\" aria-hidden=\"true\"/> Audio Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_screenshare_call\"><i class=\"fa fa-desktop\" aria-hidden=\"true\"/> Screenshare Call</a>";
+                } else {
+                    drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name +  " (" + voip_user.status + ")</a>";
+                }
 
-			}
+                drop_menu_html += "</li>";
+
+                $("#voip_tray").append(drop_menu_html);
+
+            }
+
+            if (result.length == 0) {
+                $("#voip_tray").append("<span style=\"padding:10px;text-align:center;\">No connected users</span>");
+            }
 
         });
 
     },
     start_voip_screenshare_call: function (event) {
-		console.log("Call Type: screenshare call");
+        console.log("Call Type: screenshare call");
 
         var role = "caller";
         var mode = "screensharing";
@@ -66,9 +76,9 @@ var VOIPSystemTray = Widget.extend({
         var constraints = {'audio': true, 'video': {'mediaSource': "screen"}};
         voip_call_client.requestMediaAccess(constraints);
 
-	},
+    },
     start_voip_audio_call: function (event) {
-		console.log("Call Type: audio call");
+        console.log("Call Type: audio call");
 
         var role = "caller";
         var mode = "audiocall";
@@ -77,13 +87,13 @@ var VOIPSystemTray = Widget.extend({
 
         var voip_call_client = new voip_notification.VoipCallClient(role, mode, call_type, to_partner_id);
 
-		var constraints = {'audio': true};
+        var constraints = {'audio': true};
         voip_call_client.requestMediaAccess(constraints);
 
 
-	},
+    },
     start_voip_video_call: function (event) {
-		console.log("Call Type: video call");
+        console.log("Call Type: video call");
 
         var role = "caller";
         var mode = "videocall";
@@ -92,10 +102,10 @@ var VOIPSystemTray = Widget.extend({
 
         var voip_call_client = new voip_notification.VoipCallClient(role, mode, call_type, to_partner_id);
 
-		var constraints = {'audio': true, 'video': true};
+        var constraints = {'audio': true, 'video': true};
         voip_call_client.requestMediaAccess(constraints);
 
-	},
+    },
 });
 
 SystrayMenu.Items.push(VOIPSystemTray);

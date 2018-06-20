@@ -12,6 +12,7 @@
                     <!--<button type="object" name="generate_self_signed_certificate" string="Generate Self Signed Certificate"/>-->
                 </header>
                 <group>
+                    <field name="inactivity_time"/>
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
                     <field name="server_ip"/>

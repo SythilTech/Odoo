@@ -15,6 +15,7 @@ import re
 
 from odoo import api, fields, models, registry
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 class VoipVoip(models.Model):
 
@@ -38,11 +39,19 @@ class VoipVoip(models.Model):
 
         user_list = []
 
+        inactivity_time_minutes = self.env['ir.default'].get('voip.settings', 'inactivity_time')
+
+        #Fail safe because settings are not set to default on module upgrade
+        if inactivity_time_minutes == False or inactivity_time_minutes == 0 or inactivity_time_minutes == '':
+            inactivity_time_minutes == 10
+
         #This list should only include users that have ever logged in, sort it by last presence that way all the online users are at the top
         for presence_user in self.env['bus.presence'].search([('user_id','!=',self.env.user.id)], order="last_presence desc"):
 
-            #We kinda just assume if a person hasn't been active for 5 minutes they are AFK, this isn't reliable but is better then nothing
-            if presence_user.last_presence > (datetime.datetime.now() - datetime.timedelta(minutes=5) ).strftime("%Y-%m-%d %H:%M:%S"):
+            _logger.error(presence_user.user_id.name + ", last_poll:" + presence_user.last_poll + ", last_presence:" + presence_user.last_presence + ", current_time:" + str(datetime.datetime.now()))
+            
+            #We kinda just assume if a person hasn't been active for 10 minutes they are AFK, this isn't reliable but is better then nothing
+            if presence_user.last_presence >= ( datetime.datetime.strptime(presence_user.last_poll, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.timedelta(minutes=inactivity_time_minutes) ).strftime("%Y-%m-%d %H:%M:%S"):
                 status = "Online"
             else:
                 status = "Offline"

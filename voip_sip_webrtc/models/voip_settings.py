@@ -29,6 +29,7 @@ class VoipSettings(models.Model):
     ringtone_filename = fields.Char("Ringtone Filename")
     ring_duration = fields.Integer(string="Ring Duration (Seconds)")
     server_ip = fields.Char(string="IP Address")
+    inactivity_time = fields.Integer(string="Inactivity Time (minutes)", help="The amount of minutes before the user is considered offline")
 
     @api.multi
     def set_values(self):
@@ -36,6 +37,7 @@ class VoipSettings(models.Model):
         self.env['ir.default'].set('voip.settings', 'ringtone_id', self.ringtone_id.id)
         self.env['ir.default'].set('voip.settings', 'ring_duration', self.ring_duration)
         self.env['ir.default'].set('voip.settings', 'server_ip', self.server_ip)
+        self.env['ir.default'].set('voip.settings', 'inactivity_time', self.inactivity_time)
 
     @api.model
     def get_values(self):
@@ -43,7 +45,8 @@ class VoipSettings(models.Model):
         res.update(
             ringtone_id=self.env['ir.default'].get('voip.settings', 'ringtone_id'),
             ring_duration=self.env['ir.default'].get('voip.settings', 'ring_duration'),
-            server_ip=self.env['ir.default'].get('voip.settings', 'server_ip')
+            server_ip=self.env['ir.default'].get('voip.settings', 'server_ip'),
+            inactivity_time=self.env['ir.default'].get('voip.settings', 'inactivity_time')
         )
         return res
 
