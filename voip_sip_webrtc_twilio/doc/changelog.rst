@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Fix incorrect voice URL
+
 v1.0.5
 ======
 * Answer calls from within your browser

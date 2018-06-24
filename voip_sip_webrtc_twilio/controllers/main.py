@@ -2,9 +2,15 @@
 import openerp.http as http
 import werkzeug
 from odoo.http import request
+from odoo.exceptions import UserError
 
 import logging
 _logger = logging.getLogger(__name__)
+
+try:
+    from twilio.jwt.client import ClientCapabilityToken
+except:
+    _logger.error("Twilio Client Not Installed")
 
 class TwilioVoiceController(http.Controller):
 
@@ -48,14 +54,10 @@ class TwilioVoiceController(http.Controller):
 
         values = {}
         for field_name, field_value in kwargs.items():
-            _logger.error(field_name)
-            _logger.error(field_value)
             values[field_name] = field_value
 
         from_number = values['From']
         to_number = values['To']
-        _logger.error("Twilio Route")
-        _logger.error(to_number)
         
         to_stored_number = request.env['voip.number'].sudo().search([('number','=',to_number)])
 
@@ -73,12 +75,25 @@ class TwilioVoiceController(http.Controller):
 
         return twilio_xml
         
-    @http.route('/twilio/capability-token', type='http', auth="public", csrf=False)
-    def twilio_capability_token(self, **kwargs):
+    @http.route('/twilio/capability-token/<stored_number_id>', type='http', auth="public", csrf=False)
+    def twilio_capability_token(self, stored_number_id, **kwargs):
 
         values = {}
         for field_name, field_value in kwargs.items():
             values[field_name] = field_value
 
-        #TODO generate the capability token ourselves
-        return ""
+        stored_number = request.env['voip.number'].browse( int(stored_number_id) )
+
+        # Find these values at twilio.com/console
+        account_sid = stored_number.account_id.twilio_account_sid
+        auth_token = stored_number.account_id.twilio_auth_token
+
+        capability = ClientCapabilityToken(account_sid, auth_token)
+
+        # Twilio Application Sid
+        application_sid = stored_number.twilio_app_id
+        capability.allow_client_outgoing(application_sid)
+        capability.allow_client_incoming('the_user_id')
+        token = capability.generate()
+        
+        return {'indentity': 'the_user_id', 'token': token} 
