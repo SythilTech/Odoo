@@ -7,6 +7,7 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMA
 import logging
 _logger = logging.getLogger(__name__)
 from odoo import SUPERUSER_ID
+from dateutil import tz
 
 class WebsiteSupportTicket(models.Model):
 
@@ -75,12 +76,34 @@ class WebsiteSupportTicket(models.Model):
     time_to_close = fields.Integer(string="Time to close (seconds)")
     extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
     planned_time = fields.Datetime(string="Planned Time")
+    planned_time_format = fields.Char(string="Planned Time Format", compute="_compute_planned_time_format")
     approval_id = fields.Many2one('website.support.ticket.approval', default=_default_approval_id, string="Approval")
     approval_message = fields.Text(string="Approval Message")
     approve_url = fields.Char(compute="_compute_approve_url", string="Approve URL")
     disapprove_url = fields.Char(compute="_compute_disapprove_url", string="Disapprove URL")
     tag_ids = fields.Many2many('website.support.ticket.tag', string="Tags")
 
+    @api.one
+    @api.depends('planned_time')
+    def _compute_planned_time_format(self):
+    
+        #If it is assigned to the partner, use the partners timezone and date formatting
+        if self.planned_time and self.partner_id and self.partner_id.lang:
+            partner_language = self.env['res.lang'].search([('code','=', self.partner_id.lang)])[0]
+            
+            my_planned_time = datetime.datetime.strptime(self.planned_time, DEFAULT_SERVER_DATETIME_FORMAT)
+
+            #If we have timezone information translate the planned date to local time otherwise UTC
+            if self.partner_id.tz:
+                my_planned_time = my_planned_time.replace(tzinfo=tz.gettz('UTC'))
+                local_time = my_planned_time.astimezone(tz.gettz(self.partner_id.tz))
+                self.planned_time_format = local_time.strftime(partner_language.date_format + " " + partner_language.time_format) + " " + self.partner_id.tz
+            else:
+                self.planned_time_format = my_planned_time.strftime(partner_language.date_format + " " + partner_language.time_format) + " UTC"
+            
+        else:
+            self.planned_time_format = self.planned_time
+        
     @api.one
     def _compute_approve_url(self):
         self.approve_url = "/support/approve/" + str(self.id)
@@ -447,6 +470,17 @@ class WebsiteSupportTicketCompose(models.Model):
 
     @api.one
     def send_reply(self):
+
+        #Change the approval state before we send the mail
+        if self.approval:
+            #Change the ticket state to awaiting approval
+            awaiting_approval_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_awaiting_approval')
+            self.ticket_id.state = awaiting_approval_state.id
+
+            #One support request per ticket...
+            self.ticket_id.planned_time = self.planned_time
+            self.ticket_id.approval_message = self.body
+            
         #Send email
         values = {}
 
@@ -468,17 +502,9 @@ class WebsiteSupportTicketCompose(models.Model):
         #self.ticket_id.message_post(body=self.body, subject=self.subject, message_type='comment', subtype='mt_comment')
 
         if self.approval:
-            #Change the ticket state to awaiting approval
-            awaiting_approval_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_awaiting_approval')
-            self.ticket_id.state = awaiting_approval_state.id
-
             #Also change the approval
             awaiting_approval = self.env['ir.model.data'].get_object('website_support','awaiting_approval')
             self.ticket_id.approval_id = awaiting_approval.id
-            
-            #One support request per ticket...
-            self.ticket_id.planned_time = self.planned_time
-            self.ticket_id.approval_message = self.body
         else:
             #Change the ticket state to staff replied
             staff_replied = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')

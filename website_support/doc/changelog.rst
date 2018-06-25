@@ -1,3 +1,8 @@
+v1.2.3
+======
+* Planned date now in default wrapper email template, formatted and localised
+* Default wrapper email template now uses fake/display ticket_number not id
+
 v1.2.2
 ======
 * Portal access key is generated when ticket is manually created or through email / website

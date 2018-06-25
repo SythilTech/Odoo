@@ -152,7 +152,7 @@
         </record>
 
         <record id="support_ticket_reply_wrapper" model="mail.template">
-            <field name="name">Support Ticket Reply Wrapper (User)</field>
+            <field name="name">Support Ticket Reply Wrapper</field>
             <field name="model_id" ref="model_website_support_ticket_compose"></field>
             <field name="subject">${object.subject}</field>
             <field name="email_from">${user.email|safe}</field>            
@@ -165,9 +165,11 @@
                 % if object.ticket_id.portal_access_key :
                     <b>View Ticket Online:</b> <a href="/support/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
                 % endif
-                <b>Ticket Number:</b> ${object.ticket_id.id}<br/>
-                <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}
-                <br/>
+                <b>Ticket Number:</b> ${object.ticket_id.ticket_number or object.ticket_id.id}<br/>
+                <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}<br/>
+                % if object.ticket_id.planned_time_format :
+                    <b>Planned Date:</b> ${object.ticket_id.planned_time_format}<br/>
+                % endif
                 <b>Ticket Description:</b><br/>
                 ${object.ticket_id.description|safe}
             ]]>
