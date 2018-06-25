@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Adjust permissions
+
 v1.0.4
 ======
 * Setting to adjust presense detection

@@ -327,6 +327,12 @@ class VoipAccount(models.Model):
         _logger.error("Message Received")
         _logger.error(message)
 
+    def register_ok(self, session, data):
+        _logger.error("REGISTER OK")
+        _logger.error(data)
+        
+        self.env['voip.account'].search([('username','=',session.username), ('domain','=',session.domain)])
+        
     sip_session = ""
     def uac_register(self):
 
@@ -336,6 +342,7 @@ class VoipAccount(models.Model):
             sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
             sip_session.call_ringing += self.call_ringing
             sip_session.message_received += self.message_received
+            sip_session.register_ok += self.register_ok
             sip_session.send_sip_register(self.address)
         else:
             raise UserError("Please enter your IP under settings first")

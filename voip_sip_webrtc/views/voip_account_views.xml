@@ -21,7 +21,6 @@
       	                <field name="auth_username"/>
       	                <field name="outbound_proxy"/>
       	                <field name="port"/>
-      	                <field name="wss"/>
       	                <field name="action_id" domain="[('account_id','=', active_id)]" context="{'default_account_id': active_id}"/>
       	            </group>
       	        </sheet>

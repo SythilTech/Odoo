@@ -31,7 +31,7 @@ class VoipVoip(models.Model):
         if voip_account:
             return {'address': voip_account.address, 'wss': voip_account.wss, 'auth_username': voip_account.auth_username, 'password': voip_account.password}
         else:
-            return {'address': ''}        
+            return {'address': ''}
 
     @api.model
     def user_list(self, **kw):
@@ -48,8 +48,6 @@ class VoipVoip(models.Model):
         #This list should only include users that have ever logged in, sort it by last presence that way all the online users are at the top
         for presence_user in self.env['bus.presence'].search([('user_id','!=',self.env.user.id)], order="last_presence desc"):
 
-            _logger.error(presence_user.user_id.name + ", last_poll:" + presence_user.last_poll + ", last_presence:" + presence_user.last_presence + ", current_time:" + str(datetime.datetime.now()))
-            
             #We kinda just assume if a person hasn't been active for 10 minutes they are AFK, this isn't reliable but is better then nothing
             if presence_user.last_presence >= ( datetime.datetime.strptime(presence_user.last_poll, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.timedelta(minutes=inactivity_time_minutes) ).strftime("%Y-%m-%d %H:%M:%S"):
                 status = "Online"

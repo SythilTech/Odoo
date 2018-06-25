@@ -2,3 +2,12 @@
 "access_voip_call","access voip.call","model_voip_call","base.group_user",1,1,1,0
 "access_voip_ringtone","access voip.ringetone","model_voip_ringtone","base.group_user",1,0,0,0
 "access_voip_call_client","access voip.call.client","model_voip_call_client","base.group_user",1,1,1,0
+"access_voip_voip","access voip.voip","model_voip_voip","base.group_user",1,1,1,1
+"access_voip_server","access voip.server","model_voip_server","base.group_user",1,1,1,1
+"access_voip_account","access voip.account","model_voip_account","base.group_user",1,1,1,1
+"access_voip_account_action","access voip.account.action","model_voip_account_action","base.group_user",1,1,1,1
+"access_voip_account_action_type","access voip.account.action.type","model_voip_account_action_type","base.group_user",1,1,1,1
+"access_voip_codec","access voip.codec","model_voip_codec","base.group_user",1,1,1,1
+"access_voip_call_template","access voip.call.template","model_voip_call_template","base.group_user",1,1,1,1
+"access_voip_media","access voip.media","model_voip_media","base.group_user",1,1,1,1
+"access_voip_message_template","access voip.message.template","model_voip_message_template","base.group_user",1,1,1,1

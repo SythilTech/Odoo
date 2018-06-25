@@ -5,6 +5,7 @@ import re
 import random
 import hashlib
 import threading
+import time
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +31,8 @@ class SIPSession:
         self.call_ringing = EventHook()
         self.message_sent = EventHook()
         self.message_received = EventHook()
-
+        self.register_ok = EventHook()
+        
         #Each account is bound to a different port
         self.sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sipsocket.bind(('', 0))
@@ -354,6 +356,8 @@ class SIPSession:
                         self.call_accepted.fire(self, data)
                     elif cseq_type == "MESSAGE":
                         self.message_sent.fire(self, data)
+                    elif cseq_type == "REGISTER":
+                        self.register_ok.fire(self, data)
                 elif data.split("\r\n")[0].startswith("SIP/2.0 4"):
                     self.call_error.fire(self, data)
 
