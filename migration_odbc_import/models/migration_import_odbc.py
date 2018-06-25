@@ -100,7 +100,8 @@ class MigrationImportOdbc(models.Model):
         conn = pyodbc.connect(self.connection_string)
         table_cursor = conn.cursor()
         column_cursor = conn.cursor() #Double cursor because of issue with fetch columns
-
+        key_cursor = conn.cursor() #Triple cursor
+        
         for db_table in table_cursor.tables():
             import_table = self.env['migration.import.odbc.table'].search([('import_id','=',self.id), ('name','=',db_table.table_name)])
             if len(import_table) == 0:
@@ -108,17 +109,9 @@ class MigrationImportOdbc(models.Model):
 
             #Get the fields in the table
             for column in column_cursor.columns(table=db_table.table_name):
+                
                 column_name = column[3]
                 data_type = column[5]
-                is_key = column[17]
-                
-                if is_key == "YES":
-                    is_key = True
-                elif is_key == "NO":
-                    is_key = False
-                
-                if column_name == "id":
-                    is_key = True
                     
                 import_field = self.env['migration.import.odbc.table.field'].search([('table_id','=',import_table.id),('name','=',column_name)])
                 if len(import_field) == 0:
@@ -130,5 +123,9 @@ class MigrationImportOdbc(models.Model):
                     elif data_type == "integer":              
                         orm_type = "integer"
                     
-                    self.env['migration.import.odbc.table.field'].create({'table_id': import_table.id, 'name': column_name, 'orm_type': orm_type, 'orm_name': "x_" + column_name, 'is_key': is_key})
-    
+                    self.env['migration.import.odbc.table.field'].create({'table_id': import_table.id, 'name': column_name, 'orm_type': orm_type, 'orm_name': "x_" + column_name})
+
+            #Set the Primary Key
+            for row in key_cursor.primaryKeys(db_table.table_name).fetchall():
+                primary_key = row[3]
+                self.env['migration.import.odbc.table.field'].search([('table_id','=',import_table.id), ('name','=',primary_key)])[0].is_key = True

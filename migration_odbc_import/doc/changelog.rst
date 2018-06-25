@@ -1,3 +1,7 @@
+v1.4.10
+=======
+* Fix index being marked as primary key
+
 v1.4.9
 ======
 * Support for non English characters in data remapping
