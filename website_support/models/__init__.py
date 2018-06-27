@@ -7,3 +7,4 @@ from . import res_company
 from . import website_support_settings
 from . import mail_template
 from . import website_support_department
+from . import website_support_sla

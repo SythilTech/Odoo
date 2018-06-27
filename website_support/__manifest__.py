@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.2.3",
+    'version': "1.2.4",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -26,6 +26,7 @@
         'views/res_company_views.xml',
         'views/website_support_settings_views.xml',
         'views/website_support_ticket_department_views.xml',
+        'views/website_support_sla_views.xml',
         'data/website.support.ticket.states.xml',
         'data/website.support.ticket.categories.xml',
         'data/website.menu.csv',

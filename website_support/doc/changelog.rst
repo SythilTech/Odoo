@@ -1,3 +1,7 @@
+v1.2.4
+======
+* Information only SLA
+
 v1.2.3
 ======
 * Planned date now in default wrapper email template, formatted and localised
