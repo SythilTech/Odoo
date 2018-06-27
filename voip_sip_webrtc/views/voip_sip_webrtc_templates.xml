@@ -5,7 +5,6 @@
        <xpath expr="." position="inside">
            <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/notification.js"></script>
            <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/voip_system_tray.js"></script>
-           <script type="text/javascript" src="/voip_sip_webrtc/static/src/js/sip-0.8.3.min.js"></script>
            <link rel="stylesheet" href="/voip_sip_webrtc/static/src/css/notification.css"/>
        </xpath>
     </template>

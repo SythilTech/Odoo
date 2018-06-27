@@ -102,7 +102,7 @@ class VoipAccount(models.Model):
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
 
-            audio_stream = ""
+            audio_stream = b''
             call_start_time = datetime.datetime.now()
 
             try:
@@ -118,7 +118,16 @@ class VoipAccount(models.Model):
 
                     rtpsocket.settimeout(10)
                     data, addr = rtpsocket.recvfrom(2048)
-                    data = data.decode()
+                    
+                    #_logger.error(data.hex())
+                    #payload_type = data[1]
+                    
+                    #Listen for telephone events DTMF
+                    #if payload_type == 101:
+                    #    _logger.error("Telephone Event")
+                    #    dtmf_number = data[12]                        
+                    #    _logger.error(dtmf_number)                    
+                    
                     #Add the RTP payload to the received data
                     audio_stream += data[12:]
 
@@ -329,9 +338,17 @@ class VoipAccount(models.Model):
 
     def register_ok(self, session, data):
         _logger.error("REGISTER OK")
-        _logger.error(data)
-        
-        self.env['voip.account'].search([('username','=',session.username), ('domain','=',session.domain)])
+
+        with api.Environment.manage():
+            # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
+            new_cr = self.pool.cursor()
+            self = self.with_env(self.env(cr=new_cr))
+
+            voip_account = self.env['voip.account'].search([('username','=',session.username), ('domain','=',session.domain)])[0]
+            voip_account.state = "active"
+
+            self._cr.commit()
+            self._cr.close()
         
     sip_session = ""
     def uac_register(self):

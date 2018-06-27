@@ -148,33 +148,6 @@ WebClient.include({
         $(".s-voip-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
         $(".s-chat-manager").draggable().resizable({handles: 'ne, se, sw, nw'});
 
-
-        rpc.query({
-		    model: 'voip.server',
-		    method: 'get_user_agent',
-		    args: [],
-		    context: weContext.get()
-		}).then(function(result){
-
-            if (result.address != '') {
-				console.log("Signing in as " + result.address);
-                window.userAgent = new SIP.UA({
-                    uri: result.address,
-                    wsServers: [result.wss],
-                    authorizationUser: result.auth_username,
-                    password: result.password
-                });
-
-                window.userAgent.start();
-                window.userAgent.on('message', onMessage);
-                window.userAgent.on('invite', onInvite);
-		    }
-
-
-        });
-
-
-
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
 
