@@ -20,7 +20,8 @@ class WebsiteSupportSettings(models.Model):
     max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
     allow_user_signup = fields.Boolean(string="Allow User Signup")
     auto_send_survey = fields.Boolean(string="Auto Send Survey")
-
+    business_hours_id = fields.Many2one('resource.calendar', string="Business Hours")
+    
     @api.multi
     def set_values(self):
         super(WebsiteSupportSettings, self).set_values()
@@ -32,7 +33,8 @@ class WebsiteSupportSettings(models.Model):
         self.env['ir.default'].set('website.support.settings', 'staff_reply_email_template_id', self.staff_reply_email_template_id.id)
         self.env['ir.default'].set('website.support.settings', 'max_ticket_attachments', self.max_ticket_attachments)
         self.env['ir.default'].set('website.support.settings', 'max_ticket_attachment_filesize', self.max_ticket_attachment_filesize)
-
+        self.env['ir.default'].set('website.support.settings', 'business_hours_id', self.business_hours_id.id)
+        
     @api.model
     def get_values(self):
         res = super(WebsiteSupportSettings, self).get_values()
@@ -44,6 +46,7 @@ class WebsiteSupportSettings(models.Model):
             email_default_category_id=self.env['ir.default'].get('website.support.settings', 'email_default_category_id'),
             staff_reply_email_template_id=self.env['ir.default'].get('website.support.settings', 'staff_reply_email_template_id'),
             max_ticket_attachments=self.env['ir.default'].get('website.support.settings', 'max_ticket_attachments'),
-            max_ticket_attachment_filesize=self.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize')
+            max_ticket_attachment_filesize=self.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize'),
+            business_hours_id=self.env['ir.default'].get('website.support.settings', 'business_hours_id')
         )
         return res

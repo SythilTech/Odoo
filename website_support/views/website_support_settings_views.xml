@@ -19,6 +19,7 @@
                     <field name="max_ticket_attachment_filesize"/>
                     <field name="allow_user_signup"/>
                     <field name="auto_send_survey"/>
+                    <field name="business_hours_id"/>
                 </group>
       	    </form>
         </field>

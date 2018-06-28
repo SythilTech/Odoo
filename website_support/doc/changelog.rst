@@ -1,3 +1,7 @@
+v1.2.5
+======
+* Ability to assign SLA to contact and ultimately to their tickets
+
 v1.2.4
 ======
 * Information only SLA

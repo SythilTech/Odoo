@@ -9,8 +9,7 @@ class WebsiteSupportSLA(models.Model):
 
     name = fields.Char(string="Name", translate=True)
     description = fields.Text(string="Description", translate=True)
-    #business_hours_id = fields.Many2one('resource.calendar', string="Business Hours")
-    response_time_ids = fields.One2many('website.support.sla.response', 'vsa_id', string="Category Response Times")
+    response_time_ids = fields.One2many('website.support.sla.response', 'vsa_id', string="Category Response Times (Working Hours)")
 
 class WebsiteSupportSLAResponse(models.Model):
 

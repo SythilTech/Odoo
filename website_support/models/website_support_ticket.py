@@ -82,6 +82,79 @@ class WebsiteSupportTicket(models.Model):
     approve_url = fields.Char(compute="_compute_approve_url", string="Approve URL")
     disapprove_url = fields.Char(compute="_compute_disapprove_url", string="Disapprove URL")
     tag_ids = fields.Many2many('website.support.ticket.tag', string="Tags")
+    sla_id = fields.Many2one('website.support.sla', string="SLA")
+    sla_timer = fields.Char(string="SLA Timer", compute="_compute_sla_timer")
+    sla_save_timer = fields.Float(string="SLA Save Timer", help="Stores the SLA time remaining when the SLA is paused")
+    sla_active = fields.Boolean(string="SLA Active")
+    sla_due = fields.Datetime(string="SLA Due Date")
+
+    @api.one
+    def _compute_sla_timer(self):
+        self.sla_timer = self.sla_save_timer
+
+    def pause_sla(self):
+        #Store the time remaining for when we resume the SLA
+        self.sla_save_timer = False
+        self.sla_due = False
+
+    def resume_sla(self):
+        #Recalculate the due date
+        self.sla_save_timer = False
+
+    def calculate_sla_due_date(self, hours_remaing):
+        #Find the Current Day
+        setting_business_hours_id = self.env['ir.default'].get('website.support.settings', 'business_hours_id')
+
+        current_hour_float = datetime.datetime.now().hour() + (datetime.datetime.now().minute() / 60)
+        day_of_week = datetime.datetime.now().weekday()
+
+        current_timeslot = self.env['resource.calendar.attendance'].search([('calendar_id','=', setting_business_hours_id.id), ('dayofweek','=',day_of_week), ('hour_from','<',current_hour_float), ('hour_to','>',current_hour_float)])
+        current_hours_remaing = hours_remaing
+
+        loop_current_time = datetime.datetime.now()
+
+        if current_timeslot:
+            #Inside work hours
+
+            #Check to see if there are enough hours left in the current timeslot to finish the support ticket
+            hours_left_in_day = current_timeslot.hour_to - current_hour_float
+            if current_hours_remaing < hours_left_in_day:
+                #We can finish the task in the current timeslot so tranlate it to a datetime
+                self.sla_due = loop_current_time + current_hours_remaing
+
+            else:
+                _logger.error("Loop")
+                #Keep looping through timeslots
+
+            while current_hours_remaing > 0:
+
+                #Subtract the difference between now and the end of the current time slot
+                current_hours_remaing -= current_timeslot.hour_to - current_hour_float
+
+                if current_hours_remaing > 0:
+                    #Check if there are any more timeslots for the day
+                    current_hour_float = current_timeslot
+                    today_timeslot = self.env['resource.calendar'].search([('dayofweek','=',day_of_week), ('hour_from','>',current_hour_float)], order="hour_from asc")
+                    if today_timeslot:
+                        current_timeslot = today_timeslot
+                    else:
+                        #Find the earliest timeslot of the next working day, carrying over to the new week
+                        #0 = Monday, 6 = Sunday
+                        for loop_day_of_week in range(day_of_week + 1, 6):
+                           #Loop through all timeslots for the day, from earliest to latest
+                           for loop_timeslot in self.env['resource.calendar'].search([('dayofweek','=',loop_day_of_week)], order="hour_from asc"):
+                               current_hours_remaing -= current_timeslot.hour_to - current_hour_float
+
+                        for loop_day_of_week in range(0, day_of_week -1):
+                           #Loop through all timeslots for the day, from earliest to latest
+                           for loop_timeslot in self.env['resource.calendar'].search([('dayofweek','=',loop_day_of_week)], order="hour_from asc"):
+                               current_hours_remaing -= current_timeslot.hour_to - current_hour_float
+
+        else:
+            #Outside of work hours
+            _logger.error("Ticket Submitted outside of work hours")
+
+        self.sla_due = False
 
     @api.one
     @api.depends('planned_time')
@@ -251,6 +324,15 @@ class WebsiteSupportTicket(models.Model):
 
         ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
         ticket_open_email_template.send_mail(new_id.id, True)
+
+        #Check if this contact has a SLA assigned
+        if new_id.partner_id.sla_id:
+            #Check if this category has a SLA response time
+            category_response = self.env['website.support.sla.response'].search([('vsa_id','=',new_id.partner_id.sla_id.id), ('category_id','=',new_id.category.id)])
+            if category_response:
+                new_id.sla_id = new_id.partner_id.sla_id.id
+                new_id.sla_active = True
+                #new_id.calculate_sla_due_date(category_response.response_time)
 
         #Send an email out to everyone in the category
         notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'new_support_ticket_category')
