@@ -191,14 +191,10 @@ WebClient.include({
 
     show_application: function() {
 
-        console.log("Start Twilio notification");
         window.swnotification_manager = this.notification_manager;
-        console.log(window.swnotification_manager.display);
 
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
-
-                  console.log( notification[0][1] );
 
                   if (notification[0][1] === 'voip.twilio.start') {
                       var self = this;
