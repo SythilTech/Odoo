@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_account_action_inherit_twilio_view_form" model="ir.ui.view">
+        <field name="name">voip.account.action inherit twilio form view</field>
+        <field name="model">voip.account.action</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.voip_account_action_view_form"/>
+        <field name="arch" type="xml">
+      	    <field name="recorded_media_id" position="after">
+      	        <field name="call_user_ids" attrs="{'invisible': [('action_type_internal_name', '!=', 'call_users')]}"/>
+      	    </field>
+        </field>
+    </record>
+
+</odoo>

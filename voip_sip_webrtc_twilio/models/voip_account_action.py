@@ -11,4 +11,5 @@ class VoipAccountActionInheritTwilio(models.Model):
     call_user_ids = fields.Many2many('res.users', string="Call Users")
     
     def _voip_action_call_users(self, session, data):
-        _logger.error("Call Users")
+        for call_user in self.call_user_ids:
+            _logger.error("Call User " + call_user.name)
