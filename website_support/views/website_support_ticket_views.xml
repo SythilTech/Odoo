@@ -11,8 +11,8 @@
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Open / Reply" attrs="{'invisible' :[('close_time', '=', False )]}"/>
                       <button type="object" name="open_close_ticket_wizard" string="Close Ticket" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
-                      <!--<button type="object" name="pause_sla" string="Pause SLA" attrs="{'invisible' :[('sla_active', '==', False )]}"/>
-                      <button type="object" name="resume_sla" string="Resume SLA" attrs="{'invisible' :[('sla_active', '!=', False )]}"/>-->
+                      <button type="object" name="pause_sla" string="Pause SLA" attrs="{'invisible' :[('sla_active', '==', False )]}"/>
+                      <button type="object" name="resume_sla" string="Resume SLA" attrs="{'invisible' :[('sla_active', '!=', False )]}"/>
                       <button type="object" name="send_survey" string="Send Survey"/>
                       <button type="object" name="request_approval" string="Request Approval"/>
                   </header>
@@ -32,7 +32,6 @@
                           <field name="state"/>
                           <field name="approval_id"/>
                           <field name="subject"/>
-
                           <field name="description" widget="html"/>
                           <field name="support_rating" readonly="1"/>
                           <field name="support_comment" readonly="1"/>
@@ -63,6 +62,8 @@
                               <group>
                                   <field name="sla_id"/>
                                   <field name="sla_active"/>
+                                  <field name="sla_timer" widget="float_time"/>
+                                  <field name="sla_response_category_id" domain="[('vsa_id','=',sla_id)]"/>
                               </group>
                           </page>
                       </notebook>
@@ -150,6 +151,8 @@
                   <field name="state"/>
                   <field name="email"/>
                   <field name="subject"/>
+                  <field name="sla_active"/>
+                  <field name="sla_timer" widget="float_time"/>
               </tree>
           </field>
       </record>

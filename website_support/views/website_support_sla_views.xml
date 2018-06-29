@@ -14,6 +14,7 @@
       	                  <tree editable="bottom">
       	                      <field name="category_id"/>
       	                      <field name="response_time" widget="float_time"/>
+      	                      <field name="countdown_condition"/>
       	                  </tree>
       	              </field>
       	          </group>

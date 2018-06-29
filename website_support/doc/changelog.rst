@@ -1,3 +1,7 @@
+v1.2.6
+======
+* SLA tickets now have a timer that counts down, you can select between always count and business hours only + plus/resume timer
+
 v1.2.5
 ======
 * Ability to assign SLA to contact and ultimately to their tickets
