@@ -31,7 +31,7 @@ class VoipVoip(models.Model):
         inactivity_time_minutes = self.env['ir.default'].get('voip.settings', 'inactivity_time')
 
         #Fail safe because settings are not set to default on module upgrade
-        if inactivity_time_minutes == False or inactivity_time_minutes == 0 or inactivity_time_minutes == '':
+        if inactivity_time_minutes is None:
             inactivity_time_minutes == 10
 
         #This list should only include users that have ever logged in, sort it by last presence that way all the online users are at the top

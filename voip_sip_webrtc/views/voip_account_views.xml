@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
       	    <form>
       	        <header>
-      	            <button name="uac_register" type="object" string="Send Register"/>
+      	            <button name="uac_register" type="object" string="Send SIP Register"/>
                     <field name="state" widget="statusbar"/>
       	        </header>
       	        <sheet>
