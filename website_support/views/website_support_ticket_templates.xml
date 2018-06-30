@@ -557,6 +557,16 @@
                 </div>
             </div>
 
+            <t t-if="setting_google_recaptcha_active">
+                <script src='https://www.google.com/recaptcha/api.js'></script>
+                <div t-attf-class="form-group #{error and 'description' in error and 'has-error' or ''}">
+                    <label class="col-md-3 col-sm-4 control-label" for="reCAPTCHA">reCAPTCHA</label>
+                    <div class="col-md-7 col-sm-8">
+                        <div class="g-recaptcha" t-attf-data-sitekey="#{setting_google_captcha_client_key}"/>
+                    </div>
+                </div>
+            </t>
+
             <div class="form-group">
                 <div class="col-md-offset-3 col-sm-offset-4 col-sm-8 col-md-7">
                     <button class="btn btn-primary btn-lg">Submit Ticket</button>

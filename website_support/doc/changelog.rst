@@ -1,3 +1,7 @@
+v1.2.7
+======
+* reCAPTCHA implementation since the honey pot is not bullet proof
+
 v1.2.6
 ======
 * SLA tickets now have a timer that counts down, you can select between always count and business hours only + plus/resume timer

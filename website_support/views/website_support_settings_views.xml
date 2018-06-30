@@ -20,6 +20,9 @@
                     <field name="allow_user_signup"/>
                     <field name="auto_send_survey"/>
                     <field name="business_hours_id"/>
+                    <field name="google_recaptcha_active"/>
+                    <field name="google_captcha_client_key"/>
+                    <field name="google_captcha_secret_key"/>
                 </group>
       	    </form>
         </field>

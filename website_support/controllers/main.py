@@ -10,6 +10,7 @@ _logger = logging.getLogger(__name__)
 
 import openerp.http as http
 from openerp.http import request
+import requests
 
 from odoo.addons.http_routing.models.ir_http import slug
 
@@ -263,11 +264,12 @@ class SupportTicketController(http.Controller):
         if http.request.env.user.name != "Public user":
             person_name = http.request.env.user.name
 
+        setting_google_recaptcha_active = request.env['ir.default'].get('website.support.settings', 'google_recaptcha_active')
+        setting_google_captcha_client_key = request.env['ir.default'].get('website.support.settings', 'google_captcha_client_key')
         setting_max_ticket_attachments = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachments')
-
         setting_max_ticket_attachment_filesize = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize')
 
-        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize})
+        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize, 'setting_google_recaptcha_active': setting_google_recaptcha_active, 'setting_google_captcha_client_key': setting_google_captcha_client_key})
 
     @http.route('/support/feedback/process/<help_page>', type="http", auth="public", website=True)
     def support_feedback(self, help_page, **kw):
@@ -317,6 +319,22 @@ class SupportTicketController(http.Controller):
         if values['my_gold'] != "256":
             return "Bot Detected"
 
+        setting_google_recaptcha_active = request.env['ir.default'].get('website.support.settings', 'google_recaptcha_active')
+
+        if setting_google_recaptcha_active:
+
+            setting_google_captcha_secret_key = request.env['ir.default'].get('website.support.settings', 'google_captcha_secret_key')
+
+            #Redirect them back if they didn't answer the captcha
+            if 'g-recaptcha-response' not in values:
+                return werkzeug.utils.redirect("/support/ticket/submit")
+
+            payload = {'secret': setting_google_captcha_secret_key, 'response': str(values['g-recaptcha-response'])}
+            response_json = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
+
+            if response_json.json()['success'] is not True:
+                return werkzeug.utils.redirect("/support/ticket/submit")
+                
         my_attachment = ""
         file_name = ""
 

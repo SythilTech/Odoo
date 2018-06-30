@@ -21,6 +21,9 @@ class WebsiteSupportSettings(models.Model):
     allow_user_signup = fields.Boolean(string="Allow User Signup")
     auto_send_survey = fields.Boolean(string="Auto Send Survey")
     business_hours_id = fields.Many2one('resource.calendar', string="Business Hours")
+    google_recaptcha_active = fields.Boolean(string="Google reCAPTCHA Active")
+    google_captcha_client_key = fields.Char(string="reCAPTCHA Client Key")
+    google_captcha_secret_key = fields.Char(string="reCAPTCHA Secret Key")
     
     @api.multi
     def set_values(self):
@@ -34,7 +37,10 @@ class WebsiteSupportSettings(models.Model):
         self.env['ir.default'].set('website.support.settings', 'max_ticket_attachments', self.max_ticket_attachments)
         self.env['ir.default'].set('website.support.settings', 'max_ticket_attachment_filesize', self.max_ticket_attachment_filesize)
         self.env['ir.default'].set('website.support.settings', 'business_hours_id', self.business_hours_id.id)
-        
+        self.env['ir.default'].set('website.support.settings', 'google_recaptcha_active', self.google_recaptcha_active)
+        self.env['ir.default'].set('website.support.settings', 'google_captcha_client_key', self.google_captcha_client_key)
+        self.env['ir.default'].set('website.support.settings', 'google_captcha_secret_key', self.google_captcha_secret_key)
+
     @api.model
     def get_values(self):
         res = super(WebsiteSupportSettings, self).get_values()
