@@ -13,6 +13,7 @@ import threading
 from threading import Timer
 import time
 from time import sleep
+import sys
 import datetime
 import struct
 import base64
@@ -133,9 +134,9 @@ class VoipAccount(models.Model):
 
             except Exception as e:
                 #Timeout
-                #exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
-                #_logger.error("Line: " + str(exc_tb.tb_lineno) )
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
                 
             try:
 
@@ -160,29 +161,32 @@ class VoipAccount(models.Model):
                 rtc_sender_thread.join()
 
             except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
 
-    def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, audio_stream, codec_id, voip_call_client_id):
+    def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, audio_stream, codec_id, voip_call_client_id, call_action_id=False):
 
         try:
 
             server_stream_data = ""
 
             _logger.error("Start RTP Sender")
-                
+
+            if call_action_id:
+                current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
+
             packet_count = 0
             sequence_number = randint(29161, 30000)
             timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
 
             t = threading.currentThread()
             while getattr(t, "stream_active", True):
-                
+
                 #Send audio data out every 20ms
                 server_stream_data += str(audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size])
-                    
+
                 send_data = self.generate_rtp_packet(audio_stream, codec_id.payload_type, codec_id.payload_size, packet_count, sequence_number, timestamp)
                 rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
 
@@ -190,26 +194,26 @@ class VoipAccount(models.Model):
                 sequence_number += 1
                 timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
                 sleep(0.02)
-                    
+
         except Exception as e:
             #Timeout
-            #exc_type, exc_obj, exc_tb = sys.exc_info()
             _logger.error(e)
-            #_logger.error("Line: " + str(exc_tb.tb_lineno) )
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
-            self = self.with_env(self.env(cr=new_cr))            
+            self = self.with_env(self.env(cr=new_cr))
         
             try:
                 #Add the stream data to the call
                 voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
                 voip_call_client.vc_id.write({'server_stream_data': base64.b64encode(server_stream_data)})
             except Exception as e:
-                #exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
-                #_logger.error("Line: " + str(exc_tb.tb_lineno) )
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
     def call_accepted(self, session, data):
         _logger.error("Call Accepted")
@@ -321,8 +325,9 @@ class VoipAccount(models.Model):
 
             voip_account = self.env['voip.account'].search([('username','=', session.username), ('domain','=', session.domain) ])[0]
 
-            #Execute the account action
-            method = '_voip_action_%s' % (voip_account.action_id.action_type_id.internal_name,)
+            #The setup action is only executed for the first action, e.g. call media only accepts the call first but if used in a chain it just plays
+            #Not all actions will autoaccept the call for example call users will wait for a answer
+            method = '_voip_action_setup_%s' % (voip_account.action_id.action_type_id.internal_name,)
             action = getattr(self.action_id, method, None)
 
             if not action:

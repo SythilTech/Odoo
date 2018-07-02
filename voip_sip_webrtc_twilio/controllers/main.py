@@ -64,7 +64,15 @@ class TwilioVoiceController(http.Controller):
         twilio_xml = ""
         twilio_xml += '<?xml version="1.0" encoding="UTF-8"?>' + "\n"
         twilio_xml += "<Response>\n"
-        twilio_xml += '    <Dial callerId="' + from_number + '">' + "\n"
+        twilio_xml += '    <Dial callerId="' + from_number + '"'
+
+        setting_record_calls = request.env['ir.default'].get('voip.settings','record_calls')
+        
+        if setting_record_calls:
+            twilio_xml += ' record="record-from-ringing"'
+        
+        twilio_xml += '>' + "\n"
+
         
         #Call all the users assigned to this number
         for call_route in to_stored_number.call_routing_ids:

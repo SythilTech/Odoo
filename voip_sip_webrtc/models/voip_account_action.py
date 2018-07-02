@@ -28,13 +28,13 @@ class VoipAccountAction(models.Model):
     recorded_media_id = fields.Many2one('voip.media', string="Recorded Message")
     user_id = fields.Many2one('res.users', string="Call User")
 
-    def _voip_action_recorded_message(self, session, data):
+    def _voip_action_setup_recorded_message(self, session, data):
         _logger.error("Stream recorded message")
 
         call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
         call_from_full = re.findall(r'From: (.*?)\r\n', data)[0]
         call_from = re.findall(r'<sip:(.*?)>', call_from_full)[0]
-        local_ip = self.env['ir.values'].get_default('voip.settings', 'server_ip')
+        local_ip = self.env['ir.default'].get('voip.settings', 'server_ip')
 
         rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
         rtp_audio_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
@@ -60,9 +60,6 @@ class VoipAccountAction(models.Model):
 
         rtc_listener_thread = threading.Thread(target=self.account_id.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, voip_call_client.model, voip_call_client.record_id,))
         rtc_listener_thread.start()
-
-    def _voip_action_call_user(self, sipsocket, addr, data):
-        _logger.error("Call User")
 
 class VoipAccountActionType(models.Model):
 

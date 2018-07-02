@@ -16,6 +16,7 @@
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
                     <field name="server_ip"/>
+                    <field name="record_calls"/>
                 </group>
       	    </form>
         </field>
