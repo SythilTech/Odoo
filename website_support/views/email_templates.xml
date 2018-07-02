@@ -28,6 +28,29 @@
             ]]>
             </field>
         </record>
+
+        <record id="support_ticket_sla_alert" model="mail.template">
+            <field name="name">Support Ticket SLA Alert</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="subject">SLA Alert</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear _user_name_,</p>
+                %if object.sla_timer > 0:
+                    <p>You have ${object.sla_timer_format} hours remaining for this ticket</p>
+                %endif
+                %if object.sla_timer < 0:
+                    <p>The SLA is currently ${object.sla_timer_format} hours overdue</p>
+                %endif
+                <p>Person Name: ${object.person_name}</p>
+                <p>Category: ${object.category.name}</p>
+                <p>Subject: ${object.subject}</p>
+                <p>${object.description|safe}</p>
+            ]]>
+            </field>
+        </record>
         
         <record id="new_support_ticket_category" model="mail.template">
             <field name="name">Support Ticket New Ticket (Category)</field>

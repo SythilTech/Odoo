@@ -13,6 +13,7 @@ class WebsiteSupportSLA(models.Model):
     name = fields.Char(string="Name", translate=True)
     description = fields.Text(string="Description", translate=True)
     response_time_ids = fields.One2many('website.support.sla.response', 'vsa_id', string="Category Response Times (Working Hours)")
+    alert_ids = fields.One2many('website.support.sla.alert', 'vsa_id', string="Email Alerts")
 
 class WebsiteSupportSLAResponse(models.Model):
 
@@ -45,3 +46,12 @@ class WebsiteSupportSLAResponse(models.Model):
                 raise UserError("Please set business hours in settings before using this option")
 
         return super(WebsiteSupportSLAResponse, self).create(values)
+        
+class WebsiteSupportSLAAlert(models.Model):
+
+    _name = "website.support.sla.alert"
+    _order = "alert_time desc"
+
+    vsa_id = fields.Many2one('website.support.sla', string="SLA")
+    alert_time = fields.Float(string="Alert Time", help="Number of hours before or after SLA expiry to send alert")
+    type = fields.Selection([('email','Email')], default="email", string="Type")

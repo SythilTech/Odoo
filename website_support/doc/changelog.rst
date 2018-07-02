@@ -1,3 +1,7 @@
+v1.2.8
+======
+* SLA alert emails
+
 v1.2.7
 ======
 * reCAPTCHA implementation since the honey pot is not bullet proof

@@ -2,6 +2,7 @@
 from openerp import api, fields, models
 from openerp import tools
 from random import randint
+import math
 import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 import logging
@@ -84,8 +85,16 @@ class WebsiteSupportTicket(models.Model):
     tag_ids = fields.Many2many('website.support.ticket.tag', string="Tags")
     sla_id = fields.Many2one('website.support.sla', string="SLA")
     sla_timer = fields.Float(string="SLA Time Remaining")
+    sla_timer_format = fields.Char(string="SLA Timer Format", compute="_compute_sla_timer_format")
     sla_active = fields.Boolean(string="SLA Active")
     sla_response_category_id = fields.Many2one('website.support.sla.response', string="SLA Response Category")
+    sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts", help="Keep record of SLA alerts sent so we do not resend them")
+
+    @api.one
+    @api.depends('sla_timer')
+    def _compute_sla_timer_format(self):
+        #Display negative hours in a positive format
+        self.sla_timer_format = '{0:02.0f}:{1:02.0f}'.format(*divmod(abs(self.sla_timer) * 60, 60))
 
     @api.model
     def update_sla_timer(self):
@@ -105,6 +114,28 @@ class WebsiteSupportTicket(models.Model):
             else:
                 #Countdown even if the business hours setting is not set
                 active_sla_ticket.sla_timer -= 1/60
+
+            #Send an email out to everyone in the category about the SLA alert
+            notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_sla_alert')
+
+            for sla_alert in self.env['website.support.sla.alert'].search([('vsa_id','=',active_sla_ticket.sla_id.id), ('alert_time','>=', active_sla_ticket.sla_timer)]):
+
+                #Only send out the alert once
+                if sla_alert not in active_sla_ticket.sla_alert_ids:
+
+                    for my_user in active_sla_ticket.category.cat_user_ids:
+                        values = notification_template.generate_email(active_sla_ticket.id)
+                        values['body_html'] = values['body_html'].replace("_user_name_",  my_user.partner_id.name)
+                        values['email_to'] = my_user.partner_id.email
+
+                        send_mail = self.env['mail.mail'].create(values)
+                        send_mail.send()
+
+                        #Remove the message from the chatter since this would bloat the communication history by a lot
+                        send_mail.mail_message_id.res_id = 0
+
+                    #Add the alert to the list of already sent SLA
+                    active_sla_ticket.sla_alert_ids = [(4, sla_alert.id)]
 
     def pause_sla(self):
         self.sla_active = False
