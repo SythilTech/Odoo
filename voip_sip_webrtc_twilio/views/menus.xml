@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="voip_twilio_menu" name="Twilio Accounts" parent="voip_sip_webrtc.voip_parent_menu" action="voip_twilio_action" sequence="80"/>
+    <menuitem id="voip_number_menu" name="Twilio Numbers" parent="voip_sip_webrtc.voip_parent_menu" action="voip_number_action" sequence="90"/>
+
+</odoo>

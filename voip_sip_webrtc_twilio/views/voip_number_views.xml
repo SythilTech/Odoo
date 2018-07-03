@@ -46,6 +46,4 @@
         </field>
     </record>
 
-    <menuitem id="voip_number_menu" name="Stored Numbers" parent="voip_sip_webrtc.voip_parent_menu" action="voip_number_action" sequence="90"/>
-
 </odoo>

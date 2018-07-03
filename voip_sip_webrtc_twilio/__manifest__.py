@@ -16,6 +16,7 @@
         'views/voip_call_wizard_views.xml',
         'views/voip_account_action_views.xml',
         'views/voip_sip_webrtc_twilio_templates.xml',
+        'views/menus.xml',
         #'data/voip.account.action.type.csv',
         'security/ir.model.access.csv',
     ],

@@ -45,7 +45,5 @@
 	    </p>
         </field>
     </record>
-    
-    <menuitem id="voip_twilio_menu" name="Twilio Accounts" parent="voip_sip_webrtc.voip_parent_menu" action="voip_twilio_action" sequence="90"/>
 
 </odoo>
