@@ -1,3 +1,7 @@
+v1.2.9
+======
+* Permission for SLA Alerts
+
 v1.2.8
 ======
 * SLA alert emails

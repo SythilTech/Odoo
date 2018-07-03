@@ -18,3 +18,4 @@ access_website_support_ticket_subcategory_field,access website.support.ticket.su
 access_website_support_ticket_field,access website.support.ticket.field,model_website_support_ticket_field,,1,1,1,1
 access_website_support_sla,access website.support.sla,model_website_support_sla,,1,1,1,1
 access_website_support_sla_response,access website.support.sla.response,model_website_support_sla_response,,1,1,1,1
+access_website_support_sla_alert,access website.support.sla.alert,model_website_support_sla_alert,,1,1,1,1
