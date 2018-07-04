@@ -58,6 +58,7 @@ class VoipCall(models.Model):
     sip_call_id = fields.Char(string="SIP Call ID")
     ice_username = fields.Char(string="ICE Username")
     ice_password = fields.Char(string="ICE Password")
+    call_dialog_id = fields.Many2one('voip.codec', string="Call Dialog")
 
     @api.one
     def _compute_media_url(self):

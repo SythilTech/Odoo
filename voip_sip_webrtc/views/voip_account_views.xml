@@ -5,26 +5,27 @@
         <field name="name">voip.account view form</field>
         <field name="model">voip.account</field>
         <field name="arch" type="xml">
-      	    <form>
-      	        <header>
-      	            <button name="uac_register" type="object" string="Send SIP Register"/>
+            <form>
+                <header>
+                    <button name="uac_register" type="object" string="Send SIP Register"/>
+                    <!--<button name="uac_deregister" type="object" string="Remove SIP Registration"/>-->
                     <field name="state" widget="statusbar"/>
-      	        </header>
-      	        <sheet>
-      	            <group>
-      	                <field name="name"/>
-      	                <field name="address" invisible="True"/>
-      	                <field name="username"/>
-      	                <field name="domain"/>
-      	                <field name="password" password="True"/>
-      	                <field name="voip_display_name"/>
-      	                <field name="auth_username"/>
-      	                <field name="outbound_proxy"/>
-      	                <field name="port"/>
-      	                <field name="action_id" domain="[('account_id','=', active_id)]" context="{'default_account_id': active_id}"/>
-      	            </group>
-      	        </sheet>
-      	    </form>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="address" invisible="True"/>
+                        <field name="username"/>
+                        <field name="domain"/>
+                        <field name="password" password="True"/>
+                        <field name="voip_display_name"/>
+                        <field name="auth_username"/>
+                        <field name="outbound_proxy"/>
+                        <field name="port"/>
+                        <field name="call_dialog_id"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -32,36 +33,21 @@
         <field name="name">voip.account view tree</field>
         <field name="model">voip.account</field>
         <field name="arch" type="xml">
-      	    <tree>
-      	        <field name="address"/>
-      	        <field name="outbound_proxy"/>
-      	    </tree>
+            <tree>
+                <field name="address"/>
+                <field name="outbound_proxy"/>
+            </tree>
         </field>
     </record>
 
     <record id="voip_account_action" model="ir.actions.act_window">
         <field name="name">VOIP Accounts</field>
-	<field name="res_model">voip.account</field>
-	<field name="view_mode">tree,form</field>
-	<field name="help" type="html">
-	    <p>
-	        No SIP Accounts
-	    </p>
-        </field>
-    </record>
-
-    <record id="voip_account_action_view_form" model="ir.ui.view">
-        <field name="name">voip.account.action form view</field>
-        <field name="model">voip.account.action</field>
-        <field name="arch" type="xml">
-      	    <form>
-      	        <group>
-      	            <field name="action_type_internal_name" invisible="True"/>
-      	            <field name="account_id" invisible="True"/>
-      	            <field name="action_type_id" widget="selection" domain="[('name','!=','Call User')]"/>
-      	            <field name="recorded_media_id" attrs="{'invisible': [('action_type_internal_name', '!=', 'recorded_message')]}"/>
-      	        </group>
-      	    </form>
+        <field name="res_model">voip.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                No SIP Accounts
+            </p>
         </field>
     </record>
 

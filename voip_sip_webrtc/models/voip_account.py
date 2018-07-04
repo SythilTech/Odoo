@@ -37,9 +37,10 @@ class VoipAccount(models.Model):
     outbound_proxy = fields.Char(string="Outbound Proxy")
     port = fields.Integer(string="Port", default="5060")
     verified = fields.Boolean(string="Verified")
-    wss = fields.Char(string="WSS", default="wss://edge.sip.onsip.com")
     bind_port = fields.Integer(string="Bind Port")
     action_id = fields.Many2one('voip.account.action', string="Call Action")
+    call_dialog_id = fields.Many2one('voip.dialog', string="Call Dialog")
+    bind_port = fields.Integer(string="Bind Port", help="A record of what port the SIP session is bound on so we can deregister if neccassary")
 
     @api.onchange('username','domain')
     def _onchange_username(self):
@@ -59,7 +60,7 @@ class VoipAccount(models.Model):
     def KD(self, secret, data):
         return self.H(secret + ":" + data)
 
-    def generate_rtp_packet(self, audio_stream, payload_type, payload_size, packet_count, sequence_number, timestamp):
+    def generate_rtp_packet(self, rtp_payload_data, payload_type, payload_size, packet_count, sequence_number, timestamp):
 
         rtp_data = ""
 
@@ -86,17 +87,15 @@ class VoipAccount(models.Model):
         rtp_data += " 12 20 76 3d"
 
         #Payload:
-        payload_data = audio_stream[packet_count * payload_size : packet_count * payload_size + payload_size]
         hex_string = ""
-
-        for rtp_char in payload_data:
+        for rtp_char in rtp_payload_data:
             hex_format = "{0:02x}".format(rtp_char)
             hex_string += hex_format + " "
 
         rtp_data += " " + hex_string
         return bytes.fromhex( rtp_data.replace(" ","") )
 
-    def rtp_server_listener(self, rtc_sender_thread, rtpsocket, voip_call_client_id, model=False, record_id=False):
+    def rtp_server_listener(self, rtc_sender_thread, rtpsocket, voip_call_client_id, model=False, record_id=False, call_action_id):
         #Create the call with the audio
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
@@ -166,54 +165,63 @@ class VoipAccount(models.Model):
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
 
-    def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, audio_stream, codec_id, voip_call_client_id, call_action_id=False):
-
-        try:
-
-            server_stream_data = ""
-
-            _logger.error("Start RTP Sender")
-
-            if call_action_id:
-                current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
-
-            packet_count = 0
-            sequence_number = randint(29161, 30000)
-            timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
-
-            t = threading.currentThread()
-            while getattr(t, "stream_active", True):
-
-                #Send audio data out every 20ms
-                server_stream_data += str(audio_stream[packet_count * codec_id.payload_size : packet_count * codec_id.payload_size + codec_id.payload_size])
-
-                send_data = self.generate_rtp_packet(audio_stream, codec_id.payload_type, codec_id.payload_size, packet_count, sequence_number, timestamp)
-                rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
-
-                packet_count += 1
-                sequence_number += 1
-                timestamp += codec_id.sample_rate / (1000 / codec_id.sample_interval)
-                sleep(0.02)
-
-        except Exception as e:
-            #Timeout
-            _logger.error(e)
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            _logger.error("Line: " + str(exc_tb.tb_lineno) )
+    def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, media_data, codec_id, voip_call_client_id, call_action_id):
 
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
-        
+            
             try:
-                #Add the stream data to the call
-                voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
-                voip_call_client.vc_id.write({'server_stream_data': base64.b64encode(server_stream_data)})
+
+                server_stream_data = ""
+
+                _logger.error("Start RTP Sender")
+
+                current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
+                codec = self.env['voip.codec'].browse( int(codec_id) )
+
+                packet_count = 0
+                media_index = 0
+                sequence_number = randint(29161, 30000)
+                timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
+
+                t = threading.currentThread()
+                while getattr(t, "stream_active", True):
+
+                    method = '_voip_action_sender_%s' % (current_call_action.action_type_id.internal_name,)
+                    action = getattr(current_call_action, method, None)
+
+                    #The call action is capable of changing the media playback point (reset media from start) and changing the current call action (DTMF)
+                    rtp_payload_data, media_data, media_index = action(media_data, media_index, codec.payload_size)
+
+                    if packet_count < 10:
+                        _logger.error(rtp_payload_data)
+                        _logger.error(media_index)
+
+                    send_data = self.generate_rtp_packet(rtp_payload_data, codec.payload_type, codec.payload_size, packet_count, sequence_number, timestamp)
+                    rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
+
+                    packet_count += 1
+                    sequence_number += 1
+                    timestamp += codec.sample_rate / (1000 / codec.sample_interval)
+                    sleep(0.02)
+
             except Exception as e:
+                #Timeout
                 _logger.error(e)
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
+
+        
+            #try:
+                #Add the stream data to the call
+            #    voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
+            #    voip_call_client.vc_id.write({'server_stream_data': base64.b64encode(server_stream_data)})
+            #except Exception as e:
+            #    _logger.error(e)
+            #    exc_type, exc_obj, exc_tb = sys.exc_info()
+            #    _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
     def call_accepted(self, session, data):
         _logger.error("Call Accepted")
@@ -229,27 +237,16 @@ class VoipAccount(models.Model):
 
             voip_call = self.env['voip.call'].search([('sip_call_id','=', call_id)])[0]
 
-            #Find the voip client to the call was to
-            voip_call_client = self.env['voip.call.client'].search([('vc_id','=', voip_call.id), ('sip_address','=', call_to)])[0]
+            #Setup the first action for an outgoing call
+            start_call_action = self.env['voip.account.action'].search([('voip_dialog_id','=', voip_call.call_dialog_id.id), ('start','=',True)])[0]
+            method = '_voip_action_outgoing_setup_%s' % (start_call_action.action_type_id.internal_name,)
+            action = getattr(start_call_action, method, None)
 
-            rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
-            rtp_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
+            if not action:
+                raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
 
-            #The call was accepted so start listening for / sending RTP data
-            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            rtpsocket.bind(('', voip_call_client.audio_media_port));
-
-            _logger.error(voip_call.codec_id.name)
-
-            rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_port, voip_call.to_audio, voip_call.codec_id, voip_call_client.id,))
-            rtc_sender_thread.start()
-
-            rtc_listener_thread = threading.Thread(target=self.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, voip_call_client.model, voip_call_client.record_id,))
-            rtc_listener_thread.start()
-
-            #session.rtp_threads.append(rtc_sender_thread)
-            #session.rtp_threads.append(rtc_listener_thread)
-
+            action(session, data)            
+            
             self._cr.close()
 
     def call_rejected(self, session, data):
@@ -266,7 +263,7 @@ class VoipAccount(models.Model):
         _logger.error("Call Error")
         _logger.error(data)
 
-    def make_call(self, to_address, audio_stream, audio_codec, model=False, record_id=False):
+    def make_call(self, to_address, call_dialog, model=False, record_id=False):
 
         audio_media_port = random.randint(55000,56000)
         local_ip = self.env['ir.default'].get('voip.settings', 'server_ip')
@@ -274,7 +271,9 @@ class VoipAccount(models.Model):
         if "@" not in to_address:
             to_address = to_address + "@" + self.domain
 
-        call_sdp = sdp.generate_sdp(self, local_ip, audio_media_port, [audio_codec.payload_type])
+        ulaw_codec = self.env['ir.model.data'].get_object('voip_sip_webrtc','pcmu')
+
+        call_sdp = sdp.generate_sdp(self, local_ip, audio_media_port, [ulaw_codec.payload_type])
 
         sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
         sip_session.call_accepted += self.call_accepted
@@ -284,7 +283,7 @@ class VoipAccount(models.Model):
         call_id = sip_session.send_sip_invite(to_address, call_sdp)
 
         #Create the call now so we can make it has missed or rejected
-        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': audio_stream, 'codec_id': audio_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id }
+        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': '', 'codec_id': ulaw_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id, 'call_dialog_id': call_dialog.id}
         voip_call = self.env['voip.call'].create(create_dict)
 
         #Also create the client list
@@ -327,8 +326,10 @@ class VoipAccount(models.Model):
 
             #The setup action is only executed for the first action, e.g. call media only accepts the call first but if used in a chain it just plays
             #Not all actions will autoaccept the call for example call users will wait for a answer
-            method = '_voip_action_setup_%s' % (voip_account.action_id.action_type_id.internal_name,)
-            action = getattr(self.action_id, method, None)
+            #Find the first action in the call dialog
+            start_call_action = self.env['voip.account.action'].search([('voip_dialog_id','=', voip_account.call_dialog_id.id), ('start','=',True)])[0]
+            method = '_voip_action_incoming_setup_%s' % (start_call_action.action_type_id.internal_name,)
+            action = getattr(start_call_action, method, None)
 
             if not action:
                 raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
@@ -351,6 +352,7 @@ class VoipAccount(models.Model):
 
             voip_account = self.env['voip.account'].search([('username','=',session.username), ('domain','=',session.domain)])[0]
             voip_account.state = "active"
+            voip_account.bind_port = session.bind_port
 
             self._cr.commit()
             self._cr.close()
@@ -368,3 +370,6 @@ class VoipAccount(models.Model):
             sip_session.send_sip_register(self.address)
         else:
             raise UserError("Please enter your IP under settings first")
+
+    def uac_deregister(self):
+        _logger.error("DEREGISTER")

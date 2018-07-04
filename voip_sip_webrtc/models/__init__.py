@@ -16,3 +16,4 @@ from . import ir_actions_server
 from . import voip_call_template_preview
 from . import voip_media
 from . import voip_message_template
+from . import voip_dialog

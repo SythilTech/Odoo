@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_account_action_transition_view_form" model="ir.ui.view">
+        <field name="name">voip.account.action.transition form view</field>
+        <field name="model">voip.account.action.transition</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="trigger"/>
+                    <field name="dtmf_input"/>
+                    <field name="action_from_id"/>
+                    <field name="action_to_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

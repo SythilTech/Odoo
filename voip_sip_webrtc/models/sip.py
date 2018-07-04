@@ -32,7 +32,7 @@ class SIPSession:
         self.message_sent = EventHook()
         self.message_received = EventHook()
         self.register_ok = EventHook()
-        
+
         #Each account is bound to a different port
         self.sipsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sipsocket.bind(('', 0))
@@ -96,7 +96,7 @@ class SIPSession:
         reply += "\r\n"
         reply += sdp
 
-        self.sipsocket.sendto(reply.encode(), (self.to_server, self.account_port) )    
+        self.sipsocket.sendto(reply.encode(), (self.to_server, self.account_port) )
 
     def send_sip_message(self, to_address, message_body):
         call_id = ''.join([random.choice('0123456789abcdef') for x in range(32)])
@@ -167,7 +167,6 @@ class SIPSession:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             _logger.error(e)
             _logger.error("Line: " + str(exc_tb.tb_lineno) )
-        
 
     def send_sip_invite(self, to_address, call_sdp):
 
@@ -208,15 +207,15 @@ class SIPSession:
         try:
 
             _logger.error("Listening for SIP messages on " + str(self.bind_port) )
-            
+
             #Wait and send back the auth reply
             stage = "WAITING"
             while stage == "WAITING":
-                
+
                 data, addr = self.sipsocket.recvfrom(2048)
-                
+
                 data = data.decode()
-                
+
                 _logger.error(data)
 
                 #Send auth response if challenged

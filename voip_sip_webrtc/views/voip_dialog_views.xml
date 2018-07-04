@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_dialog_view_form" model="ir.ui.view">
+        <field name="name">voip.dialog view form</field>
+        <field name="model">voip.dialog</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="call_action_ids" context="{'default_voip_dialog_id': active_id}">
+                            <tree>
+                                <field name="voip_dialog_id" invisible="True"/>
+                                <field name="name"/>
+                                <field name="start"/>
+                                <field name="action_type_id"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="voip_dialog_view_tree" model="ir.ui.view">
+        <field name="name">voip.dialog view tree</field>
+        <field name="model">voip.dialog</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="voip_dialog_view_diagram" model="ir.ui.view">
+        <field name="name">voip.dialog view diagram</field>
+        <field name="model">voip.dialog</field>
+        <field name="arch" type="xml">
+            <diagram>
+                <node object="voip.account.action">
+                    <field name="name"/>
+                </node>
+                <arrow object="voip.account.action.transition" source="action_from_id" destination="action_to_id" label="['name']">
+                    <field name="action_from_id"/>
+                    <field name="action_to_id"/>
+                    <field name="name"/>
+                </arrow>
+            </diagram>
+        </field>
+    </record>
+
+    <record id="voip_dialog_action" model="ir.actions.act_window">
+        <field name="name">VOIP Dialogs</field>
+        <field name="res_model">voip.dialog</field>
+        <field name="view_mode">tree,form,diagram</field>
+        <field name="help" type="html">
+            <p>
+                No VOIP Dialogs
+            </p>
+        </field>
+    </record>
+
+</odoo>

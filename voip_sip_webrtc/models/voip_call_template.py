@@ -62,6 +62,7 @@ class VoipCallTemplate(models.Model):
     to_address = fields.Char(string="To Address", help="Use placeholders")
     media_id = fields.Many2one('voip.media', string="Media")
     codec_id = fields.Many2one('voip.codec', string="Codec")
+    call_dialog_id = fields.Many2one('voip.dialog', string="Call Dialog")
     type = fields.Selection([('prerecorded','Pre Recorded')], string="Template Type", default="prerecorded")
     model_object_field_id = fields.Many2one('ir.model.fields', string="Field", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
     sub_object_id = fields.Many2one('ir.model', string='Sub-model', readonly=True, help="When a relationship field is selected as first field, this field shows the document model the relationship goes to.")
@@ -106,15 +107,8 @@ class VoipCallTemplate(models.Model):
         
     def make_call(self, record_id):
         _logger.error("Make Call")
-        if self.type == "prerecorded" or self.type == False:
-            to_address = self.render_template( self.to_address, self.model_id.model, record_id)            
-            decoded_media = base64.decodestring(self.media_id.media)
-            self.voip_account_id.make_call(to_address, decoded_media, self.media_id.codec_id, self.model_id.model, record_id)
-        elif self.type == "synth":
-            rendered_text = self.render_template( self.synth_text, self.model_id.model, record_id)
-            to_address = self.render_template( self.to_address, self.model_id.model, record_id)
-            audio_stream = self.voice_synth_id.voice_synth(rendered_text, self.codec_id)
-            self.voip_account_id.make_call(to_address, audio_stream, self.codec_id, self.model_id.model, record_id)
+        to_address = self.render_template(self.to_address, self.model_id.model, record_id)
+        self.voip_account_id.make_call(to_address, self.call_dialog_id, self.model_id.model, record_id)
 
     def render_template(self, template_txt, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``
