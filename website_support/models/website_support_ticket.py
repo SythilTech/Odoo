@@ -106,9 +106,19 @@ class WebsiteSupportTicket(models.Model):
             if active_sla_ticket.sla_response_category_id.countdown_condition == 'business_only':
                 #Check if the current time aligns with a timeslot in the settings, setting has to be set for business_only or UserError occurs
                 setting_business_hours_id = self.env['ir.default'].get('website.support.settings', 'business_hours_id')
-                current_hour_float = datetime.datetime.now().hour() + (datetime.datetime.now().minute() / 60)
+                current_hour = datetime.datetime.now().hour
+                current_minute = datetime.datetime.now().minute / 60
+                current_hour_float = current_hour + current_minute
                 day_of_week = datetime.datetime.now().weekday()
-                during_work_hours = self.env['resource.calendar.attendance'].search([('calendar_id','=', setting_business_hours_id.id), ('dayofweek','=',day_of_week), ('hour_from','<',current_hour_float), ('hour_to','>',current_hour_float)])
+                during_work_hours = self.env['resource.calendar.attendance'].search([('calendar_id','=', setting_business_hours_id), ('dayofweek','=',day_of_week), ('hour_from','<',current_hour_float), ('hour_to','>',current_hour_float)])
+
+                #If holiday module is installed take into consideration
+                holiday_module = self.env['ir.module.module'].search([('name','=','hr_public_holidays'), ('state','=','installed')])
+                if holiday_module:
+                    holiday_today = self.env['hr.holidays.public.line'].search([('date','=',datetime.datetime.now().date())])
+                    if holiday_today:
+                        during_work_hours = False
+
                 if during_work_hours:
                     active_sla_ticket.sla_timer -= 1/60
             else:

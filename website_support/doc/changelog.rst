@@ -1,3 +1,7 @@
+v1.2.10
+=======
+* Fix SLA business hours timer and add support for holidays via the hr_public_holidays module
+
 v1.2.9
 ======
 * Permission for SLA Alerts
