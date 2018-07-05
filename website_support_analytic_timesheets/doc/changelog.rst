@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Field employee_id is now automatically filled in from the support ticket side
+
 v1.0.3
 ======
 * Fix access rule preventing adding timesheet line without project
