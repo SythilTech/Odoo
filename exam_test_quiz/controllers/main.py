@@ -115,12 +115,12 @@ class MyController(http.Controller):
                 option_count = 1
                 
                 for option in exam_question.question_options_blank:
-                    post_name = "question" + str(question.id) + "option" + str(option_count)
+                    post_name = "question" + str(exam_question.id) + "option" + str(option_count)
                   
                     if values[post_name] != option.answer:
                         question_result = False
                     
-                    request.env['etq.result.question.option'].sudo().create({'question_id':result_question.id, 'option_id':option.id, 'question_options_value': values[post_name] })
+                    request.env['etq.result.question.option'].sudo().create({'question_id':result_question.id, 'question_options_value': values[post_name] })
                     
                     option_count += 1
                     

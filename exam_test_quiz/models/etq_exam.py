@@ -52,7 +52,7 @@ class EtqQuestion(models.Model):
     exam_id = fields.Many2one('etq.exam',string="Exam ID")
     image = fields.Binary(string="Image")
     question = fields.Html(string="Question")
-    question_rendered = fields.Html(string="Question Render", compute="render_question")
+    question_rendered = fields.Html(string="Question Render", compute="render_question", sanitize=False)
     question_type = fields.Selection((('multi_choice','Multiple Choice'), ('fill_blank','Fill in the Blank')), default="multi_choice", string="Question Type")
     question_options = fields.One2many('etq.question.option','question_id',string="Multiple Choice Options")
     question_options_blank = fields.One2many('etq.question.optionblank','question_id',string="Fill in the Blank Options")    
