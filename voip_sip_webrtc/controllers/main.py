@@ -19,6 +19,12 @@ from openerp.http import request
 
 class VoipController(http.Controller):
 
+    @http.route('/voip/window', type="http", auth="user")
+    def voip_window(self):
+        """ Returns a small popup window """
+
+        return request.render("voip_sip_webrtc.voip_window")
+        
     @http.route('/voip/ringtone/<voip_call_id>.mp3', type="http", auth="user")
     def voip_ringtone(self, voip_call_id):
         """Return the ringtone file to be used by javascript"""

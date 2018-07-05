@@ -95,7 +95,7 @@ class VoipAccount(models.Model):
         rtp_data += " " + hex_string
         return bytes.fromhex( rtp_data.replace(" ","") )
 
-    def rtp_server_listener(self, rtc_sender_thread, rtpsocket, voip_call_client_id, model=False, record_id=False, call_action_id):
+    def rtp_server_listener(self, q, rtc_sender_thread, rtpsocket, voip_call_client_id, call_action_id, model=False, record_id=False):
         #Create the call with the audio
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
@@ -104,6 +104,7 @@ class VoipAccount(models.Model):
 
             audio_stream = b''
             call_start_time = datetime.datetime.now()
+            current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
 
             try:
 
@@ -120,13 +121,20 @@ class VoipAccount(models.Model):
                     data, addr = rtpsocket.recvfrom(2048)
                     
                     #_logger.error(data.hex())
-                    #payload_type = data[1]
+                    payload_type = data[1]
                     
                     #Listen for telephone events DTMF
-                    #if payload_type == 101:
-                    #    _logger.error("Telephone Event")
-                    #    dtmf_number = data[12]                        
-                    #    _logger.error(dtmf_number)                    
+                    if payload_type == 101:
+                        _logger.error("Telephone Event")
+                        dtmf_number = data[12]
+                        _logger.error(dtmf_number)
+                        dmtf_transition = self.env['voip.account.action.transition'].search([('action_from_id','=', current_call_action.id), ('trigger','=','dtmf'), ('dtmf_input','=',dtmf_number)])
+                        
+                        if dmtf_transition:
+                            current_call_action = dmtf_transition.action_to_id
+                        
+                            #Also set the current_call_action of the sending thread
+                            q.put(current_call_action)
                     
                     #Add the RTP payload to the received data
                     audio_stream += data[12:]
@@ -165,7 +173,7 @@ class VoipAccount(models.Model):
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
 
-    def rtp_server_sender(self, rtpsocket, rtp_ip, rtp_port, media_data, codec_id, voip_call_client_id, call_action_id):
+    def rtp_server_sender(self, q, rtpsocket, rtp_ip, rtp_port, media_data, codec_id, voip_call_client_id, call_action_id):
 
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
@@ -204,8 +212,17 @@ class VoipAccount(models.Model):
 
                     packet_count += 1
                     sequence_number += 1
-                    timestamp += codec.sample_rate / (1000 / codec.sample_interval)
-                    sleep(0.02)
+                    #timestamp += codec.sample_rate / (1000 / codec.sample_interval)
+                    timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
+                    
+                    try:
+                        current_call_action = q.get(True, 0.02)
+                        _logger.error("Current Action Change")
+                        _logger.error(current_call_action.name)
+                        media_data = base64.decodestring(current_call_action.recorded_media_id.media)
+                        media_index = 0
+                    except:
+                        pass
 
             except Exception as e:
                 #Timeout
@@ -282,7 +299,7 @@ class VoipAccount(models.Model):
         sip_session.call_error += self.call_error
         call_id = sip_session.send_sip_invite(to_address, call_sdp)
 
-        #Create the call now so we can make it has missed or rejected
+        #Create the call now so we can mark it has missed or rejected
         create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': '', 'codec_id': ulaw_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id, 'call_dialog_id': call_dialog.id}
         voip_call = self.env['voip.call'].create(create_dict)
 

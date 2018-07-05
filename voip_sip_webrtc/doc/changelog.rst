@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Compact call menu
+
 v1.0.5
 ======
 * Adjust permissions

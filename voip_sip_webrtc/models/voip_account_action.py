@@ -15,6 +15,7 @@ import datetime
 import struct
 import base64
 from random import randint
+import queue
 
 class VoipAccountAction(models.Model):
 
@@ -31,7 +32,7 @@ class VoipAccountAction(models.Model):
     user_id = fields.Many2one('res.users', string="Call User")
     from_transition_ids = fields.One2many('voip.account.action.transition', 'action_to_id', string="Source Transitions")
     to_transition_ids = fields.One2many('voip.account.action.transition', 'action_from_id', string="Destination Transitions")
-    
+
     def _voip_action_incoming_setup_recorded_message(self, session, data):
         _logger.error("Incoming Stream Recorded Message")
 
@@ -59,10 +60,12 @@ class VoipAccountAction(models.Model):
         rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         rtpsocket.bind(('', voip_call_client.audio_media_port));
 
-        rtc_sender_thread = threading.Thread(target=self.account_id.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_audio_port, media_data, voip_call.codec_id.id, voip_call_client.id, self.id,))
+        my_queue = queue.Queue()
+
+        rtc_sender_thread = threading.Thread(target=self.account_id.rtp_server_sender, args=(my_queue, rtpsocket, rtp_ip, rtp_audio_port, media_data, voip_call.codec_id.id, voip_call_client.id, self.id,))
         rtc_sender_thread.start()
 
-        rtc_listener_thread = threading.Thread(target=self.account_id.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, voip_call_client.model, voip_call_client.record_id, self.id,))
+        rtc_listener_thread = threading.Thread(target=self.account_id.rtp_server_listener, args=(my_queue, rtc_sender_thread, rtpsocket, voip_call_client.id, self.id, voip_call_client.model, voip_call_client.record_id,))
         rtc_listener_thread.start()
 
     def _voip_action_outgoing_setup_recorded_message(self, session, data):
@@ -88,10 +91,12 @@ class VoipAccountAction(models.Model):
         rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         rtpsocket.bind(('', voip_call_client.audio_media_port));
 
-        rtc_sender_thread = threading.Thread(target=self.account_id.rtp_server_sender, args=(rtpsocket, rtp_ip, rtp_audio_port, media_data, voip_call.codec_id.id, voip_call_client.id, self.id,))
+        my_queue = queue.Queue()
+
+        rtc_sender_thread = threading.Thread(target=self.account_id.rtp_server_sender, args=(my_queue, rtpsocket, rtp_ip, rtp_audio_port, media_data, voip_call.codec_id.id, voip_call_client.id, self.id,))
         rtc_sender_thread.start()
 
-        rtc_listener_thread = threading.Thread(target=self.account_id.rtp_server_listener, args=(rtc_sender_thread, rtpsocket, voip_call_client.id, voip_call_client.model, voip_call_client.record_id, self.id,))
+        rtc_listener_thread = threading.Thread(target=self.account_id.rtp_server_listener, args=(my_queue, rtc_sender_thread, rtpsocket, voip_call_client.id, self.id, voip_call_client.model, voip_call_client.record_id,))
         rtc_listener_thread.start()
         
     def _voip_action_sender_recorded_message(self, media_data, media_index, payload_size):

@@ -8,5 +8,10 @@
            <link rel="stylesheet" href="/voip_sip_webrtc/static/src/css/notification.css"/>
        </xpath>
     </template>
-   
+
+    <template id="voip_window" name="Voip Window">
+        <video id="remoteVideo" autoplay="autoplay" style="height:100%;width:100%;"/>
+        <video id="localVideo" autoplay="autoplay" muted="muted" style="display:none;"/>
+    </template>
+
 </odoo>

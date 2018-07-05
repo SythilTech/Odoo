@@ -521,6 +521,16 @@ $(document).on('click', '#sip_message_send_button', function(){
     //TODO also add to chatter
 });
 
+$(document).on('click', '#voip_create_window', function(){
+    console.log("Create Window");
+    var myWindow = window.open("/voip/window", "Voip Call in Progress", "width=500,height=500");
+
+    //Transfer the stream to the popup window
+    myWindow.getElementById('remoteVideo').src = remoteVideo.src;
+
+    //TODO??? Close the model to free up space or maybe keep it there as a fallback if popup is closed
+});
+
 $(document).on('click', '#voip_full_screen', function(){
     $(".s-voip-manager").css("width","calc(100vw - 20px)");
     $(".s-voip-manager").css("height","calc(100vh - 20px)");
