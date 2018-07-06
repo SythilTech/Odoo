@@ -1,3 +1,7 @@
+v1.1.0
+======
+* Call dialogs and DTMF call action
+
 v1.0.6
 ======
 * Compact call menu

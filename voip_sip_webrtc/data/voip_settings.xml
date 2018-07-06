@@ -5,18 +5,18 @@
         <function id="default_inactivity_time"
             model="ir.default" name="set"
             eval="('voip.settings', 'inactivity_time', 10)"/>
-    
+
         <function id="default_ring_duration"
             model="ir.default" name="set"
             eval="('voip.settings', 'ring_duration', 30)"/>
 
-        <function id="default_ringtone_filename"
-            model="ir.default" name="set"
-            eval="('voip.settings', 'ringtone_filename', 'Old School Ringtone')"/>
-
         <function id="default_ringtone"
             model="ir.default" name="set"
             eval="('voip.settings', 'ringtone_id', ref('old_school') )"/>
-    
-    </data>     
+
+        <function id="default_codec_id"
+            model="ir.default" name="set"
+            eval="('voip.settings', 'codec_id', ref('pcmu') )"/>
+
+    </data>
 </odoo>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication",
-    'version': "1.0.6",
+    'version': "1.1.0",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -27,11 +27,11 @@
         'views/menus.xml',
         'security/ir.model.access.csv',
         'data/voip_ringtone.xml',
-        'data/voip_settings.xml',
         'data/voip.codec.csv',
         'data/voip.account.action.type.csv',
         'data/ir.cron.xml',
         'data/mail.message.subtype.csv',
+        'data/voip_settings.xml',
     ],
     'demo': [],
     'depends': ['web','crm','bus'],

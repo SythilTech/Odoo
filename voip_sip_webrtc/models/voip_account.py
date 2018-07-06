@@ -20,6 +20,7 @@ import base64
 from . import sdp
 from . import sip
 from random import randint
+import queue
 
 class VoipAccount(models.Model):
 
@@ -119,23 +120,24 @@ class VoipAccount(models.Model):
 
                     rtpsocket.settimeout(10)
                     data, addr = rtpsocket.recvfrom(2048)
-                    
+
                     #_logger.error(data.hex())
                     payload_type = data[1]
-                    
+
                     #Listen for telephone events DTMF
                     if payload_type == 101:
                         _logger.error("Telephone Event")
                         dtmf_number = data[12]
                         _logger.error(dtmf_number)
                         dmtf_transition = self.env['voip.account.action.transition'].search([('action_from_id','=', current_call_action.id), ('trigger','=','dtmf'), ('dtmf_input','=',dtmf_number)])
-                        
+
                         if dmtf_transition:
                             current_call_action = dmtf_transition.action_to_id
-                        
+
                             #Also set the current_call_action of the sending thread
-                            q.put(current_call_action)
-                    
+                            media_data = base64.decodestring(current_call_action.recorded_media_id.media)
+                            q.put((current_call_action,media_data))
+
                     #Add the RTP payload to the received data
                     audio_stream += data[12:]
 
@@ -148,13 +150,13 @@ class VoipAccount(models.Model):
             try:
 
                 #Update call after the stream times out
-                voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
-                voip_call_client.vc_id.write({'media': base64.b64encode(audio_stream), 'status': 'over', 'media_filename': "call.raw", 'start_time': call_start_time, 'end_time': datetime.datetime.now()})
-                diff_time = datetime.datetime.now() - call_start_time
-                voip_call_client.vc_id.duration = str(diff_time.seconds) + " Seconds"
+                #voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
+                #voip_call_client.vc_id.write({'media': base64.b64encode(audio_stream), 'status': 'over', 'media_filename': "call.raw", 'start_time': call_start_time, 'end_time': datetime.datetime.now()})
+                #diff_time = datetime.datetime.now() - call_start_time
+                #voip_call_client.vc_id.duration = str(diff_time.seconds) + " Seconds"
 
                 #Add the stream data to this client
-                voip_call_client.write({'audio_stream': base64.b64encode(audio_stream)})
+                #voip_call_client.write({'audio_stream': base64.b64encode(audio_stream)})
 
                 #Have to manually commit the new cursor?
                 self._cr.commit()
@@ -212,17 +214,17 @@ class VoipAccount(models.Model):
 
                     packet_count += 1
                     sequence_number += 1
-                    #timestamp += codec.sample_rate / (1000 / codec.sample_interval)
-                    timestamp = (datetime.datetime.utcnow() - datetime.datetime(1900, 1, 1, 0, 0, 0)).total_seconds()
+                    timestamp += codec.sample_rate / (1000 / codec.sample_interval)
                     
                     try:
-                        current_call_action = q.get(True, 0.02)
+                        current_call_action, media_data = q.get(True, 0.02)
                         _logger.error("Current Action Change")
                         _logger.error(current_call_action.name)
-                        media_data = base64.decodestring(current_call_action.recorded_media_id.media)
                         media_index = 0
-                    except:
+                    except queue.Empty:
                         pass
+                    except Exception as e:
+                        _logger.error(e)
 
             except Exception as e:
                 #Timeout
@@ -230,7 +232,6 @@ class VoipAccount(models.Model):
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
-        
             #try:
                 #Add the stream data to the call
             #    voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
@@ -288,9 +289,13 @@ class VoipAccount(models.Model):
         if "@" not in to_address:
             to_address = to_address + "@" + self.domain
 
-        ulaw_codec = self.env['ir.model.data'].get_object('voip_sip_webrtc','pcmu')
+        default_codec = self.env['voip.codec'].browse( self.env['ir.default'].get('voip.settings','codec_id') )
+        
+        #BACK COMPATABILITY use ulaw as default if setting is blank
+        if default_codec is None:
+            default_codec = self.env['ir.model.data'].get_object('voip_sip_webrtc','pcmu')
 
-        call_sdp = sdp.generate_sdp(self, local_ip, audio_media_port, [ulaw_codec.payload_type])
+        call_sdp = sdp.generate_sdp(self, local_ip, audio_media_port, [default_codec.payload_type])
 
         sip_session = sip.SIPSession(local_ip, self.username, self.domain, self.password, self.auth_username, self.outbound_proxy, self.port, self.voip_display_name)
         sip_session.call_accepted += self.call_accepted
@@ -300,7 +305,7 @@ class VoipAccount(models.Model):
         call_id = sip_session.send_sip_invite(to_address, call_sdp)
 
         #Create the call now so we can mark it has missed or rejected
-        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': '', 'codec_id': ulaw_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id, 'call_dialog_id': call_dialog.id}
+        create_dict = {'from_address': self.address, 'to_address': to_address, 'to_audio': '', 'codec_id': default_codec.id, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id, 'call_dialog_id': call_dialog.id}
         voip_call = self.env['voip.call'].create(create_dict)
 
         #Also create the client list

@@ -23,14 +23,12 @@ class VoipSettings(models.Model):
     _name = "voip.settings"
     _inherit = 'res.config.settings'
             
-    missed_call_action = fields.Selection([('nothing', 'Nothing')], string="Missed Call Action", help="What action is taken when the call is missed")
-    ringtone_id = fields.Many2one('voip.ringtone', string="Ringtone")
-    ringtone = fields.Binary(string="Default Ringtone")
-    ringtone_filename = fields.Char("Ringtone Filename")
-    ring_duration = fields.Integer(string="Ring Duration (Seconds)")
+    ringtone_id = fields.Many2one('voip.ringtone', string="Ringtone", required=True)
+    ring_duration = fields.Integer(string="Ring Duration (Seconds)", required=True)
     server_ip = fields.Char(string="IP Address")
-    inactivity_time = fields.Integer(string="Inactivity Time (minutes)", help="The amount of minutes before the user is considered offline")
-    record_calls = fields.Boolean(string="Record Calls")
+    inactivity_time = fields.Integer(string="Inactivity Time (Minutes)", help="The amount of minutes before the user is considered offline", required=True)
+    record_calls = fields.Boolean(string="Record SIP Calls")
+    codec_id = fields.Many2one('voip.codec', string="Default Codec", help="When a call is accepted it specifies to use this codec, all media should be pre-transcoded in this codec ready to be streamed", required=True)
 
     @api.multi
     def set_values(self):
@@ -40,6 +38,7 @@ class VoipSettings(models.Model):
         self.env['ir.default'].set('voip.settings', 'server_ip', self.server_ip)
         self.env['ir.default'].set('voip.settings', 'inactivity_time', self.inactivity_time)
         self.env['ir.default'].set('voip.settings', 'record_calls', self.record_calls)
+        self.env['ir.default'].set('voip.settings', 'codec_id', self.codec_id.id)
         
     @api.model
     def get_values(self):
@@ -49,7 +48,8 @@ class VoipSettings(models.Model):
             ring_duration=self.env['ir.default'].get('voip.settings', 'ring_duration'),
             server_ip=self.env['ir.default'].get('voip.settings', 'server_ip'),
             inactivity_time=self.env['ir.default'].get('voip.settings', 'inactivity_time'),
-            record_calls=self.env['ir.default'].get('voip.settings', 'record_calls')
+            record_calls=self.env['ir.default'].get('voip.settings', 'record_calls'),
+            codec_id=self.env['ir.default'].get('voip.settings', 'codec_id')
         )
         return res
 

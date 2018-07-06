@@ -11,14 +11,19 @@
                     <button string="Cancel" type="object" name="cancel" class="oe_link"/>
                     <!--<button type="object" name="generate_self_signed_certificate" string="Generate Self Signed Certificate"/>-->
                 </header>
+                <h2>Webrtc Settings</h2>
                 <group>
                     <field name="inactivity_time"/>
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
+                </group>
+                <h2>SIP Settings</h2>
+                <group>
                     <field name="server_ip"/>
+                    <field name="codec_id"/>
                     <field name="record_calls"/>
                 </group>
-      	    </form>
+            </form>
         </field>
     </record>
 
