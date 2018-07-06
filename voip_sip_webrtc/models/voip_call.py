@@ -8,9 +8,6 @@ _logger = logging.getLogger(__name__)
 import time
 from random import randint
 from hashlib import sha1
-import ssl
-#from dtls import do_patch
-#from dtls.sslconnection import SSLConnection
 import hmac
 import hashlib
 import random

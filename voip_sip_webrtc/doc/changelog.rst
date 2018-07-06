@@ -1,3 +1,7 @@
+v1.6.11
+=======
+* Compact the menu
+
 v1.6.10
 =======
 * Showed voip account field under user form view

@@ -39,9 +39,14 @@ var VOIPSystemTray = Widget.extend({
 				var voip_user = result[voip_user];
 				var drop_menu_html = "";
 
-				drop_menu_html += "<li>";
-				drop_menu_html += "  " + "<a href=\"#\">" + voip_user.name +  " (" + voip_user.status + ")</a>" + " <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_video_call\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"/> Video Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_audio_call\"><i class=\"fa fa-volume-up\" aria-hidden=\"true\"/> Audio Call</a> <a href=\"#\" data-partner=\"" + voip_user.partner_id + "\" class=\"start_voip_screenshare_call\"><i class=\"fa fa-desktop\" aria-hidden=\"true\"/> Screenshare Call</a>";
-				drop_menu_html += "</li>";
+                drop_menu_html += "<li class=\"sy_phone_menu\">";
+                drop_menu_html += voip_user.name +  " (" + voip_user.status + ")";
+
+                if (voip_user.status == "Online") {
+                    drop_menu_html += " <span style=\"float:right\"><i class=\"fa fa-volume-up start_voip_audio_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Audio Call\" aria-hidden=\"true\"/> <i class=\"fa fa-video-camera start_voip_video_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Video Call\" aria-hidden=\"true\"/> <i class=\"fa fa-desktop start_voip_screenshare_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Screen Sharing\" aria-hidden=\"true\"/></span>";
+                }
+
+                drop_menu_html += "</li>";
 
 			    $("#voip_tray").append(drop_menu_html);
 

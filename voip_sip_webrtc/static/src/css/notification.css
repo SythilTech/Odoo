@@ -1,3 +1,11 @@
+.sy_phone_menu {
+    padding: 5px;
+}
+
+.sy_phone_menu i {
+    padding-left:5px;
+}
+
 .s-chat-manager {
     width: 300px;
     height: 300px;
