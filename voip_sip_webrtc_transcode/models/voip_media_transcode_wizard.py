@@ -11,10 +11,14 @@ class VoipMediaTranscodeWizard(models.TransientModel):
 
     _name = 'voip.media.transcode.wizard'
 
+    @api.model
+    def _get_default_codec_id(self):
+        return self.env['ir.default'].get('voip.settings','codec_id')
+
     media_id = fields.Many2one('voip.media', string="Media")
     media = fields.Binary(string="Audio File", required="True")
     media_filename = fields.Char(string="Audio File Filename")
-    codec_id = fields.Many2one('voip.codec', string="Codec", required="True")
+    codec_id = fields.Many2one('voip.codec', default=_get_default_codec_id, string="Codec", required="True")
     
     def transcode(self):
         _logger.error("Transcode")
