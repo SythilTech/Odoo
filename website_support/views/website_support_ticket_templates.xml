@@ -174,6 +174,23 @@
         </t>
     </template>
 
+    <template id="help_group" name="Help Group">
+        <t t-call="website.layout">
+            <div class="container">
+                <div class="mt16 mb16">
+                    <h1 class="text-center" t-field="help_group.name"/>
+                    <t t-foreach="help_group.page_ids" t-as="help_page">
+                        <t t-if="help_page.website_published">
+                            <div class="col-md-4">
+                                <h3 class="mt8 mb8 support-help-page"><a t-attf-href="#{help_page.url_generated}" t-field="help_page.name"></a></h3>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
     <template id="help_page" name="Help Page">
         <t t-call="website.layout">
             <div class="container">

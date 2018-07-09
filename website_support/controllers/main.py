@@ -303,11 +303,15 @@ class SupportTicketController(http.Controller):
         help_page = request.env['website.support.help.page'].create({'group_id': group_id,'name': "New Help Page"})
         return werkzeug.utils.redirect("/support/help/%s/%s?enable_editor=1" % (slug(help_page.group_id), slug(help_page)))
 
+    @http.route('/support/help/<model("website.support.help.groups"):help_group>', type='http', auth="public", website=True)
+    def help_group(self, help_group):
+        """Displays help group template"""
+        return http.request.render("website_support.help_group", {'help_group':help_group})
+
     @http.route(['''/support/help/<model("website.support.help.groups"):help_group>/<model("website.support.help.page", "[('group_id','=',help_group[0])]"):help_page>'''], type='http', auth="public", website=True)
     def help_page(self, help_group, help_page, enable_editor=None, **post):
         """Displays help page template"""
         return http.request.render("website_support.help_page", {'help_page':help_page})
-
 
     @http.route('/support/ticket/process', type="http", auth="public", website=True, csrf=True)
     def support_process_ticket(self, **kwargs):

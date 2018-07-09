@@ -1,3 +1,7 @@
+v1.2.11
+=======
+* Unlinked page to list help pages by support group
+
 v1.2.10
 =======
 * Fix SLA business hours timer and add support for holidays via the hr_public_holidays module
