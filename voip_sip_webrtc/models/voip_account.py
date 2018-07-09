@@ -96,25 +96,23 @@ class VoipAccount(models.Model):
         rtp_data += " " + hex_string
         return bytes.fromhex( rtp_data.replace(" ","") )
 
-    def rtp_server_listener(self, q, rtc_sender_thread, rtpsocket, voip_call_client_id, call_action_id, model=False, record_id=False):
+    def rtp_server_listener(self, rtp_sender_queue, rtc_sender_thread, rtpsocket, voip_call_client_id, call_action_id, model=False, record_id=False):
         #Create the call with the audio
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
             new_cr = self.pool.cursor()
             self = self.with_env(self.env(cr=new_cr))
 
-            audio_stream = b''
-            call_start_time = datetime.datetime.now()
-            current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
-
             try:
-
-                #Call starts now
-                #voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
-                #voip_call_client.vc_id.write({'status':"active", 'start_time': datetime.datetime.now()})
 
                 _logger.error("Start RTP Listening")
 
+                audio_stream = b''
+                call_start_time = datetime.datetime.now()
+                current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
+
+                _logger.error("Call Action")
+                
                 t = threading.currentThread()
                 while getattr(t, "stream_active", True):
 
@@ -133,10 +131,14 @@ class VoipAccount(models.Model):
 
                         if dmtf_transition:
                             current_call_action = dmtf_transition.action_to_id
+                            
+                            #Initialize the new call action
+                            method = '_voip_action_initialize_%s' % (current_call_action.action_type_id.internal_name,)
+                            action = getattr(current_call_action, method, None)
+                            media_data = action()
 
                             #Also set the current_call_action of the sending thread
-                            media_data = base64.decodestring(current_call_action.recorded_media_id.media)
-                            q.put((current_call_action,media_data))
+                            rtp_sender_queue.put((current_call_action,media_data))
 
                     #Add the RTP payload to the received data
                     audio_stream += data[12:]
@@ -175,7 +177,7 @@ class VoipAccount(models.Model):
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
 
-    def rtp_server_sender(self, q, rtpsocket, rtp_ip, rtp_port, media_data, codec_id, voip_call_client_id, call_action_id):
+    def rtp_server_sender(self, rtp_sender_queue, rtpsocket, rtp_ip, rtp_port, codec_id, voip_call_client_id):
 
         with api.Environment.manage():
             # As this function is in a new thread, I need to open a new cursor, because the old one may be closed
@@ -184,11 +186,17 @@ class VoipAccount(models.Model):
             
             try:
 
+                _logger.error("Start RTP Sender")
+                
+                #Initialize the first action
+                current_call_action_id = rtp_sender_queue.get()
+                current_call_action = self.env['voip.account.action'].browse( current_call_action_id )
+                method = '_voip_action_initialize_%s' % (current_call_action.action_type_id.internal_name,)
+                action = getattr(current_call_action, method, None)
+                media_data = action()
+
                 server_stream_data = ""
 
-                _logger.error("Start RTP Sender")
-
-                current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
                 codec = self.env['voip.codec'].browse( int(codec_id) )
 
                 packet_count = 0
@@ -202,7 +210,7 @@ class VoipAccount(models.Model):
                     method = '_voip_action_sender_%s' % (current_call_action.action_type_id.internal_name,)
                     action = getattr(current_call_action, method, None)
 
-                    #The call action is capable of changing the media playback point (reset media from start) and changing the current call action (DTMF)
+                    #The call action is capable of changing the media playback point (replaying media) and changing the current call action
                     rtp_payload_data, media_data, media_index = action(media_data, media_index, codec.payload_size)
 
                     if packet_count < 10:
@@ -215,9 +223,9 @@ class VoipAccount(models.Model):
                     packet_count += 1
                     sequence_number += 1
                     timestamp += codec.sample_rate / (1000 / codec.sample_interval)
-                    
+
                     try:
-                        current_call_action, media_data = q.get(True, 0.02)
+                        current_call_action, media_data = rtp_sender_queue.get(True, 0.02)
                         _logger.error("Current Action Change")
                         _logger.error(current_call_action.name)
                         media_index = 0
@@ -250,21 +258,34 @@ class VoipAccount(models.Model):
             self = self.with_env(self.env(cr=new_cr))
 
             call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
+            call_from_full = re.findall(r'From: (.*?)\r\n', data)[0]
+            call_from = re.findall(r'<sip:(.*?)>', call_from_full)[0]
             call_to_full = re.findall(r'To: (.*?)\r\n', data)[0]
             call_to = re.findall(r'<sip:(.*?):', call_to_full)[0]
+            codec = self.env['ir.default'].get('voip.settings', 'codec_id')
 
             voip_call = self.env['voip.call'].search([('sip_call_id','=', call_id)])[0]
+            voip_call_client = self.env['voip.call.client'].search([('vc_id','=',voip_call.id)])[0]
 
-            #Setup the first action for an outgoing call
-            start_call_action = self.env['voip.account.action'].search([('voip_dialog_id','=', voip_call.call_dialog_id.id), ('start','=',True)])[0]
-            method = '_voip_action_outgoing_setup_%s' % (start_call_action.action_type_id.internal_name,)
-            action = getattr(start_call_action, method, None)
+            rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
+            rtp_audio_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
 
-            if not action:
-                raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+            #The call was accepted so start listening for / sending RTP data
+            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            rtpsocket.bind(('', voip_call_client.audio_media_port))
 
-            action(session, data)            
-            
+            rtp_sender_queue = queue.Queue()
+
+            rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtp_sender_queue, rtpsocket, rtp_ip, rtp_audio_port, codec, voip_call_client.id,))
+            rtc_sender_thread.start()
+
+            rtc_listener_thread = threading.Thread(target=self.rtp_server_listener, args=(rtp_sender_queue, rtc_sender_thread, rtpsocket, voip_call_client.id, voip_call.call_dialog_id.id, voip_call_client.model, voip_call_client.record_id,))
+            rtc_listener_thread.start()
+
+            #Queue the first call action now
+            current_call_action = self.env['voip.account.action'].search([('voip_dialog_id', '=', voip_call.call_dialog_id.id), ('start','=',True) ])[0]
+            rtp_sender_queue.put(current_call_action.id)
+
             self._cr.close()
 
     def call_rejected(self, session, data):
@@ -346,17 +367,40 @@ class VoipAccount(models.Model):
 
             voip_account = self.env['voip.account'].search([('username','=', session.username), ('domain','=', session.domain) ])[0]
 
-            #The setup action is only executed for the first action, e.g. call media only accepts the call first but if used in a chain it just plays
-            #Not all actions will autoaccept the call for example call users will wait for a answer
-            #Find the first action in the call dialog
-            start_call_action = self.env['voip.account.action'].search([('voip_dialog_id','=', voip_account.call_dialog_id.id), ('start','=',True)])[0]
-            method = '_voip_action_incoming_setup_%s' % (start_call_action.action_type_id.internal_name,)
-            action = getattr(start_call_action, method, None)
+            call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
+            call_from_full = re.findall(r'From: (.*?)\r\n', data)[0]
+            call_from = re.findall(r'<sip:(.*?)>', call_from_full)[0]
+            rtp_ip = re.findall(r'c=IN IP4 (.*?)\r\n', data)[0]
+            rtp_audio_port = int(re.findall(r'm=audio (.*?) RTP', data)[0])
+            codec = self.env['ir.default'].get('voip.settings', 'codec_id')
 
-            if not action:
-                raise NotImplementedError('Method %r is not implemented on %r object.' % (method, self))
+            #Create the call now
+            voip_call = self.env['voip.call'].create({'from_address': call_from, 'to_address': session.username + "@" + session.domain, 'codec_id': codec, 'ring_time': datetime.datetime.now(), 'sip_call_id': call_id })
 
-            action(session, data)
+            #Also create the client list
+            voip_call_client = self.env['voip.call.client'].create({'vc_id': voip_call.id, 'audio_media_port': rtp_audio_port, 'sip_address': call_from, 'name': call_from, 'model': False, 'record_id': False})
+
+            #Answer with a audio call
+            audio_media_port = random.randint(55000,56000)
+            local_ip = self.env['ir.default'].get('voip.settings', 'server_ip')
+            call_sdp = sdp.generate_sdp(self, local_ip, audio_media_port, [0])
+            session.answer_call(data, call_sdp)
+
+            #Start listening for / sending RTP data
+            rtpsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            rtpsocket.bind(('', voip_call_client.audio_media_port))
+
+            rtp_sender_queue = queue.Queue()
+
+            rtc_sender_thread = threading.Thread(target=self.rtp_server_sender, args=(rtp_sender_queue, rtpsocket, rtp_ip, rtp_audio_port, codec, voip_call_client.id,))
+            rtc_sender_thread.start()
+
+            rtc_listener_thread = threading.Thread(target=self.rtp_server_listener, args=(rtp_sender_queue, rtc_sender_thread, rtpsocket, voip_call_client.id, self.id, voip_call_client.model, voip_call_client.record_id,))
+            rtc_listener_thread.start()
+
+            #Queue the first call action now
+            current_call_action = self.env['voip.account.action'].search([('voip_dialog_id', '=', voip_account.call_dialog_id.id), ('start','=',True) ])[0]
+            rtp_sender_queue.put(current_call_action.id)
 
             self._cr.close()
 
