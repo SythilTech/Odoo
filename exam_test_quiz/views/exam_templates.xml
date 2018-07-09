@@ -16,12 +16,13 @@
 		    
                     <t t-foreach="questions" t-as="question_result">
                         <t t-set="question" t-value="question_result.question"/>
+                        <t t-set="question_index" t-value="question_index+1"/>
                         <div class="form-group">
                             <div>
                             
                                 <t t-if="question.question_type == 'multi_choice'">
         		            <h2>
-        		            <t t-esc="question_index + 1"/>) <t t-raw="question.question"/>
+        		            <t t-esc="question_index"/>) <t t-raw="question.question.replace('&lt;p&gt;','').replace('&lt;/p&gt;','')"/>
         		            <t t-if="question.num_correct > 1">
         		                <span> (select <t t-esc="question.num_correct"/>)</span>
         		            </t>
@@ -50,7 +51,7 @@
                                     </script>
     
                                     <h2>
-			               <t t-esc="question_index + 1"/>) <t t-raw="question.question_rendered"/>
+			               <t t-esc="question_index"/>) <t t-raw="question.question_rendered"/>
         		            </h2>
         		        
                                 </t>
