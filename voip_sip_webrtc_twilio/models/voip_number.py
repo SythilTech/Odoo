@@ -31,7 +31,7 @@ class VoipNumber(models.Model):
     def create_twilio_app(self):
         
         #Create the application for the number and point it back to the server
-        data = {'FriendlyName': 'Auto Setup Application for ' + str(self.name), 'VoiceUrl': request.httprequest.host_url + 'twilio/voice/route'}
+        data = {'FriendlyName': 'Auto Setup Application for ' + str(self.name), 'VoiceUrl': request.httprequest.host_url + 'twilio/client-voice'}
         response_string = requests.post("https://api.twilio.com/2010-04-01/Accounts/" + self.account_id.twilio_account_sid + "/Applications.json", data=data, auth=(str(self.account_id.twilio_account_sid), str(self.account_id.twilio_auth_token)))
         response_string_json = json.loads(response_string.content.decode('utf-8'))
 

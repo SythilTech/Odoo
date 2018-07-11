@@ -7,14 +7,14 @@
         <field name="arch" type="xml">
       	    <form>
       	        <sheet>
-      	            <!--<header>
+      	            <header>
       	                <button type="object" name="create_twilio_app" string="Create Twilio App"/>
-      	            </header>-->
+      	            </header>
       	            <group>
       	                <field name="name"/>
       	                <field name="number"/>
       	                <field name="account_id"/>
-      	                <!--<field name="twilio_app_id"/>-->
+      	                <field name="twilio_app_id"/>
       	                <field name="capability_token_url" placeholder="https://xxxxxxxxx.twil.io/capability-token"/>      	                
       	                <field name="call_routing_ids"/>
       	            </group>

@@ -3,6 +3,7 @@ import openerp.http as http
 import werkzeug
 from odoo.http import request
 from odoo.exceptions import UserError
+import json
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -82,8 +83,35 @@ class TwilioVoiceController(http.Controller):
         twilio_xml += "</Response>"
 
         return twilio_xml
+
+    @http.route('/twilio/client-voice', type='http', auth="public", csrf=False)
+    def twilio_client_voice(self, **kwargs):
+
+        values = {}
+        for field_name, field_value in kwargs.items():
+            _logger.error(field_name)
+            _logger.error(field_value)
+            values[field_name] = field_value
+
+        from_number = values['From']
+        to_number = values['To']
         
-    @http.route('/twilio/capability-token/<stored_number_id>', type='http', auth="public", csrf=False)
+        twilio_xml = ""
+        twilio_xml += '<?xml version="1.0" encoding="UTF-8"?>' + "\n"
+        twilio_xml += "<Response>\n"
+        twilio_xml += '    <Dial callerId="' + from_number + '"'
+
+        setting_record_calls = request.env['ir.default'].get('voip.settings','record_calls')
+        
+        if setting_record_calls:
+            twilio_xml += ' record="record-from-ringing"'
+
+        twilio_xml += ">" + to_number + "</Dial>\n"
+        twilio_xml += "</Response>"
+
+        return twilio_xml
+        
+    @http.route('/twilio/capability-token/<stored_number_id>', type='http', auth="user", csrf=False)
     def twilio_capability_token(self, stored_number_id, **kwargs):
 
         values = {}
@@ -102,6 +130,6 @@ class TwilioVoiceController(http.Controller):
         application_sid = stored_number.twilio_app_id
         capability.allow_client_outgoing(application_sid)
         capability.allow_client_incoming('the_user_id')
-        token = capability.generate()
+        token = capability.to_jwt()
         
-        return {'indentity': 'the_user_id', 'token': token} 
+        return json.dumps({'indentity': 'the_user_id', 'token': token.decode()}) 

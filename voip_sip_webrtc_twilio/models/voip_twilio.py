@@ -37,10 +37,12 @@ class VoipTwilio(models.Model):
             'target': 'new',
             'type': 'ir.actions.act_window',
             'context': {'default_twilio_account_id': self.id, 'default_margin': self.margin}
-         }
-            
+        }
+
+    @api.multi
     def setup_numbers(self):
         """Adds mobile numbers to the system"""
+        self.ensure_one()
         
         response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
         
@@ -60,10 +62,27 @@ class VoipTwilio(models.Model):
                 if self.env['voip.number'].search_count([('number','=',twilio_number)]) == 0:
                     voip_number = self.env['voip.number'].create({'name': friendly_name, 'number': twilio_number,'account_id':self.id})
 
+                    #Create the application for the number and point it back to the server
+                    data = {'FriendlyName': 'Auto Setup Application for ' + str(voip_number.name), 'VoiceUrl': request.httprequest.host_url + 'twilio/client-voice'}
+                    response_string = requests.post("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/Applications.json", data=data, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+                    response_string_json = json.loads(response_string.content.decode('utf-8'))
+
+                    voip_number.twilio_app_id = response_string_json['sid']
+
+                    voip_number.capability_token_url = request.httprequest.host_url + 'twilio/capability-token/' + str(voip_number.id)
+
                 #Setup the Voice URL
                 payload = {'VoiceUrl': str(request.httprequest.host_url + "twilio/voice/route")}
                 requests.post("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/IncomingPhoneNumbers/" + sid, data=payload, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
 
+                return {
+                    'name': 'Twilio Numbers',
+                    'view_type': 'form',
+                    'view_mode': 'tree,form',
+                    'res_model': 'voip.number',
+                    'type': 'ir.actions.act_window'
+                }
+         
         else:
             raise UserError("Bad Credentials")    
 

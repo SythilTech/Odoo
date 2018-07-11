@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Twilio capability token generation (easy setup)
+
 v1.0.6
 ======
 * Fix incorrect voice URL
