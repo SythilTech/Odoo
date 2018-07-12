@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Report that breaks down activities by day and tech
+
 v1.0.4
 ======
 * Field employee_id is now automatically filled in from the support ticket side

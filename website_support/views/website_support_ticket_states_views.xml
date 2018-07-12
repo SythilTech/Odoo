@@ -9,6 +9,7 @@
       	          <group>
       	              <field name="name"/>
       	              <field name="mail_template_id" context="{'default_model':'website.support.ticket'}"/>
+      	              <field name="unattended"/>
       	          </group>
       	      </form>
       	  </field>
@@ -21,6 +22,7 @@
       	      <tree>
       	          <field name="name"/>
       	          <field name="mail_template_id"/>
+      	          <field name="unattended"/>
       	      </tree>
       	  </field>
       </record>
@@ -34,8 +36,6 @@
 	      <p class="oe_view_nocontent_create">Create support ticket state</p>
 	  </field>
       </record>
-
-      <menuitem id="website_support_ticket_states_menu" name="States" parent="website_support_config_parent_menu" action="website_support_ticket_states_action" sequence="40"/>
 
     </data>
 </openerp>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <menuitem id="website_support_parent_menu" name="Customer Support" parent="crm.crm_menu_root" sequence="999" groups="sales_team.group_sale_salesman_all_leads,sales_team.group_sale_manager,support_group"/>
+        <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
+
+        <menuitem id="website_support_config_parent_menu" name="Support Tickets" parent="crm.crm_menu_config" sequence="999"/>
+        <menuitem id="website_support_ticket_categories_menu" name="Categories" parent="website_support_config_parent_menu" action="website_support_ticket_categories_action" sequence="10"/>
+        <menuitem id="website_support_ticket_subcategory_menu" name="Sub Categories" parent="website_support_config_parent_menu" action="website_support_ticket_subcategory_action" sequence="20"/>
+        <menuitem id="website_support_ticket_states_menu" name="States" parent="website_support_config_parent_menu" action="website_support_ticket_states_action" sequence="30"/>
+        <menuitem id="website_support_ticket_tag_menu" name="Tags" parent="website_support_config_parent_menu" action="website_support_ticket_tag_action" sequence="40"/>
+        <menuitem id="website_support_ticket_priority_menu" name="Priorities" parent="website_support_config_parent_menu" action="website_support_ticket_priority_action" sequence="50"/>
+        <menuitem id="website_support_department_menu" name="Departments" parent="website_support_config_parent_menu" action="website_support_department_action" sequence="60"/>
+        <menuitem id="website_support_sla_menu" name="SLA's" parent="website_support_config_parent_menu" action="website_support_sla_action" sequence="70"/>
+        <menuitem id="website_support_help_groups_menu" name="Help Groups" parent="website_support_config_parent_menu" action="website_support_help_groups_action" sequence="80"/>
+        <menuitem id="website_support_help_page_menu" name="Help Pages" parent="website_support_config_parent_menu" action="website_support_help_page_action" sequence="90"/>
+        <menuitem id="website_support_settings_menu" name="Settings" parent="website_support_config_parent_menu" action="website_support_settings_action" sequence="100"/>
+
+    </data>
+</openerp>

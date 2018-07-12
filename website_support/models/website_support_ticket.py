@@ -14,6 +14,7 @@ class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
     _description = "Website Support Ticket"
+    _order = "create_date desc"
     _rec_name = "subject"
     _inherit = ['mail.thread']
 
@@ -48,6 +49,7 @@ class WebsiteSupportTicket(models.Model):
     channel = fields.Char(string="Channel", default="Manual")
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
+    parent_company_id = fields.Many2one(string="Parent Company", related="partner_id.company_id")
     partner_id = fields.Many2one('res.partner', string="Partner")
     user_id = fields.Many2one('res.users', string="Assigned User")
     person_name = fields.Char(string='Person Name')
@@ -264,10 +266,11 @@ class WebsiteSupportTicket(models.Model):
     @api.one
     @api.depends('state')
     def _compute_unattend(self):
+        #BACK COMPATABLITY Use open and customer reply as default unattended states
         opened_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
         customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
 
-        if self.state == opened_state or self.state == customer_replied_state:
+        if self.state == opened_state or self.state == customer_replied_state or self.state.unattended == True:
             self.unattended = True
 
     @api.multi
@@ -462,7 +465,8 @@ class WebsiteSupportTicketStates(models.Model):
     _name = "website.support.ticket.states"
 
     name = fields.Char(required=True, translate=True, string='State Name')
-    mail_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Mail Template")
+    mail_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Mail Template", help="The mail message that the customer gets when the state changes")
+    unattended = fields.Boolean(string="Unattended", help="If ticked, tickets in this state will appear by default")
 
 class WebsiteSupportTicketPriority(models.Model):
 

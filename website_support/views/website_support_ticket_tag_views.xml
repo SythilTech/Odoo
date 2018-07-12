@@ -22,8 +22,6 @@
 	      </p>
           </field>
       </record>
-
-      <menuitem id="website_support_ticket_tag_menu" name="Tags" parent="website_support_config_parent_menu" action="website_support_ticket_tag_action" sequence="50"/>
  
     </data>
 </openerp>

@@ -48,7 +48,5 @@
 	  </field>
       </record>
 
-      <menuitem id="website_support_sla_menu" name="SLA's" parent="website_support_config_parent_menu" action="website_support_sla_action" sequence="70"/>
-
     </data>
 </openerp>

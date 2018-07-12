@@ -32,7 +32,5 @@
           <field eval="1" name="number_increment"/>
       </record>
 
-      <menuitem id="website_support_ticket_priority_menu" name="Priorities" parent="website_support_config_parent_menu" action="website_support_ticket_priority_action" sequence="40"/>
- 
     </data>
 </openerp>

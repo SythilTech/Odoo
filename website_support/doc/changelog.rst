@@ -1,3 +1,9 @@
+v1.2.12
+=======
+* Website filter state for tickets
+* Hide SLA resume and pause buttons if no SLA is assigned to the ticket
+* Choose which states get classified as unattended
+
 v1.2.11
 =======
 * Unlinked page to list help pages by support group

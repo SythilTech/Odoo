@@ -11,8 +11,8 @@
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
                       <button type="action" name="%(website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Open / Reply" attrs="{'invisible' :[('close_time', '=', False )]}"/>
                       <button type="object" name="open_close_ticket_wizard" string="Close Ticket" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
-                      <button type="object" name="pause_sla" string="Pause SLA" attrs="{'invisible' :[('sla_active', '==', False )]}"/>
-                      <button type="object" name="resume_sla" string="Resume SLA" attrs="{'invisible' :[('sla_active', '!=', False )]}"/>
+                      <button type="object" name="pause_sla" string="Pause SLA" attrs="{'invisible' :['|', ('sla_active', '==', False ), ('sla_id','==', False)]}"/>
+                      <button type="object" name="resume_sla" string="Resume SLA" attrs="{'invisible' :['|', ('sla_active', '!=', False ), ('sla_id','==', False)]}"/>
                       <button type="object" name="send_survey" string="Send Survey"/>
                       <button type="object" name="request_approval" string="Request Approval"/>
                   </header>
@@ -46,7 +46,7 @@
                                           <field name="name"/>
                                           <field name="value"/>
                                       </tree>
-                                  </field>                          
+                                  </field>
                               </group>
                           </page>
                           <page string="Attachments">
@@ -69,11 +69,7 @@
                       </notebook>
                   </sheet>
                   <div class="oe_chatter">
-                      <style>
-                          .o_chatter_button_new_message {
-                              display: none;
-                          }
-                      </style>
+                      <!-- TODO Disable the new message button because they are meant to use reply -->
                       <field name="message_follower_ids" widget="mail_followers"/>
                       <field name="message_ids" widget="mail_thread"/>
                   </div>
@@ -144,12 +140,13 @@
               <tree colors="black:ticket_color==False">
                   <field name="create_user_id" invisible="True"/>
                   <field name="ticket_color" invisible="True"/>
+                  <field name="create_date"/>
                   <field name="ticket_number_display"/>
                   <field name="priority_id"/>
+                  <field name="parent_company_id"/>
                   <field name="person_name"/>
                   <field name="category"/>
                   <field name="state"/>
-                  <field name="email"/>
                   <field name="subject"/>
                   <field name="sla_active"/>
                   <field name="sla_timer" widget="float_time"/>
@@ -179,10 +176,6 @@
               </p>
           </field>
       </record>
-
-      <menuitem id="website_support_parent_menu" name="Customer Support" parent="crm.crm_menu_root" sequence="90" groups="sales_team.group_sale_salesman_all_leads,sales_team.group_sale_manager,support_group"/>
-      <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
-      <menuitem id="website_support_config_parent_menu" name="Support Tickets" parent="crm.crm_menu_config" sequence="80"/>
 
     </data>
 </odoo>

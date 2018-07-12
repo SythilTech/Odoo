@@ -133,6 +133,12 @@
 
                 <div class="col-md-12">
                     <t t-if="ticket_count > 0"> 
+                        <div style="float:right">
+                            <a href="/support/ticket/view">All</a>
+                            <t t-foreach="ticket_states" t-as="ticket_state">
+                                | <a t-attf-href="/support/ticket/view?state=#{ticket_state.id}"><t t-esc="ticket_state.name"/></a>
+                            </t>
+                        </div>
                         <table class="table table-striped table-bordered table-hover table-condensed">
                             <tr><th>By</th><th>Subject</th><th>Category</th><th>State</th><th>Create Date</th></tr>
                             <t t-foreach="support_tickets" t-as="support_ticket">
@@ -146,9 +152,9 @@
                         </div>
                     </t>
                 </div>
-                
+
                 <br/><br/><br/><br/><br/>
-                
+
                 <div class="mt16 mb16">
                     <h1 class="text-center">Change Requests</h1>
                 </div>
@@ -168,7 +174,7 @@
                         </div>
                     </t>
                 </div>
-                
+
             </div>
 
         </t>

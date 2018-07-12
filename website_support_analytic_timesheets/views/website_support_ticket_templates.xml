@@ -44,35 +44,55 @@ ${object.description|safe}
             </field>
         </record>
 
-<template id="support_tech_report_template" name="Support Tech Report">
+<template id="strt" name="Support Tech Report">
 
     <t t-call="web.html_container">
         <t t-call="web.external_layout">
             <div class="page">
-                <h1 style="text-align:center;">Productivity Report <span t-esc="test"/></h1>
-                <table style="width:100%;">
-                    <tr><th>Tech Name</th><th>Task</th><th>Ticket</th><th>Subject</th><th>Estimated Time</th><th>Time Available</th><th>Time Recorded</th><th>Status</th><th>Date Completed</th><th>Last Modified</th><th>Partner Name</th></tr>
-                    <t t-foreach="docs" t-as="o">
-                        <tr>
-                            <td><span t-esc="o.user_id.name"/></td>
-                            <td><span t-esc="o.task_id.name"/></td>
-                            <td><span t-esc="o.ticket_number_display"/></td>
-                        </tr>
+
+                <t t-foreach="docs" t-as="timesheet_day">
+
+                    <h1 style="text-align:center;">Productivity Report <span t-esc="timesheet_day"/></h1>
+                    <t t-foreach="timesheet_day_value" t-as="timesheet_employee">
+                        <h2><t t-esc="timesheet_employee"/></h2>
+                        <table style="width:100%;">
+                            <t t-set="recorded_hour_total" t-value="0"/>
+                            <tr><th>Tech Name</th><th>Task</th><th>Ticket</th><th>Subject</th><th>Estimated Time</th><th>Time Available</th><th>Time Recorded</th><th>Status</th><th>Date Completed</th><th>Last Modified</th><th>Partner Name</th></tr>
+                            <t t-foreach="timesheet_employee_value" t-as="timesheet_line">
+                                <tr>
+                                    <td><span t-esc="timesheet_line.user_id.name"/></td>
+                                    <td><span t-esc="timesheet_line.task_id.name"/></td>
+                                    <td><span t-esc="timesheet_line.ticket_number_display"/></td>
+                                    <td><span t-esc="timesheet_line.support_ticket_id.subject"/></td>
+                                    <td><span t-esc="timesheet_line.planned_hours"/></td>
+                                    <td><span t-esc="timesheet_line.support_ticket_id.category.name"/></td>
+                                    <td><span t-esc="timesheet_line.unit_amount"/></td>
+                                    <td><span t-esc="timesheet_line.close_time"/></td>
+                                    <td><span t-esc="timesheet_line.write_date"/></td>
+                                    <td><span t-esc="timesheet_line.support_ticket_id.partner_id.name"/></td>
+                                </tr>
+                                <t t-set="recorded_hour_total" t-value="recorded_hour_total+timesheet_line.unit_amount"/>
+                            </t>
+                            <tr><td><b>Totals</b></td><td></td><td></td><td></td><td></td><td></td><td><b><t t-esc="recorded_hour_total"/></b></td><td></td><td></td><td></td><td></td></tr>
+                        </table>
+                        <br/>
                     </t>
-                </table>
+
+                </t>
+               
             </div>
         </t>
     </t>
     
-</template>        
+</template>
 
         <report
             string="Support Tech Report"
             id="support_tech_report"
             model="account.analytic.line"
             report_type="qweb-pdf"
-            name="website_support_analytic_timesheets.support_tech_report_template"
-            file="website_support_analytic_timesheets.support_tech_report_template"
+            name="website_support_analytic_timesheets.strt"
+            file="website_support_analytic_timesheets.strt"
         />
         
 </data>
