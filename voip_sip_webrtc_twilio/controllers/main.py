@@ -29,7 +29,7 @@ class TwilioVoiceController(http.Controller):
         response = request.make_response(ringtone_base64, headers)
 
         return response
-        
+
     @http.route('/twilio/voice', type='http', auth="public", csrf=False)
     def twilio_voice(self, **kwargs):
 
@@ -43,7 +43,14 @@ class TwilioVoiceController(http.Controller):
         twilio_xml = ""
         twilio_xml += '<?xml version="1.0" encoding="UTF-8"?>' + "\n"
         twilio_xml += "<Response>\n"
-        twilio_xml += "  <Dial>\n"
+        twilio_xml += "  <Dial"
+
+        setting_record_calls = request.env['ir.default'].get('voip.settings','record_calls')
+
+        if setting_record_calls:
+            twilio_xml += ' record="record-from-ringing"'
+
+        twilio_xml += ">\n"
         twilio_xml += "    <Sip>" + to_sip + ";region=gll</Sip>\n"
         twilio_xml += "  </Dial>\n"
         twilio_xml += "</Response>"
@@ -59,7 +66,7 @@ class TwilioVoiceController(http.Controller):
 
         from_number = values['From']
         to_number = values['To']
-        
+
         to_stored_number = request.env['voip.number'].sudo().search([('number','=',to_number)])
 
         twilio_xml = ""
@@ -68,17 +75,16 @@ class TwilioVoiceController(http.Controller):
         twilio_xml += '    <Dial callerId="' + from_number + '"'
 
         setting_record_calls = request.env['ir.default'].get('voip.settings','record_calls')
-        
+
         if setting_record_calls:
             twilio_xml += ' record="record-from-ringing"'
-        
+
         twilio_xml += '>' + "\n"
 
-        
         #Call all the users assigned to this number
         for call_route in to_stored_number.call_routing_ids:
             twilio_xml += "        <Client>" + call_route.twilio_client_name + "</Client>\n"
-        
+
         twilio_xml += "    </Dial>\n"
         twilio_xml += "</Response>"
 
@@ -95,14 +101,14 @@ class TwilioVoiceController(http.Controller):
 
         from_number = values['From']
         to_number = values['To']
-        
+
         twilio_xml = ""
         twilio_xml += '<?xml version="1.0" encoding="UTF-8"?>' + "\n"
         twilio_xml += "<Response>\n"
         twilio_xml += '    <Dial callerId="' + from_number + '"'
 
         setting_record_calls = request.env['ir.default'].get('voip.settings','record_calls')
-        
+
         if setting_record_calls:
             twilio_xml += ' record="record-from-ringing"'
 
@@ -110,7 +116,7 @@ class TwilioVoiceController(http.Controller):
         twilio_xml += "</Response>"
 
         return twilio_xml
-        
+
     @http.route('/twilio/capability-token/<stored_number_id>', type='http', auth="user", csrf=False)
     def twilio_capability_token(self, stored_number_id, **kwargs):
 
@@ -131,5 +137,5 @@ class TwilioVoiceController(http.Controller):
         capability.allow_client_outgoing(application_sid)
         capability.allow_client_incoming('the_user_id')
         token = capability.to_jwt()
-        
+
         return json.dumps({'indentity': 'the_user_id', 'token': token.decode()}) 

@@ -1,3 +1,7 @@
+v1.0.8
+======
+* Bug fix to also record outgoing SIP calls not just the Twilio javascript client ones.
+
 v1.0.7
 ======
 * Twilio capability token generation (easy setup)
