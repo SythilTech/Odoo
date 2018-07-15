@@ -30,6 +30,12 @@ class VoipSettings(models.Model):
     record_calls = fields.Boolean(string="Record SIP Calls")
     codec_id = fields.Many2one('voip.codec', string="Default Codec", help="When a call is accepted it specifies to use this codec, all media should be pre-transcoded in this codec ready to be streamed", required=True)
 
+    def find_outgoing_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        self.server_ip = s.getsockname()[0]
+        s.close()
+
     @api.multi
     def set_values(self):
         super(VoipSettings, self).set_values()

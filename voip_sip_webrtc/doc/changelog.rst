@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Find local outgoing IP address button to make SIP setup a little easier
+
 v1.1.0
 ======
 * Call dialogs and DTMF call action

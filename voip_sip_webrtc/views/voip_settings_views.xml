@@ -9,7 +9,6 @@
                 <header>
                     <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                     <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-                    <!--<button type="object" name="generate_self_signed_certificate" string="Generate Self Signed Certificate"/>-->
                 </header>
                 <h2>Webrtc Settings</h2>
                 <group>
@@ -20,6 +19,7 @@
                 <h2>SIP Settings</h2>
                 <group>
                     <field name="server_ip"/>
+                    <button type="object" name="find_outgoing_ip" string="Find Outgoing Local IP"/>
                     <field name="codec_id"/>
                     <field name="record_calls"/>
                 </group>
