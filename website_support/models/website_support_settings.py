@@ -24,7 +24,8 @@ class WebsiteSupportSettings(models.Model):
     google_recaptcha_active = fields.Boolean(string="Google reCAPTCHA Active")
     google_captcha_client_key = fields.Char(string="reCAPTCHA Client Key")
     google_captcha_secret_key = fields.Char(string="reCAPTCHA Secret Key")
-    
+    allow_website_priority_set = fields.Selection([("partner","Partner Only"), ("everyone","Everyone")], string="Allow Website Priority Set", help="Cusomters can set the priority of a ticket when submitting via the website form\nPartner Only = logged in user")
+
     @api.multi
     def set_values(self):
         super(WebsiteSupportSettings, self).set_values()
@@ -40,7 +41,8 @@ class WebsiteSupportSettings(models.Model):
         self.env['ir.default'].set('website.support.settings', 'google_recaptcha_active', self.google_recaptcha_active)
         self.env['ir.default'].set('website.support.settings', 'google_captcha_client_key', self.google_captcha_client_key)
         self.env['ir.default'].set('website.support.settings', 'google_captcha_secret_key', self.google_captcha_secret_key)
-
+        self.env['ir.default'].set('website.support.settings', 'allow_website_priority_set', self.allow_website_priority_set)
+        
     @api.model
     def get_values(self):
         res = super(WebsiteSupportSettings, self).get_values()
@@ -53,6 +55,7 @@ class WebsiteSupportSettings(models.Model):
             staff_reply_email_template_id=self.env['ir.default'].get('website.support.settings', 'staff_reply_email_template_id'),
             max_ticket_attachments=self.env['ir.default'].get('website.support.settings', 'max_ticket_attachments'),
             max_ticket_attachment_filesize=self.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize'),
-            business_hours_id=self.env['ir.default'].get('website.support.settings', 'business_hours_id')
+            business_hours_id=self.env['ir.default'].get('website.support.settings', 'business_hours_id'),
+            allow_website_priority_set=self.env['ir.default'].get('website.support.settings', 'allow_website_priority_set')
         )
         return res

@@ -545,6 +545,19 @@
 
             </script>
 
+            <t t-if="setting_allow_website_priority_set == 'everyone' or (setting_allow_website_priority_set == 'partner' and request.env.user.id != request.website.user_id.id)">
+                <div t-attf-class="form-group #{error and 'priority' in error and 'has-error' or ''}">
+                    <label class="col-md-3 col-sm-4 control-label" for="priority">Priority</label>
+                    <div class="col-md-7 col-sm-8">
+                        <select class="form-control" name="priority">
+                            <t t-foreach="priorities" t-as="priority">
+                                <option t-attf-value="#{priority.id}"><t t-esc="priority.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+            </t>
+
             <div t-attf-class="form-group #{error and 'category' in error and 'has-error' or ''}">
                 <label class="col-md-3 col-sm-4 control-label" for="name">Category</label>
                 <div class="col-md-7 col-sm-8">

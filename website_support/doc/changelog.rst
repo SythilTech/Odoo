@@ -1,3 +1,7 @@
+v1.2.13
+=======
+* Optional priority field on website
+
 v1.2.12
 =======
 * Website filter state for tickets

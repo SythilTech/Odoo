@@ -268,8 +268,9 @@ class SupportTicketController(http.Controller):
         setting_google_captcha_client_key = request.env['ir.default'].get('website.support.settings', 'google_captcha_client_key')
         setting_max_ticket_attachments = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachments')
         setting_max_ticket_attachment_filesize = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize')
-
-        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize, 'setting_google_recaptcha_active': setting_google_recaptcha_active, 'setting_google_captcha_client_key': setting_google_captcha_client_key})
+        setting_allow_website_priority_set = request.env['ir.default'].get('website.support.settings', 'allow_website_priority_set')
+        
+        return http.request.render('website_support.support_submit_ticket', {'categories': http.request.env['website.support.ticket.categories'].sudo().search([]), 'priorities': http.request.env['website.support.ticket.priority'].sudo().search([]), 'person_name': person_name, 'email': http.request.env.user.email, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize, 'setting_google_recaptcha_active': setting_google_recaptcha_active, 'setting_google_captcha_client_key': setting_google_captcha_client_key, 'setting_allow_website_priority_set': setting_allow_website_priority_set})
 
     @http.route('/support/feedback/process/<help_page>', type="http", auth="public", website=True)
     def support_feedback(self, help_page, **kw):
@@ -324,7 +325,8 @@ class SupportTicketController(http.Controller):
             return "Bot Detected"
 
         setting_google_recaptcha_active = request.env['ir.default'].get('website.support.settings', 'google_recaptcha_active')
-
+        setting_allow_website_priority_set = request.env['ir.default'].get('website.support.settings', 'allow_website_priority_set')
+            
         if setting_google_recaptcha_active:
 
             setting_google_captcha_secret_key = request.env['ir.default'].get('website.support.settings', 'google_captcha_secret_key')
@@ -356,6 +358,8 @@ class SupportTicketController(http.Controller):
             #Add to the communication history
             partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
 
+            if 'priority' in values and (setting_allow_website_priority_set == "partner" or setting_allow_website_priority_set == "everyone"):
+                new_ticket_id.priority_id = int(values['priority'])
         else:
             search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
 
@@ -364,6 +368,9 @@ class SupportTicketController(http.Controller):
             else:
                 new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'channel': 'Website (Public)'})
 
+            if 'priority' in values and setting_allow_website_priority_set == "everyone":
+                new_ticket_id.priority_id = int(values['priority'])
+                            
         if "subcategory" in values:
             #Also get the data from the extra fields
             for extra_field in request.env['website.support.ticket.subcategory.field'].sudo().search([('wsts_id','=', int(sub_category) )]):

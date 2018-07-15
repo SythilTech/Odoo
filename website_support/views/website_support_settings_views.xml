@@ -18,6 +18,7 @@
                     <field name="max_ticket_attachments"/>
                     <field name="max_ticket_attachment_filesize"/>
                     <field name="allow_user_signup"/>
+                    <field name="allow_website_priority_set"/>
                     <field name="auto_send_survey"/>
                     <field name="business_hours_id"/>
                     <field name="google_recaptcha_active"/>
