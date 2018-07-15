@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="res_partner_support_billing_wizard_view_form" model="ir.ui.view">
+          <field name="name">res.partner.support.billing.wizard.form.view</field>
+          <field name="model">res.partner.support.billing.wizard</field>
+          <field name="arch" type="xml">
+              <form>
+                  <group>
+                      <field name="partner_id" invisible="True"/>
+                      <field name="start_date"/>
+                      <field name="end_date"/>
+                      <field name="per_hour_charge"/>
+                  </group>
+                  <button type="object" name="generate_invoice" string="Generate Invoice"/>
+              </form>
+          </field>
+      </record>
+
+      <record id="support_billing_more_menu_server_action" model="ir.actions.server">
+          <field name="name">Generate Timesheet Invoice</field>
+          <field name="model_id" ref="base.model_res_partner"/>
+          <field name="binding_model_id" ref="base.model_res_partner"/>
+          <field name="condition">True</field>
+          <field name="state">code</field>
+          <field name="code">action = record.support_billing_action()</field>
+      </record>
+
+  </data>
+</openerp>
