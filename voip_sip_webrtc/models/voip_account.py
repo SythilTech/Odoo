@@ -108,10 +108,7 @@ class VoipAccount(models.Model):
                 _logger.error("Start RTP Listening")
 
                 audio_stream = b''
-                call_start_time = datetime.datetime.now()
                 current_call_action = self.env['voip.account.action'].browse( int(call_action_id) )
-
-                _logger.error("Call Action")
                 
                 t = threading.currentThread()
                 while getattr(t, "stream_active", True):
@@ -148,17 +145,15 @@ class VoipAccount(models.Model):
                 _logger.error(e)
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
-                
+
             try:
 
-                #Update call after the stream times out
-                #voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
-                #voip_call_client.vc_id.write({'media': base64.b64encode(audio_stream), 'status': 'over', 'media_filename': "call.raw", 'start_time': call_start_time, 'end_time': datetime.datetime.now()})
-                #diff_time = datetime.datetime.now() - call_start_time
-                #voip_call_client.vc_id.duration = str(diff_time.seconds) + " Seconds"
-
-                #Add the stream data to this client
-                #voip_call_client.write({'audio_stream': base64.b64encode(audio_stream)})
+                #Add the stream data to this client if allowed
+                record_calls = self.env['ir.default'].get('voip.settings', 'record_calls')
+                if record_calls:
+                    _logger.error("Record Client Call")
+                    voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
+                    voip_call_client.write({'audio_stream': base64.b64encode(audio_stream)})
 
                 #Have to manually commit the new cursor?
                 self._cr.commit()
@@ -191,11 +186,12 @@ class VoipAccount(models.Model):
                 #Initialize the first action
                 current_call_action_id = rtp_sender_queue.get()
                 current_call_action = self.env['voip.account.action'].browse( current_call_action_id )
+                call_start_time = datetime.datetime.now()
                 method = '_voip_action_initialize_%s' % (current_call_action.action_type_id.internal_name,)
                 action = getattr(current_call_action, method, None)
                 media_data = action()
 
-                server_stream_data = ""
+                server_stream_data = b''
 
                 codec = self.env['voip.codec'].browse( int(codec_id) )
 
@@ -216,6 +212,8 @@ class VoipAccount(models.Model):
                     if packet_count < 10:
                         _logger.error(rtp_payload_data)
                         _logger.error(media_index)
+
+                    server_stream_data += rtp_payload_data
 
                     send_data = self.generate_rtp_packet(rtp_payload_data, codec.payload_type, codec.payload_size, packet_count, sequence_number, timestamp)
                     rtpsocket.sendto(send_data, (rtp_ip, rtp_port) )
@@ -240,14 +238,28 @@ class VoipAccount(models.Model):
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
-            #try:
-                #Add the stream data to the call
-            #    voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
-            #    voip_call_client.vc_id.write({'server_stream_data': base64.b64encode(server_stream_data)})
-            #except Exception as e:
-            #    _logger.error(e)
-            #    exc_type, exc_obj, exc_tb = sys.exc_info()
-            #    _logger.error("Line: " + str(exc_tb.tb_lineno) )
+            try:
+
+                voip_call = self.env['voip.call.client'].browse( int(voip_call_client_id) ).vc_id
+                diff_time = datetime.datetime.now() - call_start_time
+                write_values = {'status': 'over', 'start_time': call_start_time, 'end_time': datetime.datetime.now(), 'duration': str(diff_time.seconds) + " Seconds"}
+
+                #Add the stream data to the call if allowed
+                record_calls = self.env['ir.default'].get('voip.settings', 'record_calls')
+                if record_calls:
+                    _logger.error("Record Server Stream")
+                    write_values.update({'media_filename': "call.raw", 'server_stream_data': base64.b64encode(server_stream_data)})
+
+                voip_call.write(write_values)
+
+                #Have to manually commit the new cursor?
+                self._cr.commit()
+                self._cr.close()
+
+            except Exception as e:
+                _logger.error(e)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
 
     def call_accepted(self, session, data):
         _logger.error("Call Accepted")

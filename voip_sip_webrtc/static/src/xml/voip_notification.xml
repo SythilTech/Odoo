@@ -3,12 +3,18 @@
 
     <t t-name="VoipSystemTray">
         <li class="o_mail_navbar_item">
+
             <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="VOIP" href="#">
                 <i class="fa fa-phone"/>
             </a>
             <ul class="o_mail_navbar_dropdown dropdown-menu" role="menu" id="voip_tray">
 
             </ul>
+        </li>
+        <li class="o_mail_navbar_item">
+            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="VOIP Presence" href="#">
+                <i id="voip_presence_light" class="fa fa-check-circle" style="color:green;"/>
+            </a>
         </li>
     </t>
 

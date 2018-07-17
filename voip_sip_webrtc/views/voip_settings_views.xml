@@ -12,7 +12,7 @@
                 </header>
                 <h2>Webrtc Settings</h2>
                 <group>
-                    <field name="inactivity_time"/>
+                    <!--<field name="inactivity_time"/>-->
                     <field name="ringtone_id"/>
                     <field name="ring_duration"/>
                 </group>

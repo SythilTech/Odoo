@@ -11,6 +11,7 @@ class ResUsersVoip(models.Model):
 
     _inherit = "res.users"
 
+    voip_presence_status = fields.Char(string="Voip Presence Status", help="Used for both Webrtc and SIP")
     voip_ringtone = fields.Binary(string="Ringtone")
     voip_account_id = fields.Many2one('voip.account', string="SIP Account")
     voip_ringtone_filename = fields.Char(string="Ringtone Filename")

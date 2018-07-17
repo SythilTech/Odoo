@@ -11,6 +11,7 @@ import time
 import string
 import socket
 import datetime
+from dateutil import tz
 import re
 
 from odoo import api, fields, models, registry
@@ -28,23 +29,14 @@ class VoipVoip(models.Model):
 
         user_list = []
 
-        inactivity_time_minutes = self.env['ir.default'].get('voip.settings', 'inactivity_time')
-
-        #Fail safe because settings are not set to default on module upgrade
-        if inactivity_time_minutes is None:
-            inactivity_time_minutes == 10
-
         #This list should only include users that have ever logged in, sort it by last presence that way all the online users are at the top
         for presence_user in self.env['bus.presence'].search([('user_id','!=',self.env.user.id)], order="last_presence desc"):
+            to_zone = tz.gettz(self.env.user.tz)
+            utc = datetime.datetime.strptime(presence_user.last_presence, DEFAULT_SERVER_DATETIME_FORMAT)
+            utc = utc.replace(tzinfo=tz.gettz('UTC'))
+            local_time = utc.astimezone(to_zone)
+            user_list.append({'name': presence_user.user_id.name, 'partner_id':presence_user.user_id.partner_id.id, 'status': presence_user.user_id.im_status, 'last_presence': local_time.strftime("%a %I:%M %p")})
 
-            #We kinda just assume if a person hasn't been active for 10 minutes they are AFK, this isn't reliable but is better then nothing
-            if presence_user.last_presence >= ( datetime.datetime.strptime(presence_user.last_poll, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.timedelta(minutes=inactivity_time_minutes) ).strftime("%Y-%m-%d %H:%M:%S"):
-                status = "Online"
-            else:
-                status = "Offline"
-
-            user_list.append({'name': presence_user.user_id.name, 'partner_id':presence_user.user_id.partner_id.id, 'status': status})        
-        
         return user_list
 
     @api.model

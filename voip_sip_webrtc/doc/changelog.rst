@@ -1,3 +1,9 @@
+v1.1.2
+======
+* RTP data is now saved if call recording setting is ticked
+* Presence recode to improve accuracy (hopefully...)
+* New presence light
+
 v1.1.1
 ======
 * Find local outgoing IP address button to make SIP setup a little easier
@@ -16,11 +22,11 @@ v1.0.5
 
 v1.0.4
 ======
-* Setting to adjust presense detection
+* Setting to adjust presence detection
 
 v1.0.3
 ======
-* Remove borken SIP widget
+* Remove broken SIP widget
 
 v1.0.2
 ======

@@ -268,7 +268,9 @@ WebClient.include({
                     $("#voip_text").html("Starting Call...");
                     $(".s-voip-manager").css("display","none");
 
-
+                    //Update Presence Light
+                    $("#voip_presence_light").attr('class', 'fa fa-check-circle');
+                    $("#voip_presence_light").attr('style', 'color:green;');
 
 				    got_remote_description = false;
 
@@ -460,20 +462,21 @@ function gotRemoteStream(event) {
 
     //For calls with multiple streams (e.g. video calls) this get called twice so we use time difference as a work around
     call_interval = setInterval(function() {
-		var endDate = new Date();
-		var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+        var endDate = new Date();
+        var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
 
         $("#voip_text").html( Math.round(seconds) + " seconds");
     }, 1000);
 
-
     rpc.query({
-	    model: 'voip.call',
-	    method: 'begin_call',
-	    args: [[call_id]],
-	    context: weContext.get()
+        model: 'voip.call',
+        method: 'begin_call',
+        args: [[call_id]],
+        context: weContext.get()
     }).then(function(result){
         console.log("Begin Call");
+        $("#voip_presence_light").attr('class', 'fa fa-exclamation-circle');
+        $("#voip_presence_light").attr('style', 'color:orange;');
     });
 
 }

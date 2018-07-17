@@ -69,6 +69,41 @@ class VoipController(http.Controller):
 
         return html
 
+    def add_riff_header(self, audio_stream, riff_audio_encoding_value):
+
+        #"RIFF"
+        riff_wrapper = b'\x52\x49\x46\x46'
+        #File Size
+        stream_length = len(audio_stream)
+        riff_wrapper += struct.pack('<I', stream_length - 8 )
+        #"WAVE"
+        riff_wrapper += b'\x57\x41\x56\x45'
+        #"fmt "
+        riff_wrapper += b'\x66\x6D\x74\x20'
+        #Subchunk1Size(18)
+        riff_wrapper += b'\x12\x00\x00\x00'
+        #AudioFormat (7) ulaw
+        #riff_wrapper += b'\x07\x00'
+        riff_wrapper += struct.pack('<H', riff_audio_encoding_value )
+        #NumChannels(1)
+        riff_wrapper += b'\x01\x00'
+        #Sample rate (8000)
+        riff_wrapper += b'\x40\x1F\x00\x00'
+        #ByteRate (SampleRate[8000] * NumChannels[1] * BitsPerSample[8]/8 = 16000)
+        riff_wrapper += b'\x40\x1F\x00\x00'
+        #BlockAlign (NumChannels[1] * BitsPerSample[8]/8)
+        riff_wrapper += b'\x01\x00'
+        #BitsPerSample(8)
+        riff_wrapper += b'\x08\x00'
+        #No idea
+        riff_wrapper += b'\x00\x00'
+        #Subchunk2ID "data"
+        riff_wrapper += b'\x64\x61\x74\x61'
+        #Subchunk2Size (NumSamples * NumChannels[1] * BitsPerSample[8])
+        riff_wrapper += struct.pack('<I', len(audio_stream) - 46 )
+
+        return riff_wrapper
+
     @http.route('/voip/messagebank/client/<voip_call_client_id>.wav', type="http", auth="user")
     def voip_messagebank_client(self, voip_call_client_id):
         """ Allow listen to call in browser """
@@ -81,36 +116,8 @@ class VoipController(http.Controller):
 
         #Add a RIFF wrapper to the raw file so we can play the audio in the browser, this is just a crude solution for those that don't have transcoding installed
         if voip_call_client.vc_id.media_filename == "call.raw":
-            #"RIFF"
-            riff_wrapper = "52 49 46 46"
-            #File Size
-            riff_wrapper += " " + struct.pack('<I', len(audio_stream) - 8 ).encode('hex')
-            #"WAVE"
-            riff_wrapper += " 57 41 56 45"
-            #"fmt "
-            riff_wrapper += " 66 6D 74 20"
-            #Subchunk1Size(18)
-            riff_wrapper += " 12 00 00 00"
-            #AudioFormat (7) ulaw
-            #riff_wrapper += " 07 00"
-            riff_wrapper += struct.pack('<H', voip_call.codec_id.riff_audio_encoding_value ).encode('hex')
-            #NumChannels(1)
-            riff_wrapper += " 01 00"
-            #Sample rate (8000)
-            riff_wrapper += " 40 1F 00 00"
-            #ByteRate (SampleRate[8000] * NumChannels[1] * BitsPerSample[8]/8 = 16000)
-            riff_wrapper += " 40 1F 00 00"
-            #BlockAlign (NumChannels[1] * BitsPerSample[8]/8)
-            riff_wrapper += " 01 00"
-            #BitsPerSample(8)
-            riff_wrapper += " 08 00"
-            #No idea
-            riff_wrapper += " 00 00"
-            #Subchunk2ID "data"
-            riff_wrapper += "64 61 74 61"
-            #Subchunk2Size (NumSamples * NumChannels[1] * BitsPerSample[8])
-            riff_wrapper += " " + struct.pack('<I', len(audio_stream) - 46 ).encode('hex')
-            media = riff_wrapper.replace(" ","").decode('hex') + audio_stream
+            riff_wrapper = self.add_riff_header(audio_stream, voip_call.codec_id.riff_audio_encoding_value)
+            media = riff_wrapper + audio_stream
 
         headers.append(('Content-Length', len(media)))
         headers.append(('Content-Type', 'audio/x-wav'))
@@ -129,37 +136,9 @@ class VoipController(http.Controller):
 
         #Add a RIFF wrapper to the raw file so we can play the audio in the browser, this is just a crude solution for those that don't have transcoding installed
         if voip_call.media_filename == "call.raw":
-            #"RIFF"
-            riff_wrapper = "52 49 46 46"
-            #File Size
-            riff_wrapper += " " + struct.pack('<I', len(audio_stream) - 8 ).encode('hex')
-            #"WAVE"
-            riff_wrapper += " 57 41 56 45"
-            #"fmt "
-            riff_wrapper += " 66 6D 74 20"
-            #Subchunk1Size(18)
-            riff_wrapper += " 12 00 00 00"
-            #AudioFormat (7) ulaw
-            #riff_wrapper += " 07 00"
-            riff_wrapper += struct.pack('<H', voip_call.codec_id.riff_audio_encoding_value ).encode('hex')
-            #NumChannels(1)
-            riff_wrapper += " 01 00"
-            #Sample rate (8000)
-            riff_wrapper += " 40 1F 00 00"
-            #ByteRate (SampleRate[8000] * NumChannels[1] * BitsPerSample[8]/8 = 16000)
-            riff_wrapper += " 40 1F 00 00"
-            #BlockAlign (NumChannels[1] * BitsPerSample[8]/8)
-            riff_wrapper += " 01 00"
-            #BitsPerSample(8)
-            riff_wrapper += " 08 00"
-            #No idea
-            riff_wrapper += " 00 00"
-            #Subchunk2ID "data"
-            riff_wrapper += "64 61 74 61"
-            #Subchunk2Size (NumSamples * NumChannels[1] * BitsPerSample[8])
-            riff_wrapper += " " + struct.pack('<I', len(audio_stream) - 46 ).encode('hex')
-            media = riff_wrapper.replace(" ","").decode('hex') + audio_stream
-
+            riff_wrapper = self.add_riff_header(audio_stream, voip_call.codec_id.riff_audio_encoding_value)
+            media = riff_wrapper + audio_stream
+            
         headers.append(('Content-Length', len(media)))
         headers.append(('Content-Type', 'audio/x-wav'))
         response = request.make_response(media, headers)

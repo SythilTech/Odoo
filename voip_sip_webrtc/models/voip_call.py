@@ -62,7 +62,7 @@ class VoipCall(models.Model):
 
     @api.one
     def _compute_media_url(self):
-        if self.media:
+        if self.server_stream_data:
             self.media_url = "/voip/messagebank/" + str(self.id)
         else:
             self.media_url = ""
@@ -126,8 +126,8 @@ class VoipCall(models.Model):
         
         if self.status == "accepted":
             self.status = "active"
-
-        self.start_time = datetime.datetime.now()
+            
+            self.start_time = datetime.datetime.now()
 
     def end_call(self):
         """ Mark the call as over, we can calculate the call duration based on the start time, also send notification to both sides to close there VOIP windows """
