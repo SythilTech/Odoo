@@ -1,3 +1,8 @@
+v1.0.9
+======
+* Update Import call history to also import call recordings
+* Calls are now added to the Odoo call log with their recordings
+
 v1.0.8
 ======
 * Bug fix to also record outgoing SIP calls not just the Twilio javascript client ones.

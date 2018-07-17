@@ -78,11 +78,29 @@ function twilio_end_call() {
 	console.log('Call ended.');
     $("#voip_text").html("Starting Call...");
     $(".s-voip-manager").css("display","none");
+
+    console.log(twilio_call_sid);
+
+    rpc.query({
+        model: 'voip.call',
+		method: 'add_twilio_call',
+		args: [voip_call_id, twilio_call_sid],
+		context: weContext.get()
+    }).then(function(result){
+        console.log("Add Twilio Call Record");
+    });
+
     Twilio.Device.disconnectAll();
 }
 
+var twilio_call_sid;
+var voip_call_id;
+
 Twilio.Device.connect(function (conn) {
     console.log('Successfully established call!');
+
+    twilio_call_sid = conn.parameters.CallSid;
+    console.log(twilio_call_sid);
 
     $(".s-voip-manager").css("display","block");
 
@@ -202,6 +220,7 @@ WebClient.include({
                       var from_number = notification[1].from_number;
                       var to_number = notification[1].to_number;
                       var capability_token_url = notification[1].capability_token_url;
+                      voip_call_id = notification[1].call_id;
 
                       console.log("Call Type: Twilio");
 

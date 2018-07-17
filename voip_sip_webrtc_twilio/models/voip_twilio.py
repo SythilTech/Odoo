@@ -8,6 +8,7 @@ import re
 from lxml import etree
 from dateutil import parser
 from openerp.http import request
+import base64
 
 from openerp import api, fields, models
 from openerp.exceptions import UserError
@@ -86,7 +87,9 @@ class VoipTwilio(models.Model):
         else:
             raise UserError("Bad Credentials")    
 
+    @api.multi
     def fetch_call_history(self):
+        self.ensure_one()
 
         payload = {}
         if self.twilio_last_check_date:
@@ -112,7 +115,7 @@ class VoipTwilio(models.Model):
             create_dict['twilio_account_id'] = self.id
 
             if 'price' in call:
-                if call['price'] > 0:
+                if float(call['price']) != 0.0:
                     create_dict['currency_id'] = self.env['res.currency'].search([('name','=', call['price_unit'])])[0].id
                     create_dict['price'] = -1.0 * float(call['price'])
 
@@ -126,7 +129,7 @@ class VoipTwilio(models.Model):
                 from_address = from_address.replace(":5060","")
                 from_address = from_address.replace("sip:","")
 
-                if "@" not in from_address:
+                if "@" not in from_address and "@" in to_address:
                     #Get the full aor based on the domain of the to address
                     domain = re.findall(r'@(.*?);', to_address)[0].replace(":5060","")
                     from_address = from_address + "@" + domain
@@ -148,7 +151,7 @@ class VoipTwilio(models.Model):
                 to_address = to_address.replace(":5060","")
                 to_address = to_address.replace("sip:","")
 
-                if "@" not in to_address:
+                if "@" not in to_address and "@" in from_address:
                     #Get the full aor based on the domain of the from address
                     domain = re.findall(r'@(.*?);', from_address)[0].replace(":5060","")
                     to_address = to_address + "@" + domain
@@ -185,10 +188,31 @@ class VoipTwilio(models.Model):
             create_dict['twilio_sid'] = call['sid']
             #Duration includes the ring time
             create_dict['duration'] = call['duration']
+
+            #Fetch the recording if it exists
+            if 'subresource_uris' in call:
+                if 'recordings' in call['subresource_uris']:
+                    if call['subresource_uris']['recordings'] != '':
+                        recording_response = requests.get("https://api.twilio.com" + call['subresource_uris']['recordings'], auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+                        recording_json = json.loads(recording_response.text)
+                        for recording in recording_json['recordings']:
+                            recording_media_uri = "https://api.twilio.com" + recording['uri'].replace(".json",".mp3")
+                            recording_media = requests.get(recording_media_uri, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+                            create_dict['twilio_call_recording'] = base64.b64encode(recording_media.content)
+                            create_dict['twilio_call_recording_filename'] = call['sid'] + ".mp3"
+
             self.env['voip.call'].create(create_dict)
 
             self.twilio_last_check_date = datetime.utcnow()
 
+        return {
+            'name': 'Twilio Call History',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'voip.call',
+            'type': 'ir.actions.act_window',
+        }
+         
     @api.multi
     def generate_invoice_previous_month(self):
         self.ensure_one()
