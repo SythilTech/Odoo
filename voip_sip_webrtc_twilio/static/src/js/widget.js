@@ -15,6 +15,7 @@ var WebClient = require('web.WebClient');
 var SystrayMenu = require('web.SystrayMenu');
 var _t = core._t;
 var qweb = core.qweb;
+var ActionManager = require('web.ActionManager');
 
 var call_conn;
 var myNotif = "";
@@ -75,7 +76,7 @@ $(document).on("click", "#voip_end_call", function(){
 });
 
 function twilio_end_call() {
-	console.log('Call ended.');
+    console.log('Call ended.');
     $("#voip_text").html("Starting Call...");
     $(".s-voip-manager").css("display","none");
 
@@ -83,11 +84,20 @@ function twilio_end_call() {
 
     rpc.query({
         model: 'voip.call',
-		method: 'add_twilio_call',
-		args: [voip_call_id, twilio_call_sid],
-		context: weContext.get()
+        method: 'add_twilio_call',
+        args: [[voip_call_id], twilio_call_sid],
+        context: weContext.get()
     }).then(function(result){
-        console.log("Add Twilio Call Record");
+        console.log("Finished Updating Twilio Call");
+    });
+
+    sw_acton_manager.do_action({
+        name: 'Twilio Call Comments',
+        type: 'ir.actions.act_window',
+        res_model: 'voip.call.comment',
+        views: [[false, 'form']],
+        context: {'default_call_id': voip_call_id},
+        target: 'new'
     });
 
     Twilio.Device.disconnectAll();
@@ -95,6 +105,7 @@ function twilio_end_call() {
 
 var twilio_call_sid;
 var voip_call_id;
+var sw_acton_manager;
 
 Twilio.Device.connect(function (conn) {
     console.log('Successfully established call!');
@@ -233,6 +244,9 @@ WebClient.include({
                       };
 
                       console.log('Calling ' + params.To + '...');
+
+                      //Because this no longer referes to the action manager for the disconnect callback
+                      sw_acton_manager = this;
 
                       $.getJSON(capability_token_url).done(function (data) {
                           // Setup Twilio.Device

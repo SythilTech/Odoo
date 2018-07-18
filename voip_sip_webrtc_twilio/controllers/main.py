@@ -4,6 +4,7 @@ import werkzeug
 from odoo.http import request
 from odoo.exceptions import UserError
 import json
+import base64
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ except:
     _logger.error("Twilio Client Not Installed")
 
 class TwilioVoiceController(http.Controller):
-
+        
     @http.route('/voip/ringtone.mp3', type="http", auth="user")
     def voip_ringtone_mp3(self):
         """Return the ringtone file to be used by javascript"""

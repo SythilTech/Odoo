@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Voip Communication - Twilio",
-    'version': "1.0.9",
+    'version': "1.0.10",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -16,6 +16,7 @@
         'views/voip_call_wizard_views.xml',
         'views/voip_account_action_views.xml',
         'views/voip_sip_webrtc_twilio_templates.xml',
+        'views/voip_call_comment_views.xml',
         'views/menus.xml',
         #'data/voip.account.action.type.csv',
         'security/ir.model.access.csv',

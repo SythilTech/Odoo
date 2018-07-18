@@ -24,8 +24,7 @@
                 <field name="twilio_account_id"/>
                 <field name="currency_id"/>
                 <field name="price" widget="monetery"/>
-                <field name="twilio_call_recording_filename" invisible="True"/>
-                <field name="twilio_call_recording" filename="twilio_call_recording_filename"/>
+                <field name="twilio_call_recording_uri"/>
             </field>
         </field>
     </record>

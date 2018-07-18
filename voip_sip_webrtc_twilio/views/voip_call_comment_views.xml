@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="voip_call_comment_view_form" model="ir.ui.view">
+        <field name="name">voip.call.comment form view</field>
+        <field name="model">voip.call.comment</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="call_id" invisible="1"/>
+                    <field name="note"/>
+                </group>
+                <button type="object" name="post_feedback" string="Post Note"/>
+            </form>
+        </field>
+    </record>
+
+</odoo>

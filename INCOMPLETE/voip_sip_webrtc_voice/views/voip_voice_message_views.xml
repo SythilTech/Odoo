@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_voice_message_view_form" model="ir.ui.view">
+        <field name="name">voip.voice.message form view</field>
+        <field name="model">voip.voice.message</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="model_id" required="1" options="{'no_create': True}"/>
+                        <field name="model" invisible="1"/>
+                        <field name="voice_synth_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Content">
+                            <field name="synth_text"/>
+                        </page>
+                        <page string="Dynamic Placeholder Generator">
+                            <group>
+                                <field name="model_object_field_id" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]"/>
+                                <field name="sub_object_id" readonly="1"/>
+                                <field name="sub_model_object_field_id" domain="[('model_id','=',sub_object_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object_id','=',False)],'required':[('sub_object_id','!=',False)]}"/>
+                                <field name="null_value"/>
+                                <field name="copyvalue"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="voip_voice_message_view_tree" model="ir.ui.view">
+        <field name="name">voip.voice.message tree view</field>
+        <field name="model">voip.voice.message</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="voice_synth_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="voip_voice_message_action" model="ir.actions.act_window">
+        <field name="name">Voip Voice Message</field>
+        <field name="res_model">voip.voice.message</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                A Voice Message is text that will be spoken by a voice synthesis engine during a call, it can use dynamic placeholders to speak customer specific pharses
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="voip_voice_message_menu" name="Voice Messages" parent="voip_sip_webrtc.voip_parent_menu" action="voip_voice_message_action" sequence="130"/>
+
+</odoo>

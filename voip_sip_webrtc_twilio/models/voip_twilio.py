@@ -196,10 +196,7 @@ class VoipTwilio(models.Model):
                         recording_response = requests.get("https://api.twilio.com" + call['subresource_uris']['recordings'], auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
                         recording_json = json.loads(recording_response.text)
                         for recording in recording_json['recordings']:
-                            recording_media_uri = "https://api.twilio.com" + recording['uri'].replace(".json",".mp3")
-                            recording_media = requests.get(recording_media_uri, auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
-                            create_dict['twilio_call_recording'] = base64.b64encode(recording_media.content)
-                            create_dict['twilio_call_recording_filename'] = call['sid'] + ".mp3"
+                            create_dict['twilio_call_recording_uri'] = "https://api.twilio.com" + recording['uri'].replace(".json",".mp3")
 
             self.env['voip.call'].create(create_dict)
 

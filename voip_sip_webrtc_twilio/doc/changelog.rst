@@ -1,3 +1,8 @@
+v1.0.10
+=======
+* Can now write a post call comment, you can also listen to call recording using a link inside the chatter
+* Call recordings are no longer downloaded, instead only the url is keep (prevents post call hang due to waiting for download + increased privacy / security not having a copy inside Odoo)
+
 v1.0.9
 ======
 * Update Import call history to also import call recordings
