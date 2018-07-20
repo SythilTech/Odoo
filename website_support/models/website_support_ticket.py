@@ -2,13 +2,14 @@
 from openerp import api, fields, models
 from openerp import tools
 from random import randint
-import math
 import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
-import logging
-_logger = logging.getLogger(__name__)
 from odoo import SUPERUSER_ID
 from dateutil import tz
+
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class WebsiteSupportTicket(models.Model):
 
@@ -17,13 +18,14 @@ class WebsiteSupportTicket(models.Model):
     _order = "create_date desc"
     _rec_name = "subject"
     _inherit = ['mail.thread']
+    _translate = True
 
     @api.model
     def _read_group_state(self, states, domain, order):
         """ Read group customization in order to display all the states in the
             kanban view, even if they are empty
         """
-        
+
         staff_replied_state = self.env['ir.model.data'].get_object('website_support',
                                                                    'website_ticket_state_staff_replied')
         customer_replied_state = self.env['ir.model.data'].get_object('website_support',
@@ -31,12 +33,12 @@ class WebsiteSupportTicket(models.Model):
         customer_closed = self.env['ir.model.data'].get_object('website_support',
                                                                'website_ticket_state_customer_closed')
         staff_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed')
-        
+
         exclude_states = [staff_replied_state.id, customer_replied_state.id, customer_closed.id, staff_closed.id]
-        
-        #state_ids = states._search([('id','not in',exclude_states)], order=order, access_rights_uid=SUPERUSER_ID)
+
+        # state_ids = states._search([('id','not in',exclude_states)], order=order, access_rights_uid=SUPERUSER_ID)
         state_ids = states._search([], order=order, access_rights_uid=SUPERUSER_ID)
-        
+
         return states.browse(state_ids)
 
     def _default_state(self):
@@ -102,18 +104,23 @@ class WebsiteSupportTicket(models.Model):
     @api.one
     @api.depends('sla_timer')
     def _compute_sla_timer_format(self):
-        #Display negative hours in a positive format
+        # Display negative hours in a positive format
         self.sla_timer_format = '{0:02.0f}:{1:02.0f}'.format(*divmod(abs(self.sla_timer) * 60, 60))
 
     @api.model
     def update_sla_timer(self):
-        
-        #Subtract 1 minute from the timer of all active SLA tickets, this includes going into negative
-        for active_sla_ticket in self.env['website.support.ticket'].search([('sla_active','=',True), ('sla_id','!=',False), ('sla_response_category_id','!=',False)]):
 
-            #If we only countdown during busines hours
+        # Subtract 1 minute from the timer of all active SLA tickets, this includes going into negative
+        for active_sla_ticket in self.env['website.support.ticket'].search([
+            ('sla_active','=',True),
+            ('sla_id','!=',False),
+            ('sla_response_category_id','!=',False)
+        ]):
+
+            # If we only countdown during busines hours
             if active_sla_ticket.sla_response_category_id.countdown_condition == 'business_only':
-                #Check if the current time aligns with a timeslot in the settings, setting has to be set for business_only or UserError occurs
+                # Check if the current time aligns with a timeslot in the settings,
+                # setting has to be set for business_only or UserError occurs
                 setting_business_hours_id = self.env['ir.default'].get('website.support.settings', 'business_hours_id')
                 current_hour = datetime.datetime.now().hour
                 current_minute = datetime.datetime.now().minute / 60
@@ -121,7 +128,7 @@ class WebsiteSupportTicket(models.Model):
                 day_of_week = datetime.datetime.now().weekday()
                 during_work_hours = self.env['resource.calendar.attendance'].search([('calendar_id','=', setting_business_hours_id), ('dayofweek','=',day_of_week), ('hour_from','<',current_hour_float), ('hour_to','>',current_hour_float)])
 
-                #If holiday module is installed take into consideration
+                # If holiday module is installed take into consideration
                 holiday_module = self.env['ir.module.module'].search([('name','=','hr_public_holidays'), ('state','=','installed')])
                 if holiday_module:
                     holiday_today = self.env['hr.holidays.public.line'].search([('date','=',datetime.datetime.now().date())])
@@ -165,11 +172,11 @@ class WebsiteSupportTicket(models.Model):
     @api.one
     @api.depends('planned_time')
     def _compute_planned_time_format(self):
-    
+
         #If it is assigned to the partner, use the partners timezone and date formatting
         if self.planned_time and self.partner_id and self.partner_id.lang:
             partner_language = self.env['res.lang'].search([('code','=', self.partner_id.lang)])[0]
-            
+
             my_planned_time = datetime.datetime.strptime(self.planned_time, DEFAULT_SERVER_DATETIME_FORMAT)
 
             #If we have timezone information translate the planned date to local time otherwise UTC
@@ -179,10 +186,10 @@ class WebsiteSupportTicket(models.Model):
                 self.planned_time_format = local_time.strftime(partner_language.date_format + " " + partner_language.time_format) + " " + self.partner_id.tz
             else:
                 self.planned_time_format = my_planned_time.strftime(partner_language.date_format + " " + partner_language.time_format) + " UTC"
-            
+
         else:
             self.planned_time_format = self.planned_time
-        
+
     @api.one
     def _compute_approve_url(self):
         self.approve_url = "/support/approve/" + str(self.id)
@@ -194,12 +201,12 @@ class WebsiteSupportTicket(models.Model):
     @api.onchange('sub_category_id')
     def _onchange_sub_category_id(self):
         if self.sub_category_id:
-            
+
             add_extra_fields = []
-            
+
             for extra_field in self.sub_category_id.additional_field_ids:
                 add_extra_fields.append((0, 0, {'name': extra_field.name}))
-                
+
             self.update({
                 'extra_field_ids': add_extra_fields,
             })
@@ -290,7 +297,7 @@ class WebsiteSupportTicket(models.Model):
             'context': {'default_ticket_id': self.id, 'default_email': self.email, 'default_subject': self.subject, 'default_approval': True, 'default_body': request_message},
             'target': 'new'
         }
-        
+
     @api.multi
     def open_close_ticket_wizard(self):
 
@@ -439,10 +446,10 @@ class WebsiteSupportTicketSubCategories(models.Model):
     _order = "sequence asc"
 
     sequence = fields.Integer(string="Sequence")
-    name = fields.Char(required=True, translate=True, string='Sub Category Name')   
+    name = fields.Char(required=True, translate=True, string='Sub Category Name')
     parent_category_id = fields.Many2one('website.support.ticket.categories', required=True, string="Parent Category")
     additional_field_ids = fields.One2many('website.support.ticket.subcategory.field', 'wsts_id', string="Additional Fields")
- 
+
     @api.model
     def create(self, values):
         sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.subcategory')
