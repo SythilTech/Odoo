@@ -480,7 +480,7 @@ msgstr "Mensaje de aprobación"
 #: model:website.support.ticket.approval,name:website_support.approval_rejected
 #: model:website.support.ticket.states,name:website_support.website_ticket_state_approval_rejected
 msgid "Approval Rejected"
-msgstr "Approval Rejected"
+msgstr "Aprobación rechazada"
 
 #. module: website_support
 #: model:ir.model.fields,field_description:website_support.field_website_support_ticket_approve_url
@@ -1291,7 +1291,7 @@ msgstr "Número de horas para enviar alerta de SLA antes o después"
 #. module: website_support
 #: model:website.support.ticket.states,name:website_support.website_ticket_state_open
 msgid "Open"
-msgstr "Abrir"
+msgstr "Abierto"
 
 #. module: website_support
 #: model:ir.ui.view,arch_db:website_support.website_support_ticket_view_form
