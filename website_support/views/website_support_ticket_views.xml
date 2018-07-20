@@ -113,6 +113,7 @@
           <field name="model">website.support.ticket</field>
           <field name="arch" type="xml">
               <search>
+                  <field name="ticket_number"/>
                   <field name="subject"/>
                   <field name="tag_ids"/>
                   <field name="partner_id"/>
@@ -141,7 +142,7 @@
                   <field name="create_user_id" invisible="True"/>
                   <field name="ticket_color" invisible="True"/>
                   <field name="create_date"/>
-                  <field name="ticket_number_display"/>
+                  <field name="ticket_number"/>
                   <field name="priority_id"/>
                   <field name="parent_company_id"/>
                   <field name="person_name"/>

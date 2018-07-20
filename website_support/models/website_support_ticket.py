@@ -24,9 +24,12 @@ class WebsiteSupportTicket(models.Model):
             kanban view, even if they are empty
         """
         
-        staff_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_replied')
-        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
-        customer_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_closed')
+        staff_replied_state = self.env['ir.model.data'].get_object('website_support',
+                                                                   'website_ticket_state_staff_replied')
+        customer_replied_state = self.env['ir.model.data'].get_object('website_support',
+                                                                      'website_ticket_state_customer_replied')
+        customer_closed = self.env['ir.model.data'].get_object('website_support',
+                                                               'website_ticket_state_customer_closed')
         staff_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed')
         
         exclude_states = [staff_replied_state.id, customer_replied_state.id, customer_closed.id, staff_closed.id]
@@ -59,17 +62,20 @@ class WebsiteSupportTicket(models.Model):
     sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     subject = fields.Char(string="Subject")
     description = fields.Text(string="Description")
-    state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state, string="State")
+    state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state,
+                            string="State")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
-    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')], string="Media Attachments")
-    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
+    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')],
+                                     string="Media Attachments")
+    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True",
+                                help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
-    ticket_number = fields.Integer(string="Ticket Number")
-    ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
+    ticket_number = fields.Char(string="Ticket Number", readonly=True)
     ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
-    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
+    company_id = fields.Many2one('res.company', string="Company",
+                                 default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
     support_rating = fields.Integer(string="Support Rating")
     support_comment = fields.Text(string="Support Comment")
     close_comment = fields.Text(string="Close Comment")
@@ -90,7 +96,8 @@ class WebsiteSupportTicket(models.Model):
     sla_timer_format = fields.Char(string="SLA Timer Format", compute="_compute_sla_timer_format")
     sla_active = fields.Boolean(string="SLA Active")
     sla_response_category_id = fields.Many2one('website.support.sla.response', string="SLA Response Category")
-    sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts", help="Keep record of SLA alerts sent so we do not resend them")
+    sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts",
+                                     help="Keep record of SLA alerts sent so we do not resend them")
 
     @api.one
     @api.depends('sla_timer')
@@ -256,14 +263,6 @@ class WebsiteSupportTicket(models.Model):
         return super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
 
     @api.one
-    @api.depends('ticket_number')
-    def _compute_ticket_number_display(self):
-        if self.ticket_number:
-            self.ticket_number_display = str(self.id) + " / " + "{:,}".format( self.ticket_number )
-        else:
-            self.ticket_number_display = self.id
-
-    @api.one
     @api.depends('state')
     def _compute_unattend(self):
         #BACK COMPATABLITY Use open and customer reply as default unattended states
@@ -313,14 +312,12 @@ class WebsiteSupportTicket(models.Model):
 
     @api.model
     def create(self, vals):
+        # Get next ticket number from the sequence
+        vals['ticket_number'] = self.env['ir.sequence'].next_by_code('website.support.ticket')
+
         new_id = super(WebsiteSupportTicket, self).create(vals)
 
         new_id.portal_access_key = randint(1000000000,2000000000)
-        
-        new_id.ticket_number = new_id.company_id.next_support_ticket_number
-
-        #Add one to the next ticket number
-        new_id.company_id.next_support_ticket_number += 1
 
         ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
         ticket_open_email_template.send_mail(new_id.id, True)
