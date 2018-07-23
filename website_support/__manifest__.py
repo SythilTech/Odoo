@@ -1,7 +1,7 @@
 {
     'name': "Website Help Desk / Support Ticket",
     'version': "1.2.14",
-    'author': "Sythil Tech",
+    'author': "Sythil Tech, Adaptive City",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
     'summary': "A helpdesk / support ticket system for your website",
