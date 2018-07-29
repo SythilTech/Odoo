@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-
     <record id="voip_account_action_view_form_inherit_voice" model="ir.ui.view">
         <field name="name">voip.account.action form view inherit voice</field>
         <field name="model">voip.account.action</field>
         <field name="inherit_id" ref="voip_sip_webrtc.voip_account_action_view_form"/>
         <field name="arch" type="xml">
             <field name="action_type_id" position="after">
-                <field name="voip_voice_message_id"/>      	            
-      	    </field>
+                <field name="voip_voice_message_id" attrs="{'invisible': [('action_type_internal_name', '!=', 'voice_message')], 'required': [('action_type_internal_name', '=', 'voice_message')]}"/>
+            </field>
         </field>
     </record>
-    
 
 </odoo>

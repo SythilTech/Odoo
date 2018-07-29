@@ -81,6 +81,47 @@ class VoipVoiceMessage(models.Model):
         if self.sub_model_object_field_id:
             self.copyvalue = self.build_expression(self.model_object_field_id.name, self.sub_model_object_field_id.name, self.null_value)
 
+    def render_template(self, template, model, res_id):
+        """Render the given template text, replace mako expressions ``${expr}``
+           with the result of evaluating these expressions with
+           an evaluation context containing:
+                * ``user``: browse_record of the current user
+                * ``object``: browse_record of the document record this mail is
+                              related to
+                * ``context``: the context passed to the mail composition wizard
+           :param str template: the template text to render
+           :param str model: model name of the document record this mail is related to.
+           :param int res_id: id of document records those mails are related to.
+        """
+        
+        # try to load the template
+        #try:
+        template = mako_template_env.from_string(tools.ustr(template))
+        #except Exception:
+        #    _logger.error("Failed to load template %r", template)
+        #    return False
+
+        # prepare template variables
+        user = self.env.user
+        record = self.env[model].browse(res_id)
+        
+        variables = {
+            'user': user
+        }
+        
+        
+        
+        variables['object'] = record
+        try:
+            render_result = template.render(variables)
+        except Exception:
+            _logger.error("Failed to render template %r using values %r" % (template, variables))
+            render_result = u""
+        if render_result == u"False":
+            render_result = u""
+
+        return render_result
+        
     @api.model
     def build_expression(self, field_name, sub_field_name, null_value):
         """Returns a placeholder expression for use in a template field,
@@ -100,5 +141,7 @@ class VoipVoiceMessage(models.Model):
             expression += "}"
         return expression
 
-    def synth_message(self, codec_id):
-        return self.voice_synth_id.voice_synth(self.synth_text, codec_id)
+    def synth_message(self, codec_id, record_id):
+        rendered_synth_text = self.render_template(self.synth_text, self.model, record_id)
+        _logger.error(rendered_synth_text)
+        return self.voice_synth_id.voice_synth(rendered_synth_text, codec_id)
