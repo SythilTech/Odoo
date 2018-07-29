@@ -46,7 +46,8 @@ var VOIPSystemTray = Widget.extend({
                 drop_menu_html += voip_user.name +  " (" + voip_user.status + ")";
 
                 if (voip_user.status == "online" || voip_user.status == "away") {
-                    drop_menu_html += " <span style=\"float:right\"><i class=\"fa fa-volume-up start_voip_audio_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Audio Call\" aria-hidden=\"true\"/> <i class=\"fa fa-video-camera start_voip_video_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Video Call\" aria-hidden=\"true\"/> <i class=\"fa fa-desktop start_voip_screenshare_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Screen Sharing\" aria-hidden=\"true\"/></span>";
+					drop_menu_html += " <sup>" + voip_user.last_activity_ago + "</sup>";
+                    drop_menu_html += "<span style=\"float:right\"><i class=\"fa fa-volume-up start_voip_audio_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Audio Call\" aria-hidden=\"true\"/> <i class=\"fa fa-video-camera start_voip_video_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Video Call\" aria-hidden=\"true\"/> <i class=\"fa fa-desktop start_voip_screenshare_call\" data-partner=\"" + voip_user.partner_id + "\" title=\"Screen Sharing\" aria-hidden=\"true\"/></span>";
                 }
                 if (voip_user.status == "offline") {
                     drop_menu_html += " <sup>" + voip_user.last_presence + "</sup>";

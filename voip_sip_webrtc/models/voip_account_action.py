@@ -33,7 +33,7 @@ class VoipAccountAction(models.Model):
     from_transition_ids = fields.One2many('voip.account.action.transition', 'action_to_id', string="Source Transitions")
     to_transition_ids = fields.One2many('voip.account.action.transition', 'action_from_id', string="Destination Transitions")
 
-    def _voip_action_initialize_recorded_message(self):
+    def _voip_action_initialize_recorded_message(self, voip_call_client):
         _logger.error("Change Action Recorded Message")
         media_data = base64.decodestring(self.recorded_media_id.media)
         return media_data

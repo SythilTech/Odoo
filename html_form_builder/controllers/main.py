@@ -188,6 +188,9 @@ class HtmlFormController(http.Controller):
         if field.character_limit > 0:
             html_output += ' maxlength="' + str(field.character_limit) + '"'
 
+        if field.setting_general_required is True:
+            html_output += '  required="required"'
+            
         html_output += "/>\n"
         html_output += "</div>\n"
 

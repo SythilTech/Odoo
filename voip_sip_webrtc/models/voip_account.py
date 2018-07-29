@@ -132,7 +132,7 @@ class VoipAccount(models.Model):
                             #Initialize the new call action
                             method = '_voip_action_initialize_%s' % (current_call_action.action_type_id.internal_name,)
                             action = getattr(current_call_action, method, None)
-                            media_data = action()
+                            media_data = action(voip_call_client)
 
                             #Also set the current_call_action of the sending thread
                             rtp_sender_queue.put((current_call_action,media_data))
@@ -184,12 +184,13 @@ class VoipAccount(models.Model):
                 _logger.error("Start RTP Sender")
                 
                 #Initialize the first action
+                voip_call_client = self.env['voip.call.client'].browse( int(voip_call_client_id) )
                 current_call_action_id = rtp_sender_queue.get()
                 current_call_action = self.env['voip.account.action'].browse( current_call_action_id )
                 call_start_time = datetime.datetime.now()
                 method = '_voip_action_initialize_%s' % (current_call_action.action_type_id.internal_name,)
                 action = getattr(current_call_action, method, None)
-                media_data = action()
+                media_data = action(voip_call_client)
 
                 server_stream_data = b''
 

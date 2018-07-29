@@ -6,6 +6,7 @@ import logging
 _logger = logging.getLogger(__name__)
 import json
 import random
+import math
 from random import randint
 import time
 import string
@@ -35,7 +36,23 @@ class VoipVoip(models.Model):
             utc = datetime.datetime.strptime(presence_user.last_presence, DEFAULT_SERVER_DATETIME_FORMAT)
             utc = utc.replace(tzinfo=tz.gettz('UTC'))
             local_time = utc.astimezone(to_zone)
-            user_list.append({'name': presence_user.user_id.name, 'partner_id':presence_user.user_id.partner_id.id, 'status': presence_user.user_id.im_status, 'last_presence': local_time.strftime("%a %I:%M %p")})
+            last_activity_diff = datetime.datetime.now() - fields.Datetime.from_string(presence_user.user_id.last_web_client_activity_datetime)
+
+            last_activity_ago = "unknown"
+            if last_activity_diff.total_seconds() < 60:
+                #Under 1 minute
+                last_activity_ago = "Active " + str(math.floor(last_activity_diff.total_seconds())) + " seconds ago"
+            elif last_activity_diff.total_seconds() < 3600:
+                #Under 1 hour
+                last_activity_ago = "Active " + str(math.floor(last_activity_diff.total_seconds() / 60)) + " minutes ago"
+            elif last_activity_diff.total_seconds() < 86400:
+                #Under 1 day
+                last_activity_ago = "Active " + str(math.floor(last_activity_diff.total_seconds() / 3600)) + " hours ago"
+            else:
+                #We won't go into weeks / months years
+                last_activity_ago = "Active " + str(last_activity_diff.days) + " days ago"
+
+            user_list.append({'name': presence_user.user_id.name, 'partner_id':presence_user.user_id.partner_id.id, 'status': presence_user.user_id.im_status, 'last_presence': local_time.strftime("%a %I:%M %p"), 'last_activity_ago': last_activity_ago})
 
         return user_list
 

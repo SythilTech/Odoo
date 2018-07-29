@@ -16,6 +16,7 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMA
 from openerp.tools import ustr
 import openerp.http as http
 from openerp.http import request
+import odoo.addons.web.controllers.main as main
 
 class VoipController(http.Controller):
 
@@ -164,3 +165,15 @@ class VoipController(http.Controller):
         else:
             #TODO read blank.mp3 and return it
             return ""
+
+class DataSetInheritVoip(main.DataSet):
+
+    @http.route(['/web/dataset/call_kw', '/web/dataset/call_kw/<path:path>'], type='json', auth="user")
+    def call_kw(self, model, method, args, kwargs, path=None):
+        value = super(DataSetInheritVoip, self).call_kw(model, method, args, kwargs, path=None)
+        
+        #Doing a write every screen change is bound to be bad for performance
+        #But I need to be able to distinguish between bus.presence having a tab open and actually using the system...
+        request.env.user.last_web_client_activity_datetime = datetime.datetime.now()
+        
+        return value
