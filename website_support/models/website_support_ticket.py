@@ -2,13 +2,14 @@
 from openerp import api, fields, models
 from openerp import tools
 from random import randint
-import math
 import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
-import logging
-_logger = logging.getLogger(__name__)
 from odoo import SUPERUSER_ID
 from dateutil import tz
+
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class WebsiteSupportTicket(models.Model):
 
@@ -17,23 +18,27 @@ class WebsiteSupportTicket(models.Model):
     _order = "create_date desc"
     _rec_name = "subject"
     _inherit = ['mail.thread']
+    _translate = True
 
     @api.model
     def _read_group_state(self, states, domain, order):
         """ Read group customization in order to display all the states in the
             kanban view, even if they are empty
         """
-        
-        staff_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_replied')
-        customer_replied_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_replied')
-        customer_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_customer_closed')
+
+        staff_replied_state = self.env['ir.model.data'].get_object('website_support',
+                                                                   'website_ticket_state_staff_replied')
+        customer_replied_state = self.env['ir.model.data'].get_object('website_support',
+                                                                      'website_ticket_state_customer_replied')
+        customer_closed = self.env['ir.model.data'].get_object('website_support',
+                                                               'website_ticket_state_customer_closed')
         staff_closed = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed')
-        
+
         exclude_states = [staff_replied_state.id, customer_replied_state.id, customer_closed.id, staff_closed.id]
-        
-        #state_ids = states._search([('id','not in',exclude_states)], order=order, access_rights_uid=SUPERUSER_ID)
+
+        # state_ids = states._search([('id','not in',exclude_states)], order=order, access_rights_uid=SUPERUSER_ID)
         state_ids = states._search([], order=order, access_rights_uid=SUPERUSER_ID)
-        
+
         return states.browse(state_ids)
 
     def _default_state(self):
@@ -59,17 +64,20 @@ class WebsiteSupportTicket(models.Model):
     sub_category_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     subject = fields.Char(string="Subject")
     description = fields.Text(string="Description")
-    state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state, string="State")
+    state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state,
+                            string="State")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
-    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')], string="Media Attachments")
-    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True", help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
+    attachment_ids = fields.One2many('ir.attachment', 'res_id', domain=[('res_model', '=', 'website.support.ticket')],
+                                     string="Media Attachments")
+    unattended = fields.Boolean(string="Unattended", compute="_compute_unattend", store="True",
+                                help="In 'Open' state or 'Customer Replied' state taken into consideration name changes")
     portal_access_key = fields.Char(string="Portal Access Key")
-    ticket_number = fields.Integer(string="Ticket Number")
-    ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display")
+    ticket_number = fields.Char(string="Ticket Number", readonly=True)
     ticket_color = fields.Char(related="priority_id.color", string="Ticket Color")
-    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
+    company_id = fields.Many2one('res.company', string="Company",
+                                 default=lambda self: self.env['res.company']._company_default_get('website.support.ticket') )
     support_rating = fields.Integer(string="Support Rating")
     support_comment = fields.Text(string="Support Comment")
     close_comment = fields.Text(string="Close Comment")
@@ -90,23 +98,29 @@ class WebsiteSupportTicket(models.Model):
     sla_timer_format = fields.Char(string="SLA Timer Format", compute="_compute_sla_timer_format")
     sla_active = fields.Boolean(string="SLA Active")
     sla_response_category_id = fields.Many2one('website.support.sla.response', string="SLA Response Category")
-    sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts", help="Keep record of SLA alerts sent so we do not resend them")
+    sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts",
+                                     help="Keep record of SLA alerts sent so we do not resend them")
 
     @api.one
     @api.depends('sla_timer')
     def _compute_sla_timer_format(self):
-        #Display negative hours in a positive format
+        # Display negative hours in a positive format
         self.sla_timer_format = '{0:02.0f}:{1:02.0f}'.format(*divmod(abs(self.sla_timer) * 60, 60))
 
     @api.model
     def update_sla_timer(self):
-        
-        #Subtract 1 minute from the timer of all active SLA tickets, this includes going into negative
-        for active_sla_ticket in self.env['website.support.ticket'].search([('sla_active','=',True), ('sla_id','!=',False), ('sla_response_category_id','!=',False)]):
 
-            #If we only countdown during busines hours
+        # Subtract 1 minute from the timer of all active SLA tickets, this includes going into negative
+        for active_sla_ticket in self.env['website.support.ticket'].search([
+            ('sla_active','=',True),
+            ('sla_id','!=',False),
+            ('sla_response_category_id','!=',False)
+        ]):
+
+            # If we only countdown during busines hours
             if active_sla_ticket.sla_response_category_id.countdown_condition == 'business_only':
-                #Check if the current time aligns with a timeslot in the settings, setting has to be set for business_only or UserError occurs
+                # Check if the current time aligns with a timeslot in the settings,
+                # setting has to be set for business_only or UserError occurs
                 setting_business_hours_id = self.env['ir.default'].get('website.support.settings', 'business_hours_id')
                 current_hour = datetime.datetime.now().hour
                 current_minute = datetime.datetime.now().minute / 60
@@ -114,7 +128,7 @@ class WebsiteSupportTicket(models.Model):
                 day_of_week = datetime.datetime.now().weekday()
                 during_work_hours = self.env['resource.calendar.attendance'].search([('calendar_id','=', setting_business_hours_id), ('dayofweek','=',day_of_week), ('hour_from','<',current_hour_float), ('hour_to','>',current_hour_float)])
 
-                #If holiday module is installed take into consideration
+                # If holiday module is installed take into consideration
                 holiday_module = self.env['ir.module.module'].search([('name','=','hr_public_holidays'), ('state','=','installed')])
                 if holiday_module:
                     holiday_today = self.env['hr.holidays.public.line'].search([('date','=',datetime.datetime.now().date())])
@@ -158,11 +172,11 @@ class WebsiteSupportTicket(models.Model):
     @api.one
     @api.depends('planned_time')
     def _compute_planned_time_format(self):
-    
+
         #If it is assigned to the partner, use the partners timezone and date formatting
         if self.planned_time and self.partner_id and self.partner_id.lang:
             partner_language = self.env['res.lang'].search([('code','=', self.partner_id.lang)])[0]
-            
+
             my_planned_time = datetime.datetime.strptime(self.planned_time, DEFAULT_SERVER_DATETIME_FORMAT)
 
             #If we have timezone information translate the planned date to local time otherwise UTC
@@ -172,10 +186,10 @@ class WebsiteSupportTicket(models.Model):
                 self.planned_time_format = local_time.strftime(partner_language.date_format + " " + partner_language.time_format) + " " + self.partner_id.tz
             else:
                 self.planned_time_format = my_planned_time.strftime(partner_language.date_format + " " + partner_language.time_format) + " UTC"
-            
+
         else:
             self.planned_time_format = self.planned_time
-        
+
     @api.one
     def _compute_approve_url(self):
         self.approve_url = "/support/approve/" + str(self.id)
@@ -187,12 +201,12 @@ class WebsiteSupportTicket(models.Model):
     @api.onchange('sub_category_id')
     def _onchange_sub_category_id(self):
         if self.sub_category_id:
-            
+
             add_extra_fields = []
-            
+
             for extra_field in self.sub_category_id.additional_field_ids:
                 add_extra_fields.append((0, 0, {'name': extra_field.name}))
-                
+
             self.update({
                 'extra_field_ids': add_extra_fields,
             })
@@ -256,14 +270,6 @@ class WebsiteSupportTicket(models.Model):
         return super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
 
     @api.one
-    @api.depends('ticket_number')
-    def _compute_ticket_number_display(self):
-        if self.ticket_number:
-            self.ticket_number_display = str(self.id) + " / " + "{:,}".format( self.ticket_number )
-        else:
-            self.ticket_number_display = self.id
-
-    @api.one
     @api.depends('state')
     def _compute_unattend(self):
         #BACK COMPATABLITY Use open and customer reply as default unattended states
@@ -291,7 +297,7 @@ class WebsiteSupportTicket(models.Model):
             'context': {'default_ticket_id': self.id, 'default_email': self.email, 'default_subject': self.subject, 'default_approval': True, 'default_body': request_message},
             'target': 'new'
         }
-        
+
     @api.multi
     def open_close_ticket_wizard(self):
 
@@ -313,14 +319,12 @@ class WebsiteSupportTicket(models.Model):
 
     @api.model
     def create(self, vals):
+        # Get next ticket number from the sequence
+        vals['ticket_number'] = self.env['ir.sequence'].next_by_code('website.support.ticket')
+
         new_id = super(WebsiteSupportTicket, self).create(vals)
 
         new_id.portal_access_key = randint(1000000000,2000000000)
-        
-        new_id.ticket_number = new_id.company_id.next_support_ticket_number
-
-        #Add one to the next ticket number
-        new_id.company_id.next_support_ticket_number += 1
 
         ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
         ticket_open_email_template.send_mail(new_id.id, True)
@@ -442,10 +446,10 @@ class WebsiteSupportTicketSubCategories(models.Model):
     _order = "sequence asc"
 
     sequence = fields.Integer(string="Sequence")
-    name = fields.Char(required=True, translate=True, string='Sub Category Name')   
+    name = fields.Char(required=True, translate=True, string='Sub Category Name')
     parent_category_id = fields.Many2one('website.support.ticket.categories', required=True, string="Parent Category")
     additional_field_ids = fields.One2many('website.support.ticket.subcategory.field', 'wsts_id', string="Additional Fields")
- 
+
     @api.model
     def create(self, values):
         sequence=self.env['ir.sequence'].next_by_code('website.support.ticket.subcategory')

@@ -3,7 +3,6 @@
 from . import website_support_ticket
 from . import res_partner
 from . import website_support_help
-from . import res_company
 from . import website_support_settings
 from . import mail_template
 from . import website_support_department

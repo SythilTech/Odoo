@@ -142,7 +142,7 @@
                         <table class="table table-striped table-bordered table-hover table-condensed">
                             <tr><th>By</th><th>Subject</th><th>Category</th><th>State</th><th>Create Date</th></tr>
                             <t t-foreach="support_tickets" t-as="support_ticket">
-                                <tr><td><t t-esc="support_ticket.partner_id.name"/></td><td><a t-attf-href="/support/ticket/view/#{support_ticket.id}"><t t-esc="support_ticket.subject"/></a></td><td><t t-esc="support_ticket.category.name"/></td><td><t t-esc="support_ticket.state.name"/></td><td><t t-esc="support_ticket.create_date"/></td></tr>
+                                <tr><td><t t-esc="support_ticket.partner_id.name"/></td><td><a t-attf-href="/support/ticket/view/#{support_ticket.id}"><t t-esc="support_ticket.subject"/></a></td><td><t t-esc="support_ticket.category.name"/></td><td><t t-esc="support_ticket.state.name"/></td><td><span t-field="support_ticket.with_context(tz=request.env.user.tz).create_date"/></td></tr>
                             </t>
                         </table>
                     </t>
