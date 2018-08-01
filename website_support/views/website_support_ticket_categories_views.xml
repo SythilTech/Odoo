@@ -9,7 +9,7 @@
       	      <form>
       	          <group>
       	              <field name="name"/>
-      	              <field name="cat_user_ids"/>
+      	              <field name="cat_user_ids" options="{'no_create_edit': True}" widget="many2many_tags"/>
       	          </group>
       	      </form>
       	  </field>

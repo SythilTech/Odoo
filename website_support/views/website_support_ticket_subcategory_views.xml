@@ -34,7 +34,7 @@
       </record>
 
       <record id="website_support_ticket_subcategory_action" model="ir.actions.act_window">
-          <field name="name">Support Ticket Subcategory</field>
+          <field name="name">Support Ticket Sub Categories</field>
       	  <field name="res_model">website.support.ticket.subcategory</field>
       	  <field name="view_type">form</field>
       	  <field name="view_mode">tree,form</field>

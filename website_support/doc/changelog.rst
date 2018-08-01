@@ -1,3 +1,17 @@
+v1.3.0
+======
+* (BACK COMPATABLITY BREAK) Remove old Sales Manager permissions
+* Group and permission overhaul (Support Client, Support Staff, Support Manager)
+* Update documentation to reflect menu changes and permission overhaul
+
+v1.2.14
+=======
+* Adding sequence for ticket number, deleting ticket number display
+* Migrate fake ticket number system to sequence system
+* Spanish tranlation
+* Timezone in website view
+* Various view improvements
+
 v1.2.13
 =======
 * Optional priority field on website

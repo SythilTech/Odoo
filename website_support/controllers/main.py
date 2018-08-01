@@ -235,7 +235,7 @@ class SupportTicketController(http.Controller):
         setting_allow_user_signup = request.env['ir.default'].get('website.support.settings', 'allow_user_signup')
 
         manager = False
-        if request.env['website.support.department.contact'].search_count([('user_id','=',request.env.user.id)]) == 1:
+        if request.env['website.support.department.contact'].sudo().search_count([('user_id','=',request.env.user.id)]) == 1:
             manager = True
 
         return http.request.render('website_support.support_help_pages', {'help_groups': help_groups, 'setting_allow_user_signup': setting_allow_user_signup, 'manager': manager})
@@ -455,7 +455,7 @@ class SupportTicketController(http.Controller):
 
         support_ticket = http.request.env['website.support.ticket'].sudo().search([('portal_access_key','=', values['portal_access_key'] ) ])[0]
 
-        http.request.env['website.support.ticket.message'].create({'ticket_id':support_ticket.id, 'by': 'customer','content':values['comment']})
+        http.request.env['website.support.ticket.message'].sudo().create({'ticket_id':support_ticket.id, 'by': 'customer','content':values['comment']})
 
         support_ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
 
@@ -471,12 +471,12 @@ class SupportTicketController(http.Controller):
         for field_name, field_value in kw.items():
             values[field_name] = field_value
 
-        ticket = http.request.env['website.support.ticket'].search([('id','=',values['ticket_id'])])
+        ticket = http.request.env['website.support.ticket'].sudo().search([('id','=',values['ticket_id'])])
 
         #check if this user owns this ticket
         if ticket.partner_id.id == http.request.env.user.partner_id.id or ticket.partner_id in http.request.env.user.partner_id.stp_ids:
 
-            http.request.env['website.support.ticket.message'].create({'ticket_id':ticket.id, 'by': 'customer','content':values['comment']})
+            http.request.env['website.support.ticket.message'].sudo().create({'ticket_id':ticket.id, 'by': 'customer','content':values['comment']})
 
             ticket.state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
 
