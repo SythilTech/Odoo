@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Fix input group generating incorrect html
+
 v1.0.5
 ======
 * Textboxes now add the required attribute

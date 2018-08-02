@@ -248,7 +248,7 @@ class HtmlFormController(http.Controller):
         html_output += "</script>\n"
 
         sub_field_number = len(field.setting_input_group_sub_fields)
-        column_width = 12 / sub_field_number
+        column_width = int(12 / sub_field_number)
 
         html_output += "<div class=\"hff hff_input_group form-group\" data-sub-field-number=\"" + str(sub_field_number) + "\" data-html-name=\"" + field.html_name + "\" data-form-type=\"" + field.field_type.html_type + "\" data-field-id=\"" + str(field.id) + "\">\n"
         html_output += "  <label class=\"control-label\" for=\"" + field.html_name + "\">" + field.field_label + "</label><br/>\n"
@@ -275,12 +275,12 @@ class HtmlFormController(http.Controller):
             elif sub_field.ttype == "binary":
                 html_output += "      <div class=\"col-md-" + str(column_width) + "\"><input type=\"file\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\"/></div>\n"
 
-            html_output += "    </div>\n"
-            html_output += "  </div>\n"
+        html_output += "    </div>\n"
+        html_output += "  </div>\n"
 
-            html_output += "  <div class=\"col-md-12\">\n"
-            html_output += "    <button class=\"btn btn-primary btn-md row pull-right\" id=\"" + field.html_name + "_add\">Add (+)</button>\n"
-            html_output += "  </div>\n"
+        html_output += "  <div class=\"col-md-12\">\n"
+        html_output += "    <button class=\"btn btn-primary btn-md row pull-right\" id=\"" + field.html_name + "_add\">Add (+)</button>\n"
+        html_output += "  </div>\n"
 
         html_output += "</div>\n"
 
