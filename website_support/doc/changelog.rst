@@ -1,3 +1,7 @@
+v1.3.1
+======
+* Remove dependency on CRM module
+
 v1.3.0
 ======
 * (BACK COMPATABLITY BREAK) Remove old Sales Manager permissions
