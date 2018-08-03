@@ -272,12 +272,12 @@ class HtmlFormController(http.Controller):
             elif sub_field.ttype == "binary":
                 html_output += "      <div class=\"col-md-" + str(column_width) + "\"><input type=\"file\" data-sub-field-name=\"" + str(sub_field.name) + "\" placeholder=\"" + str(sub_field.field_description) + "\"/></div>\n"
 
-            html_output += "    </div>\n"
-            html_output += "  </div>\n"
+        html_output += "    </div>\n"
+        html_output += "  </div>\n"
 
-            html_output += "  <div class=\"col-md-12\">\n"
-            html_output += "    <button class=\"btn btn-primary btn-md row pull-right\" id=\"" + field.html_name.encode("utf-8") + "_add\">Add (+)</button>\n"
-            html_output += "  </div>\n"
+        html_output += "  <div class=\"col-md-12\">\n"
+        html_output += "    <button class=\"btn btn-primary btn-md row pull-right\" id=\"" + field.html_name.encode("utf-8") + "_add\">Add (+)</button>\n"
+        html_output += "  </div>\n"
 
         html_output += "</div>\n"
 

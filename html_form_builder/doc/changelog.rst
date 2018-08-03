@@ -1,3 +1,7 @@
+v1.0.30
+=======
+* Fix input group generating incorrect html
+
 v1.0.29
 =======
 * Add required class / attribute to checkbox, dropbox and more
