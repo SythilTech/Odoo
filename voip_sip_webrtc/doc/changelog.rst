@@ -1,3 +1,7 @@
+v1.1.3
+======
+* No presence bug fix
+
 v1.1.2
 ======
 * RTP data is now saved if call recording setting is ticked
