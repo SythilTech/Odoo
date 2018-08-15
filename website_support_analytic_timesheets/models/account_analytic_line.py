@@ -7,7 +7,7 @@ class WebsiteSupportTicketInheritAccountAnalyticLine(models.Model):
 
     support_ticket_id = fields.Many2one('website.support.ticket', string="Support Ticket")
     person_name = fields.Char(related="support_ticket_id.person_name", string="Customer Name")
-    ticket_number_display = fields.Char(related="support_ticket_id.ticket_number_display", string="Ticket Number")
+    ticket_number_display = fields.Char(related="support_ticket_id.ticket_number", string="Ticket Number")
     state = fields.Many2one('website.support.ticket.states', readonly=True, related="support_ticket_id.state", string="State")
     open_time = fields.Datetime(related="support_ticket_id.create_date", string="Open Time")    
     close_time = fields.Datetime(related="support_ticket_id.close_time", string="Close Time")

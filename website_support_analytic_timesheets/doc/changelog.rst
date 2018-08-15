@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Compatablility fix for version 1.3.1
+
 v1.0.5
 ======
 * Report that breaks down activities by day and tech
