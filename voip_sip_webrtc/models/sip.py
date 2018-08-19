@@ -24,6 +24,7 @@ class SIPSession:
         self.outbound_proxy = outbound_proxy
         self.account_port = account_port
         self.display_name = display_name
+        self.tag = str(random.randint(0,2**31))
         self.call_accepted = EventHook()
         self.call_rejected = EventHook()
         self.call_ended = EventHook()
@@ -136,7 +137,7 @@ class SIPSession:
         register_string += "Max-Forwards: 70\r\n"
         register_string += "Contact: <sip:" + str(self.username) + "@" + str(self.ip) + ":" + str(self.bind_port) + ">\r\n"
         register_string += 'To: "' + str(self.display_name) + '"<sip:' + str(self.username) + "@" + str(self.domain) + ":" + str(self.account_port) + ">\r\n"
-        register_string += 'From: "' + str(self.display_name) + '"<sip:' + str(self.username) + "@" + str(self.domain) + ":" + str(self.account_port) + ">\r\n"
+        register_string += 'From: "' + str(self.display_name) + '"<sip:' + str(self.username) + "@" + str(self.domain) + ":" + str(self.account_port) + ">;tag=" + self.tag + "\r\n"
         register_string += "Call-ID: " + str(call_id) + "\r\n"
         register_string += "CSeq: 1 REGISTER\r\n"
         register_string += "Expires: " + str(register_frequency) + "\r\n"
