@@ -1,3 +1,7 @@
+v1.3.2
+======
+* Assigned user filter for internal users (employees) only
+
 v1.3.1
 ======
 * Remove dependency on CRM module

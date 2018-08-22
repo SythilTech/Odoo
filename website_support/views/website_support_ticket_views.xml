@@ -32,7 +32,7 @@
                                 <field name="state"/>
                             </group>
                             <group>
-                                <field name="user_id"/>
+                                <field name="user_id" domain="[('share','=',False)]"/>
                                 <field name="partner_id"/>
                                 <field name="person_name"/>
                                 <field name="email"/>
