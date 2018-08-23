@@ -82,8 +82,9 @@ class SIPSession:
         reply += "SIP/2.0 200 OK\r\n"
         for (via_heading) in re.findall(r'Via: (.*?)\r\n', sip_invite):
             reply += "Via: " + via_heading + "\r\n"
-        record_route = re.findall(r'Record-Route: (.*?)\r\n', sip_invite)[0]
-        reply += "Record-Route: " + record_route + "\r\n"
+        record_route = re.findall(r'Record-Route: (.*?)\r\n', sip_invite)
+        if record_route:
+            reply += "Record-Route: " + record_route[0] + "\r\n"
         reply += "Contact: <sip:" + str(self.username) + "@" + str(self.ip) + ":" + str(self.bind_port) + ">\r\n"
         reply += "To: " + call_to + "\r\n"
         reply += "From: " + call_from + "\r\n"
@@ -302,8 +303,9 @@ class SIPSession:
                     ringing += "SIP/2.0 180 Ringing\r\n"
                     for (via_heading) in re.findall(r'Via: (.*?)\r\n', data):
                         ringing += "Via: " + via_heading + "\r\n"
-                    record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
-                    ringing += "Record-Route: " + record_route + "\r\n"
+                    record_route = re.findall(r'Record-Route: (.*?)\r\n', data)
+                    if record_route:
+                        ringing += "Record-Route: " + record_route[0] + "\r\n"
                     ringing += "Contact: <sip:" + str(self.username) + "@" + str(self.ip) + ":" + str(self.bind_port) + ">\r\n"
                     ringing += "To: " + call_to + "\r\n"
                     ringing += "From: " + call_from + "\r\n"
@@ -331,7 +333,6 @@ class SIPSession:
                     if cseq_type == "INVITE":
                         cseq_number = cseq.split(" ")[0]
                         contact_header = re.findall(r'Contact: <(.*?)>\r\n', data)[0]
-                        record_route = re.findall(r'Record-Route: (.*?)\r\n', data)[0]
                         call_from = re.findall(r'From: (.*?)\r\n', data)[0]
                         call_to = re.findall(r'To: (.*?)\r\n', data)[0]
                         call_id = re.findall(r'Call-ID: (.*?)\r\n', data)[0]
@@ -341,7 +342,9 @@ class SIPSession:
                         reply += "ACK " + contact_header + " SIP/2.0\r\n"
                         reply += "Via: SIP/2.0/UDP " + str(self.ip) + ":" + str(self.bind_port) + ";rport\r\n"
                         reply += "Max-Forwards: 70\r\n"
-                        reply += "Route: " + record_route + "\r\n"
+                        record_route = re.findall(r'Record-Route: (.*?)\r\n', data)
+                        if record_route:
+                            reply += "Route: " + record_route[0] + "\r\n"
                         reply += "Contact: <sip:" + self.username + "@" + str(self.ip) + ":" + str(self.bind_port) + ">\r\n"
                         reply += 'To: ' + call_to + "\r\n"
                         reply += "From: " + call_from + "\r\n"
