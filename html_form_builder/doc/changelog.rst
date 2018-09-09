@@ -1,3 +1,7 @@
+v1.0.31
+=======
+* Fix form javascript public access isssue
+
 v1.0.30
 =======
 * Fix input group generating incorrect html
