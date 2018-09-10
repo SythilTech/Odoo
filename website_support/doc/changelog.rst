@@ -1,3 +1,7 @@
+v1.3.3
+======
+* Add close date to customer website portal
+
 v1.3.2
 ======
 * Assigned user filter for internal users (employees) only
