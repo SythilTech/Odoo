@@ -1,3 +1,7 @@
+v1.3.4
+======
+* Ability to limit which user groups can select a category
+
 v1.3.3
 ======
 * Add close date to customer website portal

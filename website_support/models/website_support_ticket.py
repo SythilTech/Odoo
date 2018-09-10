@@ -433,6 +433,7 @@ class WebsiteSupportTicketCategories(models.Model):
     sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string='Category Name')
     cat_user_ids = fields.Many2many('res.users', string="Category Users")
+    access_group_ids = fields.Many2many('res.groups', string="Access Groups", help="Restrict which users can select the category on the website form, none = everyone")
 
     @api.model
     def create(self, values):
