@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.3.4",
+    'version': "1.3.5",
     'author': "Sythil Tech, Adaptive City",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -40,7 +40,7 @@
         'security/ir.model.access.csv',
     ],
     'demo': [],
-    'depends': ['mail','web', 'website'],
+    'depends': ['mail','web', 'website','resource'],
     'images':[
         'static/description/3.jpg',
         'static/description/1.jpg',

@@ -1,3 +1,7 @@
+v1.3.5
+======
+* Fix business hours field missing resource module dependacy
+
 v1.3.4
 ======
 * Ability to limit which user groups can select a category
