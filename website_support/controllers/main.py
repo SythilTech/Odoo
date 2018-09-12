@@ -209,9 +209,9 @@ class SupportTicketController(http.Controller):
             support_group = request.env['ir.model.data'].sudo().get_object('website_support', 'support_group')
             support_group.users = [(4, new_user.id)]
 
-            #Also add them to the public group so they can access the website
-            public_group = request.env['ir.model.data'].sudo().get_object('base', 'group_public')
-            public_group.users = [(4, new_user.id)]
+            #Also add them to the portal group so they can access the website
+            group_portal = request.env['ir.model.data'].sudo().get_object('base','group_portal')
+            group_portal.users = [(4, new_user.id)]
 
             #Automatically sign the new user in
             request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction

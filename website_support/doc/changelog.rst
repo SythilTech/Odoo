@@ -1,3 +1,7 @@
+v1.3.6
+======
+* User accounts created through the create account link are now added to the portal group instead of the public group to resolve login issues
+
 v1.3.5
 ======
 * Fix business hours field missing resource module dependacy
