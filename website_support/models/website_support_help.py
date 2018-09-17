@@ -42,17 +42,11 @@ class WebsiteSupportHelpPage(models.Model):
     sequence = fields.Integer(string="Sequence")
     website_published = fields.Boolean(string="Published", default="True")
     url = fields.Char(string="Page URL")
-    url_generated = fields.Char(string="URL", compute='_compute_url_generated')
     group_id = fields.Many2one('website.support.help.groups', string="Group")
     content = fields.Html(sanatize=False, string='Content', translate=True)
     feedback_ids = fields.One2many('website.support.help.page.feedback', 'hp_id', string="Feedback")
     feedback_average = fields.Float(string="Feedback Average Rating", compute="_compute_feedback_average")
     feedback_count = fields.Integer(string="Feedback Count", compute="_compute_feedback_count")
-
-    @api.one
-    @api.depends('name')
-    def _compute_url_generated(self):
-        self.url_generated = "/support/help/" + slug(self.group_id) + "/" + slug(self)
 
     @api.one
     @api.depends('feedback_ids')

@@ -1,3 +1,9 @@
+v1.3.7
+======
+* Add customer close button
+* Limit help pages to 5 per help group with a more link
+* Administrator now defaults to Support Manager to help reduce install confusion
+
 v1.3.6
 ======
 * User accounts created through the create account link are now added to the portal group instead of the public group to resolve login issues

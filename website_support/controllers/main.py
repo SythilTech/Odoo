@@ -4,13 +4,14 @@ import json
 import base64
 from random import randint
 import os
-
+import datetime
+import requests
 import logging
 _logger = logging.getLogger(__name__)
 
 import openerp.http as http
 from openerp.http import request
-import requests
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 
 from odoo.addons.http_routing.models.ir_http import slug
 
@@ -493,6 +494,39 @@ class SupportTicketController(http.Controller):
 
         return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
 
+    @http.route('/support/ticket/close',type="http", auth="user")
+    def support_ticket_close(self, **kw):
+        """Close the support ticket"""
+
+        values = {}
+        for field_name, field_value in kw.items():
+            values[field_name] = field_value
+
+        ticket = http.request.env['website.support.ticket'].sudo().search([('id','=',values['ticket_id'])])
+
+        #check if this user owns this ticket
+        if ticket.partner_id.id == http.request.env.user.partner_id.id or ticket.partner_id in http.request.env.user.partner_id.stp_ids:
+
+            customer_closed_state = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_closed')
+            ticket.state = customer_closed_state
+
+            ticket.close_time = datetime.datetime.now()
+            ticket.close_date = datetime.date.today()
+
+            diff_time = datetime.datetime.strptime(ticket.close_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(ticket.create_date, DEFAULT_SERVER_DATETIME_FORMAT)
+            ticket.time_to_close = diff_time.seconds
+
+            ticket.sla_active = False
+
+            closed_state_mail_template = customer_closed_state.mail_template_id
+
+            if closed_state_mail_template:
+                closed_state_mail_template.send_mail(ticket.id, True)
+
+        else:
+            return "You do not have permission to close this commment"
+
+        return werkzeug.utils.redirect("/support/ticket/view/" + str(ticket.id))
 
     @http.route('/support/help/auto-complete',auth="public", website=True, type='http')
     def support_help_autocomplete(self, **kw):
