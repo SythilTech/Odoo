@@ -1,3 +1,7 @@
+v1.3.8
+======
+* Fix help group page using old field
+
 v1.3.7
 ======
 * Add customer close button

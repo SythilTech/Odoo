@@ -188,7 +188,7 @@
                     <t t-foreach="help_group.page_ids" t-as="help_page">
                         <t t-if="help_page.website_published">
                             <div class="col-md-4">
-                                <h3 class="mt8 mb8 support-help-page"><a t-attf-href="#{help_page.url_generated}" t-field="help_page.name"></a></h3>
+                                <h3 class="mt8 mb8 support-help-page"><a t-attf-href="/support/help/#{slug(help_group)}/#{slug(help_page)}" t-field="help_page.name"/></h3>
                             </div>
                         </t>
                     </t>
