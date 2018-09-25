@@ -1,3 +1,7 @@
+v1.0.31
+=======
+* Reject SMS without status
+
 v1.0.30
 =======
 * Include from address in mail subject
