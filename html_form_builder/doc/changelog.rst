@@ -1,3 +1,7 @@
+v1.0.8
+======
+* Fix custom actions from not working
+
 v1.0.7
 ======
 * Fix form javascript public access issue
