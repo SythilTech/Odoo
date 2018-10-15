@@ -9,9 +9,9 @@ access_website_support_ticket_categories,support staff access website.support.ti
 access_website_support_ticket_categories_manager,support manager access website.support.ticket.categories,model_website_support_ticket_categories,support_manager,1,1,1,1
 access_website_support_ticket_subcategory,support staff access website.support.ticket.subcategory,model_website_support_ticket_subcategory,support_staff,1,0,0,0
 access_website_support_ticket_subcategory_manager,support manager access website.support.ticket.subcategory,model_website_support_ticket_subcategory,support_manager,1,1,1,1
-access_website_support_help_groups,public access website.support.help.groups,model_website_support_help_groups,base.group_public,1,0,0,0
+access_website_support_help_groups,public access website.support.help.groups,model_website_support_help_groups,,1,0,0,0
 access_website_support_help_groups_manager,support manager access website.support.help.groups,model_website_support_help_groups,support_manager,1,1,1,1
-access_website_support_help_page,public access website.support.help.page,model_website_support_help_page,base.group_public,1,0,0,0
+access_website_support_help_page,public access website.support.help.page,model_website_support_help_page,,1,0,0,0
 access_website_support_help_page_manager,support manager access website.support.help.page,model_website_support_help_page,support_manager,1,1,1,1
 access_website_support_help_page_feedback,public access website.support.help.page.feedback,model_website_support_help_page_feedback,base.group_public,1,0,0,0
 access_website_support_help_page_feedback_manager,support manager access website.support.help.page.feedback,model_website_support_help_page_feedback,support_manager,1,1,1,1

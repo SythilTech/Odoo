@@ -1,3 +1,7 @@
+v1.3.9
+======
+* Fix signed in users not being able to access help groups / pages
+
 v1.3.8
 ======
 * Fix help group page using old field
