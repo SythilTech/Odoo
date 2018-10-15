@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Fix csrf being saved in html
+
 v1.0.8
 ======
 * Fix custom actions from not working

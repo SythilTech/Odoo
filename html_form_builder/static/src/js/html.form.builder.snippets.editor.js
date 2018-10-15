@@ -46,7 +46,10 @@ options.registry.html_form_builder = options.Class.extend({
             });
 
     },
-
+    cleanForSave: function () {
+		//Sometimes gets saved with the token in it
+        $(".html_form input[name='csrf_token']").val("");
+    },
 
 });
 
