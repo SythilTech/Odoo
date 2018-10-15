@@ -1,3 +1,7 @@
+v1.3.10
+=======
+* Help page unpublish / republish
+
 v1.3.9
 ======
 * Fix signed in users not being able to access help groups / pages

@@ -9,6 +9,7 @@
       	      <form>
       	          <group>
       	              <field name="group_id"/>
+      	              <field name="website_published"/>
       	              <field name="name"/>
       	              <field name="feedback_average"/>
       	              <field name="feedback_ids" context="{'hp_id':active_id}">
