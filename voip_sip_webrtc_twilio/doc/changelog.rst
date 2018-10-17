@@ -1,3 +1,7 @@
+v1.0.11
+=======
+* Ability to call leads
+
 v1.0.10
 =======
 * Can now write a post call comment, you can also listen to call recording using a link inside the chatter
