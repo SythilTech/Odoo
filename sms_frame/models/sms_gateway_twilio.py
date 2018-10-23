@@ -4,7 +4,6 @@ from datetime import datetime
 from lxml import etree
 import logging
 _logger = logging.getLogger(__name__)
-import time
 
 from openerp.http import request
 from openerp import api, fields, models
@@ -97,7 +96,6 @@ class SmsGatewayTwilio(models.Model):
         if message_id != "":
             payload = {}
             response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + sms_account.twilio_account_sid + "/Messages/" + message_id, data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
-	    _logger.error( str(response_string.text.encode('utf-8')) )
 	    root = etree.fromstring(str(response_string.text.encode('utf-8')))
 	    my_messages = root.xpath('//Message')
             sms_message = my_messages[0]
@@ -155,18 +153,11 @@ class SmsGatewayTwilio(models.Model):
 	    delivary_state = "UNDELIV"
 	elif sms_message.find('Status').text == "received":
 	    delivary_state = "RECEIVED"
-	elif sms_message.find('Status').text is None:
-	    _logger.error("No Status")
-	    return False
-	
-	_logger.error(sms_message.find('Status').text)
 	
         my_message = self.env['sms.message'].search([('sms_gateway_message_id','=', sms_message.find('Sid').text)])
-        _logger.error(len(my_message))
         if len(my_message) == 0 and sms_message.find('Direction').text == "inbound":
 	    
 	    target = self.env['sms.message'].find_owner_model(sms_message)
-	    _logger.error(target['target_model'])
 	    
 	    twilio_gateway_id = self.env['sms.gateway'].search([('gateway_model_name', '=', 'sms.gateway.twilio')])
 
@@ -184,19 +175,13 @@ class SmsGatewayTwilio(models.Model):
                     _logger.error(media_list_url)
                     
                     media_response_string = requests.get("https://api.twilio.com" + media_list_url, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
-                    _logger.error(str(sms_account.twilio_account_sid))
-                    _logger.error(str(sms_account.twilio_auth_token))
-                    _logger.error(media_response_string.text.encode('utf-8'))
 
                     media_root = etree.fromstring(media_response_string.text.encode('utf-8'))
                     for media_mms in media_root.xpath('//MediaList/Media'):
                         first_media_url = media_mms.find('Uri').text
                         media_filename = media_mms.find("Sid").text + ".jpg"
-                        _logger.error(media_filename)
-                        mms_attachment = requests.get("https://api.twilio.com" + first_media_url).content
-                        _logger.error(mms_attachment)
-                        attachments.append((media_filename, mms_attachment))
-                        _logger.error(attachments)
+                        attachments.append((media_filename, requests.get("https://api.twilio.com" + first_media_url).content) )
+
 
             from_record = self.env['res.partner'].sudo().search([('mobile','=', sms_message.find('From').text)])
 
@@ -207,7 +192,6 @@ class SmsGatewayTwilio(models.Model):
             
             if target['target_model'] == "res.partner":
                 model_id = self.env['ir.model'].search([('model','=', target['target_model'])])
-                _logger.error("res.partner mms")
 
                 my_record = self.env[target['target_model']].browse( int(target['record_id'].id) )
                 my_message = my_record.message_post(body=sms_message.find('Body').text, subject=message_subject, subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment", attachments=attachments)

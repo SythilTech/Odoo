@@ -1,6 +1,6 @@
 v1.0.31
 =======
-* Reject SMS without status
+* Revamp receive sms to support mms attachments
 
 v1.0.30
 =======

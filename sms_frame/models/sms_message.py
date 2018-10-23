@@ -40,7 +40,7 @@ class SmsMessage(models.Model):
     def find_owner_model(self, sms_message):
         """Gets the model and record this sms is meant for"""
         #look for a partner with this number
-        partner_id = self.env['res.partner'].search([('mobile','=', sms_message.find('From').text)])
+        partner_id = self.env['res.partner'].search([('mobile','=', sms_message.find('From').text )])
     	if len(partner_id) > 0:
     	    return {'record_id': partner_id[0], 'target_model': "res.partner"}
     	else:

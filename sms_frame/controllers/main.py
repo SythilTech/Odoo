@@ -3,8 +3,11 @@ import openerp.http as http
 from openerp.http import request
 import base64
 import odoo
+import requests
 import logging
 _logger = logging.getLogger(__name__)
+from lxml import etree
+from datetime import datetime
 
 def binary_content(xmlid=None, model='ir.attachment', id=None, field='datas', unique=False, filename=None, filename_field='datas_fname', download=False, mimetype=None, default_mimetype='application/octet-stream', env=None):
     return request.registry['ir.http'].binary_content(
@@ -59,10 +62,83 @@ class TwilioController(http.Controller):
         
         values = {}
 	for field_name, field_value in kwargs.items():
+	    _logger.error(field_name)
+	    _logger.error(field_value)
             values[field_name] = field_value
         
-        
-        twilio_account = request.env['sms.account'].sudo().search([('twilio_account_sid','=', values['AccountSid'])])
-        request.env['sms.gateway.twilio'].sudo().check_messages(twilio_account.id, values['MessageSid'])
+        account_id = request.env['sms.account'].sudo().search([('twilio_account_sid','=', values['AccountSid'])])[0]
+
+        delivary_state = ""
+	if values['SmsStatus'] == "failed":
+	    delivary_state = "failed"
+        elif values['SmsStatus'] == "sent":
+	    delivary_state = "successful"
+	elif values['SmsStatus'] == "delivered":
+	    delivary_state = "DELIVRD"
+	elif values['SmsStatus'] == "undelivered":
+	    delivary_state = "UNDELIV"
+	elif values['SmsStatus'] == "received":
+	    delivary_state = "RECEIVED"
+
+        my_message = request.env['sms.message'].sudo().search([('sms_gateway_message_id','=', values['MessageSid'] )])
+        if len(my_message) == 0:
+	    
+	    #Have to convert it into XML because the underlying function expects it and I'm too lazy to revamp this whole module to use json...
+	    root = etree.fromstring("<Message><From>" + values['From'] + "</From></Message>")
+	    my_messages = root.xpath('//Message')
+            sms_message = my_messages[0]
+	    target = request.env['sms.message'].sudo().find_owner_model(sms_message)
+
+	    twilio_gateway_id = request.env['sms.gateway'].sudo().search([('gateway_model_name', '=', 'sms.gateway.twilio')])
+
+            discussion_subtype = request.env['ir.model.data'].sudo().get_object('mail', 'mt_comment')
+            my_message = ""
+
+            attachments = []
+
+            _logger.error(values['NumMedia'])
+            if values['NumMedia'] > 0:
+                _logger.error("MMS received")
+                _logger.error(target['target_model'])
+                _logger.error(target['record_id'].id)
+                sms_account = request.env['sms.account'].sudo().browse(account_id)
+                media_filename = values['MessageSid'] + ".jpg"
+                attachments.append((media_filename, requests.get(values['MediaUrl0']).content) )
+
+            from_record = request.env['res.partner'].sudo().search([('mobile','=', values['From'])])
+
+            if from_record:
+                message_subject = "SMS Received from " + from_record.name
+            else:
+                message_subject = "SMS Received from " + values['From']
+            
+            if target['target_model'] == "res.partner":
+                model_id = request.env['ir.model'].sudo().search([('model','=', target['target_model'])])
+
+                my_record = request.env[target['target_model']].sudo().browse( int(target['record_id'].id) )
+                my_message = my_record.message_post(body=values['Body'], subject=message_subject, subtype_id=discussion_subtype.id, author_id=my_record.id, message_type="comment", attachments=attachments)
+                _logger.error(my_message.id)
+
+                #Notify followers of this partner who are listenings to the 'discussions' subtype
+                for notify_partner in request.env['mail.followers'].sudo().search([('res_model','=','res.partner'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
+                    my_message.needaction_partner_ids = [(4,notify_partner.partner_id.id)]
+
+                #Create the sms record in history
+                history_id = request.env['sms.message'].sudo().create({'account_id': account_id.id, 'status_code': "RECEIVED", 'from_mobile': values['From'], 'to_mobile': values['To'], 'sms_gateway_message_id': values['MessageSid'], 'sms_content': values['Body'], 'direction':'I', 'message_date':datetime.now(), 'model_id':model_id.id, 'record_id':int(target['record_id'].id), 'by_partner_id': my_record.id})
+            elif target['target_model'] == "crm.lead":
+                model_id = request.env['ir.model'].sudo().search([('model','=', target['target_model'])])
+
+                my_record = request.env[target['target_model']].sudo().browse( int(target['record_id'].id) )
+                my_message = my_record.message_post(body=values['Body'], subject=message_subject, subtype_id=discussion_subtype.id, message_type="comment", attachments=attachments)
+
+                #Notify followers of this lead who are listenings to the 'discussions' subtype
+                for notify_partner in request.env['mail.followers'].sudo().search([('res_model','=','crm.lead'),('res_id','=',target['record_id'].id), ('subtype_ids','=',discussion_subtype.id)]):
+                    my_message.needaction_partner_ids = [(4,notify_partner.partner_id.id)]
+
+                #Create the sms record in history
+                history_id = request.env['sms.message'].sudo().create({'account_id': account_id.id, 'status_code': "RECEIVED", 'from_mobile': values['From'], 'to_mobile': values['To'], 'sms_gateway_message_id': values['MessageSid'], 'sms_content': values['Body'], 'direction':'I', 'message_date':datetime.now(), 'model_id':model_id.id, 'record_id':int(target['record_id'].id)})
+            else:
+                #Create the sms record in history without the model or record_id 
+                history_id = request.env['sms.message'].sudo().create({'account_id': account_id.id, 'status_code': "RECEIVED", 'from_mobile': values['From'], 'to_mobile': values['To'], 'sms_gateway_message_id': values['MessageSid'], 'sms_content': values['Body'], 'direction':'I', 'message_date':datetime.now()})
         
         return "<Response></Response>"
