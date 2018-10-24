@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="appstore_account_view_form" model="ir.ui.view">
+        <field name="name">appstore.account.view.form</field>
+        <field name="model">appstore.account</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="repositories_ids" context="{'asa_id':active_id}">
+                        <tree editable="bottom">
+                            <field name="url"/>
+                            <field name="token"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="appstore_account_view_tree" model="ir.ui.view">
+        <field name="name">appstore.account.view.tree</field>
+        <field name="model">appstore.account</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="appstore_account_action" model="ir.actions.act_window">
+        <field name="name">App Store Accounts</field>
+        <field name="res_model">appstore.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="module_overview_parent_menu" name="App Store Management" sequence="90"/>
+    <menuitem id="module_overview_menu" name="Modules" parent="module_overview_parent_menu" action="module_overview_action" sequence="10"/>
+    <menuitem id="appstore_account_menu" name="App Store Accounts" parent="module_overview_parent_menu" action="appstore_account_action" sequence="20"/>
+    <menuitem id="module_overview_wizard_menu" name="Update App Store" parent="module_overview_parent_menu" action="module_overview_wizard_action" sequence="30"/>
+
+</odoo>

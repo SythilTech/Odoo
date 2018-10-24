@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+      <record id="module_overview_view_form" model="ir.ui.view">
+          <field name="name">module.overview.view.form</field>
+          <field name="model">module.overview</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="name"/>
+                     <field name="version"/>
+                     <field name="icon" widget="image"/>
+                     <field name="store_description"/>
+                     <field name="module_name"/>
+                     <field name="module_view_count"/>
+                     <field name="module_download_count"/>
+                     <field name="change_log_raw"/>
+                     <field name="change_log_html"/>
+                     <field name="models_ids">
+                         <tree>
+                             <field name="name"/>
+                             <field name="view_ids"/>
+                         </tree>
+                     </field>
+                     <field name="group_ids"/>
+                     <field name="menu_ids">
+                         <tree>
+                             <field name="x_id"/>
+                             <field name="name"/>
+                             <field name="parent"/>
+                         </tree>
+                     </field>
+                     <field name="image_ids">
+                         <tree>
+                             <field name="name"/>
+                         </tree>
+                     </field>
+                     <field name="depend_ids">
+                         <tree>
+                             <field name="name"/>
+                         </tree>
+                     </field>
+                     <field name="store_views_ids">
+                         <tree>
+                             <field name="ip"/>
+                             <field name="ref"/>
+                             <field name="create_date"/>
+                         </tree>
+                     </field>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="module_overview_model_view_form" model="ir.ui.view">
+          <field name="name">module.overview.model.view.form</field>
+          <field name="model">module.overview.model</field>
+          <field name="arch" type="xml">
+             <form>
+                  <group>
+                     <field name="name"/>
+                     <field name="view_ids"/>
+                     <field name="access_ids"/>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="module_overview_view_tree" model="ir.ui.view">
+          <field name="name">module.overview.view.tree</field>
+          <field name="model">module.overview</field>
+          <field name="arch" type="xml">
+              <tree>    
+                  <field name="name"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="module_overview_action" model="ir.actions.act_window">
+          <field name="name">Custom Modules</field>
+          <field name="res_model">module.overview</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+      </record>
+
+      <record id="module_overview_wizard_view_form" model="ir.ui.view">
+          <field name="name">module.overview.wizard form view</field>
+          <field name="model">module.overview.wizard</field>
+          <field name="arch" type="xml">
+              <form>
+                  <button name="update_module_list" type="object" string="Update Module List"/>
+              </form>
+          </field>
+      </record>
+
+      <record id="module_overview_wizard_action" model="ir.actions.act_window">
+          <field name="name">Update Custom Store Module List</field>
+          <field name="res_model">module.overview.wizard</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">new</field>
+      </record>
+
+</odoo>
