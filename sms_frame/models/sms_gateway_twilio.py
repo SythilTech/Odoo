@@ -95,7 +95,9 @@ class SmsGatewayTwilio(models.Model):
         if message_id != "":
             payload = {}
             response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + sms_account.twilio_account_sid + "/Messages/" + message_id, data=payload, auth=(str(sms_account.twilio_account_sid), str(sms_account.twilio_auth_token)))
-            root = etree.fromstring(str(response_string.text))
+            twil_xml = response_string.text.encode('utf-8')
+            parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+            root = etree.fromstring(twil_xml, parser=parser)
             my_messages = root.xpath('//Message')
             sms_message = my_messages[0]
             #only get the inbound ones as we track the outbound ones back to a user profile
