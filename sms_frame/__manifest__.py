@@ -1,6 +1,6 @@
 {
     'name': "SMS Framework",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -23,7 +23,7 @@
         'views/ir_actions_todo.xml',
         'security/ir.model.access.csv',
     ],
-    'depends': ['mail'],
+    'depends': ['mail','base_automation'],
     'images':[
         'static/description/3.jpg',
     ],
