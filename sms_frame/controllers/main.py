@@ -97,7 +97,7 @@ class TwilioController(http.Controller):
             attachments = []
 
             _logger.error(values['NumMedia'])
-            if values['NumMedia'] > 0:
+            if int(values['NumMedia']) > 0:
                 _logger.error("MMS received")
                 _logger.error(target['target_model'])
                 _logger.error(target['record_id'].id)
