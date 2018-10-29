@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.actions.act_window" id="sms_history_failed_action">
+          <field name="name">SMS history (Failed)</field>
+          <field name="res_model">sms.message</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'failed'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="sms_history_queued_action">
+          <field name="name">SMS history (Queued)</field>
+          <field name="res_model">sms.message</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'queued'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="sms_history_sent_action">
+          <field name="name">SMS history (Sent)</field>
+          <field name="res_model">sms.message</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'successful'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="sms_history_delivered_action">
+          <field name="name">SMS history (Delivered)</field>
+          <field name="res_model">sms.message</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="domain">[('status_code', '=', 'DELIVRD'),('mass_sms_id','=',active_id)]</field>
+          <field name="help" type="html">
+      	      <p class="oe_view_nocontent_create">SMS History</p>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="sms_mass_form_view">
+          <field name="name">sms mass view</field>
+          <field name="model">sms.mass</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <header>
+      	              <button type="object" name="send_mass_sms" string="Send Mass SMS" attrs="{'invisible': ['|', ('mass_sms_state', '!=', 'draft'), ('message_text', '=', False)]}"/>
+      	              <field name="mass_sms_state" widget="statusbar"/>
+      	          </header>
+      	          <sheet>
+      	              <div class="oe_button_box pull-right">
+      	                  <button class="oe_inline oe_stat_button" type="action" name="%(sms_frame_mass_sms.sms_history_failed_action)d" icon="fa-star">
+	                      <field name="fail_count" widget="statinfo"/>
+      	                  </button>
+      	                  <button class="oe_inline oe_stat_button" type="action" name="%(sms_frame_mass_sms.sms_history_queued_action)d" icon="fa-star">
+		              <field name="queue_count" widget="statinfo"/>
+      	                  </button>
+      	                  <button class="oe_inline oe_stat_button" type="action" name="%(sms_frame_mass_sms.sms_history_sent_action)d" icon="fa-star">
+		              <field name="sent_count" widget="statinfo"/>
+      	                  </button>
+      	                  <button class="oe_inline oe_stat_button" type="action" name="%(sms_frame_mass_sms.sms_history_delivered_action)d" icon="fa-star">
+		              <field name="delivered_count" widget="statinfo"/>
+      	                  </button>
+      	              </div>
+                        <notebook>
+                            <page string="Content">
+      	                        <group>
+      	                            <field name="from_mobile" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
+      	                            <field name="selected_records" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}" context="{'search_default_customer':True}">
+      	                                <tree>
+      	                                    <field name="name"/>
+      	                                    <field name="mobile"/>
+      	                                </tree>
+      	                            </field>
+      	                            <field name="total_count"/>
+      	                            <field name="message_text" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
+      	                            <field name="stop_message"/>
+      	                        </group>
+                            </page>
+                            <page string="Dynamic Placeholder Generator">
+                                <group>
+                                    <field name="model_object_field"/>
+                                    <field name="sub_object" readonly="1"/>
+                                    <field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}"/>
+                                    <field name="copyvalue"/>
+                                </group>
+                            </page>
+                        </notebook>
+
+      	          </sheet>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record model="ir.ui.view" id="sms_mass_tree_view">
+          <field name="name">sms mass tree view</field>
+          <field name="model">sms.mass</field>
+          <field name="arch" type="xml">
+      	      <tree>
+      	          <field name="from_mobile"/>
+      	          <field name="total_count"/>
+      	          <field name="message_text"/>
+      	      </tree>
+      	  </field>
+      </record>
+      
+      <record model="ir.actions.act_window" id="sms_mass_sms_action">
+          <field name="name">Send Mass SMS</field>
+          <field name="res_model">sms.mass</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+	  <field name="help" type="html">
+		<p>
+                    Start mass SMS.
+                </p>
+      	  </field>
+      </record>
+
+      <menuitem id="sms_mass_top_menu" name="Mass SMS" sequence="100"/>      
+      <menuitem id="sms_mass_sub_menu" name="Mass SMS" parent="sms_mass_top_menu" action="sms_mass_sms_action"/>
+
+   </data>
+</openerp>

@@ -1,0 +1,2 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_sms_mass","access sms.mass","model_sms_mass","mass_sms",1,1,1,1

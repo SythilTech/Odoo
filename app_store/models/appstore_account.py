@@ -50,14 +50,14 @@ class AppstoreAccountRepository(models.Model):
                 
             repo_data = urlopen(q).read()
     
-            thefile = zipfile.ZipFile(BytesIO(repo_data))
+            #thefile = zipfile.ZipFile(BytesIO(repo_data))
 
-            if not os.path.exists(rep_directory):
-                os.makedirs(rep_directory)
+            #if not os.path.exists(rep_directory):
+            #    os.makedirs(rep_directory)
 
-            thefile.extractall(rep_directory)
+            #thefile.extractall(rep_directory)
 
-            thefile.close()
+            #thefile.close()
 
             rep_name = account_repository.url.split("/")[4].replace("#","-")
 
@@ -67,10 +67,4 @@ class AppstoreAccountRepository(models.Model):
             #Go through all module folders under the repository directory and analyse the module
             for dir in os.listdir(full_rep_path):
                 if os.path.isdir(os.path.join(full_rep_path, dir)):
-                    try:
-                        self.env['module.overview.wizard'].create({'name':'temp wizard'}).analyse_module(dir, full_rep_path)
-                    except Exception as e:
-                        #Timeout
-                        _logger.error(e)
-                        exc_type, exc_obj, exc_tb = sys.exc_info()
-                        _logger.error("Line: " + str(exc_tb.tb_lineno) )
+                    self.env['module.overview.wizard'].create({'name':'temp wizard'}).analyse_module(dir, full_rep_path)

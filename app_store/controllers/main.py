@@ -9,6 +9,7 @@ from lxml import html, etree
 import logging
 _logger = logging.getLogger(__name__)
 import zipfile
+import json
 import io
 import csv
 import werkzeug.utils
@@ -121,3 +122,11 @@ class AppsController(http.Controller):
         request.env['module.overview.store.view'].create({'mo_id': module.id, 'ref':ref, 'ip': request.httprequest.remote_addr,'header':header_string})
 
         return http.request.render('app_store.client_app_page', {'overview':module})
+
+    @http.route('/custom/store/updates', type="http", auth="public")
+    def custom_app_store_updates(self, **kwargs):
+        module_list = []
+        for md in request.env['module.overview'].search([]):
+            module_list.append({'name': md.name, 'latest_version': "11." + md.version})
+
+        return json.dumps(module_list)

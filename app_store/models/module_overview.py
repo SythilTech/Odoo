@@ -13,6 +13,7 @@ _logger = logging.getLogger(__name__)
 import os.path
 from docutils.core import publish_string
 import sys
+import json
 
 from openerp import api, fields, models
 
@@ -106,76 +107,96 @@ class ModuleOverviewWizard(models.Model):
                     _logger.error("Line: " + str(exc_tb.tb_lineno) )
                 
     def analyse_module(self, module_name, app_directory):
+        try:
+            manifest_file = ""
+            if os.path.exists(app_directory + "/" + module_name + "/__manifest__.py"):
+                manifest_file = "__manifest__.py"
 
-        #Read __manifest__.py file
-        if os.path.exists(app_directory + "/" + module_name + "/__manifest__.py"):
-            with open(app_directory + "/" + module_name + "/__manifest__.py", 'r') as myfile:
-                data = myfile.read().replace('\n', '')
-                op_settings = ast.literal_eval(data)
-        else:
-            #If they module does not have a __openerp.py file do not even bother
-            return 0
+            if os.path.exists(app_directory + "/" + module_name + "/__openerp__.py"):
+                manifest_file = "__openerp__.py"        
 
-        #Convert icon file to base64
-        icon_base64 = ""
-        if os.path.isfile(app_directory + "/" + module_name + "/static/description/icon.png"):
-            with open(app_directory + "/" + module_name + "/static/description/icon.png", "rb") as image_file:
-                icon_base64 = base64.b64encode(image_file.read())
+            if manifest_file == "":
+                #If they module does not have a manifest file do not even bother
+                return 0
 
-        if self.env['module.overview'].search_count([('name', '=', module_name)]) == 0:
-            module_overview = self.env['module.overview'].create({'name': module_name})
-        else:
-            #Clear out most things except download / view count
-            module_overview = self.env['module.overview'].search([('name', '=', module_name)])[0]
-            module_overview.models_ids.unlink()
-            module_overview.menu_ids.unlink()
-            module_overview.group_ids.unlink()
-            module_overview.image_ids.unlink()
-            module_overview.depend_ids.unlink()
+            with open(app_directory + "/" + module_name + "/" + manifest_file, 'r') as myfile:
+                #Remove comments as literal_eval hates them
+                trimmed_data = ""
+                for i, line in enumerate(myfile):
+                    if not line.lstrip().startswith("#"):
+                        trimmed_data += line
+                        
+                trimmed_data = trimmed_data.replace("'", "\"")
+                op_settings = ast.literal_eval(trimmed_data)
 
-        module_overview.module_name = op_settings['name']
-        module_overview.icon = icon_base64
-        module_overview.version = op_settings['version']
 
-        #Read /doc/changelog.rst file
-        if os.path.exists(app_directory + "/" + module_name + "/doc/changelog.rst"):
-            with open(app_directory + "/" + module_name + "/doc/changelog.rst", 'r') as changelogfile:
-                changelogdata = changelogfile.read()
-                module_overview.change_log_raw = changelogdata
-                module_overview.change_log_html = changelogdata
-                #module_overview.change_log_html = publish_string(changelogdata, writer_name='html').split("\n",2)[2]
+            #Convert icon file to base64
+            icon_base64 = ""
+            if os.path.isfile(app_directory + "/" + module_name + "/static/description/icon.png"):
+                with open(app_directory + "/" + module_name + "/static/description/icon.png", "rb") as image_file:
+                    icon_base64 = base64.b64encode(image_file.read())
 
-        #Read /static/description/index.html file
-        with open(app_directory + "/" + module_name + "/static/description/index.html", 'r') as descriptionfile:
-            descriptiondata = descriptionfile.read()
-            module_overview.store_description = descriptiondata
+            if self.env['module.overview'].search_count([('name', '=', module_name)]) == 0:
+                module_overview = self.env['module.overview'].create({'name': module_name})
+            else:
+                #Clear out most things except download / view count
+                module_overview = self.env['module.overview'].search([('name', '=', module_name)])[0]
+                module_overview.models_ids.unlink()
+                module_overview.menu_ids.unlink()
+                module_overview.group_ids.unlink()
+                module_overview.image_ids.unlink()
+                module_overview.depend_ids.unlink()
 
-        for depend in op_settings['depends']:
-            self.env['module.overview.depend'].create({'mo_id': module_overview.id, 'name': depend})
+            module_overview.module_name = op_settings['name']
+            module_overview.icon = icon_base64
+            module_overview.version = op_settings['version']
 
-        for img in op_settings['images']:
-            image_path = app_directory + "/" + module_name + "/" + img
-            if os.path.exists(image_path):
-                with open(image_path, "rb") as screenshot_file:
-                    screenshot_base64 = base64.b64encode(screenshot_file.read())
+            #Read /doc/changelog.rst file
+            if os.path.exists(app_directory + "/" + module_name + "/doc/changelog.rst"):
+                with open(app_directory + "/" + module_name + "/doc/changelog.rst", 'r') as changelogfile:
+                    changelogdata = changelogfile.read()
+                    module_overview.change_log_raw = changelogdata
+                    module_overview.change_log_html = changelogdata
+                    #module_overview.change_log_html = publish_string(changelogdata, writer_name='html').split("\n",2)[2]
 
-                self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
+            #Read /static/description/index.html file
+            if os.path.exists(app_directory + "/" + module_name + "/static/description/index.html"):
+                with open(app_directory + "/" + module_name + "/static/description/index.html", 'r') as descriptionfile:
+                    descriptiondata = descriptionfile.read()
+                    module_overview.store_description = descriptiondata
 
-        for root, dirnames, filenames in os.walk(app_directory + '/' + module_name):
-            for filename in fnmatch.filter(filenames, '*.xml'):
-                self._read_xml(os.path.join(root, filename), module_overview.id)
+            for depend in op_settings['depends']:
+                self.env['module.overview.depend'].create({'mo_id': module_overview.id, 'name': depend})
 
-            #for filename in fnmatch.filter(filenames, '*.csv'):
-            #    self._read_csv(filename, open( os.path.join(root, filename) ).read(), module_overview.id)
+            for img in op_settings['images']:
+                image_path = app_directory + "/" + module_name + "/" + img
+                if os.path.exists(image_path):
+                    with open(image_path, "rb") as screenshot_file:
+                        screenshot_base64 = base64.b64encode(screenshot_file.read())
 
-        #Create a zip of the module (TODO include dependacies)
-        zf = zipfile.ZipFile(app_directory + "/" + module_name + ".zip", "w")
-        for dirname, subdirs, files in os.walk(app_directory + "/" + module_name):
-            for filename in files:
-                full_file_path = os.path.join(dirname, filename)
-                zf.write(full_file_path, arcname=os.path.relpath(full_file_path, app_directory + "/" + module_name))
-        zf.close()
+                    self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
 
+            for root, dirnames, filenames in os.walk(app_directory + '/' + module_name):
+                for filename in fnmatch.filter(filenames, '*.xml'):
+                    self._read_xml(os.path.join(root, filename), module_overview.id)
+
+                #for filename in fnmatch.filter(filenames, '*.csv'):
+                #    self._read_csv(filename, open( os.path.join(root, filename) ).read(), module_overview.id)
+
+            #Create a zip of the module (TODO include dependacies)
+            zf = zipfile.ZipFile(app_directory + "/" + module_name + ".zip", "w")
+            for dirname, subdirs, files in os.walk(app_directory + "/" + module_name):
+                for filename in files:
+                    full_file_path = os.path.join(dirname, filename)
+                    zf.write(full_file_path, arcname=os.path.relpath(full_file_path, app_directory + "/" + module_name))
+            zf.close()
+
+        except Exception as e:
+            _logger.error(module_name)
+            _logger.error(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            _logger.error("Line: " + str(exc_tb.tb_lineno) )
+                        
     def _read_csv(self, file_name, file_content, m_id):
         if "ir.model.access":
             rownum = 0

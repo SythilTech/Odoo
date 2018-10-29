@@ -1,11 +1,7 @@
-v0.5.2
+v1.0.1
 ======
-* Changelog on app page
+* Fix module analyse issue
 
-v0.5.1
+v1.0.0
 ======
-* Add repositories
-
-v0.5
-====
-* Added option to install from inside Odoo
+* Port to version 11

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="mass_sms_unsubscribe_server_action" model="ir.actions.server">
+            <field name="name">Mass SMS Unsubscribe Action</field>
+            <field name="condition">True</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="sms_frame.model_sms_message"/>
+            <field name="state">code</field>
+            <field name="code">
+env['res.partner'].browse(record.record_id).sms_opt_out = False
+            </field>
+        </record>
+        
+    <record id="mass_sms_stop_filter" model="ir.filters">
+        <field name="name">Mass SMS STOP Filter</field>
+        <field name="model_id">sms.message</field>
+        <field name="domain">[('direction','=', 'I'), ('sms_content','=','STOP')]</field>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="mass_sms_unsubscribe" model="base.action.rule">
+        <field name="name">Mass SMS Unsubscribe</field>
+        <field name="kind">on_create</field>
+        <field name="model_id" ref="sms_frame.model_sms_message"/>
+        <field name="filter_id" ref="mass_sms_stop_filter"/>
+        <field name="server_action_ids" eval="[(6, 0, [ref('mass_sms_unsubscribe_server_action')])]"></field>
+        <!--<field name="act_user_id" ref="base.user_demo"/>-->
+        <!--<field name="filter_pre_id" ref="test_filter_open"/>-->
+    </record>
+        
+</odoo>
