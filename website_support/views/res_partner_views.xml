@@ -18,6 +18,7 @@
                 <notebook position="inside">
                     <page string="Support Ticket">
                         <group>
+                            <field name="dedicated_support_user_id"/>
                             <field name="sla_id"/>
                             <field name="stp_ids"/>
                         </group>

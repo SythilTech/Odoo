@@ -1,3 +1,7 @@
+v1.3.11
+=======
+* Ability to assign a customer to a dedicated support staff member
+
 v1.3.10
 =======
 * Help page unpublish / republish

@@ -11,6 +11,7 @@ class ResPartnerTicket(models.Model):
     support_ticket_string = fields.Char(compute="_compute_support_ticket_string", string="Support Ticket String")
     stp_ids = fields.Many2many('res.partner', 'stp_res_partner_rel', 'stp_p1_id', 'stp_p2_id', string="Support Ticket Access Accounts", help="Can view support tickets from other contacts")
     sla_id = fields.Many2one('website.support.sla', string="SLA")
+    dedicated_support_user_id = fields.Many2one('res.users', string="Dedicated Support User")
 
     @api.one
     @api.depends('support_ticket_ids')

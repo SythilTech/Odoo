@@ -329,6 +329,10 @@ class WebsiteSupportTicket(models.Model):
         ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
         ticket_open_email_template.send_mail(new_id.id, True)
 
+        #If the customer has a dedicated support user then automatically assign them
+        if new_id.partner_id.dedicated_support_user_id:
+            new_id.user_id = new_id.partner_id.dedicated_support_user_id.id
+
         #Check if this contact has a SLA assigned
         if new_id.partner_id.sla_id:
             #Check if this category has a SLA response time
