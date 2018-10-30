@@ -31,8 +31,6 @@ class AppstoreAccountRepository(models.Model):
     @api.model
     def check_all_repositories(self):
         """Checks to see if there are any new modules"""
-        #https://github.com/SythilTech/Odoo#9.0
-        #https://github.com/SythilTech/Odoo/archive/9.0.zip
 
         filename = tempfile.mktemp('.zip')
         destDir = tempfile.mktemp()
@@ -50,19 +48,18 @@ class AppstoreAccountRepository(models.Model):
                 
             repo_data = urlopen(q).read()
     
-            #thefile = zipfile.ZipFile(BytesIO(repo_data))
+            thefile = zipfile.ZipFile(BytesIO(repo_data))
 
-            #if not os.path.exists(rep_directory):
-            #    os.makedirs(rep_directory)
+            if not os.path.exists(rep_directory):
+                os.makedirs(rep_directory)
 
-            #thefile.extractall(rep_directory)
+            thefile.extractall(rep_directory)
 
-            #thefile.close()
+            thefile.close()
 
             rep_name = account_repository.url.split("/")[4].replace("#","-")
 
             full_rep_path = rep_directory + "/" + rep_name
-            _logger.error(full_rep_path)
 
             #Go through all module folders under the repository directory and analyse the module
             for dir in os.listdir(full_rep_path):

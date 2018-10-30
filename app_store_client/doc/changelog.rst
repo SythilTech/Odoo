@@ -1,3 +1,7 @@
+v1.0.2
+======
+* Click button to automatically transfer latest version into addons folder (-> manual Odoo restart required <-)
+
 v1.0.1
 ======
 * Display list of new versions

@@ -27,7 +27,7 @@
                             Internal Name: <field name="name"/><br/>
                             Installed Version: <field name="installed_version"/><br/>
                             Latest Version: <field name="latest_version"/><br/>
-                            <!--<button type="object" name="custom_module_update_download" string="Update Module"/>-->
+                            <button type="object" class="btn btn-primary btn-sm" name="custom_module_update_download">Download Update (Restart After)</button>
                         </div>
                     </t>
                   </templates>

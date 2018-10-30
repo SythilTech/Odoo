@@ -43,10 +43,11 @@ class AppsController(http.Controller):
         modules = request.env['module.overview'].search([])
         return http.request.render('app_store.app_list', {'modules':modules})
 
-    @http.route('/apps/modules/download/<module_name>', type="http", auth="public", website=True)
+    @http.route('/apps/modules/download/<module_name>', type="http", auth="public")
     def app_download(self, module_name, **kwargs):
         """Download the module zip"""
-        filename = str(module_name) + ".zip"
+
+        filename = module_name + ".zip"
         headers = [
             ('Content-Type', 'application/octet-stream; charset=binary'),
             ('Content-Disposition', "attachment; filename=" + filename ),
@@ -58,7 +59,7 @@ class AppsController(http.Controller):
         home_directory = os.path.expanduser('~')
         app_directory = home_directory + "/apps"
 
-        response = werkzeug.wrappers.Response(file(app_directory + "/" + module_name + ".zip"), headers=headers, direct_passthrough=True)
+        response = werkzeug.wrappers.Response(open(app_directory + "/" + module_name + ".zip", mode="r+b"), headers=headers, direct_passthrough=True)
         return response
 
     def content_disposition(self, filename):
@@ -127,6 +128,6 @@ class AppsController(http.Controller):
     def custom_app_store_updates(self, **kwargs):
         module_list = []
         for md in request.env['module.overview'].search([]):
-            module_list.append({'name': md.name, 'latest_version': "11." + md.version})
+            module_list.append({'name': md.name, 'latest_version': "11.0." + md.version})
 
         return json.dumps(module_list)

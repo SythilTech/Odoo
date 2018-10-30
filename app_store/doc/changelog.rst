@@ -1,3 +1,7 @@
+v1.0.2
+======
+* Module update support and github sync fix
+
 v1.0.1
 ======
 * Fix module analyse issue

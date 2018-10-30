@@ -25,14 +25,14 @@ class AppStoreControllers(http.Controller):
 
         home_directory = os.path.expanduser('~')
         mod_name = values['module_name']
-        app_directory = home_directory + "/.local/share/Odoo/addons/9.0/" + mod_name + ".zip"
+        app_directory = home_directory + "/.local/share/Odoo/addons/11.0/" + mod_name + ".zip"
 
         #Save zip to addons folder
         with open(app_directory, 'wb') as handle:
             for block in module_file.iter_content(1024):
                 handle.write(block)
 
-        module_path = home_directory + "/.local/share/Odoo/addons/9.0/" + mod_name
+        module_path = home_directory + "/.local/share/Odoo/addons/11.0/" + mod_name
         zip_ref = zipfile.ZipFile(app_directory, 'r')
         zip_ref.extractall(module_path)
         zip_ref.close()
