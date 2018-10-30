@@ -128,6 +128,10 @@ class AppsController(http.Controller):
     def custom_app_store_updates(self, **kwargs):
         module_list = []
         for md in request.env['module.overview'].search([]):
-            module_list.append({'name': md.name, 'latest_version': "11.0." + md.version})
+            if md.version.startswith("11.0"):
+                module_list.append({'name': md.name, 'latest_version': "11.0." + md.version})            
+            else:
+                #Prefix with 11.0 so we can compare against the installed version
+                module_list.append({'name': md.name, 'latest_version': "11.0." + md.version})
 
         return json.dumps(module_list)

@@ -130,6 +130,10 @@ class ModuleOverviewWizard(models.Model):
                 op_settings = ast.literal_eval(trimmed_data)
 
 
+            #Modules that don't have version number are not analysed
+            if 'version' not in op_settings:
+                return 0
+
             #Convert icon file to base64
             icon_base64 = ""
             if os.path.isfile(app_directory + "/" + module_name + "/static/description/icon.png"):
@@ -184,7 +188,7 @@ class ModuleOverviewWizard(models.Model):
                 #    self._read_csv(filename, open( os.path.join(root, filename) ).read(), module_overview.id)
 
             #Create a zip of the module (TODO include dependacies)
-            zf = zipfile.ZipFile(app_directory + "/" + module_name + ".zip", "w")
+            zf = zipfile.ZipFile(os.path.expanduser('~') + "/apps/" + module_name + ".zip", "w")
             for dirname, subdirs, files in os.walk(app_directory + "/" + module_name):
                 for filename in files:
                     full_file_path = os.path.join(dirname, filename)
