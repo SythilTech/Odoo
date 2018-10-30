@@ -422,22 +422,35 @@ class SupportTicketController(http.Controller):
         values = {}
         for field_name, field_value in kw.items():
             values[field_name] = field_value
-            
-        extra_access = []
-        for extra_permission in http.request.env.user.partner_id.stp_ids:
-            extra_access.append(extra_permission.id)
+        
+        #Determine which tickets the logged in user can see
+        ticket_access = []
+        
+        #Can see own tickets
+        ticket_access.append(http.request.env.user.partner_id.id)
 
+        #Can see tickets of any contacts under the logged in users additional access field (TODO remove this as departments is the evolved version of this feature)
+        for extra_permission in http.request.env.user.partner_id.stp_ids:
+            ticket_access.append(extra_permission.id)
+
+        #If the logged in user is a department manager then add all the contacts in the department to the access list
+        for dep in request.env['website.support.department.contact'].sudo().search([('user_id','=',http.request.env.user.id)]):
+            for contact in dep.wsd_id.partner_ids:
+                ticket_access.append(contact.id)
+
+        search_t = [('partner_id', 'in', ticket_access), ('partner_id','!=',False)]
+        
         if 'state' in values:
-            support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False), ('state', '=', int(values['state'])) ])
-        else:
-            support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])
+            search_t.append(('state', '=', int(values['state'])))
+
+        support_tickets = request.env['website.support.ticket'].sudo().search(search_t)
 
         no_approval_required = request.env['ir.model.data'].get_object('website_support','no_approval_required')
-        change_requests = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False), ('approval_id','!=',no_approval_required.id) ], order="planned_time desc")
+        change_requests = request.env['website.support.ticket'].sudo().search([('partner_id', 'in', ticket_access), ('partner_id','!=',False), ('approval_id','!=',no_approval_required.id) ], order="planned_time desc")
 
-        ticket_states = http.request.env['website.support.ticket.states'].sudo().search([])
+        ticket_states = request.env['website.support.ticket.states'].sudo().search([])
 
-        return http.request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets), 'change_requests': change_requests, 'request_count': len(change_requests), 'ticket_states': ticket_states})
+        return request.render('website_support.support_ticket_view_list', {'support_tickets':support_tickets,'ticket_count':len(support_tickets), 'change_requests': change_requests, 'request_count': len(change_requests), 'ticket_states': ticket_states})
 
     @http.route('/support/ticket/view/<ticket>', type="http", auth="user", website=True)
     def support_ticket_view(self, ticket):

@@ -1,3 +1,8 @@
+v1.3.12
+=======
+* Department manager access to department contact tickets fix
+* Automatically add category follower to ticket followers
+
 v1.3.11
 =======
 * Ability to assign a customer to a dedicated support staff member
