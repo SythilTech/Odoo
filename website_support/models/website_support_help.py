@@ -13,7 +13,8 @@ class WebsiteSupportHelpGroups(models.Model):
     _name = "website.support.help.groups"
     _order = "sequence asc"
 
-    name = fields.Char(string="Help Group", translate=True)
+    name = fields.Char(string="Name", translate=True)
+    image = fields.Binary(string="Image")
     sequence = fields.Integer(string="Sequence")
     website_published = fields.Boolean(string="Published", default="True")
     page_ids = fields.One2many('website.support.help.page','group_id',string="Pages")

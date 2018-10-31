@@ -365,6 +365,9 @@
                 <div class="mt16 mb16 col-md-12">
                     <t t-foreach="help_groups" t-as="help_group">
                         <div class="col-md-4">
+                            <t t-if="help_group.image">
+                                <img class="img-rounded img-responsive" t-att-src="website.image_url(help_group, 'image')"/>
+                            </t>
                             <h2 class="support-help-group" t-field="help_group.name"></h2>
                             <t t-set="counter" t-value="0"/>
                             <t t-foreach="help_group.page_ids" t-as="help_page">

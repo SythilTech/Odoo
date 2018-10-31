@@ -1,3 +1,9 @@
+v1.4.0
+======
+* SLA overhaul to support multiple conditions e.g. Priority = Urgent AND Category = Technical Support
+* Fix Issue with Support Managers access being lost on module update (will apply to future versions)
+* Ability to add image to help groups (optional)
+
 v1.3.12
 =======
 * Department manager access to department contact tickets fix

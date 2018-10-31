@@ -71,6 +71,7 @@
                                     <field name="sla_id"/>
                                     <field name="sla_active"/>
                                     <field name="sla_timer" widget="float_time"/>
+                                    <field name="sla_rule_id" domain="[('vsa_id','=',sla_id)]"/>
                                     <field name="sla_response_category_id" domain="[('vsa_id','=',sla_id)]"/>
                                 </group>
                             </page>

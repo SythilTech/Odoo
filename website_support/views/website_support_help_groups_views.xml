@@ -9,9 +9,10 @@
       	      <form>
       	          <group>
       	              <field name="website_published"/>
+      	              <field name="name"/>
+      	              <field name="image"/>
       	              <field name="group_ids" widget="many2many_tags"/>
       	              <field name="partner_ids" widget="many2many_tags"/>
-      	              <field name="name"/>
       	              <field name="page_ids" context="{'group_id':active_id}">
       	                  <tree editable="bottom">
       	                      <field name="sequence" widget="handle"/>

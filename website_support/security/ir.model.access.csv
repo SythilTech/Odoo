@@ -35,3 +35,5 @@ access_website_support_sla_alert_maanger,support manager access website.support.
 access_ir_rule,support manager access ir.rule,base.model_ir_rule,support_manager,1,0,0,0
 access_ir_config_parameter,support manager access ir.config_parameter,base.model_ir_config_parameter,support_manager,1,0,0,0
 access_res_users,support manager access res.users,base.model_res_users,support_manager,1,0,1,0
+access_website_support_sla_rule,support manager access website.support.sla.rule,model_website_support_sla_rule,support_manager,1,1,1,1
+access_website_support_sla_rule_condition,support manager access website.support.sla.rule.condition,model_website_support_sla_rule_condition,support_manager,1,1,1,1

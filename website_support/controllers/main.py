@@ -363,27 +363,36 @@ class SupportTicketController(http.Controller):
             sub_category = ""
 
 
+        create_dict = {'person_name':values['person_name'],'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name}
+
         if http.request.env.user.name != "Public user":
-            new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'],'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'partner_id':http.request.env.user.partner_id.id, 'attachment': my_attachment, 'attachment_filename': file_name, 'channel': 'Website (User)'})
 
+            create_dict['channel'] = 'Website (User)'
+            
             partner = http.request.env.user.partner_id
+            create_dict['partner_id'] = partner.id
 
-            #Add to the communication history
-            partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
-
+            #Priority can only be set if backend setting allows everyone or partner
             if 'priority' in values and (setting_allow_website_priority_set == "partner" or setting_allow_website_priority_set == "everyone"):
-                new_ticket_id.priority_id = int(values['priority'])
+                create_dict['priority_id'] = int(values['priority'])
+
+            #Add to the communication history of the logged in user
+            partner.message_post(body="Customer " + partner.name + " has sent in a new support ticket", subject="New Support Ticket")
         else:
-            search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
 
-            if len(search_partner) > 0:
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'partner_id':search_partner[0].id, 'channel': 'Website (Public)'})
-            else:
-                new_ticket_id = request.env['website.support.ticket'].sudo().create({'person_name':values['person_name'], 'category':values['category'], 'sub_category_id': sub_category, 'email':values['email'], 'description':values['description'], 'subject':values['subject'], 'attachment': my_attachment, 'attachment_filename': file_name, 'channel': 'Website (Public)'})
-
+            create_dict['channel'] = 'Website (Public)'
+            
+            #Priority can only be set if backend setting allows everyone
             if 'priority' in values and setting_allow_website_priority_set == "everyone":
-                new_ticket_id.priority_id = int(values['priority'])
-                            
+                create_dict['priority_id'] = int(values['priority'])
+            
+            #Automatically assign the partner if email matches
+            search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
+            if len(search_partner) > 0:
+                creat_dict['partner_id'] = search_partner[0].id
+
+        new_ticket_id = request.env['website.support.ticket'].sudo().create(create_dict)
+
         if "subcategory" in values:
             #Also get the data from the extra fields
             for extra_field in request.env['website.support.ticket.subcategory.field'].sudo().search([('wsts_id','=', int(sub_category) )]):
