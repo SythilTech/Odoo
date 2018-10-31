@@ -456,11 +456,8 @@ class WebsiteSupportTicket(models.Model):
         return update_rec
 
     def send_survey(self):
-
         notification_template = self.env['ir.model.data'].sudo().get_object('website_support', 'support_ticket_survey')
         values = notification_template.generate_email(self.id)
-        surevey_url = "support/survey/" + str(self.portal_access_key)
-        values['body_html'] = values['body_html'].replace("_survey_url_",surevey_url)
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send(True)
 

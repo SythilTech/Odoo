@@ -15,7 +15,7 @@
                     <p>Dear ${object.person_name},</p>
                 % endif
                 <p>We would like to get your feedback on the support</p>
-                <p><a href="_survey_url_">here</a></p>
+                <p><a href="/support/survey/${object.portal_access_key}">here</a></p>
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> 

@@ -1,3 +1,7 @@
+v1.4.1
+======
+* Fix issue with survey link appearing as _survey_url_ in chatter
+
 v1.4.0
 ======
 * SLA overhaul to support multiple conditions e.g. Priority = Urgent AND Category = Technical Support
