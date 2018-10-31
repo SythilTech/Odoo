@@ -1,3 +1,10 @@
+v1.0.4
+======
+* Fix analyse issue
+* Addd author field
+* Revamp user interface of client app store
+* Fix latest version number display in custom apps update
+
 v1.0.3
 ======
 * Fix to not analyse modules with no version number

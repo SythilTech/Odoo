@@ -8,6 +8,7 @@
              <form>
                   <group>
                      <field name="name"/>
+                     <field name="author"/>
                      <field name="version"/>
                      <field name="icon" widget="image"/>
                      <field name="store_description"/>

@@ -36,6 +36,7 @@ class ModuleOverview(models.Model):
     module_download_count = fields.Integer(string="Module Download Count", help="The amount of times this module has been downloaded")
     module_name = fields.Char(string="Module Name")
     version = fields.Char(string="Version Number")
+    author = fields.Char(string="Author")
     icon = fields.Binary(string="Icon")
     store_description = fields.Html(string="Store Description")
     change_log_raw = fields.Text(string="Change Log")
@@ -126,7 +127,7 @@ class ModuleOverviewWizard(models.Model):
                     if not line.lstrip().startswith("#"):
                         trimmed_data += line
                         
-                trimmed_data = trimmed_data.replace("'", "\"")
+                #trimmed_data = trimmed_data.replace("'", "\"")
                 op_settings = ast.literal_eval(trimmed_data)
 
 
@@ -151,6 +152,9 @@ class ModuleOverviewWizard(models.Model):
                 module_overview.image_ids.unlink()
                 module_overview.depend_ids.unlink()
 
+            if 'author' in op_settings:
+                module_overview.author = op_settings['author']
+
             module_overview.module_name = op_settings['name']
             module_overview.icon = icon_base64
             module_overview.version = op_settings['version']
@@ -169,16 +173,18 @@ class ModuleOverviewWizard(models.Model):
                     descriptiondata = descriptionfile.read()
                     module_overview.store_description = descriptiondata
 
-            for depend in op_settings['depends']:
-                self.env['module.overview.depend'].create({'mo_id': module_overview.id, 'name': depend})
+            if 'depends' in op_settings:
+                for depend in op_settings['depends']:
+                    self.env['module.overview.depend'].create({'mo_id': module_overview.id, 'name': depend})
 
-            for img in op_settings['images']:
-                image_path = app_directory + "/" + module_name + "/" + img
-                if os.path.exists(image_path):
-                    with open(image_path, "rb") as screenshot_file:
-                        screenshot_base64 = base64.b64encode(screenshot_file.read())
+            if 'images' in op_settings:
+                for img in op_settings['images']:
+                    image_path = app_directory + "/" + module_name + "/" + img
+                    if os.path.exists(image_path):
+                        with open(image_path, "rb") as screenshot_file:
+                            screenshot_base64 = base64.b64encode(screenshot_file.read())
 
-                    self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
+                        self.env['module.overview.image'].create({'mo_id': module_overview.id, 'name': img, 'file_data': screenshot_base64})
 
             for root, dirnames, filenames in os.walk(app_directory + '/' + module_name):
                 for filename in fnmatch.filter(filenames, '*.xml'):

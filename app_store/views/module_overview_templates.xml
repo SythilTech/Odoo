@@ -11,14 +11,17 @@
             <!-- Latest compiled JavaScript -->
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-            <t t-foreach="modules" t-as="module">
-                <div class="col-md-4 mt32 mb32">
-                    <a t-attf-href="/client/apps/modules/#{module.name}">
-                        <img t-att-src="website.image_url(module, 'icon')" class="img-rounded mb8" t-attf-alt="#{module.module_name}" width="200" height="200"/><br/>
-                        <t t-esc="module.module_name"/>
-                    </a>
-                </div>
-            </t>
+            <div class="container" style="margin-top:16px;">
+                <t t-foreach="modules" t-as="module">
+                    <div class="col-md-3">
+                        <div class="panel panel-default" style="padding:10px;">
+                            <a t-attf-href="/client/apps/modules/#{module.name}"><img t-att-src="website.image_url(module, 'icon')" class="img-rounded mb8" t-attf-alt="#{module.module_name}" width="200" height="200"/></a><br/>
+                            <a t-attf-href="/client/apps/modules/#{module.name}" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;display:block;"><b><t t-esc="module.module_name"/></b></a>
+                            <span style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;display:block;"><t t-esc="module.author"/></span>
+                        </div>
+                    </div>
+                </t>
+            </div>
         </template>
 
         <template id="app_list" name="Module List">
@@ -228,14 +231,16 @@
                         <t t-if="overview">
                             <div class="text-center">
                                 <h1><t t-esc="overview.module_name"/></h1>
-                                <h3><t t-esc="overview.name"/></h3>
-                                <h3>Version: <t t-esc="overview.version"/></h3>
-                                <ul>
-                                    <t t-foreach="overview.depend_ids" t-as="dependacy">
-                                        <li><t t-esc="dependacy.name"/></li>
-                                    </t>
-                                </ul>
-                                <button class="btn btn-primary" t-attf-onclick="window.top.postMessage('#{overview.name}', '*')">Try</button>
+                                <table class="table table-bordered" style="max-width:600px;margin-left:auto;margin-right:auto;">
+                                <tr><td>Technical Name</td><td><t t-esc="overview.name"/></td></tr>
+                                <tr><td>Version</td><td><t t-esc="overview.version"/></td></tr>
+                                <tr><td>Dependacies</td><td>
+                                <t t-foreach="overview.depend_ids" t-as="dependacy">
+                                    <t t-esc="dependacy.name"/><br/>
+                                </t>
+                                </td></tr>
+                                <tr><td colspan="2" class="text-center"><button class="btn btn-primary" t-attf-onclick="window.top.postMessage('#{overview.name}', '*')">Install</button></td></tr>
+                                </table>
                             </div>
                         </t>
                     </div>
