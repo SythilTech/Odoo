@@ -10,6 +10,7 @@
                      <field name="name"/>
                      <field name="author"/>
                      <field name="version"/>
+                     <field name="summary"/>
                      <field name="icon" widget="image"/>
                      <field name="store_description"/>
                      <field name="module_name"/>

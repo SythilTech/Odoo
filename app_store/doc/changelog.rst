@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Added summary field
+
 v1.0.4
 ======
 * Fix analyse issue

@@ -37,6 +37,7 @@ class ModuleOverview(models.Model):
     module_name = fields.Char(string="Module Name")
     version = fields.Char(string="Version Number")
     author = fields.Char(string="Author")
+    summary = fields.Char(string="summary")
     icon = fields.Binary(string="Icon")
     store_description = fields.Html(string="Store Description")
     change_log_raw = fields.Text(string="Change Log")
@@ -154,6 +155,9 @@ class ModuleOverviewWizard(models.Model):
 
             if 'author' in op_settings:
                 module_overview.author = op_settings['author']
+
+            if 'summary' in op_settings:
+                module_overview.summary = op_settings['summary']
 
             module_overview.module_name = op_settings['name']
             module_overview.icon = icon_base64
