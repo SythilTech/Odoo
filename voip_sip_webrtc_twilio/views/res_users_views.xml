@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_inherit_voip_sip_webrtc_twilio" model="ir.ui.view">
+        <field name="name">res.users Voip TWilio</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="voip_sip_webrtc.view_users_form_inherit_voip_sip_webrtc"/>
+        <field name="arch" type="xml">
+      	    <field name="voip_account_id" position="after">
+      	        <field name="twilio_client_name"/>
+      	    </field>
+        </field>
+    </record>
+
+</odoo>

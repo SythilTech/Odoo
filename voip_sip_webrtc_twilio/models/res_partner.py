@@ -3,6 +3,7 @@ from openerp import api, fields, models
 from openerp.exceptions import UserError
 import logging
 _logger = logging.getLogger(__name__)
+import datetime
 
 class ResPartnerTwilioVoip(models.Model):
 
@@ -37,12 +38,12 @@ class ResUsersTwilioVoip(models.Model):
 
     call_routing_ids = fields.Many2many('voip.number', string="Call Routing")
     twilio_client_name = fields.Char(string="Twilio Client Name")
-    
-    def update_twilio_client_name(self, twilio_identity):
-        self.twilio_client_name = twilio_identity
         
     def get_call_details(self, conn):
         twilio_from_mobile = conn['parameters']['From']
+
+        #conn['parameters']['AccountSid']        
+                
         call_from_partner = self.env['res.partner'].sudo().search([('mobile','=',conn['parameters']['From'])])
         caller_partner_id = False
         
@@ -55,4 +56,8 @@ class ResUsersTwilioVoip(models.Model):
         ringtone = "/voip/ringtone.mp3"
         ring_duration = self.env['ir.default'].get('voip.settings', 'ring_duration')
         
-        return {'from_name': from_name, 'caller_partner_id': caller_partner_id, 'ringtone': ringtone, 'ring_duration': ring_duration}
+        #Create the call now so we can record even missed calls
+        #I have no idea why we don't get the To address, maybe it provided during call accept / reject or timeout?!?
+        voip_call = self.env['voip.call'].create({'status': 'pending', 'from_address': twilio_from_mobile, 'from_partner_id': call_from_partner.id, 'ring_time': datetime.datetime.now(), 'record_model': 'res.partner', 'record_id': call_from_partner.id or False})
+
+        return {'from_name': from_name, 'caller_partner_id': caller_partner_id, 'ringtone': ringtone, 'ring_duration': ring_duration, 'voip_call_id': voip_call.id}

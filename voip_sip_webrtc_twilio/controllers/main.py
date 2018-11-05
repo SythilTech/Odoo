@@ -136,7 +136,12 @@ class TwilioVoiceController(http.Controller):
         # Twilio Application Sid
         application_sid = stored_number.twilio_app_id
         capability.allow_client_outgoing(application_sid)
-        capability.allow_client_incoming('the_user_id')
+        
+        #Automatically create a Twilio client name for the user if one has not been manually set up
+        if not request.env.user.twilio_client_name:
+            request.env.user.twilio_client_name = request.env.cr.dbname + "_user_" + str(request.env.user.id)
+
+        capability.allow_client_incoming(request.env.user.twilio_client_name)
         token = capability.to_jwt()
 
-        return json.dumps({'indentity': 'the_user_id', 'token': token.decode()}) 
+        return json.dumps({'indentity': request.env.user.twilio_client_name, 'token': token.decode()}) 

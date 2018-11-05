@@ -1,3 +1,7 @@
+v1.0.12
+=======
+* Automatically generate Twilio client name
+
 v1.0.11
 =======
 * Ability to call leads

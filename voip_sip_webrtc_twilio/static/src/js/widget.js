@@ -40,16 +40,6 @@ $(function() {
             $.getJSON(call_route.capability_token_url).done(function (data) {
                 console.log('Got a token.');
                 console.log('Token: ' + data.token);
-                console.log("Set Client Name: " + data.identity);
-
-                rpc.query({
-                    model: 'res.users',
-		            method: 'update_twilio_client_name',
-		            args: [[odoo_session.uid], data.identity],
-		            context: weContext.get()
-               }).then(function(result){
-                   console.log("Identity Set");
-               });
 
                 // Setup Twilio.Device
                 Twilio.Device.setup(data.token);
@@ -118,6 +108,9 @@ Twilio.Device.connect(function (conn) {
     var startDate = new Date();
     var call_interval;
 
+    mySound.pause();
+    mySound.currentTime = 0;
+
     call_interval = setInterval(function() {
         var endDate = new Date();
         var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
@@ -152,6 +145,8 @@ Twilio.Device.incoming(function (conn) {
         window.countdown = result.ring_duration;
 
         var notif_text = from_name + " wants you to join a mobile call";
+
+        window.voip_call_id = result.voip_call_id
 
         var incomingNotification = new VoipTwilioCallIncomingNotification(window.swnotification_manager, "Incoming Call", notif_text, 0);
 	    window.swnotification_manager.display(incomingNotification);
@@ -221,6 +216,8 @@ WebClient.include({
     show_application: function() {
 
         window.swnotification_manager = this.notification_manager;
+        //Because this no longer referes to the action manager for the disconnect callback
+        sw_acton_manager = this;
 
         bus.on('notification', this, function (notifications) {
             _.each(notifications, (function (notification) {
@@ -244,9 +241,6 @@ WebClient.include({
                       };
 
                       console.log('Calling ' + params.To + '...');
-
-                      //Because this no longer referes to the action manager for the disconnect callback
-                      sw_acton_manager = this;
 
                       $.getJSON(capability_token_url).done(function (data) {
                           // Setup Twilio.Device

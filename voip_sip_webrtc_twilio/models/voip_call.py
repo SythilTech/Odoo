@@ -94,18 +94,19 @@ class VoipCallComment(models.TransientModel):
 
     def post_feedback(self):
         message = self.env['mail.message']
-        record = self.env[self.call_id.record_model].browse(self.call_id.record_id)
         
-        call_activity = self.env['ir.model.data'].get_object('mail','mail_activity_data_call')
-        record_model = self.env['ir.model'].search([('model','=', self.call_id.record_model)])
-        #Create an activity then mark it as done
-        note = self.note + "<hr/>From Number: " + self.call_id.twilio_number_id.name
-
-        #Chatter will sanitise html5 audo so instead place a url
-        setting_record_calls = self.env['ir.default'].get('voip.settings','record_calls')
-        if setting_record_calls:
-            note += "<br/>Recording: " + '<a target="_blank" href="' +  self.call_id.twilio_call_recording_uri + '">Play Online</a>'
-
-        mail_activity = self.env['mail.activity'].create({'res_model_id': record_model.id, 'res_id': self.call_id.record_id, 'activity_type_id': call_activity.id, 'note': note})
-        mail_activity.action_feedback()
+        if self.call_id.record_model and self.call_id.record_id:
+            record = self.env[self.call_id.record_model].browse(self.call_id.record_id)
         
+            call_activity = self.env['ir.model.data'].get_object('mail','mail_activity_data_call')
+            record_model = self.env['ir.model'].search([('model','=', self.call_id.record_model)])
+            #Create an activity then mark it as done
+            note = self.note + "<hr/>From Number: " + self.call_id.twilio_number_id.name
+
+            #Chatter will sanitise html5 audo so instead place a url
+            setting_record_calls = self.env['ir.default'].get('voip.settings','record_calls')
+            if setting_record_calls:
+                note += "<br/>Recording: " + '<a target="_blank" href="' +  self.call_id.twilio_call_recording_uri + '">Play Online</a>'
+
+            mail_activity = self.env['mail.activity'].create({'res_model_id': record_model.id, 'res_id': self.call_id.record_id, 'activity_type_id': call_activity.id, 'note': note})
+            mail_activity.action_feedback()
