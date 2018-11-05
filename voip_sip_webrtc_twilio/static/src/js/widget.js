@@ -108,8 +108,10 @@ Twilio.Device.connect(function (conn) {
     var startDate = new Date();
     var call_interval;
 
-    mySound.pause();
-    mySound.currentTime = 0;
+    if (mySound != "") {
+        mySound.pause();
+        mySound.currentTime = 0;
+    }
 
     call_interval = setInterval(function() {
         var endDate = new Date();

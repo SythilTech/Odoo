@@ -1,3 +1,7 @@
+v1.0.13
+=======
+* Fix mySound undefined bug on outgoing calls
+
 v1.0.12
 =======
 * Automatically generate Twilio client name
