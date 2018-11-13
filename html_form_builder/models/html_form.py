@@ -205,11 +205,23 @@ class HtmlFormAction(models.Model):
     _name = "html.form.action"
     _description = "HTML Form Action"
 
+    @api.model
+    def _default_email_template_id(self):
+        return self.env['ir.model.data'].get_object('html_form_builder', 'send_form_submit_data')
+
     hf_id = fields.Many2one('html.form', string="HTML Form")
     action_type_id = fields.Many2one('html.form.action.type', string="Submit Action")
     setting_name = fields.Char(string="Internal Name", related="action_type_id.internal_name")
     settings_description = fields.Char(string="Settings Description")
     custom_server_action = fields.Many2one('ir.actions.server', string="Custom Server Action")
+    from_email = fields.Char(string="From Email", help="When the form is submitted who will this email be from?")
+    to_email = fields.Char(string="To Email", help="When the form is submitted who will this email be to?")
+    email_template_id = fields.Many2one('mail.template', string="Email Template", default=_default_email_template_id)
+
+    @api.onchange('email_template_id')
+    def _onchange_email_template_id(self):
+        if self.email_template_id:
+            self.settings_description = "Email Template: " + self.email_template_id.name
 
     @api.onchange('custom_server_action')
     def _onchange_custom_server_action(self):

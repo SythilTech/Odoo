@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="send_form_submit_data" model="mail.template">
+        <field name="name">Send Form Submit Data</field>
+        <field name="model_id" ref="model_html_form_history"></field>
+        <field name="subject">${object.html_id.name} Form Data</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html"><![CDATA[
+
+            <h1> ${object.html_id.name} Form Data</h1>
+            % for form_field_data in object.insert_data:
+                <b>${form_field_data.field_id.field_description}</b><br/>
+                ${form_field_data.insert_value}<br/>
+                <br/>
+            % endfor
+
+        ]]>
+        </field>
+    </record>
+
+</odoo>

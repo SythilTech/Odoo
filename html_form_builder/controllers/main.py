@@ -18,6 +18,14 @@ class HtmlFieldResponse():
 
 class HtmlFormController(http.Controller):
 
+    def _html_action_send_email(self, submit_action, history_data, values):
+        
+        values = submit_action.email_template_id.generate_email(history_data.id)
+        values['email_from'] = submit_action.from_email
+        values['email_to'] = submit_action.to_email
+        send_mail = request.env['mail.mail'].create(values)
+        send_mail.send()
+
     def _html_action_custom_server_action(self, submit_action, history_data, values):
         form_record = request.env[history_data.html_id.model_id.model].browse(history_data.record_id)
         submit_action.custom_server_action.with_context({'active_id': form_record.id, 'active_model': history_data.html_id.model_id.model}).run()
