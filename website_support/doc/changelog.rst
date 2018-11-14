@@ -1,3 +1,7 @@
+v1.4.2
+======
+* Fix ticket submit issue with public users with existing emails submitting tickets (introduced in v1.4.0)
+
 v1.4.1
 ======
 * Fix issue with survey link appearing as _survey_url_ in chatter

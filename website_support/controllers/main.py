@@ -389,7 +389,7 @@ class SupportTicketController(http.Controller):
             #Automatically assign the partner if email matches
             search_partner = request.env['res.partner'].sudo().search([('email','=', values['email'] )])
             if len(search_partner) > 0:
-                creat_dict['partner_id'] = search_partner[0].id
+                create_dict['partner_id'] = search_partner[0].id
 
         new_ticket_id = request.env['website.support.ticket'].sudo().create(create_dict)
 
