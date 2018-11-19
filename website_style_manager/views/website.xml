@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>  
+
+        <record id="style_manager_form_view" model="ir.ui.view">
+            <field name="name">website.inherit</field>
+            <field name="model">website</field>
+      	    <field name="arch" type="xml">
+      	        <form>
+      	        <group>
+      	            <field name="force_styles"/>
+      	            <field name="tag_styles">
+      	                <tree editable="bottom">
+      	                    <field name="html_tag"/>
+      	                    <field name="font_family"/>
+      	                    <field name="font_color"/>
+      	                    <field name="font_size"/>
+      	                </tree>
+      	            </field>
+      	            <field name="custom_css"/>
+      	            <field name="color_profile"/>
+      	            <field name="custom_less_ids" context="{'default_website_id': active_id}">
+      	                <tree editable="bottom">
+      	                    <field name="name"/>
+      	                    <field name="internal_name"/>
+      	                    <field name="value"/>
+      	                </tree>
+      	            </field>
+      	        </group>
+      	        <field name="css_text" invisible="1"/>
+      	        <button type="object" name="generate_less" string="Update LESS File"/>
+      	        </form>
+            </field>
+        </record>
+
+    <record id="style_manager_action" model="ir.actions.act_window">
+      <field name="name">Style Manager</field>
+      <field name="res_model">website</field>
+      <field name="view_type">form</field>
+      <field name="view_id" ref="style_manager_form_view"/>
+      <field name="res_id" ref="website.default_website"/>
+    </record>
+
+        <menuitem id="style_manager_menu" name="Style Manager" parent="website.menu_website_configuration" action="style_manager_action" sequence="20"/>
+
+    </data>
+</openerp>

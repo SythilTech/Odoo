@@ -1,0 +1,26 @@
+.o_ace_view_css {
+    background: #2f3129;
+    top: 34px;
+    left:auto;
+    bottom:0px;
+    right: 0px;
+    position: fixed;
+    z-index: 1001;
+    
+}
+
+.oe_ccsse_open {
+    opacity: 0.97;
+}
+    
+.oe_ccsse_closed {
+    z-index: -1000;
+    opacity: 0;
+}
+
+
+#website-custom-css {
+    margin:5px;
+    width:100%;
+    height:100%;
+}

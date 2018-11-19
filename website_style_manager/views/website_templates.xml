@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="website_style_manager_editor" inherit_id="website.assets_editor" name="Website Style Manager Resources">
+            <xpath expr="/t" position="inside">
+                <script type="text/javascript" src="/website_style_manager/static/src/js/custom_css.js" />
+            </xpath>
+        </template>
+
+        <template id="custom_css" inherit_id="website.layout" active="True" customize_show="True" name="Custom CSS">
+            <xpath expr="//t[@t-set='head_website']" position="inside">
+                <style>
+                    <t t-raw="website.css_text"/>
+                </style>
+                <style id="custom_css_header">
+                    <t t-raw="website.custom_css"/>
+                </style>
+            </xpath>
+        </template>
+
+        <template id="style_override" name="Style Override" inherit_id="website.assets_frontend" priority="666">
+            <xpath expr="." position="inside">
+                <!--<link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/less/override.less'/>-->
+                <link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/css/editor.css'/>
+                <!--<link rel="stylesheet" type="text/less" href='/website_style_manager/static/src/css/custom.css'/>-->
+            </xpath>
+        </template>
+
+        <template id="custom_css_user_navbar" inherit_id="website.user_navbar">
+            <xpath expr="//li[@id='theme_customize']" position="after">
+                <li id="sythil_custom_css"><a href="#" data-action="CustomCSSView">Custom CSS</a></li>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>
