@@ -6,7 +6,8 @@
           <field name="model">module.overview</field>
           <field name="arch" type="xml">
              <form>
-                  <group>
+                 <group>
+                     <field name="published"/>
                      <field name="name"/>
                      <field name="author"/>
                      <field name="version"/>

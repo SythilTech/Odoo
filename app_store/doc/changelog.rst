@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Ability to unpublish modules from the store
+
 v1.0.5
 ======
 * Added summary field

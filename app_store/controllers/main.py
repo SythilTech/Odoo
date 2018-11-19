@@ -86,6 +86,9 @@ class AppsController(http.Controller):
 
         module = request.env['module.overview'].search([('name','=',module_name)])
 
+        if module.published == False:
+            return "No hack bypassing published"
+
         module.module_view_count += 1
 
         header_string = ""
@@ -110,6 +113,9 @@ class AppsController(http.Controller):
 
         module = request.env['module.overview'].search([('name','=',module_name)])
 
+        if module.published == False:
+            return "No hack bypassing published"
+        
         module.module_view_count += 1
 
         header_string = ""

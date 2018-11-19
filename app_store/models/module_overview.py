@@ -42,6 +42,7 @@ class ModuleOverview(models.Model):
     store_description = fields.Html(string="Store Description")
     change_log_raw = fields.Text(string="Change Log")
     change_log_html = fields.Html(string="Change Log(html)")
+    published = fields.Boolean(string="Published", default=True)
 
     @api.one
     @api.depends('menu_ids')
