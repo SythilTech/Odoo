@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Feature to choose delivery time, relative to operator timezone
+
 v1.0.3
 ======
 * Allow changing of stop message

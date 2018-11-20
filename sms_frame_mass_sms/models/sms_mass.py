@@ -22,7 +22,8 @@ class SmsMass(models.Model):
     sub_model_object_field = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")
     copyvalue = fields.Char(string='Placeholder Expression', help="Final placeholder expression, to be copy-pasted in the desired template field.")
     stop_message = fields.Char(string="STOP message", default="reply STOP to unsubscribe", required="True")
-    
+    delivery_time = fields.Datetime(string="Delivery Time")
+
     @api.onchange('model_object_field')
     def _onchange_model_object_field(self):
         if self.model_object_field.relation:
@@ -70,7 +71,10 @@ class SmsMass(models.Model):
             sms_rendered_content += "\n\n" + self.stop_message
             
             #Queue the SMS message and send them out at the limit
-            queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued', 'mass_sms_id': self.id})            
+            if self.delivery_time:
+                queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':self.delivery_time, 'status_code': 'queued', 'mass_sms_id': self.id})
+            else:
+                queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued', 'mass_sms_id': self.id})
 
             #Turn the queue manager on
             sms_queue = self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check')
