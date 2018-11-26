@@ -1,2 +1,9 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_module_overview","access_module_overview","model_module_overview",,1,0,0,0
+"access_module_overview","access module.overview","model_module_overview",,1,0,0,0
+"access_module_overview_depend","access module.overview.depend","model_module_overview_depend",,1,0,0,0
+"access_module_overview_image","access module.overview.image","model_module_overview_image",,1,0,0,0
+"access_module_overview_group","access module.overview.group","model_module_overview_group",,1,0,0,0
+"access_module_overview_menu","access module.overview.menu","model_module_overview_menu",,1,0,0,0
+"access_module_overview_model","access module.overview.model","model_module_overview_model",,1,0,0,0
+"access_module_overview_model_view","access module.overview.model.view","model_module_overview_model_view",,1,0,0,0
+"access_module_overview_model_access","access module.overview.model.access","model_module_overview_model_access",,1,0,0,0

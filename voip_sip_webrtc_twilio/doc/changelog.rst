@@ -1,3 +1,7 @@
+v1.0.14
+=======
+* Fix cability token url using http in https systems
+
 v1.0.13
 =======
 * Fix mySound undefined bug on outgoing calls

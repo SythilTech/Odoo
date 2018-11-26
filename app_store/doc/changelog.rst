@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Public access security fixes
+
 v1.0.6
 ======
 * Ability to unpublish modules from the store

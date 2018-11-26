@@ -89,7 +89,7 @@ class AppsController(http.Controller):
         if module.published == False:
             return "No hack bypassing published"
 
-        module.module_view_count += 1
+        module.sudo().module_view_count += 1
 
         header_string = ""
         for keys,values in request.httprequest.headers.items():
@@ -99,7 +99,7 @@ class AppsController(http.Controller):
         if "Referer" in request.httprequest.headers:
             ref = request.httprequest.headers['Referer']
 
-        request.env['module.overview.store.view'].create({'mo_id': module.id, 'ref':ref, 'ip': request.httprequest.remote_addr,'header':header_string})
+        request.env['module.overview.store.view'].sudo().create({'mo_id': module.id, 'ref':ref, 'ip': request.httprequest.remote_addr,'header':header_string})
 
         return http.request.render('app_store.app_page', {'overview':module})
 

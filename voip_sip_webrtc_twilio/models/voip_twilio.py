@@ -70,7 +70,7 @@ class VoipTwilio(models.Model):
 
                     voip_number.twilio_app_id = response_string_json['sid']
 
-                    voip_number.capability_token_url = request.httprequest.host_url + 'twilio/capability-token/' + str(voip_number.id)
+                    voip_number.capability_token_url = request.httprequest.host_url.replace("http://","//") + 'twilio/capability-token/' + str(voip_number.id)
 
                 #Setup the Voice URL
                 payload = {'VoiceUrl': str(request.httprequest.host_url + "twilio/voice/route")}
