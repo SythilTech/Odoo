@@ -19,7 +19,7 @@ class SupportTicketController(http.Controller):
 
     @http.route('/support/approve/<ticket_id>', type='http', auth="public")
     def support_approve(self, ticket_id, **kwargs):
-        support_ticket = request.env['website.support.ticket'].browse( int(ticket_id) )
+        support_ticket = request.env['website.support.ticket'].sudo().browse( int(ticket_id) )
 
         awaiting_approval = request.env['ir.model.data'].get_object('website_support','awaiting_approval')
 
@@ -55,7 +55,7 @@ class SupportTicketController(http.Controller):
 
     @http.route('/support/disapprove/<ticket_id>', type='http', auth="public")
     def support_disapprove(self, ticket_id, **kwargs):
-        support_ticket = request.env['website.support.ticket'].browse( int(ticket_id) )
+        support_ticket = request.env['website.support.ticket'].sudo().browse( int(ticket_id) )
 
         awaiting_approval = request.env['ir.model.data'].get_object('website_support','awaiting_approval')
 
@@ -150,7 +150,7 @@ class SupportTicketController(http.Controller):
     def support_ticket_survey(self, portal_key):
         """Display the survey"""
 
-        support_ticket = request.env['website.support.ticket'].search([('portal_access_key','=', portal_key)])
+        support_ticket = request.env['website.support.ticket'].sudo().search([('portal_access_key','=', portal_key)])
 
         if support_ticket.support_rating:
             #TODO some security incase they guess the portal key of an incomplete survey
@@ -167,7 +167,10 @@ class SupportTicketController(http.Controller):
         for field_name, field_value in kw.items():
             values[field_name] = field_value
 
-        support_ticket = request.env['website.support.ticket'].search([('portal_access_key','=', portal_key)])
+        if 'rating' not in values:
+            return "Please select a rating"
+
+        support_ticket = request.env['website.support.ticket'].sudo().search([('portal_access_key','=', portal_key)])
 
         if support_ticket.support_rating:
             #TODO some security incase they guess the portal key of an incomplete survey

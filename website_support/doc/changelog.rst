@@ -1,3 +1,7 @@
+v1.4.3
+======
+* Fix permission issue with survey and change requests being inaccessible for public users
+
 v1.4.2
 ======
 * Fix ticket submit issue with public users with existing emails submitting tickets (introduced in v1.4.0)
