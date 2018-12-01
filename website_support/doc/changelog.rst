@@ -1,3 +1,9 @@
+v1.4.4
+======
+* Close ticket email templates
+* Fix Fix help page search
+* Fix double close comment email bug
+
 v1.4.3
 ======
 * Fix permission issue with survey and change requests being inaccessible for public users

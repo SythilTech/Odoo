@@ -10,6 +10,7 @@
       	          <group>
       	              <field name="ticket_id" invisible="True"/>
           	      <field name="message"/>
+          	      <field name="template_id" context="{'default_model':'website.support.ticket', 'default_body_html': message}"/>
           	  </group>
                   <footer>
                         <button string="Close Ticket" name="close_ticket" type="object" class="btn-primary"/>

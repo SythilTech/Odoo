@@ -573,8 +573,7 @@ class SupportTicketController(http.Controller):
         help_pages = request.env['website.support.help.page'].sudo().search([('name','=ilike',"%" + values['term'] + "%")],limit=5)
 
         for help_page in help_pages:
-            #return_item = {"label": help_page.name + "<br/><sub>" + help_page.group_id.name + "</sub>","value": help_page.url_generated}
-            return_item = {"label": help_page.name,"value": help_page.url_generated}
+            return_item = {"label": help_page.name,"value": "/support/help/" + slug(help_page.group_id) + "/" + slug(help_page)}
             my_return.append(return_item) 
 
         return json.JSONEncoder().encode(my_return)

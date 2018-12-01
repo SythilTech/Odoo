@@ -6,10 +6,10 @@ import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from odoo import SUPERUSER_ID
 from dateutil import tz
+import re
 
 import logging
 _logger = logging.getLogger(__name__)
-
 
 class WebsiteSupportTicket(models.Model):
 
@@ -559,12 +559,19 @@ class WebsiteSupportTicketUsers(models.Model):
 
     cat_user_ids = fields.Many2many('website.support.ticket.categories', string="Category Users")
 
-class WebsiteSupportTicketCompose(models.Model):
+class WebsiteSupportTicketClose(models.TransientModel):
 
     _name = "website.support.ticket.close"
 
     ticket_id = fields.Many2one('website.support.ticket', string="Ticket ID")
-    message = fields.Text(string="Close Message")
+    message = fields.Html(string="Close Message")
+    template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
+
+    @api.onchange('template_id')
+    def _onchange_template_id(self):
+        if self.template_id:
+            values = self.env['mail.compose.message'].generate_email_for_composer(self.template_id.id, [self.ticket_id.id])[self.ticket_id.id]
+            self.message = values['body']
 
     def close_ticket(self):
 
@@ -582,7 +589,7 @@ class WebsiteSupportTicketCompose(models.Model):
         message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
         self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
 
-        self.ticket_id.close_comment = self.message
+        self.ticket_id.close_comment = re.compile(r'<[^>]+>').sub('', self.message)
         self.ticket_id.closed_by_id = self.env.user.id
         self.ticket_id.state = closed_state.id
 
@@ -592,11 +599,6 @@ class WebsiteSupportTicketCompose(models.Model):
         setting_auto_send_survey = self.env['ir.default'].get('website.support.settings', 'auto_send_survey')
         if setting_auto_send_survey:
             self.ticket_id.send_survey()
-
-        closed_state_mail_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_staff_closed').mail_template_id
-
-        if closed_state_mail_template:
-            closed_state_mail_template.send_mail(self.ticket_id.id, True)
 
 class WebsiteSupportTicketCompose(models.Model):
 
