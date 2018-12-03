@@ -1,0 +1,7 @@
+"id","name","type","duration","interval"
+"1_alarm_sms","1 Hour(s) SMS","sms","1","hours"
+"2_alarm_sms","2 Hour(s) SMS","sms","2","hours"
+"3_alarm_sms","3 Hour(s) SMS","sms","3","hours"
+"4_alarm_sms","4 Hour(s) SMS","sms","4","hours"
+"5_alarm_sms","5 Hour(s) SMS","sms","5","hours"
+"6_alarm_sms","6 Hour(s) SMS","sms","6","hours"
