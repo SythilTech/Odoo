@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Resolve get record name when model does not have name field
+
 v1.0.2
 ======
 * Fix Send SMS automated action not appearing in list

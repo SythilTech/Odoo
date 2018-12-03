@@ -33,7 +33,7 @@ class SmsMessage(models.Model):
             my_record_count = self.env[self.model_id.model].search_count([('id','=',self.record_id)])
             if my_record_count > 0:
                 my_record = self.env[self.model_id.model].search([('id','=',self.record_id)])
-                self.record_name = my_record.name
+                self.record_name = my_record.name_get()[0][1]
             else:
                 self.record_name = self.to_mobile
 
