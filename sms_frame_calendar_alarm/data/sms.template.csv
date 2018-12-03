@@ -1,0 +1,3 @@
+"id","name","model_id/id","template_body","sms_to"
+"sms_calendar_reminder","Calendar Reminder","calendar.model_calendar_event","Reminder: ${object.display_name} at ${object.start_datetime}",""
+"sms_calendar_reminder_attendee","Calendar Reminder Attendee","calendar.model_calendar_attendee","Hello ${object.partner_id.name}, this is a reminder for ${object.event_id.display_name} at ${object.event_id.start_datetime}","${object.partner_id.mobile}"
