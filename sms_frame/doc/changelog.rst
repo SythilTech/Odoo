@@ -1,3 +1,7 @@
+v1.0.33
+=======
+* Fix sms messages in models without name field issue
+
 v1.0.32
 =======
 * Fix sms (no attachment) recieve issue
