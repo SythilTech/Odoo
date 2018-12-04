@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+        <record id="support_ticket_closed_analytic_timesheets" model="mail.template">
+            <field name="name">Support Ticket Closed Analytic Timesheets</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from">${user.email|safe}</field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+<p>Dear ${object.person_name},</p>
+<p>Your support ticket has been closed by our staff, here is the final comment</p>
+<p>${object.close_comment or ''}</p>
+% if object.analytic_timesheet_ids:
+    <h2>Time Sheet</h2>
+    <div style="display:table">
+        <div style="display:table-header-group;">
+            <div style="display:table-row;">
+                <div style="display:table-cell;">Staff Member</div>
+                <div style="display:table-cell;">Time</div>
+            </div>
+        </div>
+        <div style="display:table-row-group;">
+        % for timeslot in object.analytic_timesheet_ids:
+            <div style="display:table-row;">
+                <div style="display:table-cell;">${timeslot.user_id.name}</div>
+                <div style="display:table-cell;">${timeslot.unit_amount}</div>
+            </div>
+        % endfor
+        </div>
+    </div>
+% endif
+<hr/>
+<b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
+<b>Ticket Category:</b> ${object.category_id.name or ''}
+<br/>
+<b>Ticket Description:</b><br/>
+${object.description|safe}
+            ]]>
+            </field>
+        </record>
+
+<template id="strt" name="Support Tech Report">
+
+    <t t-call="web.html_container">
+        <t t-call="web.external_layout">
+            <div class="page">
+
+                <t t-foreach="docs" t-as="timesheet_day">
+
+                    <h1 style="text-align:center;">Productivity Report <span t-esc="timesheet_day"/></h1>
+                    <t t-foreach="timesheet_day_value" t-as="timesheet_employee">
+                        <h2><t t-esc="timesheet_employee"/></h2>
+                        <table style="width:100%;">
+                            <t t-set="recorded_hour_total" t-value="0"/>
+                            <tr><th>Tech Name</th><th>Task</th><th>Ticket</th><th>Subject</th><th>Estimated Time</th><th>Time Available</th><th>Time Recorded</th><th>Status</th><th>Date Completed</th><th>Last Modified</th><th>Partner Name</th></tr>
+                            <t t-foreach="timesheet_employee_value" t-as="timesheet_line">
+                                <tr>
+                                    <td><span t-esc="timesheet_line.user_id.name"/></td>
+                                    <td><span t-esc="timesheet_line.task_id.name"/></td>
+                                    <td><span t-esc="timesheet_line.ticket_number_display"/></td>
+                                    <td><span t-esc="timesheet_line.support_ticket_id.subject"/></td>
+                                    <td><span t-esc="timesheet_line.planned_hours"/></td>
+                                    <td><span t-esc="timesheet_line.support_ticket_id.category_id.name"/></td>
+                                    <td><span t-esc="timesheet_line.unit_amount"/></td>
+                                    <td><span t-esc="timesheet_line.close_time"/></td>
+                                    <td><span t-esc="timesheet_line.write_date"/></td>
+                                    <td><span t-esc="timesheet_line.support_ticket_id.partner_id.name"/></td>
+                                </tr>
+                                <t t-set="recorded_hour_total" t-value="recorded_hour_total+timesheet_line.unit_amount"/>
+                            </t>
+                            <tr><td><b>Totals</b></td><td></td><td></td><td></td><td></td><td></td><td><b><t t-esc="recorded_hour_total"/></b></td><td></td><td></td><td></td><td></td></tr>
+                        </table>
+                        <br/>
+                    </t>
+
+                </t>
+               
+            </div>
+        </t>
+    </t>
+    
+</template>
+
+        <report
+            string="Support Tech Report"
+            id="support_tech_report"
+            model="account.analytic.line"
+            report_type="qweb-pdf"
+            name="website_support_analytic_timesheets.strt"
+            file="website_support_analytic_timesheets.strt"
+        />
+        
+</data>
+</openerp>

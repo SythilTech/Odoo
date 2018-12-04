@@ -1,0 +1,2 @@
+id,domain_force
+"hr_timesheet.timesheet_line_rule_user","[('user_id', '=', user.id)]"

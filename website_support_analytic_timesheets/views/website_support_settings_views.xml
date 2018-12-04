@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+      <record id="website_support_settings_view_form_inherit_timesheets" model="ir.ui.view">
+          <field name="name">website.support.settings timesheet inherit</field>
+          <field name="model">website.support.settings</field>
+          <field name="inherit_id" ref="website_support.website_support_settings_view_form"/>
+          <field name="arch" type="xml">
+              <field name="email_default_category_id" position="after">
+                  <field name="timesheet_default_project_id"/>                  
+              </field>
+          </field>
+      </record>
+        
+  </data>
+</openerp>
