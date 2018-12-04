@@ -1,3 +1,7 @@
+v1.4.5
+======
+* Fix approval mail permissions
+
 v1.4.4
 ======
 * Close ticket email templates
