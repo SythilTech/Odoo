@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="payment_subscription_view_form" model="ir.ui.view">
+        <field name="name">payment.subscription form view</field>
+        <field name="model">payment.subscription</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="product_id"/>
+                    <field name="initial_amount"/>
+                    <field name="payment_acquirer_id"/>
+                    <field name="period_interval"/>
+                    <field name="period_amount"/>
+                    <field name="subscription_ids">
+                        <tree>
+                            <field name="status"/>
+                            <field name="partner_id"/>
+                            <field name="next_payment_date"/>
+                            <field name="amount"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="payment_subscription_view_tree" model="ir.ui.view">
+        <field name="name">payment.subscription tree view</field>
+        <field name="model">payment.subscription</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="initial_amount"/>
+                <field name="period_interval"/>
+                <field name="period_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="payment_subscription_action" model="ir.actions.act_window">
+        <field name="name">Payment Subscriptions</field>
+        <field name="res_model">payment.subscription</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Add Subscription</p>
+        </field>
+    </record>
+
+      <menuitem id="payment_subscription_menu" name="Subscriptions" action="payment_subscription_action" parent="base.menu_custom" sequence="10"/>
+
+</odoo>

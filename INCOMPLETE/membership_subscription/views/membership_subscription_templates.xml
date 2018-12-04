@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="signup_thank_you" name="Membership Signup Thank You">
+        <t t-call="website.layout">
+            <div class="container">
+                <h1 class="text-center">Thank You</h1>
+            </div>
+        </t>
+    </template>
+
+    <template id="membership_management" name="Membership Management">
+        <t t-call="website.layout">
+            <div class="container">
+                <h1 class="text-center">Membership Management</h1>
+
+                <t t-if="current_membership">
+                    <t t-esc="current_membership.name"/>
+                    <!-- <a t-attf-href="/membership/change">Change</a> -->
+                    <a href="/membership/cancel">Unsubscribe</a>
+                    <br/>
+                </t>
+
+            </div>
+        </t>
+    </template>
+
+    <template id="signup_form" name="Membership Signup Form">
+        <t t-call="website.layout">
+            <div class="container">
+
+                <div class="mt16 mb16">
+                    <h1 class="text-center"><t t-esc="membership.name"/></h1>
+                </div>
+
+                <h1>Membership Signup</h1>
+                <form method="POST" action="/membership/signup/process" enctype="multipart/form-data" class="mb16 mt16">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" class="form-control" required="required"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" class="form-control" required="required"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" class="form-control" required="required"/>
+                    </div>
+                    <t t-foreach="membership.extra_field_ids" t-as="extra_field">
+                        <div class="form-group">
+                            <label t-att-for="extra_field.name"><t t-esc="extra_field.field_label"/></label>
+                            <input type="text" t-att-name="extra_field.name" class="form-control" required="required"/>
+                        </div>
+                    </t>
+                    <input type="hidden" name="membership_id" t-att-value="membership.id"/>
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <button t-attf-class="btn btn-primary btn-lg">Sign up</button>
+                </form>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>

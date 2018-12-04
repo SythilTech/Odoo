@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_payment_membership","access payment.membership","model_payment_membership","sales_team.group_sale_manager",1,1,1,1
+"public_access_payment_membership","public access payment.membership","model_payment_membership","",1,0,0,0
+"access_payment_membership_field","access payment.membership.field","model_payment_membership_field","sales_team.group_sale_manager",1,1,1,1
+"public_access_payment_membership_field","public access payment.membership.field","model_payment_membership_field","",1,0,0,0

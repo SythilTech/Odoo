@@ -1,0 +1,2 @@
+id,name,model,function,interval_number,interval_type,"active"
+"payment_subscription_check","Payment Subscription Check","payment.subscription.subscriber","subscription_check",24,hours,"1"
