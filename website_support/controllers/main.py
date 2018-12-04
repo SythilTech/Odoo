@@ -42,7 +42,7 @@ class SupportTicketController(http.Controller):
                 #values['body'] = values['body_html']
                 values['email_to'] = my_user.partner_id.email
 
-                send_mail = request.env['mail.mail'].create(values)
+                send_mail = request.env['mail.mail'].sudo().create(values)
                 send_mail.send()
 
                 #Remove the message from the chatter since this would bloat the communication history by a lot
@@ -78,7 +78,7 @@ class SupportTicketController(http.Controller):
                 #values['body'] = values['body_html']
                 values['email_to'] = my_user.partner_id.email
 
-                send_mail = request.env['mail.mail'].create(values)
+                send_mail = request.env['mail.mail'].sudo().create(values)
                 send_mail.send()
 
                 #Remove the message from the chatter since this would bloat the communication history by a lot
