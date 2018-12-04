@@ -1,3 +1,7 @@
+v1.0.1
+======
+* Fix issue with not being able to submit tickets whose category has multiple assigned users
+
 v1.0.0
 ======
 * Port to version 12
