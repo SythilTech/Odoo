@@ -1,3 +1,7 @@
+v1.0.8
+======
+* Tidy up repos on delete of account
+
 v1.0.7
 ======
 * Public access security fixes

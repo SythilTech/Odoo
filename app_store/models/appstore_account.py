@@ -24,7 +24,7 @@ class AppstoreAccountRepository(models.Model):
     _name = "appstore.account.repository"
     _description = "App Store Account Repository"
 
-    asa_id = fields.Many2one('appstore.account', string="App Store Account")
+    asa_id = fields.Many2one('appstore.account', ondelete='cascade', string="App Store Account")
     url = fields.Char(string="Repository URL")
     token = fields.Char(String="Token")
 
