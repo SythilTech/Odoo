@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="payment_membership_bronze" model="payment.membership">
+        <field name="name">Bronze</field>
+        <field name="group_ids" eval="[(4, ref('membership_subscription.bronze'))]"/>
+    </record>
+
+    <record id="payment_membership_silver" model="payment.membership">
+        <field name="name">Silver</field>
+        <field name="group_ids" eval="[(4, ref('membership_subscription.silver'))]"/>
+    </record>
+
+    <record id="payment_membership_gold" model="payment.membership">
+        <field name="name">Gold</field>
+        <field name="group_ids" eval="[(4, ref('membership_subscription.gold'))]"/>
+    </record>
+
+</odoo>

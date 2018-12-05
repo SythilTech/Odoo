@@ -14,6 +14,11 @@
         'views/membership_subscription_templates.xml',
     ],
     'depends': ['payment_reoccuring'],
+    'demo': [
+        'demo/ir.module.category.csv',
+        'demo/res.groups.xml',
+        'demo/payment_membership.xml',
+    ],
     'images':[
         'static/description/1.jpg',
     ],
