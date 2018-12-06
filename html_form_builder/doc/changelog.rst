@@ -1,3 +1,7 @@
+v1.0.32
+=======
+* Ability to use $id in return url as a dynamic placeholder to the new record ID
+
 v1.0.31
 =======
 * Fix form javascript public access isssue

@@ -27,7 +27,7 @@ class HtmlForm(models.Model):
     output_html = fields.Text(string='Embed Code', readonly=True)
     required_fields = fields.Text(readonly=True, string="Required Fields")
     defaults_values = fields.One2many('html.form.defaults', 'html_id', string="Default Values", help="Sets the value of an field before it gets inserted into the database")
-    return_url = fields.Char(string="Return URL", default=_default_return_url, help="The URL that the user will be redirected to after submitting the form", required=True)
+    return_url = fields.Char(string="Return URL", default=_default_return_url, help="The URL that the user will be redirected to after submitting the form, use $id for the id of the new record", required=True)
     submit_url = fields.Char(string="Submit URL", default=_default_submit_url)
     submit_action = fields.One2many('html.form.action', 'hf_id', string="Submit Actions")
     captcha = fields.Many2one('html.form.captcha', string="Captcha")

@@ -635,10 +635,14 @@ class HtmlFormController(http.Controller):
                 #Call the submit action, passing the action settings and the history object
                 action(sa, new_history, values)
 
+            return_url = entity_form.return_url
+            if "$id" in return_url:
+                return_url = return_url.replace("$id", str(new_record.id) )
+
             if 'is_ajax_post' in values:
-                return json.JSONEncoder().encode({'status': 'success', 'redirect_url': entity_form.return_url})
+                return json.JSONEncoder().encode({'status': 'success', 'redirect_url': return_url})
             else:
-                return werkzeug.utils.redirect(entity_form.return_url)
+                return werkzeug.utils.redirect(return_url)
 
     @http.route('/form/sinsert', type="http", auth="public", csrf=True)
     def my_secure_insert(self, **kwargs):
