@@ -1,3 +1,7 @@
+v1.0.11
+=======
+* Fix permission issue with public form submissions that had many2many default values that public can't access
+
 v1.0.10
 =======
 * Port email submit function over to 11 buy use email template system to allow customisation
