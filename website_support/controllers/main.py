@@ -249,13 +249,13 @@ class SupportTicketController(http.Controller):
         """ Displays stats related to tickets in the department """
 
         #Just get the first department, managers in multiple departments are not supported
-        department = request.env['website.support.department.contact'].search([('user_id','=',request.env.user.id)])[0].wsd_id
+        department = request.env['website.support.department.contact'].sudo().search([('user_id','=',request.env.user.id)])[0].sudo().wsd_id
 
         extra_access = []
         for extra_permission in department.partner_ids:
             extra_access.append(extra_permission.id)
 
-        support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])        
+        support_tickets = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('partner_id','!=',False) ])
 
         support_ticket_count = len(support_tickets)
 

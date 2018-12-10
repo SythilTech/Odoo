@@ -1,3 +1,7 @@
+v1.4.6
+======
+* Fix permission issues with support clients assigned as department managers not being able to view website reporting interface
+
 v1.4.5
 ======
 * Fix approval mail permissions
