@@ -45,50 +45,25 @@
 
 <template id="submenu_inherit" name="Submenu Access Groups" inherit_id="website.submenu">
 
-    <xpath expr="//li[1]" position="before">
+    <xpath expr="//li[@t-if='not submenu.child_id']" position="replace">
+
         <t t-set="group_menu_access" t-value="'No'"/>
         <t t-if="len(submenu.sudo().group_ids) == 0">
-                  <t t-set="group_menu_access" t-value="'Yes'"/>          
+            <t t-set="group_menu_access" t-value="'Yes'"/>
         </t>
         <t t-foreach="submenu.sudo().group_ids" t-as="menu_access_group">
-
             <t t-foreach="menu_access_group.users" t-as="group_user">
-
                 <t t-if="request.env.user.id == group_user.id">
                   <t t-set="group_menu_access" t-value="'Yes'"/>
                 </t>
             </t>
         </t>
-    </xpath>
-    <xpath expr="//li[2]" position="replace">
-        <t t-if="group_menu_access == 'Yes'">
-    <li t-if="submenu.child_id" t-attf-class="dropdown #{
-        (submenu.clean_url() and submenu.clean_url() != '/' and any([request.httprequest.path == child.url for child in submenu.child_id if child.url]) or
-         (submenu.clean_url() and request.httprequest.path == submenu.clean_url())) and 'active'
-        }">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <span t-field="submenu.name"/> <span class="caret" t-ignore="true"></span>
-        </a>
-        <ul class="dropdown-menu" role="menu">
-            <t t-foreach="submenu.child_id" t-as="submenu">
-                <t t-call="website.submenu"/>
-            </t>
-        </ul>
-    </li>
-        
-        </t>
-    </xpath>
 
-    <xpath expr="//li[1]" position="replace">
-        <t t-if="group_menu_access == 'Yes'">
-    <li t-if="not submenu.child_id" t-att-class="
-        'active' if submenu.clean_url() and unslug_url(request.httprequest.path) == unslug_url(submenu.clean_url()) else None
-        ">
-        <a t-att-href="submenu.clean_url()" t-ignore="true" t-att-target="'_blank' if submenu.new_window else None">
-            <span t-field="submenu.name"/>
-        </a>
-    </li>
-        </t>
+        <li t-if="group_menu_access == 'Yes' and not submenu.child_id" t-att-class="'active' if submenu.clean_url() and unslug_url(request.httprequest.path) == unslug_url(submenu.clean_url()) else None">
+            <a t-att-href="submenu.clean_url()" t-ignore="true" t-att-target="'_blank' if submenu.new_window else None">
+                <span t-field="submenu.name"/>
+            </a>
+        </li>
     </xpath>
 
 </template>
