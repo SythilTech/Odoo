@@ -98,109 +98,123 @@ class VoipTwilio(models.Model):
         else:
             response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_sid + "/Calls.json", auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
 
-        json_call_list = json.loads(response_string.text)
+        #Loop through all pages until you have reached the last page
+        while True:
 
-        for call in json_call_list['calls']:
+            json_call_list = json.loads(response_string.text)
 
-            #Don't reimport the same record
-            if self.env['voip.call'].search([('twilio_sid','=',call['sid'])]):
-                continue
+            for call in json_call_list['calls']:
 
-            from_partner = False
-            from_address = call['from']
-            to_address = call['to']
-            to_partner = False
-            create_dict = {}
+                #Don't reimport the same record
+                if self.env['voip.call'].search([('twilio_sid','=',call['sid'])]):
+                    continue
 
-            create_dict['twilio_account_id'] = self.id
+                from_partner = False
+                from_address = call['from']
+                to_address = call['to']
+                to_partner = False
+                create_dict = {}
 
-            if 'price' in call:
-                if float(call['price']) != 0.0:
-                    create_dict['currency_id'] = self.env['res.currency'].search([('name','=', call['price_unit'])])[0].id
-                    create_dict['price'] = -1.0 * float(call['price'])
+                create_dict['twilio_account_id'] = self.id
 
-            #Format the from address and find the from partner
-            if "+" in from_address:
-                #Mobiles should conform to E.164
-                from_partner = self.env['res.partner'].search([('mobile','=',from_address)])
+                if 'price' in call:
+                    if call['price'] is not None:
+                        if float(call['price']) != 0.0:
+                            create_dict['currency_id'] = self.env['res.currency'].search([('name','=', call['price_unit'])])[0].id
+                            create_dict['price'] = -1.0 * float(call['price'])
+
+                #Format the from address and find the from partner
+                if from_address is not None:
+                    from_address = from_address.replace(";region=gll","")
+                    from_address = from_address.replace(":5060","")
+                    from_address = from_address.replace("sip:","")
+
+                    if "+" in from_address:
+                        #Mobiles should conform to E.164
+                        from_partner = self.env['res.partner'].search([('mobile','=',from_address)])
+                    else:
+                        if "@" not in from_address and "@" in to_address:
+                            #Get the full aor based on the domain of the to address
+                            domain = re.findall(r'@(.*?)', to_address)[0].replace(":5060","")
+                            from_address = from_address + "@" + domain
+
+                        from_partner = self.env['res.partner'].search([('sip_address','=', from_address)])
+
+                    if from_partner:
+                        #Use the first found partner
+                        create_dict['from_partner_id'] = from_partner[0].id
+                    create_dict['from_address'] = from_address
+
+                #Format the to address and find the to partner
+                if to_address is not None:
+                    to_address = to_address.replace(";region=gll","")
+                    to_address = to_address.replace(":5060","")
+                    to_address = to_address.replace("sip:","")
+
+                    if "+" in to_address:
+                        #Mobiles should conform to E.164
+                        to_partner = self.env['res.partner'].search([('mobile','=',to_address)])
+                    else:
+
+                        if "@" not in to_address and "@" in from_address:
+                            #Get the full aor based on the domain of the from address
+                            domain = re.findall(r'@(.*?)', from_address)[0].replace(":5060","")
+                            to_address = to_address + "@" + domain
+
+                        to_partner = self.env['res.partner'].search([('sip_address','=', to_address)])
+
+                if to_partner:
+                    #Use the first found partner
+                    create_dict['to_partner_id'] = to_partner[0].id
+                create_dict['to_address'] = to_address
+
+                #Have to map the Twilio call status to the one in the core module
+                twilio_status = call['status']
+                if twilio_status == "queued":
+                    create_dict['status'] = "pending"
+                elif twilio_status == "ringing":
+                    create_dict['status'] = "pending"
+                elif twilio_status == "in-progress":
+                    create_dict['status'] = "active"
+                elif twilio_status == "canceled":
+                    create_dict['status'] = "cancelled"
+                elif twilio_status == "completed":
+                    create_dict['status'] = "over"
+                elif twilio_status == "failed":
+                    create_dict['status'] = "failed"
+                elif twilio_status == "busy":
+                    create_dict['status'] = "busy"
+                elif twilio_status == "no-answer":
+                    create_dict['status'] = "failed"
+
+                create_dict['start_time'] = call['start_time']
+                create_dict['end_time'] = call['end_time']
+
+                create_dict['twilio_sid'] = call['sid']
+                #Duration includes the ring time
+                create_dict['duration'] = call['duration']
+
+                #Fetch the recording if it exists
+                #if 'subresource_uris' in call:
+                #    if 'recordings' in call['subresource_uris']:
+                #        if call['subresource_uris']['recordings'] != '':
+                #            recording_response = requests.get("https://api.twilio.com" + call['subresource_uris']['recordings'], auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
+                #            recording_json = json.loads(recording_response.text)
+                #            for recording in recording_json['recordings']:
+                #                create_dict['twilio_call_recording_uri'] = "https://api.twilio.com" + recording['uri'].replace(".json",".mp3")
+
+                self.env['voip.call'].create(create_dict)
+
+            # Get the next page if there is one
+            next_page_uri = json_call_list['next_page_uri']
+            _logger.error(next_page_uri)
+            if next_page_uri is not None:
+                response_string = requests.get("https://api.twilio.com" + next_page_uri, data=payload,  auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
             else:
-                #SIP addresses are messy and incomplete
-                from_address = from_address.replace(";region=gll","")
-                from_address = from_address.replace(":5060","")
-                from_address = from_address.replace("sip:","")
+                break;
 
-                if "@" not in from_address and "@" in to_address:
-                    #Get the full aor based on the domain of the to address
-                    domain = re.findall(r'@(.*?);', to_address)[0].replace(":5060","")
-                    from_address = from_address + "@" + domain
-
-                from_partner = self.env['res.partner'].search([('sip_address','=', from_address)])
-
-            if from_partner:
-                #Use the first found partner
-                create_dict['from_partner_id'] = from_partner[0].id
-            create_dict['from_address'] = from_address
-
-            #Format the to address and find the to partner
-            if "+" in to_address:
-                #Mobiles should conform to E.164
-                to_partner = self.env['res.partner'].search([('mobile','=',to_address)])
-            else:
-                #SIP addresses are messy and incomplete
-                to_address = to_address.replace(";region=gll","")
-                to_address = to_address.replace(":5060","")
-                to_address = to_address.replace("sip:","")
-
-                if "@" not in to_address and "@" in from_address:
-                    #Get the full aor based on the domain of the from address
-                    domain = re.findall(r'@(.*?);', from_address)[0].replace(":5060","")
-                    to_address = to_address + "@" + domain
-
-                to_partner = self.env['res.partner'].search([('sip_address','=', to_address)])
-
-            if to_partner:
-                #Use the first found partner
-                create_dict['to_partner_id'] = to_partner[0].id
-            create_dict['to_address'] = to_address
-
-            #Have to map the Twilio call status to the one in the core module
-            twilio_status = call['status']
-            if twilio_status == "queued":
-                create_dict['status'] = "pending"
-            elif twilio_status == "ringing":
-                create_dict['status'] = "pending"
-            elif twilio_status == "in-progress":
-                create_dict['status'] = "active"
-            elif twilio_status == "canceled":
-                create_dict['status'] = "cancelled"
-            elif twilio_status == "completed":
-                create_dict['status'] = "over"
-            elif twilio_status == "failed":
-                create_dict['status'] = "failed"
-            elif twilio_status == "busy":
-                create_dict['status'] = "busy"
-            elif twilio_status == "no-answer":
-                create_dict['status'] = "failed"
-
-            create_dict['start_time'] = call['start_time']
-            create_dict['end_time'] = call['end_time']
-
-            create_dict['twilio_sid'] = call['sid']
-            #Duration includes the ring time
-            create_dict['duration'] = call['duration']
-
-            #Fetch the recording if it exists
-            if 'subresource_uris' in call:
-                if 'recordings' in call['subresource_uris']:
-                    if call['subresource_uris']['recordings'] != '':
-                        recording_response = requests.get("https://api.twilio.com" + call['subresource_uris']['recordings'], auth=(str(self.twilio_account_sid), str(self.twilio_auth_token)))
-                        recording_json = json.loads(recording_response.text)
-                        for recording in recording_json['recordings']:
-                            create_dict['twilio_call_recording_uri'] = "https://api.twilio.com" + recording['uri'].replace(".json",".mp3")
-
-            self.env['voip.call'].create(create_dict)
-
-            self.twilio_last_check_date = datetime.utcnow()
+        #After finish looping all paage then set the last check date so we only get new messages next time
+        self.twilio_last_check_date = datetime.utcnow()
 
         return {
             'name': 'Twilio Call History',

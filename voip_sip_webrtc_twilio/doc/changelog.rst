@@ -1,3 +1,7 @@
+v1.0.15
+=======
+* Fix call history import
+
 v1.0.14
 =======
 * Fix cability token url using http in https systems
