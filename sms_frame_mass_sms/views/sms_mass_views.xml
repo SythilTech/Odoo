@@ -70,24 +70,30 @@
 		              <field name="delivered_count" widget="statinfo"/>
       	                  </button>
       	              </div>
+                      <group>
+      	                  <field name="from_mobile" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
+      	                  <field name="model_id" widget="selection" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
+      	                  <field name="model_name" invisible="1"/>
+      	                  <field name="selected_records" attrs="{'invisible': [('model_name', '!=', 'res.partner')], 'readonly': [('mass_sms_state', '=', 'sent')]}" context="{'search_default_customer':True}">
+      	                      <tree>
+      	                          <field name="name"/>
+      	                          <field name="mobile"/>
+      	                      </tree>
+      	                  </field>
+      	                  <field name="mail_list_id" attrs="{'invisible': [('model_name', '!=', 'mail.mass_mailing.list')], 'readonly': [('mass_sms_state', '=', 'sent')]}"/>
+      	                  <field name="total_count"/>
+                        </group>
                         <notebook>
                             <page string="Content">
       	                        <group>
-      	                            <field name="from_mobile" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
-      	                            <field name="selected_records" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}" context="{'search_default_customer':True}">
-      	                                <tree>
-      	                                    <field name="name"/>
-      	                                    <field name="mobile"/>
-      	                                </tree>
-      	                            </field>
-      	                            <field name="total_count"/>
       	                            <field name="message_text" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
       	                            <field name="stop_message"/>
       	                        </group>
                             </page>
                             <page string="Dynamic Placeholder Generator">
                                 <group>
-                                    <field name="model_object_field"/>
+                                    <field name="dynamic_model_id" invisible="1"/>
+                                    <field name="model_object_field" domain="[('model_id','=',dynamic_model_id)]"/>
                                     <field name="sub_object" readonly="1"/>
                                     <field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}"/>
                                     <field name="copyvalue"/>
