@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Install doesn't leave zip anymore
+
 v1.0.2
 ======
 * Click button to automatically transfer latest version into addons folder (-> manual Odoo restart required <-)
