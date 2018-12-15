@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+     <record id="mail_mass_mailing_contact_tree_view_inherit_mass_mail" model="ir.ui.view">
+        <field name="name">mail.mass_mailing.contact tree view inherit mass sms</field>
+        <field name="model">mail.mass_mailing.contact</field>
+        <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_contact_tree"/>
+        <field name="arch" type="xml">
+            <field name="email" position="after">
+                <field name="mobile"/>
+            </field>
+        </field>
+    </record>
+
+ </odoo>

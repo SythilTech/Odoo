@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Add ability to send to mail list contacts
+
 v1.0.4
 ======
 * Feature to choose delivery time, relative to operator timezone

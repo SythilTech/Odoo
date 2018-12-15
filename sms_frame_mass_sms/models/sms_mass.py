@@ -8,8 +8,13 @@ class SmsMass(models.Model):
 
     _name = "sms.mass"
     
-    from_mobile = fields.Many2one('sms.number', string="From Mobile")
-    selected_records = fields.Many2many('res.partner', string="Selected Records", domain="[('sms_opt_out','=',False),('mobile','!=','')]")
+    from_mobile = fields.Many2one('sms.number', string="From Mobile", required=True)
+    model_id = fields.Many2one('ir.model', domain="[('model', 'in', ['res.partner','mail.mass_mailing.list'])]", string="Model", required=True, default=lambda self: self.env.ref('base.model_res_partner').id)
+    model_name = fields.Char(string="Model Name", related="model_id.model")
+    dynamic_model_id = fields.Many2one('ir.model', string="Dynamic Model", help="mail.mass_mailing.list maps to mail.mass_mailing.contact", compute="_compute_dynamic_model_id")
+    filter = fields.Char(string="Filter", default="[('sms_opt_out','=',False),('mobile','!=',False)]")
+    mail_list_id = fields.Many2one('mail.mass_mailing.list', string="Mailing List")
+    selected_records = fields.Many2many('res.partner', string="Selected Records", domain="[('sms_opt_out','=',False),('mobile','!=',False)]")
     message_text = fields.Text(string="Message Text")
     total_count = fields.Integer(string="Total", compute="_total_count")
     fail_count = fields.Integer(string="Failed", compute="_fail_count")
@@ -17,12 +22,21 @@ class SmsMass(models.Model):
     sent_count = fields.Integer(string="Sent", compute="_sent_count")
     delivered_count = fields.Integer(string="Received", compute="_delivered_count")
     mass_sms_state = fields.Selection((('draft','Draft'),('sent','Sent')), readonly=True, string="State", default="draft")
-    model_object_field = fields.Many2one('ir.model.fields', string="Field", domain="[('model_id.model','=','res.partner'),('ttype','!=','one2many'),('ttype','!=','many2many')]", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
+    model_object_field = fields.Many2one('ir.model.fields', string="Field", domain="[('ttype','!=','one2many'),('ttype','!=','many2many')]", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
     sub_object = fields.Many2one('ir.model', string='Sub-model', readonly=True, help="When a relationship field is selected as first field, this field shows the document model the relationship goes to.")
     sub_model_object_field = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")
     copyvalue = fields.Char(string='Placeholder Expression', help="Final placeholder expression, to be copy-pasted in the desired template field.")
     stop_message = fields.Char(string="STOP message", default="reply STOP to unsubscribe", required="True")
     delivery_time = fields.Datetime(string="Delivery Time")
+
+    @api.one
+    @api.depends('model_id')
+    def _compute_dynamic_model_id(self):
+       if self.model_id:
+           if self.model_id.model == "mail.mass_mailing.list":
+               self.dynamic_model_id = self.env['ir.model.data'].get_object('mass_mailing','model_mail_mass_mailing_contact')
+           else:
+               self.dynamic_model_id = self.model_id.id
 
     @api.onchange('model_object_field')
     def _onchange_model_object_field(self):
@@ -41,10 +55,14 @@ class SmsMass(models.Model):
             expression += "}"
         self.copyvalue = expression
        
-    @api.depends('selected_records')
     @api.one
+    @api.depends('selected_records', 'mail_list_id')
     def _total_count(self):
-        self.total_count = len(self.selected_records)
+        if self.model_name == "res.partner":
+            self.total_count = len(self.selected_records)
+        else:
+            if self.mail_list_id:
+                self.total_count = self.env['mail.mass_mailing.contact'].search_count([('list_id','=', self.mail_list_id.id)])
 
     @api.one
     def _fail_count(self):
@@ -64,17 +82,24 @@ class SmsMass(models.Model):
     
     def send_mass_sms(self):
         self.mass_sms_state = "sent"
-        for rec in self.selected_records:
 
-            sms_rendered_content = self.env['sms.template'].render_template(self.message_text, 'res.partner', rec.id)
+        record_list = False
+        if self.model_name == 'mail.mass_mailing.list':
+            record_list = self.env['mail.mass_mailing.contact'].search([('list_id','=', self.mail_list_id.id)])
+        elif self.model_name == 'res.partner':
+            record_list = self.selected_records
+
+        for rec in record_list:
+
+            sms_rendered_content = self.env['sms.template'].render_template(self.message_text, self.dynamic_model_id.model, rec.id)
 
             sms_rendered_content += "\n\n" + self.stop_message
-            
+
             #Queue the SMS message and send them out at the limit
             if self.delivery_time:
-                queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':self.delivery_time, 'status_code': 'queued', 'mass_sms_id': self.id})
+                queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.dynamic_model_id.id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':self.delivery_time, 'status_code': 'queued', 'mass_sms_id': self.id})
             else:
-                queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.env.ref('base.model_res_partner').id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued', 'mass_sms_id': self.id})
+                queued_sms = self.env['sms.message'].create({'record_id': rec.id,'model_id': self.dynamic_model_id.id,'account_id':self.from_mobile.account_id.id,'from_mobile':self.from_mobile.mobile_number,'to_mobile':rec.mobile,'sms_content':sms_rendered_content, 'direction':'O','message_date':datetime.utcnow(), 'status_code': 'queued', 'mass_sms_id': self.id})
 
             #Turn the queue manager on
             sms_queue = self.env['ir.model.data'].get_object('sms_frame', 'sms_queue_check')

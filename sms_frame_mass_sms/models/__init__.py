@@ -1,1 +1,1 @@
-import sms_mass, sms_message, res_partner
+import sms_mass, sms_message, res_partner, mail_mass_mailing_contact
