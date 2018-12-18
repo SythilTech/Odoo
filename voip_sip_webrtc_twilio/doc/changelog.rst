@@ -1,3 +1,7 @@
+v1.0.16
+=======
+* Code out the need to have the Twilio Python library installed for capabilty token generation
+
 v1.0.15
 =======
 * Fix call history import

@@ -5,14 +5,14 @@ from odoo.http import request
 from odoo.exceptions import UserError
 import json
 import base64
+import time
+import urllib.parse
+import jwt
+import hmac
+import hashlib
 
 import logging
 _logger = logging.getLogger(__name__)
-
-try:
-    from twilio.jwt.client import ClientCapabilityToken
-except:
-    _logger.error("Twilio Client Not Installed")
 
 class TwilioVoiceController(http.Controller):
         
@@ -131,17 +131,26 @@ class TwilioVoiceController(http.Controller):
         account_sid = stored_number.account_id.twilio_account_sid
         auth_token = stored_number.account_id.twilio_auth_token
 
-        capability = ClientCapabilityToken(account_sid, auth_token)
-
-        # Twilio Application Sid
         application_sid = stored_number.twilio_app_id
-        capability.allow_client_outgoing(application_sid)
-        
+
         #Automatically create a Twilio client name for the user if one has not been manually set up
         if not request.env.user.twilio_client_name:
             request.env.user.twilio_client_name = request.env.cr.dbname + "_user_" + str(request.env.user.id)
 
-        capability.allow_client_incoming(request.env.user.twilio_client_name)
-        token = capability.to_jwt()
+        header = '{"typ":"JWT",' + "\r\n"
+        header += ' "alg":"HS256"}'
+        base64_header = base64.b64encode(header.encode("utf-8"))
 
-        return json.dumps({'indentity': request.env.user.twilio_client_name, 'token': token.decode()}) 
+        payload = '{"exp":' + str(time.time() + 60) + ',' + "\r\n"
+        payload += ' "iss":"' + account_sid + '",' + "\r\n"
+        payload += ' "scope":"scope:client:outgoing?appSid=' + application_sid + '&clientName=' + request.env.user.twilio_client_name + ' scope:client:incoming?clientName=' + request.env.user.twilio_client_name + '"}'
+        base64_payload = base64.b64encode(payload.encode("utf-8"))
+        base64_payload = base64_payload.decode("utf-8").replace("+","-").replace("/","_").replace("=","").encode("utf-8")
+
+        signing_input = base64_header + b"." + base64_payload
+        secret = bytes(auth_token.encode('utf-8'))
+        signature = base64.b64encode(hmac.new(secret, signing_input, digestmod=hashlib.sha256).digest())
+        signature = signature.decode("utf-8").replace("+","-").replace("/","_").replace("=","").encode("utf-8")
+
+        token = base64_header + b"." + base64_payload + b"." + signature
+        return json.dumps({'indentity': request.env.user.twilio_client_name, 'token': token.decode("utf-8")})

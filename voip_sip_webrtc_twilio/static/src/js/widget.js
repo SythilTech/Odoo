@@ -42,7 +42,7 @@ $(function() {
                 console.log('Token: ' + data.token);
 
                 // Setup Twilio.Device
-                Twilio.Device.setup(data.token);
+                Twilio.Device.setup(data.token, { debug: true });
 
                 Twilio.Device.ready(function (device) {
                     console.log('Twilio.Device Ready!');
@@ -166,7 +166,6 @@ Twilio.Device.incoming(function (conn) {
 
 Twilio.Device.error(function (error) {
     console.log('Twilio.Device Error: ' + error.message);
-    alert(error.message);
 });
 
 var VoipTwilioCallIncomingNotification = Notification.extend({
@@ -246,7 +245,7 @@ WebClient.include({
 
                       $.getJSON(capability_token_url).done(function (data) {
                           // Setup Twilio.Device
-                          Twilio.Device.setup(data.token);
+                          Twilio.Device.setup(data.token, { debug: true });
                           Twilio.Device.connect(params);
                       }).fail(function () {
                           console.log('Could not get a token from server!');
