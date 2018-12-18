@@ -1,3 +1,8 @@
+v1.0.12
+=======
+* Remove domain from submit url to better deal with multi domain websites
+* Dropbox (many2one) now uses the fields domain if present
+
 v1.0.11
 =======
 * Fix permission issue with public form submissions that had many2many default values that public can't access

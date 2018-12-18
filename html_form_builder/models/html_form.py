@@ -17,10 +17,6 @@ class HtmlForm(models.Model):
         proto_ind_url = request.httprequest.host_url.replace("http:","")
         return proto_ind_url + "form/thankyou"
 
-    def _default_submit_url(self):
-        proto_ind_url = request.httprequest.host_url.replace("http:","")
-        return proto_ind_url + "form/sinsert"
-
     name = fields.Char(string="Form Name", required=True, translate=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True)
     fields_ids = fields.One2many('html.form.field', 'html_id', string="HTML Fields")
@@ -28,7 +24,7 @@ class HtmlForm(models.Model):
     required_fields = fields.Text(readonly=True, string="Required Fields")
     defaults_values = fields.One2many('html.form.defaults', 'html_id', string="Default Values", help="Sets the value of an field before it gets inserted into the database")
     return_url = fields.Char(string="Return URL", default=_default_return_url, help="The URL that the user will be redirected to after submitting the form", required=True)
-    submit_url = fields.Char(string="Submit URL", default=_default_submit_url)
+    submit_url = fields.Char(string="Submit URL (DEPRECATED)")
     submit_action = fields.One2many('html.form.action', 'hf_id', string="Submit Actions")
     captcha = fields.Many2one('html.form.captcha', string="Captcha")
     captcha_client_key = fields.Char(string="Captcha Client Key")
@@ -170,7 +166,10 @@ class HtmlForm(models.Model):
 
         elif fe.field_id.ttype == "many2one":
 
-            selection_list = request.env[fe.field_id.relation].search([])
+            if field.field_id.domain:
+                selection_list = request.env[fe.field_id.relation].search(fe.field_id.domain)
+            else:
+                selection_list = request.env[fe.field_id.relation].search([])
 
             for row in selection_list:
                 html_output += "    <option value=\"" + str(row.id) + "\">" + cgi.escape(row.name) + "</option>\n"

@@ -372,7 +372,11 @@ class HtmlFormController(http.Controller):
                 html_output += "    <option value=\"" + selection_value + "\">" + selection_label + "</option>\n"
 
         elif field.field_id.ttype == "many2one":
-            selection_list = request.env[field.field_id.relation].search([])
+
+            if field.field_id.domain:
+                selection_list = request.env[field.field_id.relation].search(field.field_id.domain)
+            else:
+                selection_list = request.env[field.field_id.relation].search([])
 
             for row in selection_list:
                 html_output += "    <option value=\"" + str(row.id) + "\">" + row.name + "</option>\n"
@@ -394,7 +398,7 @@ class HtmlFormController(http.Controller):
         form_string = ""
         form_string += "  <div class=\"container mt16 mb16\">\n"
         form_string += "    <h2>" + html_form.name + "</h2>\n"
-        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\" enctype=\"multipart/form-data\">\n"
+        form_string += "    <form role=\"form\" method=\"POST\" action=\"/form/sinsert\" enctype=\"multipart/form-data\">\n"
         form_string += "      <div class=\"oe_structure\" id=\"html_fields\">\n"
 
         for form_field in html_form.fields_ids:
@@ -438,7 +442,7 @@ class HtmlFormController(http.Controller):
         form_string = ""
         form_string += "  <div class=\"container mt16 mb16\">\n"
         form_string += "    <h2>" + html_form.name + "</h2>\n"
-        form_string += "    <form role=\"form\" method=\"POST\" action=\"" + html_form.submit_url + "\" enctype=\"multipart/form-data\">\n"
+        form_string += "    <form role=\"form\" method=\"POST\" action=\"/form/sinsert\" enctype=\"multipart/form-data\">\n"
         form_string += "      <div class=\"oe_structure\" id=\"html_fields\"/>\n"
         form_string += "      <input type=\"hidden\" name=\"form_id\" value=\"" + str(html_form.id) + "\"/>\n"
         form_string += "      <input type=\"hidden\" name=\"csrf_token\"/>\n"
