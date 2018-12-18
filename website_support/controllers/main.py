@@ -107,13 +107,18 @@ class SupportTicketController(http.Controller):
             for sub_category_field in sub_category_fields:
 
                 return_string += "<div class=\"form-group\">\n"
-                return_string += "  <label class=\"col-md-3 col-sm-4 control-label\" for=\"efield_" + str(sub_category_field.id) + "\">" + sub_category_field.name + "</label>\n"
-                return_string += "  <div class=\"col-md-7 col-sm-8\">\n"
+                return_string += "  <label class=\"control-label\" for=\"efield_" + str(sub_category_field.id) + "\">" + sub_category_field.name + "</label>\n"
 
                 if sub_category_field.type == "textbox":
-                    return_string += "    <input type=\"text\" required=\"True\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
+                    return_string += "  <input type=\"text\" required=\"required\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
+                elif sub_category_field.type == "dropbox":
+                    return_string += "  <select required=\"required\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
 
-                return_string += "  </div>\n"
+                    if sub_category_field.dropbox_type == "static":
+                        for field_value in sub_category_field.value_ids:
+                            return_string += "    <option value=\"" + field_value.name + "\">" + field_value.name + "</option>\n"
+                    return_string += "  </select>\n"
+
                 return_string += "</div>\n"
 
         return return_string
@@ -132,15 +137,13 @@ class SupportTicketController(http.Controller):
 
         if sub_categories:
             return_string += "<div class=\"form-group\">\n"
-            return_string += "    <label class=\"col-md-3 col-sm-4 control-label\" for=\"subcategory\">Sub Category</label>\n"
-            return_string += "    <div class=\"col-md-7 col-sm-8\">\n"
+            return_string += "  <label class=\"control-label\" for=\"subcategory\">Sub Category</label>\n"
 
-            return_string += "        <select class=\"form-control\" id=\"subcategory\" name=\"subcategory\">\n"
+            return_string += "  <select class=\"form-control\" id=\"subcategory\" name=\"subcategory\">\n"
             for sub_category in request.env['website.support.ticket.subcategory'].sudo().search([('parent_category_id','=', int(values['category']) )]):
-                return_string += "            <option value=\"" + str(sub_category.id) + "\">" + sub_category.name + "</option>\n"
+                return_string += "    <option value=\"" + str(sub_category.id) + "\">" + sub_category.name + "</option>\n"
 
-            return_string += "        </select>\n"
-            return_string += "    </div>\n"
+            return_string += "  </select>\n"
             return_string += "</div>\n"
 
         return return_string

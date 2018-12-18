@@ -469,7 +469,16 @@ class WebsiteSupportTicketSubCategoryField(models.Model):
 
     wsts_id = fields.Many2one('website.support.ticket.subcategory', string="Sub Category")
     name = fields.Char(string="Label", required="True")
-    type = fields.Selection([('textbox','Textbox')], default="textbox", required="True", string="Type")
+    type = fields.Selection([('textbox','Textbox'),('dropbox','Dropbox')], default="textbox", required="True", string="Type")
+    dropbox_type = fields.Selection([('static','Static')], default="static", string="Dropbox Type")
+    value_ids = fields.One2many('website.support.ticket.subcategory.field.value', 'wstsf_id', string="Values")
+
+class WebsiteSupportTicketSubCategoryFieldValue(models.Model):
+
+    _name = "website.support.ticket.subcategory.field.value"
+
+    wstsf_id = fields.Many2one('website.support.ticket.subcategory.field', string="Subcategory Field")
+    name = fields.Char(string="Name")
 
 class WebsiteSupportTicketState(models.Model):
 

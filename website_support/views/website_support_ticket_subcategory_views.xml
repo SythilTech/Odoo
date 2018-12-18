@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="website_support_ticket_subcategory_field_view_form" model="ir.ui.view">
+        <field name="name">website.support.ticket.subcategory.field form view</field>
+        <field name="model">website.support.ticket.subcategory.field</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="dropbox_type" attrs="{'invisible': [('type', '!=', 'dropbox')]}"/>
+                    <field name="value_ids" attrs="{'invisible': [('type', '!=', 'dropbox')]}">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
     <record id="website_support_ticket_subcategory_view_form" model="ir.ui.view">
         <field name="name">website.support.ticket.subcategory form view</field>
         <field name="model">website.support.ticket.subcategory</field>
@@ -10,7 +29,7 @@
                     <field name="parent_category_id"/>
                     <field name="name"/>
                     <field name="additional_field_ids">
-                        <tree editable="bottom">
+                        <tree>
                             <field name="name"/>
                             <field name="type"/>
                         </tree>
