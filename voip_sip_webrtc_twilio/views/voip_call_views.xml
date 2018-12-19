@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+        
     <record id="voip_call_view_tree_inherit_twilio" model="ir.ui.view">
         <field name="name">voip.call tree view inherit twilio</field>
         <field name="model">voip.call</field>
@@ -26,6 +26,16 @@
                 <field name="price" widget="monetery"/>
                 <field name="twilio_call_recording_uri"/>
             </field>
+        </field>
+    </record>
+
+    <record id="voip_call_view_search" model="ir.ui.view">
+        <field name="name">view.call.view.search</field>
+        <field name="model">voip.call</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="twilio_account_id"/>
+            </search>
         </field>
     </record>
 

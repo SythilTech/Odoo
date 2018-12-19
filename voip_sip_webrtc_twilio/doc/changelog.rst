@@ -1,3 +1,7 @@
+v1.0.17
+=======
+* Smart button on Twilio account screen that shows calls for that account
+
 v1.0.16
 =======
 * Code out the need to have the Twilio Python library installed for capabilty token generation

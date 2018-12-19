@@ -25,6 +25,11 @@ class VoipTwilio(models.Model):
     resell_account = fields.Boolean(string="Resell Account")
     margin = fields.Float(string="Margin", default="1.1", help="Multiply the call price by this figure 0.7 * 1.1 = 0.77")
     partner_id = fields.Many2one('res.partner', string="Customer")
+    twilio_call_number = fields.Integer(string="Calls", compute="_compute_twilio_call_number")
+
+    @api.one
+    def _compute_twilio_call_number(self):
+        self.twilio_call_number = self.env['voip.call'].search_count([('twilio_account_id','=',self.id)])
 
     @api.multi
     def create_invoice(self):
@@ -102,6 +107,9 @@ class VoipTwilio(models.Model):
         while True:
 
             json_call_list = json.loads(response_string.text)
+
+            if 'calls' not in json_call_list:
+                raise UserError("No calls to import")
 
             for call in json_call_list['calls']:
 
@@ -221,6 +229,7 @@ class VoipTwilio(models.Model):
             'view_type': 'form',
             'view_mode': 'tree,form',
             'res_model': 'voip.call',
+            'context': {'search_default_twilio_account_id': self.id},
             'type': 'ir.actions.act_window',
         }
          
