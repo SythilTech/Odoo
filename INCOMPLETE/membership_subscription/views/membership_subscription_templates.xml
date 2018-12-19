@@ -1,6 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <template id="membership_form_editor" inherit_id="website.assets_editor" name="Membership Form Resources">
+        <xpath expr="/t" position="inside">
+            <script type="text/javascript" src="/membership_subscription/static/src/js/membership.snippets.editor.js" />
+        </xpath>
+    </template>
+
+    <template id="membership_form_options" name="Membership Form Options" inherit_id="website.snippet_options">
+            <xpath expr="//div" position="after">
+                <div data-js='membership_form'
+                    data-selector=".membership_form"
+                    data-drop-in=".oe_structure">
+                </div>
+            </xpath>
+    </template>
+
+        <template id="membership_navbar" inherit_id="website.snippets" name="Membership Form Navbar">
+
+            <xpath expr="//div[@id='o_scroll']" position="inside">
+
+                <div id="snippet_membership_form" class="o_panel">
+                    <div class="o_panel_header">
+                        <span class="fa-stack">
+                            <i class="fa fa-align-justify fa-stack-1x"></i>
+                        </span> Membership
+                    </div>
+                    <div class="o_panel_body">
+                        <t t-snippet="membership_subscription.s_membership_form" t-thumbnail="/membership_subscription/static/src/img/ui/snippet_thumb_membership_form.jpg"/>
+                    </div>
+
+                </div>
+
+            </xpath>
+
+        </template>
+
+        <template id="s_membership_form" name="Membership Form">
+            <section class="membership_form">
+                <div class="container">
+                    <h2>Membership Signup</h2>
+                    <form method="POST" action="/membership/signup/process" enctype="multipart/form-data" class="mb16 mt16">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" class="form-control" required="required"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" class="form-control" required="required"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" class="form-control" required="required"/>
+                        </div>
+                        <input type="hidden" name="membership_id"/>
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button t-attf-class="btn btn-primary btn-lg">Sign up</button>
+                    </form>
+                </div>
+            </section>
+        </template>
+
     <template id="signup_thank_you" name="Membership Signup Thank You">
         <t t-call="website.layout">
             <div class="container">

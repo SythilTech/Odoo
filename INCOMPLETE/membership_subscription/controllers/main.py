@@ -10,6 +10,18 @@ from odoo.addons.http_routing.models.ir_http import slug
 
 class MembershipSubscriptionController(http.Controller):
 
+    @http.route('/membership/form/load', website=True, type='json', auth="user")
+    def membership_form_load(self, **kw):
+
+        values = {}
+        for field_name, field_value in kw.items():
+                values[field_name] = field_value
+
+        membership_form = request.env['payment.membership'].browse(int(values['form_id']))
+
+        #TODO return more then just ID as we get that anyway from wUtils.prompt
+        return {'form_id': membership_form.id}
+
     @http.route('/membership/cancel', type="http", auth="user", website=True)
     def membership_cancel(self):
     
