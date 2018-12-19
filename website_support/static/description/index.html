@@ -2,6 +2,7 @@
 <h2>Description</h2>
 A helpdesk / support ticket system for your website<br>
 <br/>
+<b>*IMPORTANT*</b> module requires company incoming and outgoing emails server be configured to function correctly<br/>
 <section class="oe_container">
     <div class="oe_row oe_spaced">
         <h2 class="oe_slogan">Configure Support Ticket System</h2>
@@ -17,8 +18,9 @@ Create custom categories and assigns users to each category and they will instan
 <b>Instructions</b><br/>
 <ol>
 <li>Assign yourself to the 'Support Manager' group</li>
-<li>Go to Customer Support->Configuration->Categories and select user that should respond to that type of ticket</li>
-<li>Alternatvily go to the user and select the support ticket group they should respond too</li>
+<li>Go to Customer Support->Configuration->Categories and select users that should respond to that type of ticket</li>
+<li>Setup an outgoing email server for the company so email replies can be made</li>
+<li>Setup an incoming email server so customer replies can be received</li>
 </ol>
             </p>
         </div>
@@ -130,10 +132,10 @@ Emails are automatically sent when a ticket category is changed or the ticket is
 When the customer replies via email the ticket state is automatically set to 'Customer Replied' allowing you to easily see at a glance which tickets need attending to<br/>
 Operators can reply online via Customer Support->Support Tickets<br/>
 <br/>
+This requires incoming and outgoing server for the company email has been setup<br/>
 <b>Per Operator Instructions</b><br/>
 <ol>
 <li>Assign the operator to the 'Support Staff' group</li>
-<li>Setup outgoing email for all your support ticket operators</li>
 <li>Go to Customer Support->Support Tickets and open one</li>
 <li>Hit the reply button in the header</li>
 <li>Type a message and the user will get sent an email alongside information about the ticket</li>
