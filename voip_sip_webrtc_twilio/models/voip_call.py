@@ -8,6 +8,7 @@ import datetime
 import time
 from email import utils
 from openerp.http import request
+from odoo.exceptions import UserError
 
 from openerp import api, fields, models
 
@@ -31,6 +32,9 @@ class VoipCallInheritTWilio(models.Model):
     def add_twilio_call(self, call_sid):
         self.ensure_one()
         
+        if call_sid is None:
+            raise UserError('Call Failed')
+
         self.twilio_sid = call_sid
 
         #Fetch the recording for this call

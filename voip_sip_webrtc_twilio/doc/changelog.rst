@@ -1,3 +1,7 @@
+v1.0.18
+=======
+* Display user friendly error if call fails for any reason e.g. no media access
+
 v1.0.17
 =======
 * Smart button on Twilio account screen that shows calls for that account

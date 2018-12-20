@@ -71,24 +71,26 @@ function twilio_end_call() {
     $(".s-voip-manager").css("display","none");
 
     console.log(twilio_call_sid);
-
-    rpc.query({
-        model: 'voip.call',
-        method: 'add_twilio_call',
-        args: [[voip_call_id], twilio_call_sid],
-        context: weContext.get()
-    }).then(function(result){
-        console.log("Finished Updating Twilio Call");
-    });
-
-    sw_acton_manager.do_action({
-        name: 'Twilio Call Comments',
-        type: 'ir.actions.act_window',
-        res_model: 'voip.call.comment',
-        views: [[false, 'form']],
-        context: {'default_call_id': voip_call_id},
-        target: 'new'
-    });
+    if (twilio_call_sid != null) {
+        rpc.query({
+            model: 'voip.call',
+            method: 'add_twilio_call',
+            args: [[voip_call_id], twilio_call_sid],
+            context: weContext.get()
+        }).then(function(result){
+            console.log("Finished Updating Twilio Call");
+            sw_acton_manager.do_action({
+                name: 'Twilio Call Comments',
+                type: 'ir.actions.act_window',
+                res_model: 'voip.call.comment',
+                views: [[false, 'form']],
+                context: {'default_call_id': voip_call_id},
+                target: 'new'
+            });
+        });
+    } else {
+        alert("Call Failed");
+    }
 
     Twilio.Device.disconnectAll();
 }
