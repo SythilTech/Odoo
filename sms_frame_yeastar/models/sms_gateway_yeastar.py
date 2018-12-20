@@ -120,6 +120,7 @@ class SmsAccountYeastar(models.Model):
 
                         sender_partner = self.env['res.partner'].search([('mobile_without_spaces','=',sms_sender)])
                         if sender_partner:
+                            sender_partner = sender_partner[0]
                             model_id = self.env['ir.model'].search([('model','=', 'res.partner')])
                             create_dict['model_id'] = model_id.id
                             create_dict['record_id'] = int(sender_partner.id)

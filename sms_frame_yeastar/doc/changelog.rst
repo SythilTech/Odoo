@@ -1,3 +1,7 @@
+v1.1.5
+======
+* Use first contact as sms from contact when multiple contacts have the same mobile number
+
 v1.1.4
 ======
 * URL escape message content
