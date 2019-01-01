@@ -21,6 +21,11 @@ class CRMLeadTwilioVoip(models.Model):
         else:
             raise UserError("No numbers found, can not make call")
 
+        if self.env.user.twilio_assigned_number_id:
+            self.env['voip.call.wizard'].create({'to_number': self.mobile, 'record_model': 'crm.lead', 'record_id': self.id, 'from_number': self.env.user.twilio_assigned_number_id.id}).start_call()
+            #my_context['default_from_number'] = self.env.user.twilio_assigned_number_id.id
+            return True
+
         return {
             'name': 'Voip Call Compose',
             'view_type': 'form',

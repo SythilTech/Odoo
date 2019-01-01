@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
       	    <field name="voip_account_id" position="after">
       	        <field name="twilio_client_name"/>
+      	        <field name="twilio_assigned_number_id"/>
       	    </field>
         </field>
     </record>

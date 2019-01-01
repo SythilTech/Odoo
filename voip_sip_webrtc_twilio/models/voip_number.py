@@ -16,8 +16,8 @@ class VoipNumber(models.Model):
     account_id = fields.Many2one('voip.twilio', string="Twilio Account")
     capability_token_url = fields.Char(string="Capability Token URL")
     twilio_app_id = fields.Char(string="Twilio App ID")
-    call_routing_ids = fields.Many2many('res.users', string="Call Routing")
-    
+    call_routing_ids = fields.Many2many('res.users', string="Called Users", help="The users that will get called when an incoming call is made to this number")
+
     @api.model
     def get_numbers(self, **kw):
         """ Get the numbers that the user can receive calls from """

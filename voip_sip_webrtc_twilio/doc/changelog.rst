@@ -1,3 +1,7 @@
+v1.0.19
+=======
+* Feature to assign a number to a user to speed up calling
+
 v1.0.18
 =======
 * Display user friendly error if call fails for any reason e.g. no media access
