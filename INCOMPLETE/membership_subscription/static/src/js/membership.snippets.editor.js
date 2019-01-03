@@ -16,7 +16,6 @@ options.registry.membership_form = options.Class.extend({
     onBuilt: function() {
         var self = this;
 
-
         rpc.query({
                 model: 'payment.membership',
                 method: 'name_search',
@@ -44,8 +43,10 @@ options.registry.membership_form = options.Class.extend({
     cleanForSave: function () {
 		var self = this;
 		//Sometimes the form gets saved with the token in it
+        self.$target.find("input[name='csrf_token']").removeAttr("value");
         self.$target.find("input[name='csrf_token']").attr("t-att-value","request.csrf_token()");
     },
+
 });
 
 });

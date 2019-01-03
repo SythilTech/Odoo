@@ -12,7 +12,7 @@ class PaymentSubscription(models.Model):
     name = fields.Char(string="Name", required=True)
     product_id = fields.Many2one('product.template', string="Product", required=True)
     initial_amount = fields.Float(string="Initial Amount", related="product_id.list_price")
-    payment_acquirer_id = fields.Many2one('payment.acquirer', string="Payment Acquirer", domain="[('token_implemented','=',True), ('save_token','=','always')]", required=True)
+    payment_acquirer_id = fields.Many2one('payment.acquirer', string="Payment Acquirer", domain="[('token_implemented','=',True)]", required=True)
     period_interval = fields.Selection([('days','Days')], default="days", string="Period Interval", required=True)
     period_amount = fields.Float(default="7.0", string="Period Amount", required=True)
     subscription_ids = fields.One2many('payment.subscription.subscriber', 'subscription_id', string="Subscribers")

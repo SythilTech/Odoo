@@ -3,6 +3,8 @@
 import logging
 _logger = logging.getLogger(__name__)
 import werkzeug
+import requests
+import json
 
 import odoo.http as http
 from odoo.http import request
@@ -19,8 +21,7 @@ class MembershipSubscriptionController(http.Controller):
 
         membership_form = request.env['payment.membership'].browse(int(values['form_id']))
 
-        #TODO return more then just ID as we get that anyway from wUtils.prompt
-        return {'form_id': membership_form.id}
+        return {'form_id': membership_form.id, 'payment_acquirer': membership_form.subscription_id.payment_acquirer_id.id}
 
     @http.route('/membership/cancel', type="http", auth="user", website=True)
     def membership_cancel(self):
@@ -49,17 +50,27 @@ class MembershipSubscriptionController(http.Controller):
     def membership_signup(self, membership):
         return request.render('membership_subscription.signup_form', {'membership': membership})
 
-    @http.route('/membership/signup/process', type="http", auth="public")
+    @http.route('/membership/signup/process', type="http", auth="public", website=True)
     def membership_signup_process(self, **kwargs):
 
         values = {}
         for field_name, field_value in kwargs.items():
             values[field_name] = field_value
 
-        membership = request.env['payment.membership'].sudo().browse( int(values['membership_id']) )
+        membership = request.env['payment.membership'].sudo().browse( int( values['membership_id'] ) )
 
-        #Create the new user
-        new_user = request.env['res.users'].sudo().create({'name': values['name'], 'login': values['email'], 'email': values['email'], 'password': values['password'] })
+        # The user account is created now but access right are only given when payment has been received
+        if request.env['res.users'].sudo().search_count([('login', '=', values['email'])]) == 0:
+            new_user = request.env['res.users'].sudo().create({'name': values['name'], 'login': values['email'], 'email': values['email'], 'password': values['password'] })
+        else:
+            return "User account with this login already exists"
+
+        # Modify the users partner record only with the allowed fields
+        extra_fields_dict = {}
+        for extra_field in membership.extra_field_ids:
+            extra_fields_dict[extra_field.sudo().field_id.name] = values[extra_field.name]
+
+        new_user.partner_id.write(extra_fields_dict)
 
         #Remove all permissions
         new_user.groups_id = False
@@ -67,24 +78,27 @@ class MembershipSubscriptionController(http.Controller):
         #Also add them to the portal group so they can access the website
         group_portal = request.env['ir.model.data'].sudo().get_object('base','group_portal')
         group_portal.users = [(4, new_user.id)]
-            
-        #Add the user to the assigned groups
-        for user_group in membership.group_ids:
-            user_group.users = [(4, new_user.id)]
 
-        #Modify the users partner record only with the allowed fields
-        extra_fields_dict = {}
-        for extra_field in membership.extra_field_ids:
-            extra_fields_dict[extra_field.sudo().field_id.name] = values[extra_field.name]
-
-        #Add them to the membership
+        # Add them to the membership
         extra_fields_dict['payment_membership_id'] = membership.id
 
-        new_user.partner_id.write(extra_fields_dict)
+        # Paid memberships get redirected to the payment gateway assigned to the subscription 
+        if membership.subscription_id:
+            #Add the subscription product to the order
+            order = request.website.sale_get_order(force_create=1)
+            request.website.sale_reset()
+            order._cart_update(product_id=membership.subscription_id.product_id.id, set_qty=1)
 
-        #Automatically sign the new user in
-        request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
-        request.session.authenticate(request.env.cr.dbname, values['email'], values['password'])
+            return json.JSONEncoder().encode({'status': 'unpaid', 'acquirer': membership.subscription_id.payment_acquirer_id.id})
+        else:
+            
+            # Users of free membership gain instant rights access
+            for user_group in membership.group_ids:
+                user_group.users = [(4, new_user.id)]
 
-        #Redirect them
-        return werkzeug.utils.redirect(membership.redirect_url)
+            # Automatically sign the new user in
+            request.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
+            request.session.authenticate(request.env.cr.dbname, values['email'], values['password'])
+
+            # Redirect them to the thank you page
+            return json.JSONEncoder().encode({'status': 'paid', 'redirect_url': membership.redirect_url})

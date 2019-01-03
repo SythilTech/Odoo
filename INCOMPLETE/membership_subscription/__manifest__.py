@@ -9,6 +9,7 @@
     'license':'LGPL-3',
     'data': [
         'security/ir.model.access.csv',
+        'security/ir_rule.xml',
         'data/website.menu.csv',
         'views/payment_membership_views.xml',
         'views/membership_subscription_templates.xml',

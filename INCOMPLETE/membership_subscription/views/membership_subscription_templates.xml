@@ -7,6 +7,12 @@
         </xpath>
     </template>
 
+    <template id="membership_form_front_assert" inherit_id="website.assets_frontend" name="Membership Form Front Asserts">
+        <xpath expr="/t" position="inside">
+            <script type="text/javascript" src="/membership_subscription/static/src/js/membership.snippets.js" />
+        </xpath>
+    </template>
+
     <template id="membership_form_options" name="Membership Form Options" inherit_id="website.snippet_options">
             <xpath expr="//div" position="after">
                 <div data-js='membership_form'
@@ -40,7 +46,7 @@
             <section class="membership_form">
                 <div class="container">
                     <h2>Membership Signup</h2>
-                    <form method="POST" action="/membership/signup/process" enctype="multipart/form-data" class="mb16 mt16">
+                    <form method="POST" enctype="multipart/form-data" class="mb16 mt16">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" name="name" class="form-control" required="required"/>
@@ -55,7 +61,7 @@
                         </div>
                         <input type="hidden" name="membership_id"/>
                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                        <button t-attf-class="btn btn-primary btn-lg">Sign up</button>
+                        <button t-attf-class="btn btn-primary btn-lg btn-website-membership-signup">Sign up</button>
                     </form>
                 </div>
             </section>
