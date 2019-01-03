@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="migration_import_wordpress_form_view" model="ir.ui.view">
+            <field name="name">migration.import.wordpress form view</field>
+            <field name="model">migration.import.wordpress</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="import_media" string="Import Media" type="object"/>
+                        <button name="import_pages" string="Import Pages" type="object"/>
+                    </header>
+                    <group>
+                        <field name="wordpress_url"/>
+                        <field name="wordpress_imported_user_ids"/>
+                        <field name="wordpress_page_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="view_id"/>
+                                <field name="url" widget="url"/>
+                            </tree>
+                        </field>
+                        <field name="wordpress_imported_media"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="migration_import_wordpress_tree_view" model="ir.ui.view">
+            <field name="name">migration.import.wordpress tree view</field>
+            <field name="model">migration.import.wordpress</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="wordpress_url"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="migration_import_wordpress_action" model="ir.actions.act_window">
+            <field name="name">Wordpress Import</field>
+            <field name="res_model">migration.import.wordpress</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>
