@@ -1,3 +1,7 @@
+v1.0.20
+=======
+* Fix JWT renewal for incoming calls
+
 v1.0.19
 =======
 * Feature to assign a number to a user to speed up calling

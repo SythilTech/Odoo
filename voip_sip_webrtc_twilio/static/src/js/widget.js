@@ -25,37 +25,44 @@ var mySound = "";
 
 $(function() {
 
-    rpc.query({
-        model: 'voip.number',
-		method: 'get_numbers',
-		args: [],
-		context: weContext.get()
-    }).then(function(result){
+    // Renew the token every 55 seconds
+    var myJWTTimer = setInterval(renewJWT, 55000);
+    renewJWT();
 
-        for (var i = 0; i < result.length; i++) {
-            var call_route = result[i];
+    function renewJWT() {
+        rpc.query({
+            model: 'voip.number',
+	    	method: 'get_numbers',
+	    	args: [],
+	    	context: weContext.get()
+        }).then(function(result){
 
-            console.log("Signing in as " + call_route.capability_token_url);
+            for (var i = 0; i < result.length; i++) {
+                var call_route = result[i];
 
-            $.getJSON(call_route.capability_token_url).done(function (data) {
-                console.log('Got a token.');
-                console.log('Token: ' + data.token);
+                console.log("Signing in as " + call_route.capability_token_url);
 
-                // Setup Twilio.Device
-                Twilio.Device.setup(data.token, { debug: true });
+                $.getJSON(call_route.capability_token_url).done(function (data) {
+                    console.log('Got a token.');
+                    console.log('Token: ' + data.token);
 
-                Twilio.Device.ready(function (device) {
-                    console.log('Twilio.Device Ready!');
+                    // Setup Twilio.Device
+                    Twilio.Device.setup(data.token, { debug: true });
+
+                    Twilio.Device.ready(function (device) {
+                        console.log('Twilio.Device Ready!');
+                    });
+
+                })
+                .fail(function () {
+                    console.log('Could not get a token from server!');
                 });
 
-            })
-            .fail(function () {
-                console.log('Could not get a token from server!');
-            });
+	    	}
 
-		}
+        });
+    }
 
-    });
 });
 
 
