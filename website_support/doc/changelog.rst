@@ -1,3 +1,7 @@
+v1.4.7
+======
+* Fix upgrade issue for people before version 1.1.0 related to approval
+
 v1.4.6
 ======
 * Fix permission issues with support clients assigned as department managers not being able to view website reporting interface

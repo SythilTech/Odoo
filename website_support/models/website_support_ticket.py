@@ -49,7 +49,10 @@ class WebsiteSupportTicket(models.Model):
         return default_priority[0]
 
     def _default_approval_id(self):
-        return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
+        try:
+            return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
+        except ValueError:
+            return False
 
     channel = fields.Char(string="Channel", default="Manual")
     create_user_id = fields.Many2one('res.users', "Create User")
