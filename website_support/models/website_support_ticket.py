@@ -51,8 +51,11 @@ class WebsiteSupportTicket(models.Model):
         return default_priority[0]
 
     def _default_approval_id(self):
-        return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
-    
+        try:
+            return self.env['ir.model.data'].get_object('website_support', 'no_approval_required')
+        except ValueError:
+            return False
+
     approval_id = fields.Many2one('website.support.ticket.approval', default=_default_approval_id, string="Approval")
     create_user_id = fields.Many2one('res.users', "Create User")
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")

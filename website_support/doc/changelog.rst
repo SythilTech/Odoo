@@ -1,3 +1,7 @@
+v1.6.1
+======
+* Fix upgrade issue for people pre version 1.6.0 related to default approval
+
 v1.6.0
 ======
 * Add approval field
