@@ -1,0 +1,11 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_sms_account_user","access_sms_account","model_sms_account","base.group_user",1,0,0,0
+"access_sms_account_system","access_sms_account","model_sms_account","base.group_system",1,1,1,1
+"access_sms_message_user","access_sms_message","model_sms_message","base.group_user",1,0,1,0
+"access_sms_message_system","access_sms_message","model_sms_message","base.group_system",1,1,1,1
+"access_sms_gateway","access_sms_gateway","model_sms_gateway",,1,0,0,0
+"access_sms_number_system","access_sms_number_system","model_sms_number","base.group_system",1,1,1,1
+"access_sms_number_user","access_sms_number_user","model_sms_number","base.group_user",1,0,0,0
+"access_sms_template","access_sms_template","model_sms_template",,1,1,1,1
+"access_sms_compose","access_sms_compose","model_sms_compose",,1,1,1,1
+"access_sms_gateway_twilio","access_sms_gateway_twilio","model_sms_gateway_twilio",,1,0,0,0
