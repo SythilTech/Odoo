@@ -94,7 +94,8 @@ function getUserMediaSuccess(stream) {
     remoteVideo = document.querySelector('#remoteVideo');
 
     localStream = stream;
-	localVideo.src = window.URL.createObjectURL(stream);
+	localVideo.srcObject = stream;
+	//localVideo.src = window.URL.createObjectURL(stream);
 
     window.peerConnection = new RTCPeerConnection(peerConnectionConfig);
     window.peerConnection.onicecandidate = gotIceCandidate;

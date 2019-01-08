@@ -96,7 +96,7 @@ function twilio_end_call() {
             });
         });
     } else {
-        alert("Call Failed");
+        console.log("Call Failed");
     }
 
     Twilio.Device.disconnectAll();

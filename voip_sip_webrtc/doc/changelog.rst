@@ -1,3 +1,7 @@
+v1.1.4
+======
+* Fix to work in latest version of Google Chrome
+
 v1.1.3
 ======
 * No presence bug fix
