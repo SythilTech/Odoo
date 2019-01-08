@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<templates id="sms_widget" xml:space="preserve">
+    <t t-name="sms_widget">
+        <t t-if="! widget.get('effective_readonly')">
+            <input type="text"></input>
+        </t>
+    </t>
+</templates>
