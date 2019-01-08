@@ -1,3 +1,7 @@
+v1.0.21
+=======
+* Fix Call History report and add ability to skip report (can be time consuming)
+
 v1.0.20
 =======
 * Fix JWT renewal for incoming calls

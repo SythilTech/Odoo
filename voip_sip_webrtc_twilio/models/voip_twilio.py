@@ -335,61 +335,7 @@ class VoipTwilioInvoice(models.Model):
     start_date = fields.Date(string="Start Date")
     end_date = fields.Date(string="End Date")
     margin = fields.Float(string="Margin")
-
-    @api.multi
-    def generate_invoice(self):
-        self.ensure_one()
-
-        #invoice_account = self.twilio_account_id.partner_id.property_account_receivable_id.id
-        #invoice = self.env['account.invoice'].create({'type': 'out_invoice', 'journal_type': 'sale', 'partner_id': self.twilio_account_id.partner_id.id, 'account_id': invoice_account, 'fiscal_position_id': self.twilio_account_id.partner_id.property_account_position_id.id})
-
-        response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + self.twilio_account_id.twilio_account_sid + "/Calls.json?StartTime%3E=" + self.start_date + "&EndTime%3C=" + self.end_date, auth=(str(self.twilio_account_id.twilio_account_sid), str(self.twilio_account_id.twilio_auth_token)))
-
-        json_call_list = json.loads(response_string.text)
-
-        call_total = 0.0
-        for call in json_call_list['calls']:
-            if call['price'] > 0:
-                call_total += -1.0 * float(call['price']) * self.margin
-
-        call_name = "VOIP Calls " + self.start_date + " - " + self.end_date
-
-        invoice = self.env['account.invoice'].create({
-            'partner_id': self.twilio_account_id.partner_id.id,
-            'account_id': self.twilio_account_id.partner_id.property_account_receivable_id.id,
-            'fiscal_position_id': self.twilio_account_id.partner_id.property_account_position_id.id
-        })
-
-        line_values = {
-            'name': call_name,
-            'price_unit': call_total,
-            'invoice_id': invoice.id,
-            'account_id': invoice.journal_id.default_credit_account_id.id
-        }
-
-        #invoice_line = self.env['account.invoice.line'].new(line_values)
-        invoice.write({'invoice_line_ids': [(0, 0, line_values)]})
-        invoice.compute_taxes()
-
-        return {
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'account.invoice',
-            'type': 'ir.actions.act_window',
-            'res_id': invoice.id,
-            'view_id': self.env['ir.model.data'].get_object('account', 'invoice_form').id
-         }
-         
-         
-class VoipTwilioInvoice(models.Model):
-
-    _name = "voip.twilio.invoice"
-    _description = "Twilio Account Invoice"
-
-    twilio_account_id = fields.Many2one('voip.twilio', string="Twilio Account")
-    start_date = fields.Date(string="Start Date")
-    end_date = fields.Date(string="End Date")
-    margin = fields.Float(string="Margin")
+    generate_call_report = fields.Boolean(string="Generate Call Report", default=True)
 
     @api.multi
     def generate_invoice(self):
@@ -416,9 +362,10 @@ class VoipTwilioInvoice(models.Model):
                         call_cost = -1.0 * float(call['price']) * self.margin
                         call_total += call_cost
 
-                        m, s = divmod( int(call['duration']) , 60)
-                        h, m = divmod(m, 60)
-                        self.env['account.invoice.voip.history'].create({'invoice_id': invoice.id, 'start_time': call_start, 'duration': "%d:%02d:%02d" % (h, m, s), 'cost':  call_cost, 'to_address': call['to'] })
+                        if self.generate_call_report:
+                            m, s = divmod( int(call['duration']) , 60)
+                            h, m = divmod(m, 60)
+                            self.env['account.invoice.voip.history'].create({'invoice_id': invoice.id, 'start_time': call_start, 'duration': "%d:%02d:%02d" % (h, m, s), 'cost':  call_cost, 'to_address': call['to'] })
 
             #Get the next page if there is one
             next_page_uri = json_call_list['next_page_uri']
