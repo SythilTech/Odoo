@@ -352,6 +352,7 @@ class VoipTwilioInvoice(models.Model):
 
         #Loop through all pages until you have reached the end
         call_total = 0
+        duration_total = 0
         while True:
 
             for call in json_call_list['calls']:
@@ -361,6 +362,7 @@ class VoipTwilioInvoice(models.Model):
                         call_start = parser.parse(call['start_time'])
                         call_cost = -1.0 * float(call['price']) * self.margin
                         call_total += call_cost
+                        duration_total += float(call['duration'])
 
                         if self.generate_call_report:
                             m, s = divmod( int(call['duration']) , 60)
@@ -375,6 +377,13 @@ class VoipTwilioInvoice(models.Model):
             else:
                 #End the loop if there are is no more pages
                 break
+
+        #Put Total call time and cost into invoice for the report or pdf attachment
+        invoice.voip_total_call_cost = round(call_total,2)
+        m, s = divmod( int(duration_total) , 60)
+        h, m = divmod(m, 60)
+        invoice.voip_total_call_time = "%d:%02d:%02d" % (h, m, s)
+        invoice.twilio_invoice = True
 
         line_values = {
             'name': "VOIP Calls " + self.start_date + " - " + self.end_date,
@@ -401,6 +410,9 @@ class AccountInvoiceVoip(models.Model):
     _inherit = "account.invoice"
 
     voip_history_ids = fields.One2many('account.invoice.voip.history', 'invoice_id', string="VOIP Call History")
+    twilio_invoice = fields.Boolean(string="Is Twilio Invoice", help="Allows Twilio specific changes to invoice template")
+    voip_total_call_time = fields.Char(string="Voip Total Call Time")
+    voip_total_call_cost = fields.Float(string="Voip Total Call Cost")
 
 class AccountInvoiceVoipHistory(models.Model):
 

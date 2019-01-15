@@ -1,3 +1,8 @@
+v1.0.22
+=======
+* Call log report now has total cost / total duration
+* Invoices created by the Create Invoice button will generate a unique pdf more tailored to calls (e.g. no quantity column)
+
 v1.0.21
 =======
 * Fix Call History report and add ability to skip report (can be time consuming)
