@@ -5,6 +5,7 @@ import cgi
 
 from openerp.http import request
 from openerp import api, fields, models
+import ast
 
 _logger = logging.getLogger(__name__)
 
@@ -165,9 +166,9 @@ class HtmlForm(models.Model):
                 html_output += "    <option value=\"" + selection_value + "\">" + selection_label + "</option>\n"
 
         elif fe.field_id.ttype == "many2one":
-
-            if field.field_id.domain:
-                selection_list = request.env[fe.field_id.relation].search(fe.field_id.domain)
+            field_domain = request.env[fe.field_id.model].fields_get()[fe.field_id.name]['domain']
+            if field_domain:
+                selection_list = request.env[fe.field_id.relation].search(ast.literal_eval(field_domain))
             else:
                 selection_list = request.env[fe.field_id.relation].search([])
 

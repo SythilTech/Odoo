@@ -1,3 +1,7 @@
+v1.0.13
+=======
+* Fix dropbox (many2one) domain filter so it actually works...
+
 v1.0.12
 =======
 * Remove domain from submit url to better deal with multi domain websites
