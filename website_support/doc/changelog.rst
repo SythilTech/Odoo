@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Chinese(Traditional) translation courtesy of "UniPiece Limited, Simon Chaung <simon@unipiece.com.tw>"
+
 v1.0.3
 ======
 * Adds ticket compose email template that uses user email (same as version 11), default is still company as from address.
