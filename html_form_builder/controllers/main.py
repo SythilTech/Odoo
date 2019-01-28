@@ -372,9 +372,9 @@ class HtmlFormController(http.Controller):
                 html_output += "    <option value=\"" + selection_value + "\">" + selection_label + "</option>\n"
 
         elif field.field_id.ttype == "many2one":
-
-            if field.field_id.domain:
-                selection_list = request.env[field.field_id.relation].search(field.field_id.domain)
+            field_domain = request.env[field.field_id.model].fields_get()[field.field_id.name]['domain']
+            if field_domain:
+                selection_list = request.env[field.field_id.relation].search(ast.literal_eval(field_domain))
             else:
                 selection_list = request.env[field.field_id.relation].search([])
 
