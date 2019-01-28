@@ -71,6 +71,7 @@ class WebsiteSupportTicket(models.Model):
     description = fields.Text(string="Description")
     state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state,
                             string="State")
+    state_id = fields.Integer(related='state.id', string="State ID")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")

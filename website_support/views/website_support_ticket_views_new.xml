@@ -8,37 +8,63 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button type="action" name="%(website_support.website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
+                        <!-- class="oe_highlight" attrs="{'class=oe_highlight' :[('close_time', '!=', False )]} -->
+                        <button type="action" name="%(website_support.website_support_ticket_compose_action)d"
+                                context="{'default_ticket_id': active_id, 'default_partner_id': partner_id,
+                                'default_email':email, 'default_subject':subject}" class="oe_highlight"
+                                string="Reply" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
                         <button type="action" name="%(website_support.website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Open / Reply" attrs="{'invisible' :[('close_time', '=', False )]}"/>
                         <button type="object" name="open_close_ticket_wizard" string="Close Ticket" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
                         <button type="object" name="pause_sla" string="Pause SLA" attrs="{'invisible' :['|', ('sla_active', '==', False ), ('sla_id','==', False)]}"/>
                         <button type="object" name="resume_sla" string="Resume SLA" attrs="{'invisible' :['|', ('sla_active', '!=', False ), ('sla_id','==', False)]}"/>
                         <button type="object" name="send_survey" string="Send Survey"/>
                         <button type="object" name="request_approval" string="Request Approval"/>
+                        <button type="object" name="action_assign_me" string="Assign" confirm="Do you want to assign yourself as responsible person for this ticket?"/>
+
                     </header>
+
                     <sheet>
                         <div class="oe_title">
                             <label for="subject" class="oe_edit_only"/>
-                            <h1><field name="subject"/></h1>
+                            <h2><field name="subject" required="True" default_focus="1" placeholder="Subject of ticket"/></h2>
                         </div>
                         <div class="oe_button_box" name="button_box">
-
+                            <button name="toggle_reopen_ticket" type="object" class="oe_stat_button"
+                                    confirm="Do you want to reopen this ticket?"
+                                    attrs="{'invisible':[('close_date', '=', False)]}" icon="fa-arrow-circle-down">
+                                <field string="Closing Date" name="close_date"/>
+                            </button>
+                            <button name="toggle_shift_priority" type="object" color="ticket_color"
+                                    class="oe_stat_button" icon="fa-ticket">
+                                <field name="priority_id" widget="statinfo" string="Priority" readonly="1"/>
+                            </button>
                         </div>
+
+                        <field name="partner_image" widget='image' attrs="{'invisible':[('partner_image', '=', 0)]}"
+                               class="oe_avatar" readonly="1" options='{"preview_image": "partner_image", "size": [90, 90]}'/>
+                        <div class="oe_title">
+                            <div>
+                                <label for="partner_id"/><br></br>
+                                <field name="partner_id"/><br></br>
+                                <label for="user_id"/><br></br>
+                                <field name="user_id" domain="[('share','=',False)]" placeholder="To case/ticket assigned user"/><br></br>
+                                <label for="ticket_number" string="Ticket number | Creation Date"/><br></br>
+                                <field name="ticket_number" readonly="1"/> | <field name="create_date" readonly="1"/><br></br>
+                            </div>
+                        </div>
+
                         <group>
                             <group>
-                                <field name="ticket_number"/>
+                                <field name="person_name"/>
+                                <field name="email"/>
                                 <field name="channel"/>
-                                <field name="priority_id"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
                                 <field name="category"/>
                                 <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
-                                <field name="state"/>
                             </group>
                             <group>
-                                <field name="user_id" domain="[('share','=',False)]"/>
-                                <field name="partner_id"/>
-                                <field name="person_name"/>
-                                <field name="email"/>
+                                <field name="state" style="font-weight:bold;color:blue"/>
+                                <!--<field name="state_id"  attrs="{'invisible' :[('state_id', '==', 3)]}"/> -->
                                 <field name="approval_id"/>
                                 <field name="support_rating" readonly="1"/>
                                 <field name="support_comment" readonly="1"/>
