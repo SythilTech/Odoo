@@ -63,7 +63,7 @@
                                 <field name="sub_category_id" domain="[('parent_category_id','=',category)]"/>
                             </group>
                             <group>
-                                <field name="state" style="font-weight:bold;color:blue"/>
+                                <field name="state" style="font-weight:bold;color:blue" readonly="True"/>
                                 <!--<field name="state_id"  attrs="{'invisible' :[('state_id', '==', 3)]}"/> -->
                                 <field name="approval_id"/>
                                 <field name="support_rating" readonly="1"/>
