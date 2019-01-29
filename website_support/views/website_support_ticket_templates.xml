@@ -204,6 +204,15 @@
                     <h1 class="text-center" t-field="help_page.name"/>
                     <div id="wrap" class="oe_structure oe_empty" t-field="help_page.content" style="min-height:200px;"/>
 
+                    <t t-if="len(help_page.attachment_ids) > 0">
+                        <br/>
+                        <b>Attachments</b><br/>
+                        <t t-foreach="help_page.attachment_ids" t-as="attachment">
+                            <a t-attf-href="/web/content/#{attachment.id}?download=1"><t t-esc="attachment.name"/></a><br/>
+                        </t>
+                        <br/>
+                    </t>
+
                     <!-- Submit Feedback -->
                     <form method="GET" t-attf-action="/support/feedback/process/#{help_page.id}">
 

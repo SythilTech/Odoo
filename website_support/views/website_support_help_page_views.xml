@@ -11,6 +11,12 @@
       	              <field name="group_id"/>
       	              <field name="website_published"/>
       	              <field name="name"/>
+      	              <field name="attachment_ids" context="{'default_public':True, 'default_res_model': 'website.support.help.page', 'default_res_field': 'attachment_ids', 'default_res_id': active_id}">
+      	                  <tree>
+      	                      <field name="name"/>
+      	                      <field name="create_date"/>
+      	                  </tree>
+      	              </field>
       	              <field name="feedback_average"/>
       	              <field name="feedback_ids" context="{'hp_id':active_id}">
       	                  <tree>

@@ -1,3 +1,8 @@
+v1.4.8
+======
+* Fix spelling mistake sanatize=False to sanitize=False, which should allow things like youtube videos and other stuff to be placed in help pages like it was designed to do...
+* Add help page attachments
+
 v1.4.7
 ======
 * Fix upgrade issue for people before version 1.1.0 related to approval
