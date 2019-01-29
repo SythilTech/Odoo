@@ -245,9 +245,6 @@ class WebsiteSupportTicket(models.Model):
 
         body_short = tools.html_sanitize(msg_dict['body'])
 
-        #Add to message history to keep HTML clean
-        self.conversation_history_ids.create({'ticket_id': self.id, 'by': 'customer', 'content': body_short })
-
         #If the to email address is to the customer then it must be a staff member
         if msg_dict.get('to') == self.email:
             change_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_staff_replied')
@@ -255,6 +252,9 @@ class WebsiteSupportTicket(models.Model):
             change_state = self.env['ir.model.data'].get_object('website_support','website_ticket_state_customer_replied')
 
         self.state_id = change_state.id
+
+        #Add to message history to keep HTML clean
+        self.conversation_history_ids.create({'ticket_id': self.id, 'by': 'customer', 'content': body_short })
 
         return super(WebsiteSupportTicket, self).message_update(msg_dict, update_vals=update_vals)
 
@@ -430,6 +430,22 @@ class WebsiteSupportTicketMessage(models.Model):
     ticket_id = fields.Many2one('website.support.ticket', string='Ticket ID')
     by = fields.Selection([('staff','Staff'), ('customer','Customer')], string="By")
     content = fields.Html(string="Content")
+
+    @api.model
+    def create(self, values):
+
+        new_record = super(WebsiteSupportTicketMessage, self).create(values)
+        
+        # Notify everyone following the ticket of the custoemr reply
+        if values['by'] == "customer":
+            customer_reply_email_template = self.env['ir.model.data'].get_object('website_support','support_ticket_customer_reply_wrapper')
+            email_values = customer_reply_email_template.generate_email(new_record.id)
+            for follower in new_record.ticket_id.message_follower_ids:
+                email_values['email_to'] = follower.partner_id.email
+                send_mail = self.env['mail.mail'].sudo().create(email_values)
+                send_mail.send()
+
+        return new_record
 
 class WebsiteSupportTicketCategory(models.Model):
 

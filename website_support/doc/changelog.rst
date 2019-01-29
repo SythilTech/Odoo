@@ -1,3 +1,8 @@
+v1.0.5
+======
+* Custoemr replies should always send off email notification to followers
+* Customer replies made via website interface should be added to chatter as the user instead of odoobot
+
 v1.0.4
 ======
 * Chinese(Traditional) translation courtesy of "UniPiece Limited, Simon Chaung <simon@unipiece.com.tw>"

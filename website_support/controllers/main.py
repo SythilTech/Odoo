@@ -519,7 +519,7 @@ class SupportTicketController(http.Controller):
 
             request.env['website.support.ticket.message'].sudo().create({'ticket_id':ticket.id, 'by': 'customer','content':values['comment']})
             ticket.state_id = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
-            request.env['website.support.ticket'].sudo().browse(ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
+            ticket.sudo(request.env.user.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
         else:
             return "You do not have permission to submit this commment"
 

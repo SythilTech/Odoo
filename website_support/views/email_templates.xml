@@ -180,8 +180,10 @@
 
         <record id="support_ticket_customer_reply_wrapper" model="mail.template">
             <field name="name">Support Ticket Customer Reply Wrapper</field>
+            <field name="email_from"><![CDATA[${object.ticket_id.company_id.name} <${object.ticket_id.company_id.email}>]]></field>
+            <field name="reply_to">SendReplyViaSystem@example.com</field>
             <field name="model_id" ref="model_website_support_ticket_message"></field>
-            <field name="subject">${object.subject}</field>
+            <field name="subject">${object.ticket_id.subject}</field>
             <field name="auto_delete" eval="False"/>
             <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
