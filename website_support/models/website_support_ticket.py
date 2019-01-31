@@ -11,6 +11,7 @@ import re
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class WebsiteSupportTicket(models.Model):
 
     _name = "website.support.ticket"
@@ -59,6 +60,7 @@ class WebsiteSupportTicket(models.Model):
     priority_id = fields.Many2one('website.support.ticket.priority', default=_default_priority_id, string="Priority")
     parent_company_id = fields.Many2one(string="Parent Company", related="partner_id.company_id")
     partner_id = fields.Many2one('res.partner', string="Partner")
+    partner_image = fields.Binary(related='partner_id.image_medium', string="Partner image", readonly='True')
     user_id = fields.Many2one('res.users', string="Assigned User")
     person_name = fields.Char(string='Person Name')
     email = fields.Char(string="Email")
@@ -69,6 +71,7 @@ class WebsiteSupportTicket(models.Model):
     description = fields.Text(string="Description")
     state = fields.Many2one('website.support.ticket.states', group_expand='_read_group_state', default=_default_state,
                             string="State")
+    state_id = fields.Integer(related='state.id', string="State ID")
     conversation_history = fields.One2many('website.support.ticket.message', 'ticket_id', string="Conversation History")
     attachment = fields.Binary(string="Attachments")
     attachment_filename = fields.Char(string="Attachment Filename")
@@ -464,6 +467,36 @@ class WebsiteSupportTicket(models.Model):
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send(True)
 
+    # by Cooby tec
+    @api.multi
+    def toggle_reopen_ticket(self):
+        self.close_time = False
+
+        # Also reset the date for gamification
+        self.close_date = False
+        open_state = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open')
+        self.state = open_state.id
+
+    @api.multi
+    def toggle_shift_priority(self):
+        priority_obj = self.env['website.support.ticket.priority']
+        for ticket in self:
+            if ticket.priority_id and ticket.priority_id.sequence:
+                next_priority = priority_obj.search([('sequence', '>', ticket.priority_id.sequence)], order='sequence',
+                                                    limit=1)
+                if next_priority:  # if there's next priority, assign it that one
+                    ticket.priority_id = next_priority.id
+                else:
+                    first_priority = priority_obj.search([], order='sequence', limit=1)
+                    if first_priority:  # if there isn't, assign the lowest priority (since the button is a toggle)
+                        ticket.priority_id = first_priority.id
+
+    @api.multi
+    def action_assign_me(self):
+        # Assign current user
+        self.user_id = self._uid
+
+
 class WebsiteSupportTicketApproval(models.Model):
 
     _name = "website.support.ticket.approval"
@@ -592,7 +625,7 @@ class WebsiteSupportTicketClose(models.TransientModel):
         message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
         self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
 
-        self.ticket_id.close_comment = re.compile(r'<[^>]+>').sub('', self.message)
+        self.ticket_id.close_comment = self.message
         self.ticket_id.closed_by_id = self.env.user.id
         self.ticket_id.state = closed_state.id
 

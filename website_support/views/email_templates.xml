@@ -131,7 +131,7 @@
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
                 <p>Your support ticket has been closed by our staff, here is the final comment</p>
-                <p>${object.close_comment or ''}</p>
+                <p>${object.close_comment|safe or ''}</p>
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> 

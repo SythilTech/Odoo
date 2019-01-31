@@ -1,3 +1,15 @@
+v1.5.10
+=======
+* Changes courtesy of lucode (https://github.com/SythilTech/Odoo/pull/60)
+* Adding some UX related logic to Support Ticket view.
+* Updating french / german language
+* Adding new client form view. Old view is still default one.
+* New client form view. state readonly in view.
+
+v1.4.9
+======
+* Change close email template to support html and remove from form view as it is displayed in chatter anyway.
+
 v1.4.8
 ======
 * Fix spelling mistake sanatize=False to sanitize=False, which should allow things like youtube videos and other stuff to be placed in help pages like it was designed to do...
