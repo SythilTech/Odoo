@@ -174,6 +174,9 @@ class DataSetInheritVoip(main.DataSet):
         
         #Doing a write every screen change is bound to be bad for performance
         #But I need to be able to distinguish between bus.presence having a tab open and actually using the system...
-        request.env.user.last_web_client_activity_datetime = datetime.datetime.now()
-        
+        try:
+            request.env.user.last_web_client_activity_datetime = datetime.datetime.now()
+        except:
+            pass
+
         return value
