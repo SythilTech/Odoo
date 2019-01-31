@@ -42,7 +42,6 @@
                                 <field name="approval_id"/>
                                 <field name="support_rating" readonly="1"/>
                                 <field name="support_comment" readonly="1"/>
-                                <field name="close_comment"/>
                                 <field name="close_time"/>
                             </group>
                         </group>

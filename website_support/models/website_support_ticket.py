@@ -625,7 +625,7 @@ class WebsiteSupportTicketClose(models.TransientModel):
         message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
         self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
 
-        self.ticket_id.close_comment = re.compile(r'<[^>]+>').sub('', self.message)
+        self.ticket_id.close_comment = self.message
         self.ticket_id.closed_by_id = self.env.user.id
         self.ticket_id.state = closed_state.id
 
