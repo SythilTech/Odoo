@@ -21,6 +21,17 @@
       	        </field>
       	    </field>
         </record>
+
+        <record id="crm_lead__view_form_inherit_sms_frame" model="ir.ui.view">
+            <field name="name">E.164 mobile placeholder (Lead)</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+      	        <field name="mobile" position="replace">
+      	            <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760"/>
+      	        </field>
+      	    </field>
+        </record>
         
     </data>
 </openerp>
