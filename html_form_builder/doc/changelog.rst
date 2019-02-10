@@ -1,3 +1,7 @@
+v1.0.14
+=======
+* Fix form defaults for many2one
+
 v1.0.13
 =======
 * Fix dropbox (many2one) domain filter so it actually works...

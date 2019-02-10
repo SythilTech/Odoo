@@ -596,6 +596,8 @@ class HtmlFormController(http.Controller):
             for df in entity_form.defaults_values:
                 if df.field_id.ttype == "many2many":
                     secure_values[df.field_id.name] = [(4, request.env[df.field_id.relation].sudo().search([('name', '=', df.default_value)])[0].id)]
+                elif df.field_id.ttype == "many2one":
+                    secure_values[df.field_id.name] = int(df.default_value)
                 else:
                     if df.default_value == "user_id":
                         secure_values[df.field_id.name] = request.env.user.id
