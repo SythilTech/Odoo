@@ -566,14 +566,42 @@ class SupportTicketController(http.Controller):
         for field_name, field_value in kw.items():
             values[field_name] = field_value
 
-        return_string = ""
-
         my_return = []
 
-        help_pages = request.env['website.support.help.page'].sudo().search([('name','=ilike',"%" + values['term'] + "%")],limit=5)
+        help_pages = request.env['website.support.help.page'].sudo().search([('name','=ilike',"%" + values['term'] + "%")], limit=5)
 
         for help_page in help_pages:
             return_item = {"label": help_page.name,"value": "/support/help/" + slug(help_page.group_id) + "/" + slug(help_page)}
             my_return.append(return_item) 
 
         return json.JSONEncoder().encode(my_return)
+
+    @http.route('/support/help/suggest',auth="public", website=True, type='http')
+    def support_help_suggest(self, **kw):
+        """Provides a list of help pages which are similar to the subject"""
+
+        values = {}
+        for field_name, field_value in kw.items():
+            values[field_name] = field_value
+
+        if values['term'] == "":
+            # Return blank so we can hide the suggestion div
+            return ""
+
+        return_html = '<label class="col-md-3 col-sm-4 control-label" for="suggestions">Suggestions</label>'
+        return_html += '<div class="col-md-7 col-sm-8" style="padding-left:5px;padding-right:5px;">'
+        return_html += '  <div style="border: solid red 2px;margin-bottom: 15px;padding:15px;padding-right:15px;padding-top:5px;padding-bottom:5px;border-radius:4px;">'
+
+        help_pages = request.env['website.support.help.page'].sudo().search([('name','=ilike',"%" + values['term'] + "%")], limit=5)
+
+        for help_page in help_pages:
+            return_html += '    <a href="' + "/support/help/" + slug(help_page.group_id) + "/" + slug(help_page) + '">' + help_page.name + '</a><br/>'
+
+        return_html += "  </div>"
+        return_html += "</div>"
+
+        if help_pages:
+            return return_html
+        else:
+            # Return blank so we can hide the suggestion div            
+            return ""

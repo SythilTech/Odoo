@@ -1,3 +1,7 @@
+v1.5.11
+=======
+* Suggest help pages that are similiar to ticket subject (reduces tickets submitted that already have a help article)
+
 v1.5.10
 =======
 * Changes courtesy of lucode (https://github.com/SythilTech/Odoo/pull/60)
