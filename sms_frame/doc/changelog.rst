@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Rework auto e.164 converesion so it works if the data is imported, mass edited through module or created through a website form
+
 v1.0.3
 ======
 * Resolve get record name when model does not have name field
