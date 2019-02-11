@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_module_module_view_form_inherit_app_store_client" model="ir.ui.view">
+        <field name="name">ir.module.module form view inherit app store client</field>
+        <field name="model">ir.module.module</field>
+        <field name="inherit_id" ref="base.module_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_uninstall_wizard']" position="after">
+                <button name="restart_service" type="object" string="Restart Service"/>
+            </xpath>
+      	</field>
+    </record>
+
+</odoo>

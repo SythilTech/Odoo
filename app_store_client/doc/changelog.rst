@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Button to restart Odoo
+
 v1.0.3
 ======
 * Install doesn't leave zip anymore

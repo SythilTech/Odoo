@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store Client",
-    'version': "1.0.3",
+    'version': "1.0.4",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -9,6 +9,7 @@
     'data': [
         'views/app_store_client_templates.xml',
         'views/module_custom_updates_views.xml',
+        'views/ir_module_module_views.xml',
         'data/ir.config_parameter.xml',
     ],
     'qweb': [

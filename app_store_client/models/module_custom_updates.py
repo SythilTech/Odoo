@@ -50,12 +50,10 @@ class ModuleCustomUpdates(models.Model):
     def check_custom_app_store_updates(self):
         self.ensure_one()
 
-        _logger.error("Check for custom updates")
-
         for up_md in self.env['module.custom.updates'].search([]):
             up_md.unlink()
         
-        custom_app_store_url = self.env['ir.config_parameter'].get_param('custom_app_store_url') 
+        custom_app_store_url = self.env['ir.config_parameter'].get_param('custom_app_store_url')
 
         r = requests.get(custom_app_store_url + "/custom/store/updates")
         module_list = json.loads(r.content.decode('utf-8'))
@@ -63,8 +61,6 @@ class ModuleCustomUpdates(models.Model):
         for md in module_list:
             local_md = self.env['ir.module.module'].search([('name','=', md['name']), ('state','=','installed')])
             if local_md:
-                _logger.error(local_md.installed_version)
-                _logger.error(md['latest_version'])
                 if local_md.installed_version != md['latest_version']:
                     self.env['module.custom.updates'].create({'name': md['name'], 'shortdesc': local_md.shortdesc, 'installed_version': local_md.installed_version, 'latest_version': md['latest_version']})
 
