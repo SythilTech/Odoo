@@ -73,7 +73,8 @@
                       <group>
       	                  <field name="from_mobile" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
       	                  <field name="model_id" widget="selection" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
-      	                  <field name="model_name" invisible="1"/>
+      	                  <field name="model_name" invisible="True"/>
+      	                  <field name="filter" widget="domain" options="{'model': 'model_name', 'in_dialog': True}" attrs="{'invisible': ['|', ('model_name', '=', 'res.partner'), ('model_name', '=', 'mail.mass_mailing.list')]}"/>
       	                  <field name="selected_records" attrs="{'invisible': [('model_name', '!=', 'res.partner')], 'readonly': [('mass_sms_state', '=', 'sent')]}" context="{'search_default_customer':True}">
       	                      <tree>
       	                          <field name="name"/>

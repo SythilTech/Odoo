@@ -9,10 +9,10 @@ class SmsMass(models.Model):
     _name = "sms.mass"
 
     from_mobile = fields.Many2one('sms.number', string="From Mobile", required=True)
-    model_id = fields.Many2one('ir.model', domain="[('model', 'in', ['res.partner','mail.mass_mailing.list'])]", string="Model", required=True, default=lambda self: self.env.ref('base.model_res_partner').id)
+    model_id = fields.Many2one('ir.model', string="Model", required=True, default=lambda self: self.env.ref('base.model_res_partner').id)
     model_name = fields.Char(string="Model Name", related="model_id.model")
     dynamic_model_id = fields.Many2one('ir.model', string="Dynamic Model", help="mail.mass_mailing.list maps to mail.mass_mailing.contact", compute="_compute_dynamic_model_id")
-    filter = fields.Char(string="Filter", default="[('sms_opt_out','=',False),('mobile','!=',False)]")
+    filter = fields.Char(string="Filter")
     mail_list_id = fields.Many2one('mail.mass_mailing.list', string="Mailing List")
     selected_records = fields.Many2many('res.partner', string="Selected Records", domain="[('sms_opt_out','=',False),('mobile','!=',False)]")
     message_text = fields.Text(string="Message Text")
@@ -87,6 +87,8 @@ class SmsMass(models.Model):
             record_list = self.env['mail.mass_mailing.contact'].search([('list_ids','=', self.mail_list_id.id)])
         elif self.model_name == 'res.partner':
             record_list = self.selected_records
+        else:
+            record_list = self.env[self.modal_name].search(self.filter)
 
         for rec in record_list:
 
