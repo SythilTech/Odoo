@@ -3,6 +3,7 @@ import logging
 _logger = logging.getLogger(__name__)
 import requests
 from datetime import datetime
+import ast
 
 class SmsMass(models.Model):
 
@@ -88,7 +89,7 @@ class SmsMass(models.Model):
         elif self.model_name == 'res.partner':
             record_list = self.selected_records
         else:
-            record_list = self.env[self.modal_name].search(self.filter)
+            record_list = self.env[self.model_name].search(ast.literal_eval(self.filter))
 
         for rec in record_list:
 
