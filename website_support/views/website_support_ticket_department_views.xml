@@ -58,7 +58,5 @@
 	  </field>
       </record>
 
-      <menuitem id="website_support_department_menu" name="Departments" parent="website_support_config_parent_menu" action="website_support_department_action" sequence="60"/>
-
     </data>
 </openerp>

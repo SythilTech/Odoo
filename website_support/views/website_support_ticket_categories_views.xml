@@ -43,8 +43,5 @@
           <field eval="1" name="number_increment"/>
       </record>
 
-
-      <menuitem id="website_support_ticket_categories_menu" name="Categories" parent="website_support_config_parent_menu" action="website_support_ticket_categories_action" sequence="20"/>
-
     </data>
 </openerp>

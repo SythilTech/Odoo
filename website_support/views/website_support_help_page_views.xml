@@ -45,7 +45,5 @@
 	  </field>
       </record>
 
-      <menuitem id="website_support_help_page_menu" name="Help Pages" parent="website_support_config_parent_menu" action="website_support_help_page_action" sequence="60"/>
-
     </data>
 </openerp>

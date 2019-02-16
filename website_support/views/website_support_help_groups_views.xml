@@ -61,8 +61,6 @@
           <field eval="1" name="number_next"/>
           <field eval="1" name="number_increment"/>
       </record>
-      
-      <menuitem id="website_support_help_groups_menu" name="Help Groups" parent="website_support_config_parent_menu" action="website_support_help_groups_action" sequence="50"/>
 
     </data>
 </openerp>

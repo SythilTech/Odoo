@@ -155,10 +155,6 @@
 	      </p>
           </field>
       </record>
-
-      <menuitem id="website_support_parent_menu" name="Customer Support" parent="sales_team.menu_base_partner" sequence="90" groups="sales_team.group_sale_salesman_all_leads,sales_team.group_sale_manager,support_group"/>
-      <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" sequence="10"/>
-      <menuitem id="website_support_config_parent_menu" name="Support Tickets" parent="sales_team.menu_sale_config" sequence="80"/>
  
     </data>
 </openerp>

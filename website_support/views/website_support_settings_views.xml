@@ -31,6 +31,4 @@
 	<field name="target">inline</field>
     </record>
 
-    <menuitem id="website_support_settings_menu" name="Settings" parent="website_support_config_parent_menu" action="website_support_settings_action" sequence="50"/>
-
 </odoo>
