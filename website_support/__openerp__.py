@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "2.0.0",
+    'version': "2.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

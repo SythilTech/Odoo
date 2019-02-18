@@ -207,7 +207,7 @@ class SupportTicketController(http.Controller):
         setting_allow_user_signup = request.env['ir.values'].get_default('website.support.settings', 'allow_user_signup')
         
         manager = False
-        if request.env['website.support.department.contact'].search_count([('user_id','=',request.env.user.id)]) == 1:
+        if request.env['website.support.department.contact'].sudo().search_count([('user_id','=',request.env.user.id)]) == 1:
             manager = True
         
         return http.request.render('website_support.support_help_pages', {'help_groups': help_groups, 'setting_allow_user_signup': setting_allow_user_signup, 'manager': manager})

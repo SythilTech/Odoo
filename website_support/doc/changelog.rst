@@ -1,3 +1,11 @@
+v2.0.1
+======
+* Fix permission issue
+
+v2.0.0
+======
+* Remove dependacy on crm module
+
 v1.6.1
 ======
 * Fix upgrade issue for people pre version 1.6.0 related to default approval
