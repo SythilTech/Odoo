@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Fix delivery receipts
+
 v1.0.4
 ======
 * Rework auto e.164 converesion so it works if the data is imported, mass edited through module or created through a website form

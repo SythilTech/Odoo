@@ -219,7 +219,10 @@ class SmsGatewayTwilio(models.Model):
         """Updates the sms message when it is successfully received by the mobile phone"""
         my_account = self.env['sms.account'].search([('twilio_account_sid','=', account_sid)])[0]
         response_string = requests.get("https://api.twilio.com/2010-04-01/Accounts/" + my_account.twilio_account_sid + "/Messages/" + message_id, auth=(str(my_account.twilio_account_sid), str(my_account.twilio_auth_token)))
-        root = etree.fromstring(str(response_string.text))
+
+        twil_xml = response_string.text.encode('utf-8')
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        root = etree.fromstring(twil_xml, parser=parser)
 
         #map the Twilio delivary code to the sms delivary states 
         delivary_state = ""
