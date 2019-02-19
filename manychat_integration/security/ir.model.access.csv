@@ -1,0 +1,12 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_integration_manychat","Access integration.manychat","model_integration_manychat","manychat_integrator",1,1,1,1
+"access_integration_manychat_field","Access integration.manychat.field","model_integration_manychat_field","manychat_integrator",1,0,0,0
+"access_integration_manychat_tag","Access integration.manychat.tag","model_integration_manychat_tag","manychat_integrator",1,0,0,0
+"access_integration_manychat_subscriber","Access integration.manychat.subscriber","model_integration_manychat_subscriber","manychat_integrator",1,0,0,0
+"access_integration_manychat_subscriber_ref","Access integration.manychat.subscriber.ref","model_integration_manychat_subscriber_ref","manychat_integrator",1,0,0,0
+"access_integration_manychat_subscriber_field","Access integration.manychat.subscriber.field","model_integration_manychat_subscriber_field","manychat_integrator",1,0,0,0
+"access_integration_manychat_subscriber_link","Access integration.manychat.subscriber.link","model_integration_manychat_subscriber_link","manychat_integrator",1,1,1,1
+"access_integration_manychat_subscriber_link_candidate_wizard","Access i.m.s.l.candidate.wizard","model_i_m_s_l_candidate_wizard","manychat_integrator",1,1,1,1
+"access_integration_manychat_import","Access integration.manychat.import","model_integration_manychat_import","manychat_integrator",1,1,1,1
+"access_integration_manychat_map","Access integration.manychat.map","model_integration_manychat_map","manychat_integrator",1,1,1,1
+"access_integration_manychat_map_field","Access integration.manychat.map.field","model_integration_manychat_map_field","manychat_integrator",1,1,1,1

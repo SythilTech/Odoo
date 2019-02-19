@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="res_partner_view_form_inherit_manychat_integration" model="ir.ui.view">
+        <field name="name">Res Partner Form View Inherit ManyChat</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="ManyChat">
+                    <group>
+                        <field name="manychat_id"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>

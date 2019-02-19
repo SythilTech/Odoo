@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="res_config_settings_inherit_manychat_integration" model="ir.ui.view">
+        <field name="name">res.config.settings Inherit ManyChat</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="website.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='cdn_setting']" position="after">
+                <div class="col-xs-12 col-md-6 o_setting_box" id="manychat_setting">
+                    <div class="o_setting_right_pane">
+                        <label for="manychat_id"/>
+		        <div class="text-muted">
+		            The account/page which any ManyChat widgets are bound to
+                        </div>
+                        <div class="content-group">
+                            <div class="mt16">
+                                <field name="manychat_id"/>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

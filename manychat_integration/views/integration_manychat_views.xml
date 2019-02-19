@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="integration_manychat_view_form" model="ir.ui.view">
+        <field name="name">ManyChat Integration Form View</field>
+        <field name="model">integration.manychat</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button type="object" name="import_custom_data" string="Import Custom Data"/>
+                    <button type="object" name="import_individual_subscriber" string="Import Individual Subscriber"/>
+                </header>
+                <group>
+                    <field name="name"/>
+                    <field name="authorization_token"/>
+                    <field name="import_model_id"/>
+                    <field name="record_link_ids">
+                        <tree>
+                            <field name="model_id"/>
+                            <field name="field_map_ids" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                    <field name="field_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="type"/>
+                            <field name="description"/>
+                        </tree>
+                    </field>
+                    <field name="tag_ids">
+                        <tree>
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="integration_manychat__map_view_form" model="ir.ui.view">
+        <field name="name">ManyChat Integration Map Form View</field>
+        <field name="model">integration.manychat.map</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="model_id"/>
+                    <field name="field_map_ids" context="{'default_model_id':model_id}">
+                        <tree editable="bottom">
+                            <field name="model_id" invisible="True"/>
+                            <field name="manychat_field_id"/>
+                            <field name="odoo_field_id" domain="[('model_id','=',model_id)]"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="integration_manychat_import_view_form" model="ir.ui.view">
+        <field name="name">ManyChat Integration Import Form View</field>
+        <field name="model">integration.manychat.import</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="subscriber_id"/>
+                </group>
+                <button type="object" name="wizard_import_subscriber" string="Import Subscriber"/>
+            </form>
+        </field>
+    </record>
+
+    <record id="integration_manychat_view_tree" model="ir.ui.view">
+        <field name="name">ManyChat Integration Tree View</field>
+        <field name="model">integration.manychat</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="integration_manychat_action" model="ir.actions.act_window">
+        <field name="name">ManyChat Account</field>
+        <field name="res_model">integration.manychat</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                Please enter ManyChat account details
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="integration_parent_menu" name="Integrations" sequence="3"/>
+    <menuitem id="integration_manychat_menu" name="ManyChat" parent="integration_parent_menu" sequence="10"/>
+    <menuitem id="integration_manychat_page_menu" name="Pages" parent="integration_manychat_menu" action="integration_manychat_action" sequence="10"/>
+
+</odoo>

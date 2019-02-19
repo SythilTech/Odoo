@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="custom_css" inherit_id="website.layout" active="True" customize_show="True" name="ManyChat Widgets">
+        <xpath expr="//t[@t-set='head_website']" position="inside">
+            <script t-attf-src="//widget.manychat.com/#{website.sudo().manychat_id.page_id}.js" async="async"></script>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="manychat_integrator" model="res.groups">
+        <field name="name">ManyChat Integrator</field>
+        <field name="comment">Can import subscribers from ManyChat</field>
+    </record>
+        
+</odoo>

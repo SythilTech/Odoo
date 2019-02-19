@@ -1,0 +1,48 @@
+<div class="container">
+<h2>Description</h2>
+ManyChat Integration<br/>
+<h1>Instructions</h1>
+<h2>Initial Setup</h2>
+Settup as many ManyChat pages as you want to import subscriber data from<br/>
+<img src="1.jpg" class="img-responsive"/>
+<ol>
+    <li>Login to ManyChat and go to Settings->API->Get Token to get a authorization token</li>
+    <li>Login to Odoo and assign your user account to the 'ManyChat Integrator' group
+    <li>Go into the Integrations->ManyChat->Pages menu and create a new record with the authorization token from step 1</li>
+    <li>Click on 'Import Custom Data' button</li>
+</ol>
+<br/>
+<h2>Import a subscriber</h2>
+Create records in other models based on custom field data mapping<br/>
+<img src="2.jpg" class="img-responsive"/>
+<ol>
+    <li>Go into the Integrations->ManyChat->Pages menu and select a ManyChat page</li>
+    <li>Select a model you want the subscribers imported into</li>
+    <li>Create a record link for the import model, selecting what custom field data goes into what field</li>
+    <li>Click the 'Import Individual Subscriber' button and enter in the subscriber ID</li>
+    <li>Once you click the 'Import Subscriber' button the ManyChat subscriber will be imported or updated if it already exists</li>
+</ol>
+<br/>
+<h2>Handle External Requests</h2>
+Update data as it is received from ManyChat using external requests<br/>
+<img src="3.jpg" class="img-responsive"/>
+<br/>
+For URL use &lt;your_domain&gt;/manychat/import<br/>
+For request body use<br/>
+<pre>
+{
+  "params": [Full Subscriber Data]
+}
+</pre>
+<br/>
+<h2>Add record links</h2>
+Link records from other models so they also get updated<br/>
+<ol>
+    <li>Go into the Integrations->ManyChat->Subscribers menu and select a subscriber</li>
+    <li>Click the 'Create Record Link' button, the popup will surgest records based on custom field data e.g. ManyChat email = Lead Email</li>
+    <li>Select the records you wish to link and a link will be formed so they stay up to date with any data obtained from ManyChat</li>
+</ol>
+<h2>See Also</h2>
+manychat_integration_crm for the ability to import subscribers as leads<br/>
+manychat_integration_website to easily add ManyChat widgets to your website<br/>
+</div>

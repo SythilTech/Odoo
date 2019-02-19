@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="integration_manychat_subscriber_view_form" model="ir.ui.view">
+        <field name="name">ManyChat Integration Subscriber Form View</field>
+        <field name="model">integration.manychat.subscriber</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="create_record_link" type="object" string="Create Record Link"/>
+                </header>
+                <group>
+                    <field name="profile_pic"  widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;profile_pic&quot;, &quot;size&quot;: [90, 90]}"/>
+                    <field name="status"/>
+                    <field name="name"/>
+                    <field name="first_name"/>
+                    <field name="last_name"/>
+                    <field name="gender"/>
+                    <field name="im_id"/>
+                    <field name="locale"/>
+                    <field name="language"/>
+                    <field name="timezone"/>
+                    <field name="live_chat_url" widget="url"/>
+                    <field name="last_input_text"/>
+                    <field name="subscribed"/>
+                    <field name="last_interaction"/>
+                    <field name="last_seen"/>
+                    <field name="is_followup_enabled"/>
+                    <field name="tag_ids" widget="many2many_tags"/>
+                    <field name="user_ref_ids">
+                        <tree>
+                            <field name="user_ref"/>
+                            <field name="opted_in"/>
+                        </tree>
+                    </field>
+                    <field name="custom_field_ids">
+                        <tree>
+                            <field name="imf_id"/>
+                            <field name="value"/>
+                        </tree>
+                    </field>
+                    <field name="record_link_ids">
+                        <tree editable="bottom">
+                            <field name="record_model_id"/>
+                            <field name="record_id"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="i_m_s_l_w_view_form" model="ir.ui.view">
+        <field name="name">i.m.s.l.w Form View</field>
+        <field name="model">i.m.s.l.w</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="sub_id" invisible="True"/>
+                    <field name="candidate_record_ids">
+                        <tree>
+                            <field name="record_model_id"/>
+                            <field name="record_id"/>
+                            <field name="record_name"/>
+                            <field name="field_link_id"/>
+                        </tree>
+                    </field>
+                    <button name="create_links" type="object" string="Create Links"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="i_m_s_l_candidate_wizard_view_tree" model="ir.ui.view">
+        <field name="name">i.m.s.l.candidate.wizard Tree View</field>
+        <field name="model">i.m.s.l.candidate.wizard</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="record_model_id"/>
+                <field name="record_id"/>
+                <field name="record_name"/>
+                <field name="field_link_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="integration_manychat_subscriber_view_tree" model="ir.ui.view">
+        <field name="name">ManyChat Integration Subscriber Tree View</field>
+        <field name="model">integration.manychat.subscriber</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="im_id"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="integration_manychat_subscriber_action" model="ir.actions.act_window">
+        <field name="name">ManyChat Subscriber</field>
+        <field name="res_model">integration.manychat.subscriber</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                Import subscribers from under pages
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="integration_manychat_subscriber_menu" name="Subscribers" parent="integration_manychat_menu" action="integration_manychat_subscriber_action" sequence="20"/>
+
+</odoo>
