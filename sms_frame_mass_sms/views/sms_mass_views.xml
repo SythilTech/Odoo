@@ -71,6 +71,7 @@
       	                  </button>
       	              </div>
                       <group>
+                          <field name="name"/>
       	                  <field name="from_mobile" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
       	                  <field name="model_id" widget="selection" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
       	                  <field name="model_name" invisible="True"/>
@@ -83,10 +84,13 @@
       	                  </field>
       	                  <field name="mail_list_id" attrs="{'invisible': [('model_name', '!=', 'mail.mass_mailing.list')], 'readonly': [('mass_sms_state', '=', 'sent')]}"/>
       	                  <field name="total_count"/>
+      	                  <field name="segment_total"/>
                         </group>
                         <notebook>
                             <page string="Content">
       	                        <group>
+      	                            <field name="message_character_counter"/>
+      	                            <field name="message_segment_counter"/>
       	                            <field name="message_text" attrs="{'readonly': [('mass_sms_state', '=', 'sent')]}"/>
       	                            <field name="stop_message"/>
       	                        </group>

@@ -4,11 +4,23 @@ _logger = logging.getLogger(__name__)
 import requests
 from datetime import datetime
 import ast
+import math
 
 class SmsMass(models.Model):
 
     _name = "sms.mass"
 
+    @api.multi
+    def copy(self, default=None):
+        """
+        Reset state back to draft so we can resend
+        """
+        self.ensure_one()
+        default = dict(default or {})
+        default['mass_sms_state'] = 'draft'
+        return super(SmsMass, self).copy(default)
+        
+    name = fields.Char(string="Name")
     from_mobile = fields.Many2one('sms.number', string="From Mobile", required=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True, default=lambda self: self.env.ref('base.model_res_partner').id)
     model_name = fields.Char(string="Model Name", related="model_id.model")
@@ -16,8 +28,11 @@ class SmsMass(models.Model):
     filter = fields.Char(string="Filter")
     mail_list_id = fields.Many2one('mail.mass_mailing.list', string="Mailing List")
     selected_records = fields.Many2many('res.partner', string="Selected Records", domain="[('sms_opt_out','=',False),('mobile','!=',False)]")
+    message_character_counter = fields.Integer(string="Character Count", compute="_compute_message_character_counter")
+    message_segment_counter = fields.Integer(string="Segment Count", compute="_compute_message_segment_counter")
     message_text = fields.Text(string="Message Text")
-    total_count = fields.Integer(string="Total", compute="_total_count")
+    segment_total = fields.Integer(string="Segment Total", compute="_compute_segment_total")
+    total_count = fields.Integer(string="Recipient Total", compute="_total_count")
     fail_count = fields.Integer(string="Failed", compute="_fail_count")
     queue_count = fields.Integer(string="Queue", compute="_queue_count")
     sent_count = fields.Integer(string="Sent", compute="_sent_count")
@@ -28,6 +43,26 @@ class SmsMass(models.Model):
     sub_model_object_field = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")
     copyvalue = fields.Char(string='Placeholder Expression', help="Final placeholder expression, to be copy-pasted in the desired template field.")
     stop_message = fields.Char(string="STOP message", default="reply STOP to unsubscribe", required="True")
+
+    @api.depends('total_count', 'message_segment_counter')
+    def _compute_segment_total(self):
+        self.segment_total = self.total_count * self.message_segment_counter
+
+    @api.depends('message_text')
+    def _compute_message_character_counter(self):
+
+        if self.message_text:
+            self.message_character_counter = len(self.message_text) + len(self.stop_message)
+        else:
+            self.message_character_counter = len(self.stop_message)
+
+    @api.depends('message_text', 'message_character_counter')
+    def _compute_message_segment_counter(self):
+    
+        if self.message_character_counter <= 160:
+            self.message_segment_counter = 1
+        else:
+            self.message_segment_counter = math.ceil(self.message_character_counter / 153)
 
     @api.one
     @api.depends('model_id')
@@ -63,6 +98,8 @@ class SmsMass(models.Model):
         else:
             if self.mail_list_id:
                 self.total_count = self.env['mail.mass_mailing.contact'].search_count([('list_ids','=', self.mail_list_id.id)])
+            else:
+                self.total_count = self.env[self.model_name].search_count(ast.literal_eval(self.filter))
 
     @api.one
     def _fail_count(self):
