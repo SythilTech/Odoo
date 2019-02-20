@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.module_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_uninstall_wizard']" position="after">
-                <button name="restart_service" type="object" string="Restart Service"/>
+                <button name="restart_service" type="object" class="btn-danger" string="Restart Service"/>
             </xpath>
       	</field>
     </record>

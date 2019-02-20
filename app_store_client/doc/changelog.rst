@@ -1,3 +1,7 @@
+v1.0.5
+======
+* Fix orgin mismatch alert
+
 v1.0.4
 ======
 * Button to restart Odoo

@@ -21,12 +21,6 @@ rpc.query({
     console.log(app_url);
 });
 
-//var P = new Model('ir.config_parameter');
-//P.call('get_param', ['custom_app_store_url']).then(function(app_url) {
-//    my_app_url = app_url;
-//});
-
-
 window.onmessage = function(e){
 
     //Check origin matches app store url to make sure nothing weird is happening
@@ -37,7 +31,7 @@ window.onmessage = function(e){
         });
 
 	} else {
-		alert("Origin Mismatch");
+		console.log("Origin Mismatch");
 	}
 };
 

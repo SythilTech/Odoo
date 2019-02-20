@@ -1,3 +1,7 @@
+v1.0.23
+=======
+* Add 'Make Twilio Call' button to activity screen to optimise workflow
+
 v1.0.22
 =======
 * Call log report now has total cost / total duration
