@@ -1,3 +1,7 @@
+v1.5.12
+=======
+* Add ability for clients to add attachments in there replies from the website interface
+
 v1.5.11
 =======
 * Suggest help pages that are similiar to ticket subject (reduces tickets submitted that already have a help article)
