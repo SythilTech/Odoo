@@ -19,6 +19,7 @@ class IntegrationManyChat(models.Model):
     record_link_ids = fields.One2many('integration.manychat.map', 'im_id', string="Record Links")
     field_ids = fields.One2many('integration.manychat.field', 'im_id', string="Custom Fields")
     tag_ids = fields.One2many('integration.manychat.tag', 'im_id', string="Tags")
+    subscriber_ids = fields.One2many('integration.manychat.subscriber', 'im_id', string="Subscribers")
 
     @api.depends('authorization_token')
     def _compute_page_id(self):
@@ -129,6 +130,10 @@ class IntegrationManyChat(models.Model):
 
                 # Create a link to the record so we can update it later
                 import_record.record_link_ids = [(0,0,{'sub_id': import_record.id, 'record_model_id': self.import_model_id.id, 'record_id': new_record.id})]
+
+    def update_subscriber_data(self):
+        for subscriber in self.subscriber_ids:
+            self.import_subscriber(subscriber.manychat_id)
 
 class IntegrationManyChatimport(models.TransientModel):
 

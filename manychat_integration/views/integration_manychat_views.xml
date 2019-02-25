@@ -9,6 +9,7 @@
                 <header>
                     <button type="object" name="import_custom_data" string="Import Custom Data"/>
                     <button type="object" name="import_individual_subscriber" string="Import Individual Subscriber"/>
+                    <button type="object" name="update_subscriber_data" string="Update Subscriber Data"/>
                 </header>
                 <group>
                     <field name="name"/>
