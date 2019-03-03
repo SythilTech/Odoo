@@ -17,6 +17,7 @@
                 <page string="ManyChat">
                     <group>
                         <field name="manychat_id"/>
+                        <field name="live_chat_url" widget="url"/>
                     </group>
                 </page>
             </notebook>

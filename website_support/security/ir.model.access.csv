@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_website_support_ticket,access website.support.ticket,model_website_support_ticket,support_staff,1,1,1,0
+employee_access_website_support_ticket,employee access website.support.ticket,model_website_support_ticket,base.group_user,1,0,0,0
 access_website_support_ticket_compose,access website.support.ticket.compose,model_website_support_ticket_compose,support_staff,1,1,1,0
 access_website_support_ticket_states,support staff access website.support.ticket.states,model_website_support_ticket_states,support_staff,1,0,0,0
 access_website_support_ticket_states_maanger,support manager access website.support.ticket.states,model_website_support_ticket_states,support_manager,1,1,1,1

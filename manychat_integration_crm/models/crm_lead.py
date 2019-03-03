@@ -17,11 +17,12 @@ class CrmLeadManyChat(models.Model):
     contact_lastname = fields.Char(string="Contact Lastname")
     image = fields.Binary(string="Image")
     manychat_custom_field_ids = fields.Char()
+    live_chat_url = fields.Char(string="Live Chat URL")
 
     @api.model
     def manychat_create(self, manychat_page, json_data):
 
-        import_values = {'manychat_id': json_data['data']['id'], 'name': json_data['data']['name'], 'contact_name': json_data['data']['name'], 'contact_firstname': json_data['data']['first_name'], 'contact_lastname': json_data['data']['last_name']}
+        import_values = {'manychat_id': json_data['data']['id'], 'name': json_data['data']['name'], 'contact_name': json_data['data']['name'], 'contact_firstname': json_data['data']['first_name'], 'contact_lastname': json_data['data']['last_name'], 'live_chat_url': json_data['data']['live_chat_url']}
 
         if json_data['data']['is_followup_enabled'] == False:
             import_values['opt_out'] = True
@@ -54,7 +55,7 @@ class CrmLeadManyChat(models.Model):
 
     def manychat_write(self, manychat_page, json_data):
 
-        import_values = {'manychat_id': json_data['data']['id'], 'name': json_data['data']['name'], 'contact_name': json_data['data']['name'], 'contact_firstname': json_data['data']['first_name'], 'contact_lastname': json_data['data']['last_name']}
+        import_values = {'manychat_id': json_data['data']['id'], 'name': json_data['data']['name'], 'contact_name': json_data['data']['name'], 'contact_firstname': json_data['data']['first_name'], 'contact_lastname': json_data['data']['last_name'], 'live_chat_url': json_data['data']['live_chat_url']}
 
         if json_data['data']['is_followup_enabled'] == False:
             import_values['opt_out'] = True

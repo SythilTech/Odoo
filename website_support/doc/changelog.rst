@@ -1,3 +1,7 @@
+v1.5.13
+=======
+* Adjust permissions so employees can view contacts without access to support ticket data.
+
 v1.5.12
 =======
 * Add ability for clients to add attachments in there replies from the website interface
