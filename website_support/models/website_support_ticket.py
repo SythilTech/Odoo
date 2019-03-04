@@ -362,6 +362,11 @@ class WebsiteSupportTicket(models.Model):
         ticket_open_email_template = self.env['ir.model.data'].get_object('website_support', 'website_ticket_state_open').mail_template_id
         ticket_open_email_template.send_mail(new_id.id, True)
 
+        setting_auto_create_contact = self.env['ir.default'].get('website.support.settings', 'auto_create_contact')
+        if setting_auto_create_contact and new_id.person_name and new_id.email and not new_id.partner_id:
+            new_partner = self.env['res.partner'].sudo().create({'name': new_id.person_name, 'email': new_id.email})
+            new_id.partner_id = new_partner.id
+
         #If the customer has a dedicated support user then automatically assign them
         if new_id.partner_id.dedicated_support_user_id:
             new_id.user_id = new_id.partner_id.dedicated_support_user_id.id
@@ -372,16 +377,8 @@ class WebsiteSupportTicket(models.Model):
             #Go through all rules starting from the lowest response time
             for sla_rule in new_id.partner_id.sla_id.rule_ids:
                 #All conditions have to match
-                _logger.error(sla_rule.name)
                 all_true = True
                 for sla_rule_con in sla_rule.condition_ids:
-                    _logger.error("rule type:" + str(sla_rule_con.type))
-                    _logger.error("ticket category: " + str(new_id.category.name))
-                    _logger.error("rule category: " + str(sla_rule_con.category_id.name))
-                    _logger.error("ticket sub category: " + str(new_id.sub_category_id.name))
-                    _logger.error("rule sub category: " + str(sla_rule_con.subcategory_id.name))
-                    _logger.error("ticket priority: " + str(new_id.priority_id.name))
-                    _logger.error("rule priority: " + str(sla_rule_con.priority_id.name))
                     if sla_rule_con.type == "category" and new_id.category.id != sla_rule_con.category_id.id:
                         all_true = False
                     elif sla_rule_con.type == "subcategory" and new_id.sub_category_id.id != sla_rule_con.subcategory_id.id:

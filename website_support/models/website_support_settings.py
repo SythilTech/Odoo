@@ -19,6 +19,7 @@ class WebsiteSupportSettings(models.Model):
     max_ticket_attachments = fields.Integer(string="Max Ticket Attachments")
     max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
     allow_user_signup = fields.Boolean(string="Allow User Signup")
+    auto_create_contact = fields.Boolean(string="Auto Create Contact")
     auto_send_survey = fields.Boolean(string="Auto Send Survey")
     business_hours_id = fields.Many2one('resource.calendar', string="Business Hours")
     google_recaptcha_active = fields.Boolean(string="Google reCAPTCHA Active")
@@ -29,6 +30,7 @@ class WebsiteSupportSettings(models.Model):
     @api.multi
     def set_values(self):
         super(WebsiteSupportSettings, self).set_values()
+        self.env['ir.default'].set('website.support.settings', 'auto_create_contact', self.auto_create_contact)
         self.env['ir.default'].set('website.support.settings', 'auto_send_survey', self.auto_send_survey)
         self.env['ir.default'].set('website.support.settings', 'allow_user_signup', self.allow_user_signup)
         self.env['ir.default'].set('website.support.settings', 'change_user_email_template_id', self.change_user_email_template_id.id)
@@ -47,6 +49,7 @@ class WebsiteSupportSettings(models.Model):
     def get_values(self):
         res = super(WebsiteSupportSettings, self).get_values()
         res.update(
+            auto_create_contact=self.env['ir.default'].get('website.support.settings', 'auto_create_contact'),
             auto_send_survey=self.env['ir.default'].get('website.support.settings', 'auto_send_survey'),
             allow_user_signup=self.env['ir.default'].get('website.support.settings', 'allow_user_signup'),
             change_user_email_template_id=self.env['ir.default'].get('website.support.settings', 'change_user_email_template_id'),

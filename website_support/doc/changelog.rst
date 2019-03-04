@@ -1,3 +1,7 @@
+v1.5.15
+=======
+* Add setting to auto create contact
+
 v1.5.14
 =======
 * Add ability to add attachments on staff reply and staff ticket close
