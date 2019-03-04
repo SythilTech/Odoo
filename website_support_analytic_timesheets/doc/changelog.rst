@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Move timesheet into tab and fix permission issue
+
 v1.0.6
 ======
 * Compatablility fix for version 1.3.1
