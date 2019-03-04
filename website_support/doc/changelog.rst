@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Add ability for clients to add attachments in there replies from the website interface
+
 v1.0.5
 ======
 * Custoemr replies should always send off email notification to followers

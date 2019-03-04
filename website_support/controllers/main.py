@@ -474,10 +474,13 @@ class SupportTicketController(http.Controller):
         for dep in request.env['website.support.department.contact'].sudo().search([('user_id','=',http.request.env.user.id)]):
             for contact in dep.wsd_id.partner_ids:
                 ticket_access.append(contact.id)
-        
+
+        setting_max_ticket_attachments = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachments')
+        setting_max_ticket_attachment_filesize = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize')
+
         # Only let the user this ticket is assigned to view this ticket
         support_ticket = http.request.env['website.support.ticket'].sudo().search([('partner_id', 'in', ticket_access), ('partner_id','!=',False), ('id','=',ticket) ])[0]
-        return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket})
+        return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize})
 
     @http.route('/support/portal/ticket/view/<portal_access_key>', type="http", auth="public", website=True)
     def support_portal_ticket_view(self, portal_access_key):
@@ -519,7 +522,25 @@ class SupportTicketController(http.Controller):
 
             request.env['website.support.ticket.message'].sudo().create({'ticket_id':ticket.id, 'by': 'customer','content':values['comment']})
             ticket.state_id = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
-            ticket.sudo(request.env.user.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
+
+            attachments = []
+            if 'file' in values:
+
+                for c_file in request.httprequest.files.getlist('file'):
+                    data = c_file.read()
+
+                    if c_file.filename:
+                        new_attachment = request.env['ir.attachment'].sudo().create({
+                            'name': c_file.filename,
+                            'datas': base64.b64encode(data),
+                            'datas_fname': c_file.filename,
+                            'res_model': 'website.support.ticket',
+                            'res_id': ticket.id
+                        })
+
+                        attachments.append( (c_file.filename, data) )
+
+            ticket.sudo(request.env.user.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment", attachments=attachments)
         else:
             return "You do not have permission to submit this commment"
 
