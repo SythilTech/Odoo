@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="sms_lead_more_menu_server_action" model="ir.actions.server">
+            <field name="name">SMS Lead</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="binding_model_id" ref="crm.model_crm_lead"/>
+            <field name="condition">True</field>
+            <field name="state">code</field>
+            <field name="code">action = record.sms_action()</field>
+        </record>
+        
+        <record id="view_lead_form_inherit_sms_frame" model="ir.ui.view">
+            <field name="name">E.164 mobile placeholder (Lead)</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+      	        <field name="mobile" position="replace">
+      	            <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760"/>
+      	        </field>
+      	    </field>
+        </record>
+
+        <record id="crm_lead__view_form_inherit_sms_frame" model="ir.ui.view">
+            <field name="name">E.164 mobile placeholder (Lead)</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+      	        <field name="mobile" position="replace">
+      	            <field name="mobile" placeholder="E.164 format e.g. +61 427 671 760"/>
+      	        </field>
+      	    </field>
+        </record>
+        
+    </data>
+</openerp>
