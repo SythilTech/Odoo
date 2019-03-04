@@ -16,6 +16,7 @@
                   </group>
                   <field name="body" widget="html"/>
                   <group>
+                      <field name="attachment_ids" widget="many2many_binary" string="Attach Files" nolabel="1" colspan="2"/>
                       <field name="template_id" context="{'default_model':'website.support.ticket', 'default_body_html': body}"/>
                   </group>
                   <footer>

@@ -1,3 +1,7 @@
+v1.5.14
+=======
+* Add ability to add attachments on staff reply and staff ticket close
+
 v1.5.13
 =======
 * Adjust permissions so employees can view contacts without access to support ticket data.

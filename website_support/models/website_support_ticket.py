@@ -602,6 +602,7 @@ class WebsiteSupportTicketClose(models.TransientModel):
     ticket_id = fields.Many2one('website.support.ticket', string="Ticket ID")
     message = fields.Html(string="Close Message")
     template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
+    attachment_ids = fields.Many2many('ir.attachment', 'sms_close_attachment_rel', 'sms_close_id', 'attachment_id', 'Attachments')
 
     @api.onchange('template_id')
     def _onchange_template_id(self):
@@ -624,6 +625,18 @@ class WebsiteSupportTicketClose(models.TransientModel):
         #We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
         message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
         self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
+
+        email_wrapper = self.env['ir.model.data'].get_object('website_support', 'support_ticket_close_wrapper')
+
+        values = email_wrapper.generate_email([self.id])[self.id]
+        values['model'] = "website.support.ticket"
+        values['res_id'] = self.ticket_id.id
+
+        for attachment in self.attachment_ids:
+            values['attachment_ids'].append((4, attachment.id))
+
+        send_mail = self.env['mail.mail'].create(values)
+        send_mail.send()
 
         self.ticket_id.close_comment = self.message
         self.ticket_id.closed_by_id = self.env.user.id
@@ -648,6 +661,7 @@ class WebsiteSupportTicketCompose(models.Model):
     template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
     approval = fields.Boolean(string="Approval")
     planned_time = fields.Datetime(string="Planned Time")
+    attachment_ids = fields.Many2many('ir.attachment', 'sms_compose_attachment_rel', 'sms_compose_id', 'attachment_id', 'Attachments')
 
     @api.onchange('template_id')
     def _onchange_template_id(self):
@@ -680,6 +694,10 @@ class WebsiteSupportTicketCompose(models.Model):
         values = email_wrapper.generate_email([self.id])[self.id]
         values['model'] = "website.support.ticket"
         values['res_id'] = self.ticket_id.id
+
+        for attachment in self.attachment_ids:
+            values['attachment_ids'].append((4, attachment.id))
+
         send_mail = self.env['mail.mail'].create(values)
         send_mail.send()
 

@@ -120,6 +120,32 @@
             </field>
         </record>
 
+        <record id="support_ticket_close_wrapper" model="mail.template">
+            <field name="name">Support Ticket Close Wrapper</field>
+            <field name="model_id" ref="model_website_support_ticket_close"></field>
+            <field name="email_from"><![CDATA[${object.ticket_id.company_id.name} <${object.ticket_id.company_id.email}>]]></field>
+            <field name="email_to">${object.ticket_id.email|safe}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.ticket_id.person_name},</p>
+                <p>Your support ticket has been closed by our staff, here is the final comment</p>
+                <p>${object.message|safe or ''}</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_id.ticket_number or object.ticket_id.id}<br/>
+                <b>Ticket Category:</b> 
+                % if object.ticket_id.category.name :
+                    ${object.ticket_id.category.name}
+                % endif
+                <br/>
+                <b>Ticket Description:</b><br/>
+                ${object.ticket_id.description|safe}
+                
+            ]]>
+            </field>
+        </record>
+
         <record id="support_ticket_closed" model="mail.template">
             <field name="name">Support Ticket Closed</field>
             <field name="model_id" ref="model_website_support_ticket"></field>
