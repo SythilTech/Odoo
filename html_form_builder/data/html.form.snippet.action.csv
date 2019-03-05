@@ -1,0 +1,3 @@
+"id","name","action_model"
+"partner_insert","Create New Partner","res.partner"
+"lead_insert","Create New Lead","crm.lead"
