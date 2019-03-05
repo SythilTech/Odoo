@@ -96,7 +96,10 @@ class VoipCallComment(models.TransientModel):
     call_id = fields.Many2one('voip.call', string="Voip Call")
     note = fields.Html(string="Note")
 
+    @api.multi
     def post_feedback(self):
+        self.ensure_one()
+
         message = self.env['mail.message']
         
         if self.call_id.record_model and self.call_id.record_id:
@@ -114,3 +117,9 @@ class VoipCallComment(models.TransientModel):
 
             mail_activity = self.env['mail.activity'].create({'res_model_id': record_model.id, 'res_id': self.call_id.record_id, 'activity_type_id': call_activity.id, 'note': note})
             mail_activity.action_feedback()
+
+
+            return {'type': 'ir.actions.act_window',
+                'res_model': self.call_id.record_model,
+                'view_mode': 'form',
+                'res_id': int(self.call_id.record_id)}

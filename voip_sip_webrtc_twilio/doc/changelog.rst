@@ -1,3 +1,7 @@
+v1.0.24
+=======
+* Redirect to record after making call comment
+
 v1.0.23
 =======
 * Add 'Make Twilio Call' button to activity screen to optimise workflow
