@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="integration_manychat_server_view_form" model="ir.ui.view">
+        <field name="name">ManyChat Integration Server Form View</field>
+        <field name="model">integration.manychat.server</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="server_slug"/>
+                    <field name="model_id"/>
+                    <field name="model_name" invisible="True"/>
+                    <field name="domain" widget="domain" options="{'model': 'model_name', 'in_dialog': True}"/>
+                    <field name="message_ids">
+                        <tree>
+                            <field name="type"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="integration_manychat_server_message_view_form" model="ir.ui.view">
+        <field name="name">ManyChat Integration Server Message Form View</field>
+        <field name="model">integration.manychat.server.message</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="type"/>
+                    <field name="text"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="integration_manychat_server_view_tree" model="ir.ui.view">
+        <field name="name">ManyChat Integration Server Tree View</field>
+        <field name="model">integration.manychat.server</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="domain"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="integration_manychat_server_action" model="ir.actions.act_window">
+        <field name="name">ManyChat Intergration Dynamic Content Server</field>
+        <field name="res_model">integration.manychat.server</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                Please enter ManyChat Dynamic Content Server details
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="integration_manychat_server_menu" name="Dynamic Content Server" parent="integration_manychat_menu" action="integration_manychat_server_action" sequence="30"/>
+
+</odoo>

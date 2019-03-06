@@ -1,6 +1,6 @@
 {
     'name': "ManyChat Integration",
-    'version': "1.0.1",
+    'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -10,6 +10,7 @@
     'data': [
         'views/integration_manychat_views.xml',
         'views/integration_manychat_subscriber_views.xml',
+        'views/integration_manychat_server_views.xml',
         'views/res_partner_views.xml',
         'data/res.groups.xml',
         'security/ir.model.access.csv'

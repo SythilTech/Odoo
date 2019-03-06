@@ -35,6 +35,18 @@ For request body use<br/>
 }
 </pre>
 <br/>
+<h2>Serve Dynamic Content</h2>
+Send data such as upcoming events.<br/>
+<img src="4.jpg" class="img-responsive"/>
+<ol>
+    <li>Go into the Integrations->ManyChat->Dynamic Content Server menu</li>
+    <li>Give the Dynamic content server a name and slug then select which model you will retrieve data from e.g. event.event</li>
+    <li>Set a filter so only certain records are returned<li>
+    <li>Create a series of messages you want sent out, use of dynmaic placeholders is allowed</li>
+    <li>Go into ManyChat and place down a Dynamic Content block</li>
+    <li>For URL use &lt;your_domain&gt;/manychat/serve/&lt;server_slug&gt;</li>
+    <li>Add a headers with key of 'Content-Type' and value of 'text/html; charset=utf-8'</li>
+</ol>
 <h2>Add record links</h2>
 Link records from other models so they also get updated<br/>
 <ol>
