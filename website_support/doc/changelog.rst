@@ -1,3 +1,7 @@
+v1.5.16
+=======
+* Add many2one type to custom fields
+
 v1.5.15
 =======
 * Add setting to auto create contact

@@ -6,6 +6,7 @@ from random import randint
 import os
 import datetime
 import requests
+import ast
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -113,6 +114,11 @@ class SupportTicketController(http.Controller):
 
                 if sub_category_field.type == "textbox":
                     return_string += "    <input type=\"text\" required=\"True\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
+                elif sub_category_field.type == "many2one":
+                    return_string += "    <select required=\"True\" class=\"form-control\" name=\"efield_" + str(sub_category_field.id) + "\">\n"
+                    for record in request.env[sub_category_field.model_name].sudo().search(ast.literal_eval(sub_category_field.filter)):
+                        return_string += "        <option value=\"" + record.name + " (" + str(record.id) + ")\">" + record.name + "</option>\n"
+                    return_string += "</select>\n"
 
                 return_string += "  </div>\n"
                 return_string += "</div>\n"
