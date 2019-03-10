@@ -1,6 +1,6 @@
 {
     'name': "ManyChat Integration",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Sythil Tech",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

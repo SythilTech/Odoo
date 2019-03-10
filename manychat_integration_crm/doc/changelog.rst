@@ -1,3 +1,7 @@
+v1.0.3
+======
+* Type converserion if going into many2one field
+
 v1.0.2
 ======
 * Add Manychat tab to opportunbity view

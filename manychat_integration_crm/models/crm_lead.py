@@ -33,7 +33,10 @@ class CrmLeadManyChat(models.Model):
             # Try to map the custom field to the Odoo field
             mapping_custom_field = self.env['integration.manychat.map.field'].search([('map_id.im_id', '=', manychat_page.id), ('map_id.model_id.model', '=', 'crm.lead'), ('manychat_field_id.name', '=', custom_field['name']), ('odoo_field_id', '!=', False)])
             if mapping_custom_field:
-                import_values[mapping_custom_field[0].odoo_field_id.name] = custom_field['value']
+                if mapping_custom_field[0].odoo_field_id.ttype == "many2one":
+                    import_values[mapping_custom_field[0].odoo_field_id.name] = int(custom_field['value'])
+                else:
+                    import_values[mapping_custom_field[0].odoo_field_id.name] = custom_field['value']
 
         manychat_tags = []
         for tag in json_data['data']['tags']:
@@ -66,8 +69,10 @@ class CrmLeadManyChat(models.Model):
             # Try to map the custom field to the Odoo field
             mapping_custom_field = self.env['integration.manychat.map.field'].search([('map_id.im_id', '=', manychat_page.id), ('map_id.model_id.model', '=', 'crm.lead'), ('manychat_field_id.name', '=', custom_field['name']), ('odoo_field_id', '!=', False)])
             if mapping_custom_field:
-                _logger.error(mapping_custom_field.name_get()[0][1])
-                import_values[mapping_custom_field[0].odoo_field_id.name] = custom_field['value']
+                if mapping_custom_field[0].odoo_field_id.ttype == "many2one":
+                    import_values[mapping_custom_field[0].odoo_field_id.name] = int(custom_field['value'])
+                else:
+                    import_values[mapping_custom_field[0].odoo_field_id.name] = custom_field['value']
 
         manychat_tags = []
         for tag in json_data['data']['tags']:

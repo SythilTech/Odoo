@@ -1,6 +1,6 @@
 {
     'name': "ManyChat Integration - CRM",
-    'version': "1.0.2",
+    'version': "1.0.3",
     'author': "Success Made Easier",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
