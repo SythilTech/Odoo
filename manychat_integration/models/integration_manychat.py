@@ -162,8 +162,8 @@ class IntegrationManyChatMapField(models.Model):
 
     map_id = fields.Many2one('integration.manychat.map', string="ManyChat Record Link")
     model_id = fields.Many2one('ir.model', string="Model")
-    manychat_field_id = fields.Many2one('integration.manychat.field', string="ManyChat Field")
-    odoo_field_id = fields.Many2one('ir.model.fields', string="Odoo Field")
+    manychat_field_id = fields.Many2one('integration.manychat.field', string="ManyChat Field", required=True)
+    odoo_field_id = fields.Many2one('ir.model.fields', string="Odoo Field", required=True)
 
     @api.multi
     def name_get(self):
