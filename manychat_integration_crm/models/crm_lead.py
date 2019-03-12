@@ -7,6 +7,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 class CrmLeadManyChat(models.Model):
 
@@ -34,7 +35,10 @@ class CrmLeadManyChat(models.Model):
             mapping_custom_field = self.env['integration.manychat.map.field'].search([('map_id.im_id', '=', manychat_page.id), ('map_id.model_id.model', '=', 'crm.lead'), ('manychat_field_id.name', '=', custom_field['name']), ('odoo_field_id', '!=', False)])
             if mapping_custom_field:
                 if mapping_custom_field[0].odoo_field_id.ttype == "many2one":
-                    import_values[mapping_custom_field[0].odoo_field_id.name] = int(custom_field['value'])
+                    if self.env[mapping_custom_field[0].odoo_field_id.relation].sudo().search_count([('id','=', int(custom_field['value']))]) == 1:
+                        import_values[mapping_custom_field[0].odoo_field_id.name] = int(custom_field['value'])
+                    else:
+                        raise UserError("Record " + str(custom_field['value']) + " of model " + mapping_custom_field[0].odoo_field_id.relation + " does not exist")
                 else:
                     import_values[mapping_custom_field[0].odoo_field_id.name] = custom_field['value']
 
@@ -65,12 +69,14 @@ class CrmLeadManyChat(models.Model):
 
         manychat_custom_fields = []
         for custom_field in json_data['data']['custom_fields']:
-            _logger.error(custom_field['name'])
             # Try to map the custom field to the Odoo field
             mapping_custom_field = self.env['integration.manychat.map.field'].search([('map_id.im_id', '=', manychat_page.id), ('map_id.model_id.model', '=', 'crm.lead'), ('manychat_field_id.name', '=', custom_field['name']), ('odoo_field_id', '!=', False)])
             if mapping_custom_field:
                 if mapping_custom_field[0].odoo_field_id.ttype == "many2one":
-                    import_values[mapping_custom_field[0].odoo_field_id.name] = int(custom_field['value'])
+                    if self.env[mapping_custom_field[0].odoo_field_id.relation].sudo().search_count([('id','=', int(custom_field['value']))]) == 1:
+                        import_values[mapping_custom_field[0].odoo_field_id.name] = int(custom_field['value'])
+                    else:
+                        raise UserError("Record " + str(custom_field['value']) + " of model " + mapping_custom_field[0].odoo_field_id.relation + " does not exist")
                 else:
                     import_values[mapping_custom_field[0].odoo_field_id.name] = custom_field['value']
 
