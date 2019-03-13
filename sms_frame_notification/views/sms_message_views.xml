@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <menuitem id="sms_root_message_menu" name="SMS Messages" action="sms_frame.sms_message_action" sequence="30"/>
+
+   </data>
+</openerp>
