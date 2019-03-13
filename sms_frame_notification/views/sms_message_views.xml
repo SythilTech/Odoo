@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-      <menuitem id="sms_root_message_menu" name="SMS Messages" action="sms_frame.sms_message_action" sequence="30"/>
+      <menuitem id="sms_root_message_menu" name="SMS Messages" action="sms_frame.sms_message_action" sequence="30" web_icon="sms_frame_notification,static/description/menu_icon.png"/>
 
    </data>
 </openerp>

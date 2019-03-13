@@ -131,7 +131,7 @@
       	  </field>
       </record>
 
-      <menuitem id="sms_mass_top_menu" name="Mass SMS" sequence="100"/>      
+      <menuitem id="sms_mass_top_menu" name="Mass SMS" sequence="100" web_icon="sms_frame_mass_sms,static/description/menu_icon.png"/>      
       <menuitem id="sms_mass_sub_menu" name="Mass SMS" parent="sms_mass_top_menu" action="sms_mass_sms_action"/>
 
    </data>
