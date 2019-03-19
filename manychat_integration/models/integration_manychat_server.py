@@ -63,7 +63,7 @@ class IntegrationManyChatServer(models.Model):
     server_slug = fields.Char(string="Slug", help="Name in url", required=True)
     model_id = fields.Many2one('ir.model', string="Model", help="Reads Data from this model", required=True)
     model_name = fields.Char(related="model_id.model", string="Model Name")
-    domain = fields.Char(string="Domain", help="Returns only records that match the domain", required=True)
+    domain = fields.Char(string="Domain", help="Returns only records that match the domain, Use ${last_input_text} to get the last input text", required=True)
     message_ids = fields.One2many('integration.manychat.server.message', 'server_id', string="Messages")
 
 class IntegrationManyChatServerMessage(models.Model):
