@@ -2,6 +2,8 @@
 
 import ast
 import json
+import logging
+_logger = logging.getLogger(__name__)
 
 import odoo.http as http
 from odoo.http import Response, request, HttpRequest

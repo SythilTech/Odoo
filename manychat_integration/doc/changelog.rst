@@ -1,3 +1,7 @@
+v1.0.4
+======
+* Dynamic content builder for text messages
+
 v1.0.3
 ======
 * Type converserion if going into many2one field

@@ -71,8 +71,49 @@ class IntegrationManyChatServerMessage(models.Model):
     _name = 'integration.manychat.server.message'
     
     server_id = fields.Many2one('integration.manychat.server', string="Server")
+    model_id = fields.Many2one(related="server_id.model_id", string="Model")
+    model_object_field_id = fields.Many2one('ir.model.fields', string="Field", help="Select target field from the related document model.\nIf it is a relationship field you will be able to select a target field at the destination of the relationship.")
+    sub_object_id = fields.Many2one('ir.model', string='Sub-model', readonly=True, help="When a relationship field is selected as first field, this field shows the document model the relationship goes to.")
+    sub_model_object_field_id = fields.Many2one('ir.model.fields', string='Sub-field', help="When a relationship field is selected as first field, this field lets you select the target field within the destination document model (sub-model).")
+    null_value = fields.Char(string='Default Value', help="Optional value to use if the target field is empty")
+    copyvalue = fields.Char(string='Placeholder Expression', help="Final placeholder expression, to be copy-pasted in the desired template field.")
     type = fields.Selection([('text', 'Text')], string="Type", required=True)
     text = fields.Text(string="Text", help="Use Dynamic Placeholders")
+
+    @api.model
+    def build_expression(self, field_name, sub_field_name, null_value):
+        """Returns a placeholder expression for use in a template field,
+           based on the values provided in the placeholder assistant.
+
+          :param field_name: main field name
+          :param sub_field_name: sub field name (M2O)
+          :param null_value: default value if the target value is empty
+          :return: final placeholder expression
+        """
+        expression = ''
+        if field_name:
+            expression = "${object." + field_name
+            if sub_field_name:
+                expression += "." + sub_field_name
+            if null_value:
+                expression += " or '''%s'''" % null_value
+            expression += "}"
+        return expression
+
+    @api.onchange('model_object_field_id')
+    def _onchange_model_object_field_id(self):
+        if self.model_object_field_id.relation:
+            self.sub_object_id = self.env['ir.model'].search([('model','=',self.model_object_field_id.relation)])[0].id
+        else:
+            self.sub_object_id = False    
+    
+        if self.model_object_field_id:
+            self.copyvalue = self.build_expression(self.model_object_field_id.name, self.sub_model_object_field_id.name, self.null_value)
+
+    @api.onchange('sub_model_object_field_id')
+    def _onchange_sub_model_object_field_id(self):
+        if self.sub_model_object_field_id:
+            self.copyvalue = self.build_expression(self.model_object_field_id.name, self.sub_model_object_field_id.name, self.null_value)
 
     def render_message(self, template, model, res_id):
         """Render the given template text, replace mako expressions ``${expr}``
