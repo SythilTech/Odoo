@@ -12,7 +12,6 @@
         'views/integration_manychat_subscriber_views.xml',
         'views/integration_manychat_server_views.xml',
         'views/res_partner_views.xml',
-        'views/res_users_views.xml',
         'data/res.groups.xml',
         'security/ir.model.access.csv'
     ],
