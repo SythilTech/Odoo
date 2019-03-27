@@ -6,7 +6,7 @@
             <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="VOIP" href="#">
                 <i class="fa fa-phone"/>
             </a>
-            <ul class="o_mail_navbar_dropdown dropdown-menu" role="menu" id="voip_tray">
+            <ul class="o_mail_navbar_dropdown dropdown-menu" role="menu" id="voip_tray" style="max-height:1000px;overflow-y:scroll;">
 
             </ul>
         </li>

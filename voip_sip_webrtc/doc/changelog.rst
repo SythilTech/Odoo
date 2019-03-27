@@ -1,3 +1,7 @@
+v1.6.12
+=======
+* Add scroll bar to user list (1000px)
+
 v1.6.11
 =======
 * Compact the menu
