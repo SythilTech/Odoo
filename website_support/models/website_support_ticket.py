@@ -90,6 +90,7 @@ class WebsiteSupportTicket(models.Model):
     close_time = fields.Datetime(string="Close Time")
     close_date = fields.Date(string="Close Date")
     closed_by_id = fields.Many2one('res.users', string="Closed By")
+    close_lock = fields.Boolean(string="Close Lock")
     time_to_close = fields.Integer(string="Time to close (seconds)")
     extra_field_ids = fields.One2many('website.support.ticket.field', 'wst_id', string="Extra Details")
     planned_time = fields.Datetime(string="Planned Time")
@@ -108,6 +109,18 @@ class WebsiteSupportTicket(models.Model):
     sla_alert_ids = fields.Many2many('website.support.sla.alert', string="SLA Alerts",
                                      help="Keep record of SLA alerts sent so we do not resend them")
 
+    @api.multi
+    @api.depends('subject', 'ticket_number')
+    def name_get(self):
+        res = []
+        for record in self:
+            if record.subject and record.ticket_number:
+                name = record.subject + " (#" + record.ticket_number + ")"
+            else:
+                name = record.subject
+            res.append((record.id, name))
+        return res
+        
     @api.one
     @api.depends('sla_timer')
     def _compute_sla_timer_format(self):
@@ -286,6 +299,19 @@ class WebsiteSupportTicket(models.Model):
     def message_update(self, msg_dict, update_vals=None):
         """ Override to update the support ticket according to the email. """
 
+        if self.close_lock:
+            # Send lock email
+            setting_ticket_lock_email_template_id = self.env['ir.default'].get('website.support.settings', 'ticket_lock_email_template_id')
+            if setting_ticket_lock_email_template_id:
+                mail_template = self.env['mail.template'].browse(setting_ticket_lock_email_template_id)
+            else:
+                # BACK COMPATABLITY FAIL SAFE
+                mail_template = self.env['ir.model'].get_object('website_support', 'support_ticket_close_lock')
+
+            mail_template.send_mail(self.id, True)
+            
+            return False
+
         body_short = tools.html_sanitize(msg_dict['body'])
         #body_short = tools.html_email_clean(msg_dict['body'], shorten=True, remove=True)
 
@@ -340,6 +366,18 @@ class WebsiteSupportTicket(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'website.support.ticket.close',
+            'context': {'default_ticket_id': self.id},
+            'target': 'new'
+        }
+
+    @api.multi
+    def merge_ticket(self):
+        return {
+            'name': "Merge Support Ticket",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket.merge',
             'context': {'default_ticket_id': self.id},
             'target': 'new'
         }
@@ -493,13 +531,59 @@ class WebsiteSupportTicket(models.Model):
         # Assign current user
         self.user_id = self._uid
 
-
 class WebsiteSupportTicketApproval(models.Model):
 
     _name = "website.support.ticket.approval"
 
     wst_id = fields.Many2one('website.support.ticket', string="Support Ticket")
     name = fields.Char(string="Name", translate=True)
+
+class WebsiteSupportTicketMerge(models.TransientModel):
+
+    _name = "website.support.ticket.merge"
+
+    ticket_id = fields.Many2one('website.support.ticket', ondelete="cascade", string="Support Ticket")
+    merge_ticket_id = fields.Many2one('website.support.ticket', ondelete="cascade", required="True", string="Merge With")
+
+    @api.multi
+    def merge_tickets(self):
+
+        self.ticket_id.close_time = datetime.datetime.now()
+
+        #Also set the date for gamification
+        self.ticket_id.close_date = datetime.date.today()
+
+        diff_time = datetime.datetime.strptime(self.ticket_id.close_time, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(self.ticket_id.create_date, DEFAULT_SERVER_DATETIME_FORMAT)
+        self.ticket_id.time_to_close = diff_time.seconds
+
+        closed_state = self.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_staff_closed')
+        self.ticket_id.state = closed_state.id
+
+        # Lock the ticket to prevent reopening
+        self.ticket_id.close_lock = True
+        
+        # Send merge email
+        setting_ticket_merge_email_template_id = self.env['ir.default'].get('website.support.settings', 'ticket_merge_email_template_id')
+        if setting_ticket_merge_email_template_id:
+            mail_template = self.env['mail.template'].browse(setting_ticket_merge_email_template_id)
+        else:
+            # BACK COMPATABLITY FAIL SAFE
+            mail_template = self.env['ir.model'].get_object('website_support', 'support_ticket_merge')
+
+        mail_template.send_mail(self.id, True)
+
+        # Add as follower to new ticket
+        if self.ticket_id.partner_id:
+            self.merge_ticket_id.message_subscribe([self.ticket_id.partner_id.id])
+
+        return {
+            'name': "Support Ticket",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket',
+            'res_id': self.merge_ticket_id.id
+        }
 
 class WebsiteSupportTicketField(models.Model):
 
@@ -694,6 +778,7 @@ class WebsiteSupportTicketCompose(models.Model):
         values = email_wrapper.generate_email([self.id])[self.id]
         values['model'] = "website.support.ticket"
         values['res_id'] = self.ticket_id.id
+        values['reply_to'] = email_wrapper.reply_to
 
         for attachment in self.attachment_ids:
             values['attachment_ids'].append((4, attachment.id))

@@ -15,6 +15,8 @@ class WebsiteSupportSettings(models.Model):
     close_ticket_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="(OBSOLETE)Close Ticket Email Template")
     change_user_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Change User Email Template")
     staff_reply_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket.compose')]", string="Staff Reply Email Template")
+    ticket_merge_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket.merge')]", string="Merge Ticket Email Template")
+    ticket_lock_email_template_id = fields.Many2one('mail.template', domain="[('model_id','=','website.support.ticket')]", string="Lock Ticket Email Template")
     email_default_category_id = fields.Many2one('website.support.ticket.categories', string="Email Default Category")
     max_ticket_attachments = fields.Integer(string="Max Ticket Attachments")
     max_ticket_attachment_filesize = fields.Integer(string="Max Ticket Attachment Filesize (KB)")
@@ -35,6 +37,8 @@ class WebsiteSupportSettings(models.Model):
         self.env['ir.default'].set('website.support.settings', 'allow_user_signup', self.allow_user_signup)
         self.env['ir.default'].set('website.support.settings', 'change_user_email_template_id', self.change_user_email_template_id.id)
         self.env['ir.default'].set('website.support.settings', 'close_ticket_email_template_id', self.close_ticket_email_template_id.id)
+        self.env['ir.default'].set('website.support.settings', 'ticket_merge_email_template_id', self.ticket_merge_email_template_id.id)
+        self.env['ir.default'].set('website.support.settings', 'ticket_lock_email_template_id', self.ticket_lock_email_template_id.id)
         self.env['ir.default'].set('website.support.settings', 'email_default_category_id', self.email_default_category_id.id)
         self.env['ir.default'].set('website.support.settings', 'staff_reply_email_template_id', self.staff_reply_email_template_id.id)
         self.env['ir.default'].set('website.support.settings', 'max_ticket_attachments', self.max_ticket_attachments)
@@ -54,6 +58,8 @@ class WebsiteSupportSettings(models.Model):
             allow_user_signup=self.env['ir.default'].get('website.support.settings', 'allow_user_signup'),
             change_user_email_template_id=self.env['ir.default'].get('website.support.settings', 'change_user_email_template_id'),
             close_ticket_email_template_id=self.env['ir.default'].get('website.support.settings', 'close_ticket_email_template_id'),
+            ticket_merge_email_template_id=self.env['ir.default'].get('website.support.settings', 'ticket_merge_email_template_id'),
+            ticket_lock_email_template_id=self.env['ir.default'].get('website.support.settings', 'ticket_lock_email_template_id'),
             email_default_category_id=self.env['ir.default'].get('website.support.settings', 'email_default_category_id'),
             staff_reply_email_template_id=self.env['ir.default'].get('website.support.settings', 'staff_reply_email_template_id'),
             max_ticket_attachments=self.env['ir.default'].get('website.support.settings', 'max_ticket_attachments'),

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="website_support_ticket_merge_view_form" model="ir.ui.view">
+            <field name="name">website.support.ticket.merge.form.view</field>
+            <field name="model">website.support.ticket.merge</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="ticket_id" invisible="True"/>
+                        <field name="merge_ticket_id"  options="{'no_create': True, 'no_create_edit':True}" domain="[('id', '!=', ticket_id), ('unattended', '=', True)]"/>
+                        <button name="merge_tickets" type="object" string="Merge Tickets"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -2,6 +2,59 @@
 <openerp>
     <data>                    
 
+        <record id="support_ticket_close_lock" model="mail.template">
+            <field name="name">Support Ticket Close Lock</field>
+            <field name="model_id" ref="model_website_support_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Close Lock (#${object.ticket_number or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
+                <p>The ticket has already been closed and locked, please open a new ticket or reply to an open ticket</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_merge" model="mail.template">
+            <field name="name">Support Ticket Merge</field>
+            <field name="model_id" ref="model_website_support_ticket_merge"></field>
+            <field name="email_from"><![CDATA[${object.ticket_id.company_id.name} <${object.ticket_id.company_id.email}>]]></field>
+            <field name="email_to">${object.ticket_id.email|safe}</field>
+            <field name="subject">Support Ticket Merge (#${object.ticket_id.ticket_number or object.ticket_id.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.ticket_id.person_name :
+                    <p>Dear ${object.ticket_id.person_name},</p>
+                % endif
+                <p>Your ticket has been merged with ticket number #${object.merge_ticket_id.ticket_number}</p>
+                <p>We are aware of this incident from a previously submitted request. You will be updated on any changes from the earlier ticket.</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_id.ticket_number or object.id}<br/>
+                <b>Ticket Category:</b> 
+                % if object.ticket_id.category.name :
+                    ${object.ticket_id.category.name}
+                % endif
+                <br/>
+                <b>Ticket Description:</b><br/>
+                ${object.ticket_id.description|safe}
+            ]]>
+            </field>
+        </record>
+
         <record id="support_ticket_survey" model="mail.template">
             <field name="name">Support Ticket Survey</field>
             <field name="model_id" ref="model_website_support_ticket"></field>

@@ -1,3 +1,8 @@
+v1.6.0
+======
+* Add merge ticket button
+* Add close lock feature to prevent reopening tickets (auto lock upon ticket merge)
+
 v1.5.16
 =======
 * Add many2one type to custom fields

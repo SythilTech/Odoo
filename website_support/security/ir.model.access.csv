@@ -22,6 +22,7 @@ access_website_support_ticket_tag,support staff access website.support.ticket.ta
 access_website_support_ticket_tag_manager,support manager access website.support.ticket.tag,model_website_support_ticket_tag,support_manager,1,1,1,1
 access_website_support_ticket_close,support staff access website.support.ticket.close,model_website_support_ticket_close,support_staff,1,1,1,1
 access_website_support_ticket_approval,access website.support.ticket.approval,model_website_support_ticket_approval,support_staff,1,1,1,1
+access_website_support_ticket_merge,access website.support.ticket.merge,model_website_support_ticket_merge,support_staff,1,1,1,1
 access_website_support_department_contact,access website.support.department.contact,model_website_support_department_contact,support_manager,1,1,1,1
 access_website_support_ticket_subcategory_field,support staff access website.support.ticket.subcategory.field,model_website_support_ticket_subcategory_field,support_staff,1,0,0,0
 access_website_support_ticket_subcategory_field_manager,support manager access website.support.ticket.subcategory.field,model_website_support_ticket_subcategory_field,support_manager,1,1,1,1

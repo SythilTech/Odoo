@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.5.16",
+    'version': "1.6.0",
     'author': "Sythil Tech, Adaptive City",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",
@@ -14,6 +14,7 @@
         'views/website_support_ticket_templates.xml',
         'views/website_support_ticket_compose_views.xml',
         'views/website_support_ticket_close_views.xml',
+        'views/website_support_ticket_merge_views.xml',
         'views/website_support_ticket_views.xml',
         'views/website_support_ticket_categories_views.xml',
         'views/website_support_ticket_subcategory_views.xml',

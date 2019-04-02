@@ -2,6 +2,14 @@
 <odoo>
     <data noupdate="1">
 
+        <function id="default_ticket_merge_email_template_id"
+            model="ir.default" name="set"
+            eval="('website.support.settings', 'ticket_merge_email_template_id', ref('website_support.support_ticket_merge') )"/>
+
+        <function id="default_ticket_lock_email_template_id"
+            model="ir.default" name="set"
+            eval="('website.support.settings', 'ticket_lock_email_template_id', ref('website_support.support_ticket_close_lock') )"/>
+
         <function id="default_change_user_email_template_id"
             model="ir.default" name="set"
             eval="('website.support.settings', 'change_user_email_template_id', ref('website_support.support_ticket_user_change') )"/>
