@@ -87,7 +87,7 @@
         <field name="name">website.support.ticket kanban view</field>
         <field name="model">website.support.ticket</field>
         <field name="arch" type="xml">
-            <kanban class="o_res_partner_kanban" default_group_by="state" create="false">
+            <kanban class="o_res_partner_kanban" default_group_by="state_id" create="false">
                 <field name="subject"/>
                 <field name="priority_id"/>
                 <field name="state_id"/>
