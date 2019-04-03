@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+        <record id="res_country_state_city_import_view_form" model="ir.ui.view">
+            <field name="name">res.country.state.city.import.view.form</field>
+            <field name="model">res.country.state.city.import</field>
+            <field name="arch" type="xml">
+      	        <form>
+      	            <group>
+      	                <field name="country_id"/>
+      	            </group>
+      	            <footer>
+      	                <button type="object" name="geonames_import" string="Import from GeoNames"/>
+      	            </footer>
+      	        </form>
+      	    </field>
+        </record>
+               
+       <record id="res_country_state_city_import_action" model="ir.actions.act_window">
+           <field name="name">GeoNames Import Wizard</field>
+	   <field name="res_model">res.country.state.city.import</field>
+	   <field name="view_type">form</field>
+	   <field name="view_mode">form</field>
+	   <field name="target">new</field>
+       </record>
+
+    </data>
+</openerp> 

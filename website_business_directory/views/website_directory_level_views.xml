@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="website_directory_level_view_form" model="ir.ui.view">
+        <field name="name">website.directory.level form view</field>
+        <field name="model">website.directory.level</field>
+        <field name="arch" type="xml">
+            <form>
+      	        <group>
+      	            <field name="name"/>
+      	            <field name="billing_plan"/>
+      	            <field name="category_limit"/>
+      	        </group>
+      	    </form>
+      	</field>
+    </record>
+
+    <record id="website_directory_level_view_tree" model="ir.ui.view">
+        <field name="name">website.directory.level tree view</field>
+        <field name="model">website.directory.level</field>
+        <field name="arch" type="xml">
+            <tree>
+      	        <field name="name"/>
+      	        <field name="billing_plan"/>
+      	        <field name="category_limit"/>
+      	    </tree>
+      	</field>
+    </record>
+
+    <record id="website_directory_level_action" model="ir.actions.act_window">
+        <field name="name">Business Directory Levels</field>
+        <field name="res_model">website.directory.level</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

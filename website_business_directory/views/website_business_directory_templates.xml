@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="directory_booking" model="mail.template">
+            <field name="name">Directory Restaurant Booking</field>
+            <field name="model_id" ref="model_website_directory_booking"></field>
+            <field name="email_from">${object.email}</field>            
+            <field name="email_to">${object.partner_id.email}</field>
+            <field name="subject">New online booking</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.partner_id.name},</p>
+                <p>A new online booking has been made, here are the details,</p>
+                <hr/>
+                <b>Booking Name:</b> ${object.booking_name}<br/>
+                <b>Email:</b> ${object.email}<br/>
+                <b>Number of People:</b> ${object.number_of_people}<br/>
+                <b>Booking Time:</b> ${object.booking_datetime}<br/>
+                <b>Notes:</b><br/>
+                ${object.notes}
+                
+            ]]>
+            </field>
+        </record>
+
+<template id="directory_search_box" name="Directory Search Box">
+
+    <script>
+
+    $(document).ready(function() {
+
+        //Term Autocomplete
+        $("#search_term_business_directory").autocomplete({
+            source: '/directory/term-auto-complete',
+            minLength: 1           
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+             return $("<li/>")
+                 .data("item.autocomplete", item)
+                 .append("<a>" + item.label + "</a>")
+                 .appendTo(ul);
+        };
+
+        //Location Autocomplete
+        $("#search_location_business_directory").autocomplete({
+            source: '/directory/location-auto-complete',
+            minLength: 1
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+             return $("<li/>")
+                 .data("item.autocomplete", item)
+                 .append("<a>" + item.label + "</a>")
+                 .appendTo(ul);
+        };
+    });
+
+    </script>
+
+    <div name="search_from_container" class="row">
+        <div class="col-md-2"/>
+        <div class="col-md-8">
+            <form method="GET" action="/directory/search">
+                <div class="form-group col-md-6">
+                    <input type="search" class="form-control" id="search_term_business_directory" name="term" placeholder="Business name or category"/>                
+                </div>
+                <div class="form-group col-md-6">
+                    <div class="input-group">
+
+                        <input type="search" class="form-control" id="search_location_business_directory" name="location" placeholder="Location"/>
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </span>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-md-2"/>
+     </div>
+
+     <div id="g_map"/>
+
+</template>
+
+<template id="directory_search" name="Directory Search">
+    <t t-call="website.layout">
+        <div class="container">
+            <div class="mt16 mb16">
+                <h1 class="text-center">Directory Search</h1>
+                <t t-call="website_business_directory.directory_search_box"/>
+
+                <div id="category-panel" class="panel panel-default mt16">
+                    <div class="panel-body">
+                        <t t-foreach="directory_categories" t-as="cat">
+                            <div class="col-md-3">
+                                <t t-call="website_business_directory.directory_categories_reoccursive"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</template>
+
+<template id="directory_search_front_listings" inherit_id="website_business_directory.directory_search" active="False" customize_show="True" name="Directory Front Listings">
+    <xpath expr="//div[@id='category-panel']" position="after">
+        <t t-foreach="featured_listings" t-as="directory_company">
+            <t t-call="website_business_directory.directory_featuered_listing"/>
+        </t>
+
+        <t t-foreach="regular_listings" t-as="directory_company">
+            <t t-call="website_business_directory.directory_regular_listing"/>
+        </t>
+    </xpath>
+</template>
+
+<template id="directory_featured_listing" name="Directory Featured Listing">
+    <div class="panel panel-warning">
+        <div class="panel-body">
+            <div class="directory-list-top">
+                <a t-attf-href="/directory/company/#{ slug(directory_company) }">
+                    <img t-att-src="website.image_url(directory_company, 'image_medium')" style="margin-right:10px;margin-bottom:10px;" class="img-rounded pull-left" t-attf-alt="#{directory_company.name} Logo" t-attf-title="#{directory_company.name}"/>
+                    <span t-field="directory_company.name"/><br/>
+                </a>
+                <span t-field="directory_company.directory_description"/>
+            </div>
+            <div class="directory-list-bottom" style="clear:both;">
+                <span t-field="directory_company.street"/>, <span t-field="directory_company.city"/>, <span t-field="directory_company.state_id.name"/>, <span t-field="directory_company.zip"/><br/>
+                <t t-if="directory_company.allow_restaurant_booking">
+                    <a t-attf-href="/directory/company/#{ slug(directory_company) }/booking">Make Booking</a>
+                </t>
+                <t t-if="directory_company.menu">
+                    <a t-attf-href="/directory/company/#{ slug(directory_company) }/Menu">Online Menu</a>
+                </t>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="directory_regular_listing" name="Directory Regular Listing">
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="directory-list-top">
+                <a t-attf-href="/directory/company/#{ slug(directory_company) }">
+                    <img t-att-src="website.image_url(directory_company, 'image_medium')" style="margin-right:10px;margin-bottom:10px;" class="img-rounded pull-left" t-attf-alt="#{directory_company.name} Logo" t-attf-title="#{directory_company.name}"/>
+                    <span t-field="directory_company.name"/><br/>
+                </a>
+                <span t-field="directory_company.directory_description"/>
+            </div>
+            <div class="directory-list-bottom" style="clear:both;">
+                <span t-field="directory_company.street"/>, <span t-field="directory_company.city"/>, <span t-field="directory_company.state_id.name"/>, <span t-field="directory_company.zip"/><br/>
+                <t t-if="directory_company.allow_restaurant_booking">
+                    <a t-attf-href="/directory/company/#{ slug(directory_company) }/booking">Make Booking</a>
+                </t>
+                <t t-if="directory_company.menu">
+                    <a t-attf-href="/directory/company/#{ slug(directory_company) }/Menu">Online Menu</a>
+                </t>
+            </div>
+        </div>
+    </div>
+
+</template>
+
+<template id="directory_search_results" name="Directory Search Results">
+    <t t-call="website.layout">
+        <div class="container">
+            <div class="mt16 mb16">
+                <t t-call="website_business_directory.directory_search_box"/>
+            </div>
+
+            <h1 class="text-center"><t t-raw="heading_string"/></h1>
+
+            <t t-foreach="featured_listings" t-as="directory_company">
+                <t t-call="website_business_directory.directory_featured_listing"/>
+            </t>
+
+            <t t-foreach="regular_listings" t-as="directory_company">
+                <t t-call="website_business_directory.directory_regular_listing"/>
+            </t>
+        </div>
+    </t>
+</template>
+
+<template id="directory_search_results_map" inherit_id="website_business_directory.directory_search_box" active="False" customize_show="True" name="Directory Listings Map">
+    <xpath expr="//div[@id='g_map']" position="inside">
+        <div id="map" style="width:100%;height:300px;margin-top:16px;"></div>
+        <script t-attf-src="https://maps.googleapis.com/maps/api/js?key=#{google_maps_api_key}"/>
+        <script>
+
+            var geocoder = new google.maps.Geocoder();
+            
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+            });
+
+            function codeAddress(address) {
+
+                geocoder.geocode( { 'address': address}, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        map.setCenter(results[0].geometry.location);
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: results[0].geometry.location
+                        });
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                });
+            }
+
+        <!-- Maybe later we give featured listings a different marker icon -->
+        <t t-foreach="featured_listings" t-as="directory_company">
+            codeAddress('<t t-esc="directory_company.street"/>, <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.zip"/>');
+        </t>
+
+        <t t-foreach="regular_listings" t-as="directory_company">
+            codeAddress('<t t-esc="directory_company.street"/>, <t t-esc="directory_company.city"/>, <t t-esc="directory_company.state_id.name"/>, <t t-esc="directory_company.zip"/>');
+        </t>
+
+        </script>
+
+    </xpath>
+
+</template>
+
+<template id="directory_company_page" name="Directory Company Page">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1><t t-esc="directory_company.name"/></h1>
+            <a t-attf-href="/directory/company/#{ slug(directory_company) }/website"><t t-esc="directory_company.website"/></a>
+            <img t-att-src="website.image_url(directory_company, 'image_medium')" style="margin-right:10px;margin-bottom:10px;" class="img-rounded pull-left" t-attf-alt="#{directory_company.name} Logo" t-attf-title="#{directory_company.name}"/>
+            <div style="clear:both;">
+            <t t-esc="directory_company.directory_description"/>
+            <h2>Reviews</h2>
+            <t t-foreach="directory_company.directory_review_ids" t-as="review">
+                <span t-field="review.name"/><br/>
+                <span t-field="review.rating"/><br/>
+                <span t-field="review.description"/><br/>
+                <hr/>
+            </t>
+            <h2>Write Review</h2>
+            <form method="POST" action="/directory/review/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-att-value="directory_company.id"/>
+                <div class="form-group">
+                    <label for="name">Rating*</label><br/>
+                    <label class="radio-inline"><input type="radio" name="rating" value="1"/>1 Star</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="2"/>2 Star</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="3"/>3 Star</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="4"/>4 Star</label>
+                    <label class="radio-inline"><input type="radio" name="rating" value="5"/>5 Star</label>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name*</label>
+                    <input type="text" name="name" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea name="description" class="form-control"/>
+                </div>
+
+                <button t-attf-class="btn btn-primary btn-lg">Submit Review</button>
+            </form>
+            </div>
+
+
+        </div>
+    </t>
+</template>
+
+<template id="directory_company_menu" name="Directory Company Page">
+    <t t-call="website.layout">
+        <div class="container">
+            <h1><t t-esc="directory_company.name"/></h1>
+            <t t-foreach="directory_company.menu" t-as="department">
+                <t t-field="department.name"/>
+                <t t-field="department.description"/>
+                <t t-foreach="department.menu_item_ids">
+                    <t t-field="name"/>
+                    <t t-field="description"/>
+                    <t t-field="single_price"/>
+                </t>
+            </t>
+        </div>
+    </t>
+</template>
+
+<template id="directory_account" name="Directory Account">
+    <t t-call="website.layout">
+        <div class="container">
+            <h1>My Listings</h1>
+            <t t-foreach="businesses" t-as="business">
+                <t t-esc="business.name"/> <a t-attf-href="/directory/account/business/edit/#{ slug(business) }">Edit</a> <a t-attf-href="/directory/account/business/upgrade/#{ slug(business) }">Change Plan</a><br/>
+            </t>
+            <t t-if="len(businesses) &lt; request.env.user.directory_level_id.free_listing_limit">
+                <a href="/directory/account/business/add">Add Business</a>
+            </t>
+            <t t-if="len(businesses) &gt;= request.env.user.directory_level_id.free_listing_limit">
+                <p class="text-danger">You have reached the maximum number of listings for a free account</p>
+            </t>
+        </div>
+    </t>
+</template>
+
+<template id="directory_account_business_add" name="Directory Business Add">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1>Enter Business Info</h1>
+            <form method="POST" action="/directory/account/business/add/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <div class="form-group">
+                    <label for="name">Business Logo*</label>
+                    <input type="file" name="logo" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="name">Business Name*</label>
+                    <input type="text" name="name" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">Business Email*</label>
+                    <input type="text" name="email" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="text" name="website" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country*</label>
+                    <select id="company_country" name="country" class="form-control" required="True">
+                        <option value="">Select Country</option>
+                        <t t-foreach="countries" t-as="country">
+                            <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                        </t>
+                    </select>
+                </div>
+
+<script>
+
+$(document).ready(function() {
+    $("#company_country").change(function() {
+
+        $.ajax({url: "/directory/state/fetch?country=" + $("#company_country").val(), success: function(result){
+            $("#company_state").html(result)
+        }});
+
+    });
+});
+
+</script>
+
+                <div class="form-group">
+                    <label for="state">State*</label>
+                    <select id="company_state" name="state" class="form-control" required="True">
+                        <option value="">Select Country First</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="city">City*</label>
+                    <input type="text" name="city" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="street">Street Address*</label>
+                    <input type="text" name="street" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="zip">Zip*</label>
+                    <input type="text" name="zip" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">Business Description</label>
+                    <textarea name="directory_description" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="facebook_url">Facebook URL</label>
+                    <input type="text" name="facebook_url" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="twitter_url">Twitter URL</label>
+                    <input type="text" name="twitter_url" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="youtube_url">Youtube URL</label>
+                    <input type="text" name="youtube_url" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="instagram_url">Instgram URL</label>
+                    <input type="text" name="instagram_url" class="form-control"/>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="allow_restaurant_booking"/> Allow Restaurant Bookings</label>
+                </div>
+
+                <h2>Open Times</h2>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_monday_start">Monday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_monday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_monday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_monday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_monday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_tuesday_start">Tuesday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_tuesday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_tuesday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_tuesday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_tuesday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_wednesday_start">Wednesday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_wednesday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_wednesday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_wednesday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_wednesday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_thursday_start">Thursday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_thursday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_thursday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_thursday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_thursday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_friday_start">Friday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_friday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_friday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_friday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_friday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_saturday_start">Saturday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_saturday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_saturday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_saturday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_saturday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="directory_sunday_start">Sunday</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_sunday_start" class="form-control" placeholder="Open Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_sunday_start_period" class="form-control"><option value="am">AM</option><option value="pm">PM</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="directory_sunday_end" class="form-control" placeholder="Close Time"/>
+                        </div>
+                        <div class="col-md-1">
+                            <select name="directory_sunday_end_period" class="form-control"><option value="am">AM</option><option value="pm" selected="selected">PM</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <button t-attf-class="btn btn-primary btn-lg">Add Business</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<template id="directory_account_business_upgrade" name="Directory Business Upgrade">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1>Change Listing Plan</h1>
+            <form method="POST" action="/directory/account/business/upgrade/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-att-value="directory_company.id"/>
+                <!--<t t-foreach="plan_levels" t-as="plan_level">
+                    <input type="radio" name"plan_level" t-att-value="plan_level.id"/> <t t-esc="plan_level.name"/><br/>
+                </t>-->
+                <button t-attf-class="btn btn-primary btn-lg">Change Listing Plan</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<template id="directory_account_business_edit" name="Directory Business Edit">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1>Edit Business Info</h1>
+            <form method="POST" action="/directory/account/business/edit/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-att-value="directory_company.id"/>
+                <div class="form-group">
+                    <label for="name">Business Logo</label>
+                    <input type="file" name="logo"/>
+                </div>                
+                <div class="form-group">
+                    <label for="name">Business Name*</label>
+                    <input type="text" name="name" class="form-control" required="True" t-att-value="directory_company.name"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">Business Email*</label>
+                    <input type="text" name="email" class="form-control" required="True" t-att-value="directory_company.email"/>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country*</label>
+                    <select name="country" class="form-control" required="True">
+                        <option value="">Select Country</option>
+                        <t t-foreach="countries" t-as="country">
+                            <option t-attf-value="#{country.id}" t-att-selected="directory_company.country_id.id == country.id"><t t-esc="country.name"/></option>
+                        </t>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="state">State*</label>
+                    <select name="state" class="form-control" required="True">
+                        <option value="">Select State</option>
+                        <t t-foreach="states" t-as="state">
+                            <option t-attf-value="#{state.id}" t-att-selected="directory_company.state_id.id == state.id"><t t-esc="state.name"/></option>
+                        </t>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="city">City*</label>
+                    <input type="text" name="city" class="form-control" required="True"  t-att-value="directory_company.city"/>
+                </div>
+                <div class="form-group">
+                    <label for="street">Street Address*</label>
+                    <input type="text" name="street" class="form-control" required="True" t-att-value="directory_company.street"/>
+                </div>
+                <div class="form-group">
+                    <label for="zip">Zip*</label>
+                    <input type="text" name="zip" class="form-control" required="True" t-att-value="directory_company.zip"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">Business Description</label>
+                    <textarea name="description" class="form-control"><t t-esc="directory_company.directory_description"/></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="directory_monday_start">Monday Start Time</label>
+                    <input type="text" name="directory_monday_start" class="form-control" t-att-value="directory_company.directory_monday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_monday_end">Monday End Time</label>
+                    <input type="text" name="directory_monday_end" class="form-control" t-att-value="directory_company.directory_monday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_tuesday_start">Tuesday Start Time</label>
+                    <input type="text" name="directory_tuesday_start" class="form-control" t-att-value="directory_company.directory_tuesday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_tuesday_end">Tuesday End Time</label>
+                    <input type="text" name="directory_tuesday_end" class="form-control" t-att-value="directory_company.directory_tuesday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_wednesday_start">Wednesday Start Time</label>
+                    <input type="text" name="directory_wednesday_start" class="form-control" t-att-value="directory_company.directory_wednesday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_wednesday_end">Wednesday End Time</label>
+                    <input type="text" name="directory_wednesday_end" class="form-control" t-att-value="directory_company.directory_wednesday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_thursday_start">Thursday Start Time</label>
+                    <input type="text" name="directory_thursday_start" class="form-control" t-att-value="directory_company.directory_thursday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_thursday_end">Tuesday End Time</label>
+                    <input type="text" name="directory_thursday_end" class="form-control" t-att-value="directory_company.directory_thursday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_friday_start">Friday Start Time</label>
+                    <input type="text" name="directory_friday_start" class="form-control" t-att-value="directory_company.directory_friday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_friday_end">Friday End Time</label>
+                    <input type="text" name="directory_friday_end" class="form-control" t-att-value="directory_company.directory_friday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_saturday_start">Saturday Start Time</label>
+                    <input type="text" name="directory_saturday_start" class="form-control" t-att-value="directory_company.directory_saturday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_saturday_end">Saturday End Time</label>
+                    <input type="text" name="directory_saturday_end" class="form-control" t-att-value="directory_company.directory_saturday_end"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_sunday_start">Sunday Start Time</label>
+                    <input type="text" name="directory_sunday_start" class="form-control" t-att-value="directory_company.directory_sunday_start"/>
+                </div>
+                <div class="form-group">
+                    <label for="directory_sunday_end">Sunday End Time</label>
+                    <input type="text" name="directory_sunday_end" class="form-control" t-att-value="directory_company.directory_sunday_end"/>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="allow_restaurant_booking" t-att-checked="directory_company.allow_restaurant_booking"/> Allow Restaurant Bookings</label>
+                </div>
+                <button t-attf-class="btn btn-primary btn-lg">Update Business Details</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<template id="directory_register" name="Directory Register">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <div class="col-md-3"/>
+            <div class="col-md-6">
+                <h1 class="text-center">Create an Account</h1>
+                <form method="POST" action="/directory/register/process" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="form-group">
+                        <label for="name">Name*</label>
+                        <input type="text" name="name" class="form-control" required="True"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email*</label>
+                        <input type="text" name="email" class="form-control" required="True"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password*</label>
+                        <input type="password" name="password" class="form-control" required="True"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_again">Password (Again)*</label>
+                        <input type="password" name="password_again" class="form-control" required="True"/>
+                    </div>
+                    <button t-attf-class="btn btn-primary btn-lg">Create Account</button>
+                </form>
+            </div>
+            <div class="col-md-3"/>
+        </div>
+    </t>
+</template>
+
+<template id="directory_company_booking" name="Directory Company Booking">
+    <t t-call="website.layout">
+
+        <script>
+        $( function() {
+            $("#booking_datetime").datetimepicker({inline: true, sideBySide: true,
+                format: "YYYY-MM-DD HH:mm:ss",
+                icons : {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down'
+                },
+            });
+        });
+        </script>
+
+        <div class="container mt32 mb32">
+            <h1>Create a Booking</h1>
+            <form method="POST" action="/directory/company/booking/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="business_id" t-attf-value="#{directory_company.id}"/>                
+                <div class="form-group">
+                    <label for="booking_name">Booking Name*</label>
+                    <input type="text" name="booking_name" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input type="text" name="email" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="number_of_people">Number of People*</label>
+                    <input type="number" name="number_of_people" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="booking_datetime">Time*</label>
+                    <div class="input-group date">
+                        <input type="text" id="booking_datetime" name="booking_datetime" class="form-control" required="True"/>
+                        <span class="input-group-addon"><span class="fa fa-calendar"/></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea name="notes" class="form-control"/>
+                </div>
+                <button t-attf-class="btn btn-primary btn-lg">Make Booking</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+<template id="directory_categories_reoccursive" name="Directory Search Reoccusive">
+    <li>
+        <a t-attf-href="/directory/search/category/#{slug(cat)}" t-field="cat.name"/>
+        <ul t-if="cat.children_category_ids" class="nav nav-pills nav-stacked nav-hierarchy">
+            <t t-foreach="cat.children_category_ids" t-as="cat">
+                <t t-call="website_business_directory.directory_categories_reoccursive"/>
+            </t>
+        </ul>
+    </li>
+</template>
+
+</odoo>

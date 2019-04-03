@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+        <record id="res_country_state_city_view_form" model="ir.ui.view">
+            <field name="name">res.country.state.city.view.form</field>
+            <field name="model">res.country.state.city</field>
+            <field name="arch" type="xml">
+      	        <form>
+      	            <group>
+      	                <field name="name"/>
+      	                <field name="state_id"/>
+      	                <field name="zip"/>
+                        <field name="latitude"/>
+                        <field name="longitude"/>
+      	            </group>
+      	        </form>
+      	    </field>
+        </record>
+        
+        <record id="res_country_state_city_view_tree" model="ir.ui.view">
+            <field name="name">res.country.state.city.view.tree</field>
+            <field name="model">res.country.state.city</field>
+            <field name="arch" type="xml">
+      	        <tree>
+      	            <field name="name"/>
+      	            <field name="state_id"/>
+                    <field name="latitude"/>
+                    <field name="longitude"/>
+      	        </tree>
+      	    </field>
+        </record>
+       
+       <record id="res_country_state_city_action" model="ir.actions.act_window">
+           <field name="name">Locations</field>
+	   <field name="res_model">res.country.state.city</field>
+	   <field name="view_type">form</field>
+	   <field name="view_mode">tree,form</field>
+       </record>
+
+    </data>
+</openerp> 

@@ -1,0 +1,5 @@
+id,name,url,website_published,view_id/id
+"page_directory_search","Directory Search","/directory",1,"website_business_directory.directory_search"
+"page_directory_register","Directory Register","/directory/register",1,"website_business_directory.directory_register"
+"page_directory_account_business_add","Directory Business Add","/directory/account/business/add",1,"website_business_directory.directory_account_business_add"
+"page_directory_account_business_edit","Directory Business Edit","/directory/account/business/edit",1,"website_business_directory.directory_account_business_edit"

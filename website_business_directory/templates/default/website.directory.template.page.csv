@@ -1,0 +1,5 @@
+id,template_id/id,page_id/id,view_id/id
+"website_directory_template_default_page_directory_search","website_directory_template_default","page_directory_search","directory_search"
+"website_directory_template_default_page_directory_register","website_directory_template_default","page_directory_register","directory_register"
+"website_directory_template_default_page_directory_account_business_add","website_directory_template_default","page_directory_account_business_add","directory_account_business_add"
+"website_directory_template_default_page_directory_account_business_edit","website_directory_template_default","page_directory_account_business_edit","directory_account_business_edit"

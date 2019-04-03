@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+ 
+    <record id="view_partner_form_inherit_website_business_directory" model="ir.ui.view">
+        <field name="name">res.partner Business Directory</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Business Directory">
+                    <group>
+                        <field name="in_directory"/>
+                        <field name="listing_level"/>
+                        <field name="business_owner"/>
+                        <field name="directory_description"/>
+                        <field name="facebook_url" widget="url"/>
+                        <field name="twitter_url" widget="url"/>
+                        <field name="youtube_url" widget="url"/>
+                        <field name="instagram_url" widget="url"/>
+                        <field name="city_id"/>
+                        <field name="latitude"/>
+                        <field name="longitude"/>
+                        <field name="company_category_ids"/>
+                        <field name="directory_monday_start" widget="float_time"/>
+                        <field name="directory_monday_end" widget="float_time"/>
+                        <field name="directory_tuesday_start" widget="float_time"/>
+                        <field name="directory_tuesday_end" widget="float_time"/>
+                        <field name="directory_wednesday_start" widget="float_time"/>
+                        <field name="directory_wednesday_end" widget="float_time"/>
+                        <field name="directory_thursday_start" widget="float_time"/>
+                        <field name="directory_thursday_end" widget="float_time"/>
+                        <field name="directory_friday_start" widget="float_time"/>
+                        <field name="directory_friday_end" widget="float_time"/>
+                        <field name="directory_saturday_start" widget="float_time"/>
+                        <field name="directory_saturday_end" widget="float_time"/>
+                        <field name="directory_sunday_start" widget="float_time"/>
+                        <field name="directory_sunday_end" widget="float_time"/>
+                        <field name="directory_listing_open_hours">
+                            <tree>
+                                <field name="day"/>
+                                <field name="start_time" widget="float_time"/>
+                                <field name="end_time" widget="float_time"/>
+                            </tree>
+                        </field>
+                        <field name="allow_restaurant_booking"/>
+                        <field name="display_online_menu"/>
+                        <field name="featured_listing"/>
+                        <field name="directory_review_ids">
+                            <tree>
+                                <field name="create_date"/>
+                                <field name="name"/>
+                                <field name="description"/>
+                                <field name="rating"/>
+                            </tree>
+                        </field>
+                        <field name="menu">
+                            <tree>
+                                <field name="name"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>

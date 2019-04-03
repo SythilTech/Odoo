@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="directory_free_account" model="res.users.directory.level">
+            <field name="name">Free Account</field>
+            <field name="free_listing_limit">1</field>
+        </record>
+        
+    </data>     
+</odoo>

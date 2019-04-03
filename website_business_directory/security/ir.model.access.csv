@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_res_partner_directory","directory access res.partner","base.model_res_partner","",1,0,0,0
+"access_res_partner_directory_category","access res.partner.directory.category","model_res_partner_directory_category","",1,0,0,0
+"access_res_partner_directory_review","access res.partner.directory.review","model_res_partner_directory_review","",1,0,1,0
+"access_res_country_state_city","access res.country.state.city","model_res_country_state_city","",1,0,0,0

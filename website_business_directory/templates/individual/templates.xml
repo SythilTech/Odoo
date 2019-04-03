@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="directory_account_individual_add" name="Directory Individual Add">
+    <t t-call="website.layout">
+        <div class="container mt32 mb32">
+            <h1>Enter Personal Info</h1>
+            <form method="POST" action="/directory/account/business/add/process" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <div class="form-group">
+                    <label for="logo">Listing Image*</label>
+                    <input type="file" name="logo" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="name">Your Name*</label>
+                    <input type="text" name="name" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">Your Email*</label>
+                    <input type="text" name="email" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="text" name="website" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country*</label>
+                    <select id="company_country" name="country" class="form-control" required="True">
+                        <option value="">Select Country</option>
+                        <t t-foreach="countries" t-as="country">
+                            <option t-attf-value="#{country.id}"><t t-esc="country.name"/></option>
+                        </t>
+                    </select>
+                </div>
+
+<script>
+
+$(document).ready(function() {
+    $("#company_country").change(function() {
+
+        $.ajax({url: "/directory/state/fetch?country=" + $("#company_country").val(), success: function(result){
+            $("#company_state").html(result)
+        }});
+
+    });
+});
+
+</script>
+
+                <div class="form-group">
+                    <label for="state">State*</label>
+                    <select id="company_state" name="state" class="form-control" required="True">
+                        <option value="">Select Country First</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="city">City*</label>
+                    <input type="text" name="city" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="street">Street Address*</label>
+                    <input type="text" name="street" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="zip">Zip*</label>
+                    <input type="text" name="zip" class="form-control" required="True"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">Personal Description</label>
+                    <textarea name="directory_description" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="facebook_url">Facebook URL</label>
+                    <input type="text" name="facebook_url" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="twitter_url">Twitter URL</label>
+                    <input type="text" name="twitter_url" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="youtube_url">Youtube URL</label>
+                    <input type="text" name="youtube_url" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label for="instagram_url">Instgram URL</label>
+                    <input type="text" name="instagram_url" class="form-control"/>
+                </div>
+
+                <button t-attf-class="btn btn-primary btn-lg">Add Personal Listing</button>
+            </form>
+        </div>
+    </t>
+</template>
+
+</odoo>

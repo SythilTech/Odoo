@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="business_directory_top_menu" name="Directory" sequence="80"/>        
+    <menuitem id="biz_directory_parent_menu" parent="business_directory_top_menu" name="Business Directory" sequence="10"/>
+    <menuitem id="biz_directory_listing_menu" parent="business_directory_top_menu" name="Listings" action="business_directory_action" sequence="20"/>
+    <menuitem id="business_directory_category_menu" parent="business_directory_top_menu" name="Categories" action="website_directory_category_action" sequence="30"/>
+    <menuitem id="business_directory_template_menu" parent="business_directory_top_menu" name="Templates" action="website_directory_template_action" sequence="40"/>
+    <menuitem id="res_country_state_city_menu" name="Locations" parent="business_directory_top_menu" action="res_country_state_city_action" sequence="50"/>
+    <menuitem id="business_directory_geo_import_menu" parent="business_directory_top_menu" name="Import Locations" action="res_country_state_city_import_action" sequence="60"/>
+
+</odoo>
