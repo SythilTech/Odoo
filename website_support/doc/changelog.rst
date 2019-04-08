@@ -1,3 +1,7 @@
+v1.6.1
+======
+* Change close template to allow blank closing comment
+
 v1.6.0
 ======
 * Add merge ticket button

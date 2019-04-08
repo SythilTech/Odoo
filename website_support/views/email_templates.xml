@@ -183,8 +183,11 @@
             <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.ticket_id.person_name},</p>
-                <p>Your support ticket has been closed by our staff, here is the final comment</p>
-                <p>${object.message|safe or ''}</p>
+                <p>Your support ticket has been closed by our staff</p>
+                % if object.message:
+                    <p>Here is the final comment</p>
+                    <p>${object.message|safe or ''}</p>
+                % endif
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_id.ticket_number or object.ticket_id.id}<br/>
                 <b>Ticket Category:</b> 
@@ -209,8 +212,11 @@
             <field name="built_in" eval="True"/>
             <field name="body_html"><![CDATA[
                 <p>Dear ${object.person_name},</p>
-                <p>Your support ticket has been closed by our staff, here is the final comment</p>
-                <p>${object.close_comment|safe or ''}</p>
+                <p>Your support ticket has been closed by our staff</p>
+                % if object.close_comment:
+                    <p>Here is the final comment</p>
+                    <p>${object.close_comment|safe or ''}</p>
+                % endif
                 <hr/>
                 <b>Ticket Number:</b> ${object.ticket_number or object.id}<br/>
                 <b>Ticket Category:</b> 
