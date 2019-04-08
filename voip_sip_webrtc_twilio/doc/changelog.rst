@@ -1,3 +1,7 @@
+v1.0.25
+=======
+* Fix an upgrade issue
+
 v1.0.24
 =======
 * Redirect to record after making call comment

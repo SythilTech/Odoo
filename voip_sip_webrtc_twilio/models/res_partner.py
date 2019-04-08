@@ -9,6 +9,10 @@ class ResPartnerTwilioVoip(models.Model):
 
     _inherit = "res.partner"
 
+    call_routing_ids = fields.Many2many('voip.number', string="Call Routing")
+    twilio_client_name = fields.Char(string="Twilio Client Name")
+    twilio_assigned_number_id = fields.Many2one('voip.number', string="Assigned Number")
+
     @api.multi
     def twilio_mobile_action(self):
         self.ensure_one()
