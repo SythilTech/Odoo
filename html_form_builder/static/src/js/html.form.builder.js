@@ -12,7 +12,7 @@ $(function() {
 
     e.preventDefault();  // Prevent the default submit behavior
 
-    var my_form = $(".html_form form");
+    var my_form = $(this).closest(".html_form form");
 
     $(".html_form form input").each(function( index ) {
         pattern = $( this ).attr('pattern');

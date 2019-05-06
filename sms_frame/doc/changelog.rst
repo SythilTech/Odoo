@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Type cast fix
+
 v1.0.5
 ======
 * Fix delivery receipts

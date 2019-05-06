@@ -490,6 +490,7 @@ class WebsiteSupportTicket(models.Model):
             email_values['email_to'] = assigned_user.partner_id.email
             email_values['body_html'] = email_values['body_html'].replace("_user_name_", assigned_user.name)
             email_values['body'] = email_values['body'].replace("_user_name_", assigned_user.name)
+            email_values['reply_to'] = email_values['reply_to']
             send_mail = self.env['mail.mail'].create(email_values)
             send_mail.send()
 

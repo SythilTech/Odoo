@@ -39,17 +39,17 @@ class ResPartnerSms(models.Model):
     @api.model
     def create(self, vals):
         if 'country_id' in vals and 'mobile' in vals:
-            phone_code = self.env['res.country'].browse(vals['country_id']).phone_code
+            phone_code = self.env['res.country'].browse(int(vals['country_id'])).phone_code
             vals['mobile'] = self.e164_convert(phone_code, vals['mobile'])
         return super(ResPartnerSms, self).create(vals)
 
     @api.multi
     def write(self, vals):
         if 'country_id' in vals and 'mobile' in vals:
-            phone_code = self.env['res.country'].browse(vals['country_id']).phone_code
+            phone_code = self.env['res.country'].browse(int(vals['country_id'])).phone_code
             vals['mobile'] = self.e164_convert(phone_code, vals['mobile'])
         if 'country_id' in vals and 'mobile' not in vals:
-            phone_code = self.env['res.country'].browse(vals['country_id']).phone_code
+            phone_code = self.env['res.country'].browse(int(vals['country_id'])).phone_code
             vals['mobile'] = self.e164_convert(phone_code, self.mobile)
         if 'country_id' not in vals and 'mobile' in vals:
             vals['mobile'] = self.e164_convert(self.country_id.phone_code, vals['mobile'])
