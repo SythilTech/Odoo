@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <menuitem id="website_support_parent_menu" name="Customer Support" groups="support_staff" sequence="40"/>
+    <menuitem
+      id="website_support_parent_menu"
+      name="Customer Support"
+      web_icon="website_support,static/description/icon.png"
+      groups="support_staff"
+      sequence="40"/>
     <menuitem id="website_support_ticket_menu" name="Support Tickets" parent="website_support_parent_menu" action="website_support_ticket_action" groups="support_staff" sequence="10"/>
 
     <menuitem id="website_support_config_parent_menu" name="Configuration" parent="website_support_parent_menu" groups="support_manager" sequence="999"/>
