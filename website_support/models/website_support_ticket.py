@@ -244,6 +244,10 @@ class WebsiteSupportTicket(models.Model):
     def _compute_disapprove_url(self):
         self.disapprove_url = "/support/disapprove/" + str(self.id)
 
+    @api.onchange('category')
+    def _onchange_category(self):
+        self.sub_category_id = False
+
     @api.onchange('sub_category_id')
     def _onchange_sub_category_id(self):
         if self.sub_category_id:

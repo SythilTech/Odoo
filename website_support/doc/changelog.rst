@@ -1,3 +1,7 @@
+v1.6.2
+======
+* Clears sub category on category change to prevent saving with sub category of old parent
+
 v1.6.1
 ======
 * Change close template to allow blank closing comment
