@@ -325,7 +325,7 @@ class SupportTicketController(http.Controller):
     @http.route(['''/support/help/<model("website.support.help.group"):help_group>/<model("website.support.help.page", "[('group_id','=',help_group[0])]"):help_page>'''], type='http', auth="public", website=True)
     def help_page(self, help_group, help_page, enable_editor=None, **post):
         """Displays help page template"""
-        if help_group.website_published and help_page.website_published:
+        if help_group.website_published and help_page.website_published and request.env.user in help_group.sudo().group_ids.users:
             return http.request.render("website_support.help_page", {'help_page':help_page})
         else:
             return request.render('website.404')
