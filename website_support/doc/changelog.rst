@@ -1,3 +1,7 @@
+v1.0.7
+======
+* Portal user reply fix
+
 v1.0.6
 ======
 * Add ability for clients to add attachments in there replies from the website interface

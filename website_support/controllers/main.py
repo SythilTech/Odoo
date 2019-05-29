@@ -540,7 +540,8 @@ class SupportTicketController(http.Controller):
 
                         attachments.append( (c_file.filename, data) )
 
-            ticket.sudo(request.env.user.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment", attachments=attachments)
+            message_post = ticket.sudo().message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment", attachments=attachments)
+            message_post.author_id = request.env.user.partner_id.id
         else:
             return "You do not have permission to submit this commment"
 
