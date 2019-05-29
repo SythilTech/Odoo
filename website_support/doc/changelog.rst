@@ -1,3 +1,7 @@
+v1.6.3
+======
+* Prevent direct help page access
+
 v1.6.2
 ======
 * Clears sub category on category change to prevent saving with sub category of old parent
