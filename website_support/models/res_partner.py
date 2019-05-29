@@ -13,6 +13,17 @@ class ResPartnerTicket(models.Model):
     sla_id = fields.Many2one('website.support.sla', string="SLA")
     dedicated_support_user_id = fields.Many2one('res.users', string="Dedicated Support User")
 
+    @api.multi
+    def create_support_ticket(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'website.support.ticket',
+            'view_mode': 'form',
+            'context': {'default_partner_id': self.id},
+            'target': 'new',
+        }
+
     @api.one
     @api.depends('support_ticket_ids')
     def _count_support_tickets(self):

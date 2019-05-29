@@ -15,6 +15,11 @@
                         <field name="support_ticket_string" string="Support Tickets" widget="statinfo"/>
                     </button>
                 </xpath>
+                <sheet position="before">
+                    <header>
+                        <button type="object" name="create_support_ticket" string="Create Support Ticket"/>
+                    </header>
+                </sheet>
                 <notebook position="inside">
                     <page string="Support Ticket" groups="website_support.support_staff">
                         <group>

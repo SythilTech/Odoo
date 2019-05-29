@@ -1,3 +1,7 @@
+v1.6.4
+======
+* Add create support ticket button to form view
+
 v1.6.3
 ======
 * Prevent direct help page access
