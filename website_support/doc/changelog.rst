@@ -1,3 +1,7 @@
+v1.0.8
+======
+* Fix links in new ticket in category email
+
 v1.0.7
 ======
 * Portal user reply fix

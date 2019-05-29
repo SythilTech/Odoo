@@ -5,6 +5,7 @@ import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from odoo import SUPERUSER_ID
 from dateutil import tz
+from odoo.http import request
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -359,7 +360,7 @@ class WebsiteSupportTicket(models.Model):
 
         for my_user in new_id.category_id.cat_user_ids:
             values = notification_template.generate_email(new_id.id)
-            values['body_html'] = values['body_html'].replace("_ticket_url_", "web#id=" + str(new_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
+            values['body_html'] = values['body_html'].replace("_ticket_url_", request.httprequest.host_url + "web#id=" + str(new_id.id) + "&view_type=form&model=website.support.ticket&menu_id=" + str(support_ticket_menu.id) + "&action=" + str(support_ticket_action.id) ).replace("_user_name_",  my_user.partner_id.name)
             values['email_to'] = my_user.partner_id.email
 
             send_mail = self.env['mail.mail'].create(values)
