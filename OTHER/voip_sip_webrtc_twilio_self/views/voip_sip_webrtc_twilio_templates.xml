@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="voip_twilio_backend_assets" name="VOIP Twilio Client Assets" inherit_id="web.assets_backend">
+       <xpath expr="." position="inside">
+           <script type="text/javascript" src="/voip_sip_webrtc_twilio/static/src/js/twilio.min.js"></script>
+           <!--<script type="text/javascript" src="/voip_sip_webrtc_twilio/static/src/js/quickstart.js"></script>-->
+           <script type="text/javascript" src="/voip_sip_webrtc_twilio/static/src/js/widget.js"></script>
+       </xpath>
+    </template>
+
+    <template id="voip_invoice" name="Voip Invoice" inherit_id="account.report_invoice_document">
+        <xpath expr="//table[@name='invoice_line_table']/thead/tr" position="replace">
+            <tr>
+                <t t-if="o.twilio_invoice">
+                    <th>Description</th>
+                    <th class="hidden">Source Document</th>
+                    <th class="text-right">Number of Calls</th>
+                    <th class="text-right">Price</th>
+                    <th t-if="display_discount" class="text-right">Disc.(%)</th>
+                    <th class="text-right">Taxes</th>
+                    <th class="text-right">Amount</th>
+                </t>
+                <t t-if="not o.twilio_invoice">
+                    <th>Description</th>
+                    <th class="hidden">Source Document</th>
+                    <th class="text-right">Quantity</th>
+                    <th class="text-right">Unit Price</th>
+                    <th t-if="display_discount" class="text-right">Disc.(%)</th>
+                    <th class="text-right">Taxes</th>
+                    <th class="text-right">Amount</th>
+                </t>
+            </tr>
+        </xpath>
+        <xpath expr="//table[@name='invoice_line_table']/tbody" position="replace">
+            <tbody class="invoice_tbody">
+                <t t-if="o.twilio_invoice">
+                    <tr t-foreach="o.invoice_line_ids" t-as="l">
+                        <td><span t-field="l.name"/></td>
+                        <td class="hidden"><span t-field="l.origin"/></td>
+                        <td class="text-right">
+                            <span t-esc="len(o.voip_history_ids)"/>
+                            <span t-field="l.uom_id" groups="product.group_uom"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.price_unit"/>
+                        </td>
+                        <td t-if="display_discount" class="text-right">
+                            <span t-field="l.discount"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
+                        </td>
+                        <td class="text-right" id="subtotal">
+                            <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </td>
+                    </tr>
+                    <tr t-foreach="range(max(5-len(o.invoice_line_ids),0))" t-as="l">
+                        <td>&amp;nbsp;</td>
+                        <td class="hidden"/>
+                        <td/>
+                        <td/>
+                        <td t-if="display_discount"/>
+                        <td/>
+                        <td/>
+                    </tr>
+                </t>
+                <t t-if="not o.twilio_invoice">
+                    <tr t-foreach="o.invoice_line_ids" t-as="l">
+                        <td><span t-field="l.name"/></td>
+                        <td class="hidden"><span t-field="l.origin"/></td>
+                        <td class="text-right">
+                            <span t-field="l.quantity"/>
+                            <span t-field="l.uom_id" groups="product.group_uom"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.price_unit"/>
+                        </td>
+                        <td t-if="display_discount" class="text-right">
+                            <span t-field="l.discount"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
+                        </td>
+                        <td class="text-right" id="subtotal">
+                            <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </td>
+                    </tr>
+                    <tr t-foreach="range(max(5-len(o.invoice_line_ids),0))" t-as="l">
+                        <td>&amp;nbsp;</td>
+                        <td class="hidden"/>
+                        <td/>
+                        <td/>
+                        <td t-if="display_discount"/>
+                        <td/>
+                        <td/>
+                    </tr>
+                </t>
+            </tbody>
+        </xpath>
+    </template>
+
+    <template id="voip_call_history" name="Voip Call Log">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h1 style="text-align:center;">Call Log</h1>
+                    <table style="width:75%;">
+                        <tr><th>Time</th><th>Duration</th><th>Address</th><th>Cost</th></tr>
+                
+                        <t t-foreach="o.voip_history_ids" t-as="voip_call">
+                            <tr><td><span t-field="voip_call.start_time"/></td><td><span t-field="voip_call.duration"/></td><td><span t-field="voip_call.to_address"/></td><td><span t-field="voip_call.cost"/></td></tr>
+                        </t>
+                    </table>
+                    <br/>
+                    Total Time: <span t-field="o.voip_total_call_time"/><br/>
+                    Total Cost: <span t-field="o.voip_total_call_cost"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

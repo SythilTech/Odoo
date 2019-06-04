@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mail_activity_view_form_inherit_twilio" model="ir.ui.view">
+        <field name="name">mail.activity Twilio</field>
+        <field name="model">mail.activity</field>
+        <field name="inherit_id" ref="mail.mail_activity_view_form_popup"/>
+        <field name="arch" type="xml">
+            <field name="activity_type_id" position="after">
+                <field name="activity_type_id_ref" invisible="True"/>
+            </field>
+            <xpath expr="//button[@name='action_done']" position="after">
+                <button type="object" name="twilio_mobile_action" string="Make Twilio Call" attrs="{'invisible':[('activity_type_id_ref', '!=', 'mail.mail_activity_data_call')]}"/>
+            </xpath>
+      	</field>
+    </record>
+
+</odoo>

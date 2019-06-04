@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="voip_parent_menu" name="Voip" parent="crm.crm_menu_root" sequence="10"/>
+    <menuitem id="voip_call_menu" name="Call Log" parent="voip_parent_menu" action="voip_call_action" sequence="10"/>
+    <menuitem id="voip_twilio_menu" name="Twilio Accounts" parent="voip_parent_menu" action="voip_twilio_action" sequence="80"/>
+    <menuitem id="voip_number_menu" name="Twilio Numbers" parent="voip_parent_menu" action="voip_number_action" sequence="90"/>
+
+</odoo>

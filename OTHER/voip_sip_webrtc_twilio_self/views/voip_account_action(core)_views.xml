@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_account_action_view_form" model="ir.ui.view">
+        <field name="name">voip.account.action form view</field>
+        <field name="model">voip.account.action</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="voip_dialog_id" invisible="True"/>
+                    <field name="action_type_internal_name" invisible="True"/>
+                    <field name="account_id" invisible="True"/>
+                    <field name="name"/>
+                    <field name="start"/>
+                    <field name="action_type_id" widget="selection" domain="[('name','!=','Call User')]"/>
+                    <field name="recorded_media_id" attrs="{'invisible': [('action_type_internal_name', '!=', 'recorded_message')], 'required': [('action_type_internal_name', '=', 'recorded_message')]}"/>
+                    <field name="from_transition_ids" context="{'default_action_to_id': active_id}">
+                        <tree>
+                            <field name="name"/>
+                            <field name="trigger"/>
+                            <field name="dtmf_input"/>
+                            <field name="action_from_id"/>
+                            <field name="action_to_id" invisible="True"/>
+                        </tree>
+                    </field>
+                    <field name="to_transition_ids" context="{'default_action_from_id': active_id}">
+                        <tree>
+                            <field name="name"/>
+                            <field name="trigger"/>
+                            <field name="dtmf_input"/>
+                            <field name="action_from_id" invisible="True"/>
+                            <field name="action_to_id"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

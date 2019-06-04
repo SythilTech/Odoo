@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="voip_call_wizard_view_form" model="ir.ui.view">
+        <field name="name">voip.call.wizard form view</field>
+        <field name="model">voip.call.wizard</field>
+        <field name="arch" type="xml">
+      	    <form>
+      	        <group>
+      	            <field name="record_model" invisible="True"/>
+      	            <field name="record_id" invisible="True"/>
+      	            <field name="partner_id" invisible="True"/>
+      	            <field name="from_number"/>
+      	            <field name="to_number"/>
+      	        </group>
+      	        <button name="start_call" type="object" string="Start Call"/>
+      	    </form>
+        </field>
+    </record>
+
+</odoo>

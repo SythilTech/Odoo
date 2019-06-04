@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_inherit_voip_sip_webrtc" model="ir.ui.view">
+        <field name="name">res.users Voip</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+      	    <notebook position="inside">
+      	        <page string="VOIP">
+      	            <group>
+      	                <field name="voip_ringtone" filename="voip_ringtone_filename"/>
+      	                <field name="voip_ringtone_filename" invisible="1"/>
+      	                <field name="voip_account_id"/>
+                        <!--<field name="voip_missed_call" filename="voip_missed_call_filename"/>
+                        <field name="voip_missed_call_filename" invisible="1"/>-->
+      	            </group>
+      	        </page>
+      	    </notebook>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_voip_call_wizard","access voip.call.wizard","model_voip_call_wizard","base.group_user",1,1,1,0
+"access_voip_number","access voip.number","model_voip_number","base.group_user",1,1,1,1
+"access_voip_twilio","access voip.twilio","model_voip_twilio","base.group_user",1,1,1,1
+"access_voip_twilio_invoice","access voip.twilio.invoice","model_voip_twilio_invoice","base.group_user",1,1,1,1
+"access_account_invoice_voip_history","access account.invoice.voip.history","model_account_invoice_voip_history","base.group_user",1,1,1,1

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="twilio_lead_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Twilio Call Lead Mobile</field>
+        <field name="model_id" ref="model_crm_lead"/>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.twilio_mobile_action()</field>
+    </record>
+
+    <record id="view_lead_form_inherit_twilio" model="ir.ui.view">
+        <field name="name">crm.lead Twilio</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='mobile']" position="replace">
+                <field name="mobile" widget="phone" placeholder="E.164 format e.g. +61 427 671 760"/>
+                <button type="object" name="twilio_mobile_action" class="btn-xs btn-link mb4 fa fa-phone" attrs="{'invisible':[('mobile', '=', False)]}"/>
+            </xpath>
+      	</field>
+    </record>
+
+</odoo>

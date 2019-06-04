@@ -1,0 +1,40 @@
+<div class="container">
+<h2>Description</h2>
+Provides real time call functionality as well Twilio XML for automated calls<br/>
+<br/>
+<h3>Import Call Log</h3>
+<img src="2.jpg" class="img-responsive" alt="Import Twilio Log"/>
+Import log of calls made using external SIP clients<br/>
+Access the import button under CRM->VOIP->Twilio Accounts<br/>
+<br/>
+<h3>Call mobiles from your browser</h3>
+<img src="3.jpg" class="img-responsive" alt="WebRTC Twilio Call"/>
+Manually call mobile phones and talk in real time.<br/>
+<h4>Setup</h4>
+1. Configure your environment so Twilio can access your database from the public internet<br/>
+2. Enter Twilio account details under CRM->Voip->Twilio Accounts<br/>
+3. Click "Setup Numbers" button<br/>
+4. Go to any contact and select Twilio Call Mobile from the action menu at the top<br/>
+<br/>
+If your database can not be directly accessed by Twilio you can create a Twilio app for handling capability token generation by following this guide<br/>
+<a href="https://www.twilio.com/docs/voice/client/javascript/quickstart">https://www.twilio.com/docs/voice/client/javascript/quickstart</a><br/>
+<br/>
+<h3>Answer calls from your browser</h3>
+<img src="3.jpg" class="img-responsive" alt="WebRTC Twilio Call"/>
+Go to CRM->Voip->Twilio Accounts and hit the setup numbers button this will automatically point the number to your server.<br/>
+Then go into CRM->Voip->Stored Number and assign users to a number, when a call is made they can answer it within there browser.<br/>
+<b>IMPORTANT</b> In order for this feature to work you will need your database to have a publicly accessable url.<br/>
+<br/>
+<h3>Serve Twilio XML for SIP Calls</h3>
+<img src="1.jpg" class="img-responsive" alt="Serve Twilio XML"/>
+Serves out Twilio XML which directs calls to the callee<br/>
+<h4>Setup</h4>
+1.  Add "[domain]/twilio/voice" under the request URL<br/>
+2.  Setup your Twilio SIP account<br/>
+<br/>
+Known Issues<br/>
+Twilio Apps points to http url on Odoo systems behind a reverse proxy<br/>
+Does not work in Google Chrome at all<br/>
+<br/>
+Find a bug or need support? send an email to steven@sythiltech.com.au<br/>
+</div>
