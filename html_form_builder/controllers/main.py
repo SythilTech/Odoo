@@ -23,7 +23,7 @@ class HtmlFormController(http.Controller):
         values = submit_action.email_template_id.generate_email(history_data.id)
         values['email_from'] = submit_action.from_email
         values['email_to'] = submit_action.to_email
-        send_mail = request.env['mail.mail'].create(values)
+        send_mail = request.env['mail.mail'].sudo().create(values)
         send_mail.send()
 
     def _html_action_custom_server_action(self, submit_action, history_data, values):

@@ -10,7 +10,7 @@
 "access_html_form_defaults","Access html.form.defaults","model_html_form_defaults","",1,0,0,0
 "access_html_form_history","Access html.form.history","model_html_form_history","",1,0,0,0
 "access_html_form_history_field","Access html.form.history.field","model_html_form_history_field","",1,0,0,0
-"access_html_form_action","Access html.form.action","model_html_form_action","",1,0,0,0
+"access_html_form_action","Access html.form.action","model_html_form_action","website.group_website_designer",1,1,1,1
 "access_html_form_designer","access_html_form_designer","html_form_builder.model_html_form","website.group_website_designer",1,0,0,0
 "access_html_form_field_designer","access_html_form_field_designer","html_form_builder.model_html_form_field","website.group_website_designer",1,0,0,0
 "access_html_form_field_type_designer","access_html_form_field_type_designer","html_form_builder.model_html_form_field_type","website.group_website_designer",1,0,0,0
