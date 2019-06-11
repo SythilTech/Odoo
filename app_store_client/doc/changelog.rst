@@ -1,3 +1,7 @@
+v1.0.6
+======
+* Allows you to change where the module is downloaded too instead of the default .local folder
+
 v1.0.5
 ======
 * Fix orgin mismatch alert

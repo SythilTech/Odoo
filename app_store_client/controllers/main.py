@@ -25,7 +25,8 @@ class AppStoreControllers(http.Controller):
         mod_name = values['module_name']
         r = requests.get(app_store + "/apps/modules/download/" + mod_name)
 
-        module_path = os.path.expanduser('~') + "/.local/share/Odoo/addons/11.0/" + mod_name
+        download_path = request.env['ir.config_parameter'].get_param('custom_app_store_download_path')
+        module_path = os.path.expanduser('~') + download_path + mod_name
 
         zip_ref = zipfile.ZipFile(io.BytesIO(r.content))
         zip_ref.extractall(module_path)

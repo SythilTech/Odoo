@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+
         <record id="custom_app_store_url" model="ir.config_parameter">
             <field name="key">custom_app_store_url</field>
             <field name="value">http://192.168.56.102:8069</field>
         </record>
+
+        <record id="custom_app_store_download_path" model="ir.config_parameter">
+            <field name="key">custom_app_store_download_path</field>
+            <field name="value">/.local/share/Odoo/addons/11.0/</field>
+        </record>
+
     </data>
 </odoo>
