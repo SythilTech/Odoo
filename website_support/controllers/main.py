@@ -474,15 +474,28 @@ class SupportTicketController(http.Controller):
     def support_ticket_view(self, ticket):
         """View an individual support ticket"""
 
-        extra_access = []
-        for extra_permission in http.request.env.user.partner_id.stp_ids:
-            extra_access.append(extra_permission.id)
-
         setting_max_ticket_attachments = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachments')
         setting_max_ticket_attachment_filesize = request.env['ir.default'].get('website.support.settings', 'max_ticket_attachment_filesize')
 
-        #only let the user this ticket is assigned to view this ticket
-        support_ticket = http.request.env['website.support.ticket'].sudo().search(['|', ('partner_id','=',http.request.env.user.partner_id.id), ('partner_id', 'in', extra_access), ('id','=',ticket) ])[0]
+        #Determine if the logged in user can see this ticket
+        ticket_access = []
+        
+        #Can see own tickets
+        ticket_access.append(http.request.env.user.partner_id.id)
+
+        #Can see tickets of any contacts under the logged in users additional access field (TODO remove this as departments is the evolved version of this feature)
+        for extra_permission in http.request.env.user.partner_id.stp_ids:
+            ticket_access.append(extra_permission.id)
+            
+        #If the logged in user is a department manager then add all the contacts in the department to the access list
+        for dep in request.env['website.support.department.contact'].sudo().search([('user_id','=',http.request.env.user.id)]):
+            for contact in dep.wsd_id.partner_ids:
+                ticket_access.append(contact.id)
+
+        search_t = [('partner_id', 'in', ticket_access), ('partner_id','!=',False), ('id','=',ticket)]
+        
+        support_ticket = request.env['website.support.ticket'].sudo().search(search_t)
+        
         return http.request.render('website_support.support_ticket_view', {'support_ticket':support_ticket, 'setting_max_ticket_attachments': setting_max_ticket_attachments, 'setting_max_ticket_attachment_filesize': setting_max_ticket_attachment_filesize})
 
     @http.route('/support/portal/ticket/view/<portal_access_key>', type="http", auth="public", website=True)

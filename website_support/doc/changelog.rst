@@ -1,3 +1,7 @@
+v1.6.5
+======
+* Fixed bug with department manager not being able to view individual tickets
+
 v1.6.4
 ======
 * Add create support ticket button to form view

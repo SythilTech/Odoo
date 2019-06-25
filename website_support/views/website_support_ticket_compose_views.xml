@@ -11,10 +11,16 @@
                       <field name="ticket_id" invisible="True"/>
                       <field name="approval" invisible="True"/>
                       <field name="email"/>
+                      <field name="email_cc"/>
                       <field name="subject"/>
                       <field name="planned_time" attrs="{'invisible':[('approval','=', False)], 'required': [('approval','=', True)]}"/>
                   </group>
-                  <field name="body" widget="html"/>
+                  <field name="body" widget="html" class="support-ticket-compose" default_focus="1"/>
+                  <script>
+                  $(function() {
+                      $(".support-ticket-compose").focus();
+                  });
+                  </script>
                   <group>
                       <field name="attachment_ids" widget="many2many_binary" string="Attach Files" nolabel="1" colspan="2"/>
                       <field name="template_id" context="{'default_model':'website.support.ticket', 'default_body_html': body}"/>

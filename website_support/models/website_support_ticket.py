@@ -745,6 +745,7 @@ class WebsiteSupportTicketCompose(models.Model):
     ticket_id = fields.Many2one('website.support.ticket', string='Ticket ID')
     partner_id = fields.Many2one('res.partner', string="Partner", readonly="True")
     email = fields.Char(string="Email", readonly="True")
+    email_cc = fields.Char(string="Cc")
     subject = fields.Char(string="Subject", readonly="True")
     body = fields.Text(string="Message Body")
     template_id = fields.Many2one('mail.template', string="Mail Template", domain="[('model_id','=','website.support.ticket'), ('built_in','=',False)]")
@@ -784,6 +785,9 @@ class WebsiteSupportTicketCompose(models.Model):
         values['model'] = "website.support.ticket"
         values['res_id'] = self.ticket_id.id
         values['reply_to'] = email_wrapper.reply_to
+        
+        if self.email_cc:
+            values['email_cc'] = self.email_cc
 
         for attachment in self.attachment_ids:
             values['attachment_ids'].append((4, attachment.id))
