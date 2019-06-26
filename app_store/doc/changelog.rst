@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Skip repos on error (better error handling later...)
+
 v1.0.8
 ======
 * Tidy up repos on delete of account

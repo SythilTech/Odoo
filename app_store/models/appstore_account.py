@@ -45,9 +45,13 @@ class AppstoreAccountRepository(models.Model):
             
             if account_repository.token:
                 q.add_header('Authorization', 'token ' + account_repository.token)
-                
-            repo_data = urlopen(q).read()
-    
+
+            try:
+                repo_data = urlopen(q).read()
+            except:
+                _logger.error("Failed to read repo")
+                continue
+
             thefile = zipfile.ZipFile(BytesIO(repo_data))
 
             if not os.path.exists(rep_directory):
