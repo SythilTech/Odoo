@@ -1,3 +1,7 @@
+v1.6.6
+======
+* Ability to set a default body and cc depending on ticket contact, which auto fills the ticket reply wizard
+
 v1.6.5
 ======
 * Fixed bug with department manager not being able to view individual tickets

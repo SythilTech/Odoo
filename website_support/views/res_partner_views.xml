@@ -23,6 +23,8 @@
                 <notebook position="inside">
                     <page string="Support Ticket" groups="website_support.support_staff">
                         <group>
+                            <field name="ticket_default_email_cc"/>
+                            <field name="ticket_default_email_body" widget="html"/>
                             <field name="dedicated_support_user_id"/>
                             <field name="sla_id"/>
                             <field name="stp_ids"/>

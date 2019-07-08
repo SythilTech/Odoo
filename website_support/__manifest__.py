@@ -1,6 +1,6 @@
 {
     'name': "Website Help Desk / Support Ticket",
-    'version': "1.6.5",
+    'version': "1.6.6",
     'author': "Sythil Tech, Adaptive City",
     'category': "Tools",
     'support': "steven@sythiltech.com.au",

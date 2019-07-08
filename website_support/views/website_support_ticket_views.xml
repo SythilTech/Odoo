@@ -8,8 +8,8 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button type="action" name="%(website_support.website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Reply" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
-                        <button type="action" name="%(website_support.website_support_ticket_compose_action)d" context="{'default_ticket_id': active_id, 'default_partner_id': partner_id, 'default_email':email, 'default_subject':subject}" string="Open / Reply" attrs="{'invisible' :[('close_time', '=', False )]}"/>
+                        <button type="object" name="open_reply_ticket_wizard" string="Reply" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
+                        <button type="object" name="open_reply_ticket_wizard" string="Open / Reply" attrs="{'invisible' :[('close_time', '=', False )]}"/>
                         <button type="object" name="open_close_ticket_wizard" string="Close Ticket" attrs="{'invisible' :[('close_time', '!=', False )]}"/>
                         <button type="object" name="pause_sla" string="Pause SLA" attrs="{'invisible' :['|', ('sla_active', '==', False ), ('sla_id','==', False)]}"/>
                         <button type="object" name="resume_sla" string="Resume SLA" attrs="{'invisible' :['|', ('sla_active', '!=', False ), ('sla_id','==', False)]}"/>

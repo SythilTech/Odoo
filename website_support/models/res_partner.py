@@ -12,6 +12,8 @@ class ResPartnerTicket(models.Model):
     stp_ids = fields.Many2many('res.partner', 'stp_res_partner_rel', 'stp_p1_id', 'stp_p2_id', string="Support Ticket Access Accounts", help="(DEPRICATED use departments) Can view support tickets from other contacts")
     sla_id = fields.Many2one('website.support.sla', string="SLA")
     dedicated_support_user_id = fields.Many2one('res.users', string="Dedicated Support User")
+    ticket_default_email_cc = fields.Char(string="Default Email CC")
+    ticket_default_email_body = fields.Text(string="Default Email Body")
 
     @api.multi
     def create_support_ticket(self):

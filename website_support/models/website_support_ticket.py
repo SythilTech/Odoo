@@ -362,6 +362,26 @@ class WebsiteSupportTicket(models.Model):
         }
 
     @api.multi
+    def open_reply_ticket_wizard(self):
+
+        context = {'default_ticket_id': self.id, 'default_partner_id': self.partner_id.id, 'default_email': self.email, 'default_subject': self.subject}
+
+        if self.partner_id.ticket_default_email_cc:
+            context['default_email_cc'] = self.partner_id.ticket_default_email_cc
+        if self.partner_id.ticket_default_email_body:
+            context['default_body'] = self.partner_id.ticket_default_email_body
+
+        return {
+            'name': "Support Ticket Compose",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'website.support.ticket.compose',
+            'context': context,
+            'target': 'new'
+        }
+
+    @api.multi
     def open_close_ticket_wizard(self):
 
         return {
