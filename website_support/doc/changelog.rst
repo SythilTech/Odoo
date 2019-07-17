@@ -1,3 +1,7 @@
+v1.6.7
+======
+* Fix help pages 404
+
 v1.6.6
 ======
 * Ability to set a default body and cc depending on ticket contact, which auto fills the ticket reply wizard
