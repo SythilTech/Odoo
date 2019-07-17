@@ -1,3 +1,7 @@
+v1.0.11
+=======
+* Fix help page 404
+
 v1.0.10
 =======
 * Fix issue with translations caused by the change of field category to category_id in version 12 to match naming conventions
