@@ -304,7 +304,7 @@
                         </t>
                     </table>
                     <t t-if="portal_access_key">
-                        <form method="POST" action="/support/portal/ticket/comment">
+                        <form method="POST" action="/support/portal/ticket/comment" enctype="multipart/form-data">
                             <b>Add Comment</b><br/>
                             <textarea  class="form-control" name="comment" style="min-height: 120px" required="True"></textarea>
                             <br/>

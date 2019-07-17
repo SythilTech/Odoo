@@ -1,3 +1,7 @@
+v1.6.8
+======
+* Fix comment attachments in portal reply
+
 v1.6.7
 ======
 * Fix help pages 404
