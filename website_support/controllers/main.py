@@ -503,7 +503,25 @@ class SupportTicketController(http.Controller):
 
         support_ticket.state_id = request.env['ir.model.data'].sudo().get_object('website_support', 'website_ticket_state_customer_replied')
 
-        request.env['website.support.ticket'].sudo().browse(support_ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment")
+
+        attachments = []
+        if 'file' in values:
+
+            for c_file in request.httprequest.files.getlist('file'):
+                data = c_file.read()
+
+                if c_file.filename:
+                    new_attachment = request.env['ir.attachment'].sudo().create({
+                        'name': c_file.filename,
+                        'datas': base64.b64encode(data),
+                        'datas_fname': c_file.filename,
+                        'res_model': 'website.support.ticket',
+                        'res_id': support_ticket.id
+                    })
+
+                    attachments.append( (c_file.filename, data) )
+
+        request.env['website.support.ticket'].sudo().browse(support_ticket.id).message_post(body=values['comment'], subject="Support Ticket Reply", message_type="comment", attachments=attachments)
 
         return werkzeug.utils.redirect("/support/portal/ticket/view/" + str(support_ticket.portal_access_key) )
 

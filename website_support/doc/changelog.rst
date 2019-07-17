@@ -1,6 +1,7 @@
 v1.0.11
 =======
 * Fix help page 404
+* Fix portal reply 500
 
 v1.0.10
 =======
