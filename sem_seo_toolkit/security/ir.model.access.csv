@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sem_client,access sem.client,model_sem_client,sem_group,1,1,1,1
+access_sem_client_website,access sem.client.website,model_sem_client_website,sem_group,1,1,1,1
+access_sem_check,access sem.check,model_sem_check,sem_group,1,1,1,1
+access_sem_check_category,access sem.check.category,model_sem_check_category,sem_group,1,1,1,1
+access_sem_report_seo,access sem.report.seo,model_sem_report_seo,sem_group,1,0,1,0
+access_sem_report_seo_check,access sem.report.seo.check,model_sem_report_seo_check,sem_group,1,0,1,0

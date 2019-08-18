@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- TOPIC CONSISTENCY CHECK -->
+
+        <record id="seo_check_keyword_in_title" model="sem.check">
+            <field name="name">Keyword in Title</field>
+            <field name="function_name">keyword_in_title</field>
+            <field name="description">Checks if the specified keyword is in the HTML title tag.
+Check fails if zero or more then one title tags are found.</field>
+            <field name="category_id" ref="seo_check_category_topic_consistency"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+            <field name="keyword_required">1</field>
+        </record>
+
+        <!-- CONTENT QUILITY CHECKS -->
+
+        <record id="seo_check_title_exists" model="sem.check">
+            <field name="name">Title Exists</field>
+            <field name="function_name">title_exists</field>
+            <field name="description">Checks if a HTML title tag exists.
+Check fails if zero or more then one title tags are found or title tag is empty.</field>
+            <field name="category_id" ref="seo_check_category_content_quality"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_meta_description_exists" model="sem.check">
+            <field name="name">Has Meta Description</field>
+            <field name="function_name">has_meta_description</field>
+            <field name="description">Checks if a HTML meta description tag exists.
+Check fails if zero or more then one meta description tags are found or meta description is empty.</field>
+            <field name="category_id" ref="seo_check_category_content_quality"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_valid_links" model="sem.check">
+            <field name="name">Valid Links</field>
+            <field name="function_name">valid_links</field>
+            <field name="description">Checks all anchor tags to see if the href returns HTTP 200.
+Check fails if any link does not return a HTTP 200 including 3** redirects.</field>
+            <field name="category_id" ref="seo_check_category_content_quality"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_valid_images" model="sem.check">
+            <field name="name">Valid Images</field>
+            <field name="function_name">valid_images</field>
+            <field name="description">Checks all img tags to see if the src returns HTTP 200.
+Check fails if any img does not return a HTTP 200 or does not have a src attribute.</field>
+            <field name="category_id" ref="seo_check_category_content_quality"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_images_have_alt" model="sem.check">
+            <field name="name">Images Have alt Attribute</field>
+            <field name="function_name">images_have_alt</field>
+            <field name="description">Checks all img tags to see if they have an alt attribute.
+Check fails if any img does not have an alt attribute or the alt is empty.</field>
+            <field name="category_id" ref="seo_check_category_content_quality"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <!-- PERFORMANCE -->
+
+        <record id="seo_check_page_load_time" model="sem.check">
+            <field name="name">Page Load Time</field>
+            <field name="function_name">page_load_time</field>
+            <field name="description">Simulates a page load using Google Chrome and checks if the domComplete time is less then 2 seconds from navigationStart event.
+Check fails if the time difference is more then 2 seconds.</field>
+            <field name="category_id" ref="seo_check_category_performance"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_non_optimised_images" model="sem.check">
+            <field name="name">Non Optimised Images</field>
+            <field name="function_name">non_optimised_images</field>
+            <field name="description">Checks all images to see if there is a difference between natural size vs display size, e.g. natural 800x800 pixel image styled to display as 400x400 image.
+Check fails if any image has been shrinked of streched via css.</field>
+            <field name="category_id" ref="seo_check_category_performance"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <!-- SECURITY CHECKS -->
+
+        <record id="seo_check_https" model="sem.check">
+            <field name="name">HTTPS</field>
+            <field name="function_name">https</field>
+            <field name="description">Checks if supplied URL after redirects starts with https://.
+Check fails if page starts with any other protocol mainly http://.</field>
+            <field name="category_id" ref="seo_check_category_security"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_mixed_content" model="sem.check">
+            <field name="name">Mixed Content</field>
+            <field name="function_name">mixed_content</field>
+            <field name="description">Checks all images and links to see if they use http when website is https.
+Check fails if any image or link is using http:// on a https:// website.</field>
+            <field name="category_id" ref="seo_check_category_security"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <!-- VISIBILITY -->
+
+        <record id="seo_check_sitemap_exists" model="sem.check">
+            <field name="name">Sitemap Exists</field>
+            <field name="function_name">sitemap_exists</field>
+            <field name="description">Checks if the file sitemap.xml or sitemap_index.xml exists (does not validate).
+Check fails if neither file exist.</field>
+            <field name="category_id" ref="seo_check_category_visibility"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">domain</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_index_allowed" model="sem.check">
+            <field name="name">Indexing Allowed</field>
+            <field name="function_name">index_allowed</field>
+            <field name="description">Checks see if if a noindex exists for any web crawlers.
+Check fails if any noindex meta tag exists.</field>
+            <field name="category_id" ref="seo_check_category_visibility"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+        <record id="seo_check_google_domain_indexed" model="sem.check">
+            <field name="name">Google Domain Indexed</field>
+            <field name="function_name">google_domain_indexed</field>
+            <field name="description">Checks if a Google search for site:[domain] returns any results
+Check fails if results are zero.</field>
+            <field name="category_id" ref="seo_check_category_visibility"/>
+            <field name="check_type">offsite</field>
+            <field name="check_level">domain</field>
+            <field name="active">1</field>
+        </record>
+
+        <!-- MISC -->
+
+        <record id="seo_check_google_analytics" model="sem.check">
+            <field name="name">Google Analytics Installed</field>
+            <field name="function_name">google_analytics</field>
+            <field name="description">Checks for any of the Google Analytics .js files are referenced in the source code.
+Check fails if none are found.</field>
+            <field name="category_id" ref="seo_check_category_misc"/>
+            <field name="check_type">onsite</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
+    </data>
+</odoo>

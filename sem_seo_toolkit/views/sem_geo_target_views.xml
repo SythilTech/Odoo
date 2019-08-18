@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_geo_target_wizard_view_form" model="ir.ui.view">
+        <field name="name">sem.geo_target.wizard form view</field>
+        <field name="model">sem.geo_target.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="keyword_id" invisible="True"/>
+                    <field name="search_engine_id"/>
+                    <field name="location_string"/>
+                    <field name="geo_target_ids"/>
+                </group>
+                <footer>
+                    <button name="add_geo_locations" type="object" string="Add Geo Locations" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="seo_report" name="SEO Report">
+        <t t-call="website.layout">
+            <div class="container">
+
+                 <div class="mt16 mb16">
+                     <h1 class="text-center">SEO Report</h1>
+
+                     <div name="search_from_container" class="form-group">
+                         <div class="col-md-3"></div>
+                         <div class="col-md-6">
+                             <form meth="get" action="/seo/report/">
+                                 <input type="input" class="form-control" name="url" t-attf-value="#{request.params.get('url')}" placeholder="Enter Page URL"/>
+                             </form>
+                         </div>
+                         <div class="col-md-3"></div>
+                     </div>
+ 
+                </div>
+
+                <t t-if="sem_report">
+                    <div class="mt64 mb16">
+                    <h2 class="text-center">Checks</h2>
+                        <table class="table table-bordered">
+                            <tr><th style="width:200px;">Check Name</th><th style="width:70px;">Result</th><th>Notes</th></tr>
+                            <t t-as="seo_check" t-foreach="sem_report.check_ids">
+                                <tr>
+                                    <td><span t-field="seo_check.check_id.name"/></td>
+                                    <td class="text-center">
+                                    <t t-if="seo_check.check_pass">
+                                        <span style="color:green;">&#10004;</span>
+                                    </t>
+                                    <t t-if="not seo_check.check_pass">
+                                        <span style="color:red;">&#10006;</span>
+                                    </t>
+                                    </td>
+                                    <td><span t-field="seo_check.notes"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+</odoo>

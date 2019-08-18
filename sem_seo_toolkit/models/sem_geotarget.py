@@ -1,0 +1,50 @@
+# -*- coding: utf-8 -*-
+
+from odoo import api, fields, models
+
+class SemGeoTarget(models.Model):
+
+    _name = "sem.geo_target"
+
+    search_engine_id = fields.Many2one('sem.search_engine', string="Search Engine")
+    location_id = fields.Char(string="Location ID", help="The ID of the location within the search engine")
+    name = fields.Char(string="Name")
+
+class SemGeoTargetWizard(models.TransientModel):
+
+    _name = "sem.geo_target.wizard"
+
+    keyword_id = fields.Many2one('sem.client.website.keyword', string="")
+    search_engine_id = fields.Many2one('sem.search_engine', string="Search Engine")
+    location_string = fields.Char(string="Find Geo Target")
+    geo_target_ids = fields.Many2many('sem.geo_target.wizard.record', string="Geo Targets")
+
+    @api.onchange('location_string')
+    def _onchange_location_string(self):
+        if self.search_engine_id and self.location_string:
+
+            # Remove all records created by this wizard so old items don't show in the geo target surggestion list
+            for geo_target_record in self.env['sem.geo_target.wizard.record'].search([('wizard_id','=', self.id)]):
+                geo_target_record.unlink()
+
+            # Now add the list returned by the API for the user to select from
+            geo_targets = self.search_engine_id.find_geo_targets(self.location_string)
+            for geo_target in geo_targets:
+                self.env['sem.geo_target.wizard.record'].create({'wizard_id': self.id, 'location_id': geo_target[0], 'name': geo_target[1]})
+
+    def add_geo_locations(self):
+
+        for geo_target in self.geo_target_ids:
+            # Add the geo location to the local cache so it is easy to select locale for future keywords
+            local_geo_target = self.env['sem.geo_target'].create({'search_engine_id': self.search_engine_id.id, 'location_id': geo_target.location_id, 'name': geo_target.name})
+
+            # Also add the locales to the keyword
+            self.keyword_id.geo_target_ids = [(4, local_geo_target.id)]
+
+class SemGeoTargetWizardRecord(models.TransientModel):
+
+    _name = "sem.geo_target.wizard.record"
+
+    wizard_id = fields.Many2one('sem.geo_target.wizard', string="Wizard")
+    location_id = fields.Char(string="The reference ID of the location in the Search Engine database")
+    name = fields.Char(string="Name")

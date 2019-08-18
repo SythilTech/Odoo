@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_check_category_view_form" model="ir.ui.view">
+        <field name="name">sem.check.category form view</field>
+        <field name="model">sem.check.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="check_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="keyword_required"/>
+                            <field name="check_type"/>
+                            <field name="check_level"/>
+                            <field name="active"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_check_category_view_tree" model="ir.ui.view">
+        <field name="name">sem.check.category tree view</field>
+        <field name="model">sem.check.category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_check_category_action" model="ir.actions.act_window">
+        <field name="name">SEO Check Category</field>
+        <field name="res_model">sem.check.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

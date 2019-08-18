@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_client_website_view_form" model="ir.ui.view">
+        <field name="name">sem.client.website form view</field>
+        <field name="model">sem.client.website</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="check_website" type="object" string="Check Website"/>
+                    <button name="competitor_analyse" type="object" string="Competitor Analyse"/>
+                    <button name="search_report" type="object" string="Search Report"/>
+                </header>
+                <group>
+                    <field name="client_id"/>
+                    <field name="url"/>
+                    <field name="page_ids">
+                        <tree>
+                            <field name="url"/>
+                        </tree>
+                    </field>
+                    <field name="keyword_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_client_website_view_tree" model="ir.ui.view">
+        <field name="name">sem.client.website tree view</field>
+        <field name="model">sem.client.website</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="client_id"/>
+                <field name="url"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_client_website_action" model="ir.actions.act_window">
+        <field name="name">SEM Client Website</field>
+        <field name="res_model">sem.client.website</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

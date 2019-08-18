@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seo_check_category_topic_consistency" model="sem.check.category">
+            <field name="name">Topic Consistency</field>
+        </record>
+
+        <record id="seo_check_category_content_quality" model="sem.check.category">
+            <field name="name">Content Quality</field>
+        </record>
+
+        <record id="seo_check_category_performance" model="sem.check.category">
+            <field name="name">Performance</field>
+        </record>
+
+        <record id="seo_check_category_security" model="sem.check.category">
+            <field name="name">Security</field>
+        </record>
+
+        <record id="seo_check_category_visibility" model="sem.check.category">
+            <field name="name">Visibility</field>
+        </record>
+
+        <record id="seo_check_category_misc" model="sem.check.category">
+            <field name="name">Misc</field>
+        </record>
+
+    </data>     
+</odoo>

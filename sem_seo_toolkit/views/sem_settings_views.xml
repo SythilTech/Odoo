@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+    <record id="sem_settings_view_form" model="ir.ui.view">
+        <field name="name">sem.settings form view</field>
+        <field name="model">sem.settings</field>
+        <field name="arch" type="xml">
+            <form class="oe_form_configuration">
+                <header>
+                    <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                    <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                </header>
+                <group>
+                    <field name="google_cse_key"/>
+                    <field name="google_search_engine_id"/>
+                    <field name="google_ads_developer_token"/>
+                    <field name="google_ads_client_id"/>
+                    <field name="google_ads_client_secret"/>
+                    <field name="google_ads_manager_account_customer_id"/>
+                </group>
+                <button name="google_ads_authorize" type="object" string="Google Ads Authorize"/>
+      	    </form>
+        </field>
+    </record>
+
+    <record id="sem_settings_action" model="ir.actions.act_window">
+        <field name="name">SEM Settings</field>
+	<field name="res_model">sem.settings</field>
+	<field name="view_mode">form</field>
+	<field name="target">inline</field>
+    </record>
+
+    </data>
+</odoo>

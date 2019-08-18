@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report file="sem_seo_toolkit.seo_pdf_report" name="sem_seo_toolkit.seo_pdf_report" report_type="qweb-pdf" string="SEO Report" model="sem.report.seo" id="seo_pdf_report_report"/>
+
+    <record id="sem_report_seo_view_form" model="ir.ui.view">
+        <field name="name">sem.report.seo form view</field>
+        <field name="model">sem.report.seo</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="client_id"/>
+                    <field name="url"/>
+                    <field name="keyword"/>
+                    <field name="check_ids">
+                        <tree>
+                            <field name="check_id"/>
+                            <field name="check_pass"/>
+                            <field name="notes"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_report_seo_view_tree" model="ir.ui.view">
+        <field name="name">sem.report.seo tree view</field>
+        <field name="model">sem.report.seo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="client_id"/>
+                <field name="url"/>
+                <field name="keyword"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_report_seo_action" model="ir.actions.act_window">
+        <field name="name">SEM Seo Report</field>
+        <field name="res_model">sem.report.seo</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
