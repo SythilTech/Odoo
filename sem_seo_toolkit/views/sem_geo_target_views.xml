@@ -20,4 +20,40 @@
         </field>
     </record>
 
+    <record id="sem_geo_target_view_form" model="ir.ui.view">
+        <field name="name">sem.geo_target form view</field>
+        <field name="model">sem.geo_target</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="search_engine_id"/>
+                    <field name="name"/>
+                    <field name="location_id"/>
+                    <field name="latitude"/>
+                    <field name="longitude"/>
+                    <field name="accuracy_radius_meters"/>
+                    <field name="device_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_geo_target_view_tree" model="ir.ui.view">
+        <field name="name">sem.geo_target tree view</field>
+        <field name="model">sem.geo_target</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="search_engine_id"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_geo_target_action" model="ir.actions.act_window">
+        <field name="name">Geo Targets</field>
+        <field name="res_model">sem.geo_target</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
 </odoo>

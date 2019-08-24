@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="seo_depend_selenium" model="sem.depend">
+            <field name="name">Selenium / Google Chrome</field>
+        </record>
+
+        <record id="seo_depend_google_cse" model="sem.depend">
+            <field name="name">Google CSE</field>
+        </record>
+
+    </data>
+</odoo>

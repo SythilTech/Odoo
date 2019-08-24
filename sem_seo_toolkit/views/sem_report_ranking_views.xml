@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_report_ranking_view_form" model="ir.ui.view">
+        <field name="name">sem.report.ranking form view</field>
+        <field name="model">sem.report.ranking</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="website_id"/>
+                    <field name="result_ids">
+                        <tree>
+                            <field name="keyword_id"/>
+                            <field name="geo_target_id"/>
+                            <field name="rank"/>
+                            <field name="search_url" widget="url"/>
+                            <field name="link_url" widget="url"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_report_ranking_result_view_form" model="ir.ui.view">
+        <field name="name">sem.report.ranking.result form view</field>
+        <field name="model">sem.report.ranking.result</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="keyword_id"/>
+                    <field name="geo_target_id"/>
+                    <field name="rank"/>
+                    <field name="search_url" widget="url"/>
+                    <field name="link_url"/>
+                    <field name="search_html" widget="html"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_report_ranking_view_tree" model="ir.ui.view">
+        <field name="name">sem.ranking.seo tree view</field>
+        <field name="model">sem.report.ranking</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="website_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_report_ranking_action" model="ir.actions.act_window">
+        <field name="name">SEM ranking Report</field>
+        <field name="res_model">sem.report.ranking</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

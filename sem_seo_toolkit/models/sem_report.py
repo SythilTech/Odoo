@@ -20,6 +20,7 @@ class SemReportSeoCheck(models.Model):
     check_id = fields.Many2one('sem.check', string="SEO Check")
     check_pass = fields.Boolean(string="Pass", help="Did it pass or fail this check/test")
     notes = fields.Html(sanitize=False, string="Notes", help="Any additional information")
+    time = fields.Float(string="Processing Time")
 
 class SemReportCompetition(models.Model):
 
@@ -40,6 +41,40 @@ class SemReportCompetitionRanking(models.Model):
     title = fields.Char(string="Title")
     link = fields.Char(string="Link")
     snippet = fields.Text(string="Snippet")
+
+class SemReportRanking(models.Model):
+
+    _name = "sem.report.ranking"
+
+    website_id = fields.Many2one('sem.client.website', string="Client Website")
+    result_ids = fields.One2many('sem.report.ranking.result', 'ranking_id', string="Results")
+
+class SemReportRankingResult(models.Model):
+
+    _name = "sem.report.ranking.result"
+
+    ranking_id = fields.Many2one('sem.report.ranking', string="Ranking Report")
+    keyword_id = fields.Many2one('sem.client.website.keyword', string="Keyword")
+    geo_target_id = fields.Many2one('sem.geo_target', string="Geo Target")
+    rank = fields.Integer(string="Rank")
+    search_url = fields.Char(string="Search URL")
+    link_url = fields.Char(string="Link URL")
+    search_html = fields.Char(string="Search HTML")
+
+class SemReportMetric(models.Model):
+
+    _name = "sem.report.metric"
+
+    url = fields.Char(string="URL")
+    result_ids = fields.One2many('sem.report.metric.result', 'report_metric_id', string="Results")
+
+class SemReportMetricResults(models.Model):
+
+    _name = "sem.report.metric.result"
+
+    report_metric_id = fields.Many2one('sem.report.metric', string="SEO Metric")
+    metric_id = fields.Many2one('sem.metric', string="Metric")
+    value = fields.Char(string="Value")
 
 class SemReportSearch(models.Model):
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_track_view_form" model="ir.ui.view">
+        <field name="name">sem.track form view</field>
+        <field name="model">sem.track</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="create_date" string="Time"/>
+                    <field name="referrer"/>
+                    <field name="user_agent"/>
+                    <field name="start_url"/>
+                    <field name="ip"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_track_view_tree" model="ir.ui.view">
+        <field name="name">sem.track tree view</field>
+        <field name="model">sem.track</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date" string="Time"/>
+                <field name="referrer"/>
+                <field name="start_url"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_track_action" model="ir.actions.act_window">
+        <field name="name">Website Analytics</field>
+        <field name="res_model">sem.track</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -9,8 +9,21 @@ Set of tools to help with Search Engine Marketing / Optimisation<br/>
 </ol>
 If not installed the checks will be omitted from the report<br/>
 <a href="https://selenium-python.readthedocs.io/installation.html">https://selenium-python.readthedocs.io/installation.html</a><br/>
-sudo pip3 install selenium<br/>
-<br/>
+<a href="https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/">https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/</a><br/>
+Ubuntu 64 Bit instructions<br/>
+<pre>
+sudo pip3 install selenium
+sudo su -
+curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
+echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+apt-get -y update
+apt-get -y install google-chrome-stable
+wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
+apt install unzip
+chown root:root /usr/bin/chromedriver
+chmod +x /usr/bin/chromedriver
+</pre>
+Then restart your Odoo instance<br/>
 <b>*NOTE*</b> You will need to enter an API key and search engine ID for Google Custom Search Engine in settings for the following checks to work<br/>
 <ol>
 <li>Google Domain Indexed</li>

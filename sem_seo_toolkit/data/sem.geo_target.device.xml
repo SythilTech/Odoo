@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sem_device_desktop" model="sem.geo_target.device">
+            <field name="name">Desktop</field>
+            <field name="user_agent">Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36</field>
+        </record>
+
+        <record id="sem_device_tablet" model="sem.geo_target.device">
+            <field name="name">Tablet</field>
+            <field name="user_agent">Mozilla/5.0+(iPad;+CPU+OS+7_0+like+Mac+OS+X)+AppleWebKit/537.51.1+(KHTML,+like+Gecko)+Version/7.0+Mobile/11A465+Safari/9537.53</field>
+        </record>
+
+        <record id="sem_device_mobile" model="sem.geo_target.device">
+            <field name="name">Mobile</field>
+            <field name="user_agent">Mozilla/5.0+(iPhone;+CPU+iPhone+OS+7_0+like+Mac+OS+X)+AppleWebKit/537.51.1+(KHTML,+like+Gecko)+Version/7.0+Mobile/11A465+Safari/9537.53</field>
+        </record>
+
+    </data>     
+</odoo>

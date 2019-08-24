@@ -3,8 +3,18 @@ import sys
 import requests
 from lxml import html
 import json
+import urllib.parse as urlparse
+import base64
+import time
 import logging
 _logger = logging.getLogger(__name__)
+
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+except:
+    _logger.error("Selenium not installed")
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -28,57 +38,125 @@ class SemClientWebsite(models.Model):
     keyword_ids = fields.One2many('sem.client.website.keyword', 'website_id', string="Keywords")
 
     @api.multi
-    def check_website(self):
+    def metric_report(self):
         self.ensure_one()
 
+        metric_report = self.env['sem.report.metric'].create({'url': self.url})
+
         try:
-            request_response = requests.get(self.url)
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            driver = webdriver.Chrome(chrome_options = chrome_options)
+            driver.get(self.url)
+            parsed_html = html.fromstring(driver.page_source)
         except:
-            raise UserError(_("Error accessing website"))
+            # Fall back to requests and skip some checks that need Selenium / Google Chrome
+            driver = False
+            parsed_html = html.fromstring(requests.get(self.url).text)
 
-        sem_report = self.env['sem.report.seo'].create({'client_id': self.client_id.id, 'url': self.url})
-
-        # Domain level checks
-        for seo_check in self.env['sem.check'].search([('active', '=', True), ('keyword_required', '=', False), ('check_level', '=', 'domain')]):
-            method = '_seo_check_%s' % (seo_check.function_name,)
-            action = getattr(seo_check, method, None)
+        for seo_metric in self.env['sem.metric'].search([('active', '=', True)]):
+            method = '_seo_metric_%s' % (seo_metric.function_name,)
+            action = getattr(seo_metric, method, None)
 
             if not action:
                 raise NotImplementedError('Method %r is not implemented' % (method,))
 
-            parsed_html = html.fromstring(request_response.text)
-
             try:
-                check_result = action(request_response, parsed_html, False)
+                metric_result = action(driver, self.url, parsed_html)
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 _logger.error(e)
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
                 continue
-            
-            if check_result != False:
-                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1]})
 
-        # Page level checks
-        for seo_check in self.env['sem.check'].search([('active', '=', True), ('keyword_required', '=', False), ('check_level', '=', 'page')]):
+            if metric_result != False:
+                self.env['sem.report.metric.result'].create({'report_metric_id': metric_report.id, 'metric_id': seo_metric.id, 'value': metric_result})
+
+        try:
+            driver.quit()
+        except:
+            pass
+
+        return {
+            'name': 'SEM Metric Report',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sem.report.metric',
+            'type': 'ir.actions.act_window',
+            'res_id': metric_report.id
+        }
+
+    @api.multi
+    def check_website(self):
+        self.ensure_one()
+
+        sem_report = self.env['sem.report.seo'].create({'client_id': self.client_id.id, 'url': self.url})
+
+        try:
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            driver = webdriver.Chrome(chrome_options = chrome_options)
+            driver.get(self.url)
+            parsed_html = html.fromstring(driver.page_source)
+        except:
+            # Fall back to requests and skip some checks that need Selenium / Google Chrome
+            driver = False
+            parsed_html = html.fromstring(requests.get(self.url).text)
+
+        # Domain level checks
+        for seo_check in self.env['sem.check'].search([('active', '=', True), ('check_level', '=', 'domain')]):
             method = '_seo_check_%s' % (seo_check.function_name,)
             action = getattr(seo_check, method, None)
 
             if not action:
                 raise NotImplementedError('Method %r is not implemented' % (method,))
 
-            parsed_html = html.fromstring(request_response.text)
-
-            check_result = action(request_response, parsed_html, False)
+            try:
+                start = time.time()
+                check_result = action(driver, self.url, parsed_html)
+                end = time.time()
+                diff = end - start
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error(e)
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
+                continue
 
             if check_result != False:
-                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1]})
+                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
+
+        # Page level checks
+        for seo_check in self.env['sem.check'].search([('active', '=', True), ('check_level', '=', 'page')]):
+            method = '_seo_check_%s' % (seo_check.function_name,)
+            action = getattr(seo_check, method, None)
+
+            if not action:
+                raise NotImplementedError('Method %r is not implemented' % (method,))
+
+            try:
+                start = time.time()
+                check_result = action(driver, self.url, parsed_html)
+                end = time.time()
+                diff = end - start
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error(e)
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
+                continue
+
+            if check_result != False:
+                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
+
+        try:
+            driver.quit()
+        except:
+            pass
 
         return {
             'name': 'SEM Seo Report',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'sem.report',
+            'res_model': 'sem.report.seo',
             'type': 'ir.actions.act_window',
             'res_id': sem_report.id
         }
@@ -170,7 +248,73 @@ class SemClientWebsite(models.Model):
             'res_model': 'sem.report.search',
             'res_id': search_report.id,
             'type': 'ir.actions.act_window'
-        } 
+        }
+
+    @api.multi
+    def ranking_report(self):
+        self.ensure_one()
+
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(chrome_options = chrome_options)
+
+        ranking_report = self.env['sem.report.ranking'].create({'website_id': self.id})
+
+        for keyword in self.keyword_ids:
+            if keyword.active:
+                for geo_target in keyword.geo_target_ids:
+
+                    url = "https://www.google.com/search?tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2000&q="
+                    url += keyword.name.lower()
+                    url += "&num=100&ip=0.0.0.0&source_ip=0.0.0.0&ie=UTF-8&oe=UTF-8&hl=en&adtest=on&noj=1&igu=1"
+
+                    key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+
+                    uule = "w+CAIQICI"
+                    uule += key[len(geo_target.name) % len(key)]
+                    uule += base64.b64encode(bytes(geo_target.name, "utf-8")).decode()
+                    url += "&uule=" + uule
+                    url += "&adtest-useragent=" + geo_target.device_id.user_agent
+
+                    driver.implicitly_wait(2)
+                    driver.get(url)
+                    organic_counter = 1
+                    rank = 0
+                    link_url = ""
+
+                    organic_hook = '//*[@class="srg"]/*[@data-hveid]'
+
+                    for organic_listing in driver.find_elements(By.XPATH, organic_hook):
+
+                        try:
+
+                            heading = organic_listing.find_element(By.XPATH, './/a//*[@role="heading"]')
+                            index_date = organic_listing.find_element(By.XPATH, './/*[@class="f"]')
+                            url_anchor = organic_listing.find_element(By.XPATH, './/a[@ping]')
+                            parsed = urlparse.urlparse(url_anchor.get_attribute('ping'))
+                            link_url = urlparse.parse_qs(parsed.query)['url'][0]
+
+                            if link_url.startswith(self.url):
+                                rank = organic_counter
+                                break
+
+                            organic_counter += 1
+                        except:
+                            pass
+
+                    # Create the ranking even if the client's website is not found
+                    self.env['sem.report.ranking.result'].create({'ranking_id': ranking_report.id, 'keyword_id': keyword.id, 'geo_target_id': geo_target.id, 'rank': rank, 'search_url': url, 'link_url': link_url, 'search_html': driver.page_source})
+
+        driver.quit()
+
+        return {
+            'name': 'Ranking Report',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sem.report.ranking',
+            'res_id': ranking_report.id,
+            'type': 'ir.actions.act_window'
+        }
 
 class SemClientWebsitePage(models.Model):
 

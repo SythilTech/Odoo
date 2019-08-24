@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seo_metric_page_load_time" model="sem.metric">
+            <field name="name">Page Load Time</field>
+            <field name="function_name">page_load_time</field>
+            <field name="description">Simulates a page load using Google Chrome and returns the time between navigationStart and domComplete events.</field>
+            <field name="active">1</field>
+        </record>
+
+    </data>
+</odoo>

@@ -12,7 +12,12 @@
                 <group>
                     <field name="website_id"/>
                     <field name="name"/>
-                    <field name="geo_target_ids"/>
+                    <field name="geo_target_ids">
+                        <tree>
+                            <field name="search_engine_id"/>
+                            <field name="name"/>
+                        </tree>
+                    </field>
                 </group>
             </form>
         </field>

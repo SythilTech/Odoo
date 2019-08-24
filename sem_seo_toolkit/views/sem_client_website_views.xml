@@ -8,8 +8,8 @@
             <form>
                 <header>
                     <button name="check_website" type="object" string="Check Website"/>
-                    <button name="competitor_analyse" type="object" string="Competitor Analyse"/>
                     <button name="search_report" type="object" string="Search Report"/>
+                    <button name="metric_report" type="object" string="Metric Report"/>
                 </header>
                 <group>
                     <field name="client_id"/>

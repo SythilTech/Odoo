@@ -10,10 +10,9 @@
                     <field name="name"/>
                     <field name="description"/>
                     <field name="category_id"/>
-                    <field name="check_type"/>
                     <field name="check_level"/>
-                    <field name="keyword_required"/>
                     <field name="active"/>
+                    <field name="depend_ids" widget="many2many_tags"/>
                 </group>
             </form>
         </field>
@@ -27,10 +26,9 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="category_id"/>
-                <field name="check_type"/>
                 <field name="check_level"/>
-                <field name="keyword_required"/>
                 <field name="active"/>
+                <field name="depend_ids" widget="many2many_tags"/>
             </tree>
         </field>
     </record>

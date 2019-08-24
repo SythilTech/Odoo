@@ -11,8 +11,6 @@
                     <field name="check_ids">
                         <tree>
                             <field name="name"/>
-                            <field name="keyword_required"/>
-                            <field name="check_type"/>
                             <field name="check_level"/>
                             <field name="active"/>
                         </tree>

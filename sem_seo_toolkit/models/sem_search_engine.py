@@ -2,6 +2,7 @@
 
 import requests
 import json
+import base64
 import logging
 _logger = logging.getLogger(__name__)
 

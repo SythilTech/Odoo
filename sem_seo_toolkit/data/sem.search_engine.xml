@@ -7,5 +7,10 @@
             <field name="internal_name">google</field>
         </record>
 
+        <record id="seo_search_engine_bing" model="sem.search_engine">
+            <field name="name">Microsoft Bing</field>
+            <field name="internal_name">bing</field>
+        </record>
+
     </data>     
 </odoo>

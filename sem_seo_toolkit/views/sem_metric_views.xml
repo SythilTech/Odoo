@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_metric_view_form" model="ir.ui.view">
+        <field name="name">sem.metric form view</field>
+        <field name="model">sem.metric</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="active"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_metric_view_tree" model="ir.ui.view">
+        <field name="name">sem.metric tree view</field>
+        <field name="model">sem.metric</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_metric_action" model="ir.actions.act_window">
+        <field name="name">SEO Metric</field>
+        <field name="res_model">sem.metric</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

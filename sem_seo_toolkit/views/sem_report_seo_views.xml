@@ -17,6 +17,7 @@
                             <field name="check_id"/>
                             <field name="check_pass"/>
                             <field name="notes"/>
+                            <field name="time"/>
                         </tree>
                     </field>
                 </group>

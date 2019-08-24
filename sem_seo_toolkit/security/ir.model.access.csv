@@ -1,7 +1,18 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sem_client,access sem.client,model_sem_client,sem_group,1,1,1,1
-access_sem_client_website,access sem.client.website,model_sem_client_website,sem_group,1,1,1,1
-access_sem_check,access sem.check,model_sem_check,sem_group,1,1,1,1
+access_sem_client_website,access sem.client.website,model_sem_client_website,sem_group,1,0,1,0
+access_sem_client_website_keyword,access sem.client.website.keyword,model_sem_client_website_keyword,sem_group,1,0,1,0
+access_sem_track,access sem.track,model_sem_track,sem_group,1,0,0,0
+access_sem_metric,access sem.metric,model_sem_metric,sem_group,1,1,1,0
+access_sem_geo_target,access sem.geo_target,model_sem_geo_target,sem_group,1,0,0,0
+access_sem_geo_target_device,access sem.geo_target.device,model_sem_geo_target_device,sem_group,1,1,1,1
+access_sem_check,access sem.check,model_sem_check,sem_group,1,1,1,0
 access_sem_check_category,access sem.check.category,model_sem_check_category,sem_group,1,1,1,1
+access_sem_report_metric,access sem.report.metric,model_sem_report_metric,sem_group,1,0,1,0
 access_sem_report_seo,access sem.report.seo,model_sem_report_seo,sem_group,1,0,1,0
 access_sem_report_seo_check,access sem.report.seo.check,model_sem_report_seo_check,sem_group,1,0,1,0
+access_sem_report_search,access sem.report.search,model_sem_report_search,sem_group,1,0,1,0
+access_sem_depend,access sem.depend,model_sem_depend,sem_group,1,0,0,0
+access_ir_rule,access ir.rule,base.model_ir_rule,sem_group,1,0,0,0
+access_ir_config_parameter,access ir.config_parameter,base.model_ir_config_parameter,sem_group,1,0,0,0
+access_sem_track,access sem.track,model_sem_track,,0,0,1,0

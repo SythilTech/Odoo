@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_geo_target_device_view_form" model="ir.ui.view">
+        <field name="name">sem.geo_target.device form view</field>
+        <field name="model">sem.geo_target.device</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="user_agent"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_geo_target_device_view_tree" model="ir.ui.view">
+        <field name="name">sem.geo_target.device tree view</field>
+        <field name="model">sem.geo_target.device</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="user_agent"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_geo_target_device_action" model="ir.actions.act_window">
+        <field name="name">Devices</field>
+        <field name="res_model">sem.geo_target.device</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
