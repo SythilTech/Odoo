@@ -5,11 +5,11 @@ from odoo import api, fields, models
 class SemReportSeo(models.Model):
 
     _name = "sem.report.seo"
-    _rec_name = "keyword"
+    _rec_name = "url"
 
     client_id = fields.Many2one('sem.client', string="Client")
+    page_id = fields.Many2one('sem.client.website.page', string="Page")
     url = fields.Char(string="URL")
-    keyword = fields.Char(string="Keyword")
     check_ids = fields.One2many('sem.report.seo.check', 'report_id', string="Checks")
 
 class SemReportSeoCheck(models.Model):
@@ -59,7 +59,16 @@ class SemReportRankingResult(models.Model):
     rank = fields.Integer(string="Rank")
     search_url = fields.Char(string="Search URL")
     link_url = fields.Char(string="Link URL")
-    search_html = fields.Char(string="Search HTML")
+    item_ids = fields.One2many('sem.report.ranking.result.item', 'result_id', string="Search Results")
+
+class SemReportRankingResultItem(models.Model):
+
+    _name = "sem.report.ranking.result.item"
+
+    result_id = fields.Many2one('sem.report.ranking', string="Ranking Report Result")
+    name = fields.Char(string="Name")
+    url = fields.Char(string="URL")
+    snippet = fields.Char(string="Snippet")
 
 class SemReportMetric(models.Model):
 
@@ -92,3 +101,23 @@ class SemReportSearchResult(models.Model):
     geo_target_id = fields.Many2one('sem.geo_target', string="Geo Target")
     monthly_searches = fields.Char(string="Monthly Searches")
     competition = fields.Char(string="Competition")
+
+#class SemReportGoogleBusiness(models.Model):
+#
+#    _name = "sem.report.google.business"
+#
+#    client_id = fields.Many2one('sem.client', string="Client")
+#    queries_direct = fields.Integer(string="Queries Direct")
+#    queries_indirect = fields.Integer(string="Queries Indirect")
+#    queries_chain = fields.Integer(string="Queries Chain")
+#    views_maps = fields.Integer(string="Views Maps")
+#    views_search = fields.Integer(string="Views Search")
+#    actions_website = fields.Integer(string="Actions Website")
+#    actions_phone = fields.Integer(string="Actions Phone")
+#    actions_driving_directions = fields.Integer(string="Actions Driving Directions")
+#    photos_views_merchant = fields.Integer(string="Photos Views Merchant")
+#    photos_views_customers = fields.Integer(string="Photos Views Customers")
+#    photos_count_merchant = fields.Integer(string="Photos Count Merchant")
+#    photos_count_customers = fields.Integer(string="Photos Count Customers")
+#    local_post_views_search = fields.Integer(string="Local Post Views Search")
+#    local_post_actions_call_to_action = fields.Integer(string="Local Post Actions Call to Action")

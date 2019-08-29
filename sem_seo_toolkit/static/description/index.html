@@ -2,15 +2,36 @@
 <h2>Description</h2>
 Set of tools to help with Search Engine Marketing / Optimisation<br/>
 <br/>
-<b>*NOTE*</b> Selenium, Google Chrome headless and the Chrome driver will need to be installed for the following SEO checks<br/>
-<ol>
-<li>Page Load Time</li>
-<li>Non Optimised Images</li>
-</ol>
-If not installed the checks will be omitted from the report<br/>
+<h3>Client Details</h3>
+Keep track of clients websites, target keywords
+<img class="img-responsive" src="1.JPG"/>
+<h3>Search Context</h3>
+See insight and search results relative to a search context such as from a specific geographic location or device type
+<img class="img-responsive" src="2.JPG"/>
+<h3>Primative Tracking</h3>
+Log individual website hits to gain low level information about user activity on clients website
+<img class="img-responsive" src="3.JPG"/>
+<h3>Modular SEO checks</h3>
+Perform automated tests on a webpage to detect potential issues such as broken links<br/>
+Each check can be turned on and off to help control some of the more resouce intense checks
+<img class="img-responsive" src="4.JPG"/>
+<h3>SEO Reports</h3>
+Reports return details about each check such as which links are broken or which images are missing alt tags
+<img class="img-responsive" src="5.JPG"/>
+<br/>
+<b>*NOTE*</b> Due to the nature of the module and it's interaction with search engines multiple dependencies are needed for full functionality, here is a breakdown<br/>
+Google CSE: is needed for the "Google Domain Indexed" SEO check<br/>
+Google Ads: used in getting search insight information such as the number of times a keyword is searched in a particular geo location<br/>
+Bing Web Search v7: returns geo specific search results for each keyword<br/>
+Bing Maps: used for finding latitude and longitude when creating search context<br/>
+Selenium: Controls web browsers and is used for the "Page Load Time" and "Non Optimised Images" SEO checks<br/>
+Google Chrome Headless: only browser the module currently supports needed alongside Selenium<br/>
+Selenium Chrome driver: driver needed to programmatically control Google Chrome<br/>
+<br/>
+If a dependency is not setup it will just skip the SEO check<br/>
+<h3>Selenium and Google Chrome Installation (Ubuntu 64 bit)</h3>
 <a href="https://selenium-python.readthedocs.io/installation.html">https://selenium-python.readthedocs.io/installation.html</a><br/>
 <a href="https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/">https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/</a><br/>
-Ubuntu 64 Bit instructions<br/>
 <pre>
 sudo pip3 install selenium
 sudo su -
@@ -20,19 +41,10 @@ apt-get -y update
 apt-get -y install google-chrome-stable
 wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
 apt install unzip
+unzip chromedriver_linux64.zip
+mv chromedriver /usr/bin/chromedriver
 chown root:root /usr/bin/chromedriver
 chmod +x /usr/bin/chromedriver
 </pre>
 Then restart your Odoo instance<br/>
-<b>*NOTE*</b> You will need to enter an API key and search engine ID for Google Custom Search Engine in settings for the following checks to work<br/>
-<ol>
-<li>Google Domain Indexed</li>
-</ol>
-If not setup the checks will be omitted from the report<br/>
-It is also needed for the SEO Competitor Analyse Report<br/>
-<br/>
-<h3>Modular SEO checks that can be deactivated and extended</h3>
-<img class="img-responsive" src="1.JPG"/>
-<h3>Reports show all issues detected</h3>
-<img class="img-responsive" src="2.JPG"/>
 </div>

@@ -10,7 +10,13 @@
                     <field name="keyword_id" invisible="True"/>
                     <field name="search_engine_id"/>
                     <field name="location_string"/>
-                    <field name="geo_target_ids"/>
+                    <field name="geo_target_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                        </tree>
+                    </field>
                 </group>
                 <footer>
                     <button name="add_geo_locations" type="object" string="Add Geo Locations" class="oe_highlight"/>
@@ -33,8 +39,21 @@
                     <field name="longitude"/>
                     <field name="accuracy_radius_meters"/>
                     <field name="device_id"/>
+                    <field name="map_zoom_level"/>
                 </group>
             </form>
+        </field>
+    </record>
+
+    <record id="sem_geo_target_wizard_record_view_tree" model="ir.ui.view">
+        <field name="name">sem.geo_target.wizard.record tree view</field>
+        <field name="model">sem.geo_target.wizard.record</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="latitude"/>
+                <field name="longitude"/>
+            </tree>
         </field>
     </record>
 
@@ -50,7 +69,7 @@
     </record>
 
     <record id="sem_geo_target_action" model="ir.actions.act_window">
-        <field name="name">Geo Targets</field>
+        <field name="name">Search Context</field>
         <field name="res_model">sem.geo_target</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>

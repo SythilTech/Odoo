@@ -10,8 +10,8 @@
             <form>
                 <group>
                     <field name="client_id"/>
+                    <field name="page_id"/>
                     <field name="url"/>
-                    <field name="keyword"/>
                     <field name="check_ids">
                         <tree>
                             <field name="check_id"/>
@@ -33,7 +33,6 @@
                 <field name="create_date"/>
                 <field name="client_id"/>
                 <field name="url"/>
-                <field name="keyword"/>
             </tree>
         </field>
     </record>

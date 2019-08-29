@@ -15,6 +15,7 @@
                             <field name="rank"/>
                             <field name="search_url" widget="url"/>
                             <field name="link_url" widget="url"/>
+                            <field name="item_ids"/>
                         </tree>
                     </field>
                 </group>
@@ -33,7 +34,13 @@
                     <field name="rank"/>
                     <field name="search_url" widget="url"/>
                     <field name="link_url"/>
-                    <field name="search_html" widget="html"/>
+                    <field name="item_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="url"/>
+                            <field name="snippet"/>
+                        </tree>
+                    </field>
                 </group>
             </form>
         </field>

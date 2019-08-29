@@ -19,6 +19,7 @@
                     <field name="google_ads_client_secret"/>
                     <field name="google_ads_manager_account_customer_id"/>
                     <field name="bing_web_search_api_key"/>
+                    <field name="bing_maps_api_key"/>
                     <field name="tracking_code"/>
                 </group>
                 <button name="google_ads_authorize" type="object" string="Google Ads Authorize"/>

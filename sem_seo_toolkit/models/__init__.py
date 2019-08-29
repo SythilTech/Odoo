@@ -3,6 +3,7 @@
 from . import google_ads
 from . import sem_depend
 from . import sem_client
+from . import sem_client_website_page
 from . import sem_geotarget
 from . import sem_metric
 from . import sem_check

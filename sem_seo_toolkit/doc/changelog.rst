@@ -1,3 +1,11 @@
+v1.0.2
+======
+* Renamed Geo Targets to Search Context as it now includes device user agent
+* Added ranking report (requires manual rank extraction for Google)
+* Check website button has been moved to check webpage since it doesn't currently recursively go through each page
+* Smart button navigation
+* Added Bing API for geo coding
+
 v1.0.1
 ======
 * Many bug fixes

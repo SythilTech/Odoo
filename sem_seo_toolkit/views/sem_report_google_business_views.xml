@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_report_google_business_view_form" model="ir.ui.view">
+        <field name="name">sem.report.google.business form view</field>
+        <field name="model">sem.report.google.business</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="client_id"/>
+                    <field name="queries_direct"/>
+                    <field name="queries_indirect"/>
+                    <field name="queries_chain"/>
+                    <field name="views_maps"/>
+                    <field name="views_search"/>
+                    <field name="actions_website"/>
+                    <field name="actions_phone"/>
+                    <field name="actions_driving_directions"/>
+                    <field name="photos_views_merchant"/>
+                    <field name="photos_views_customers"/>
+                    <field name="photos_count_merchant"/>
+                    <field name="photos_count_customers"/>
+                    <field name="local_post_views_search"/>
+                    <field name="local_post_actions_call_to_action"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_report_google_business_view_tree" model="ir.ui.view">
+        <field name="name">sem.report.google.business tree view</field>
+        <field name="model">sem.report.google.business</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="client_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_report_google_business_action" model="ir.actions.act_window">
+        <field name="name">SEM Google My Business Reports</field>
+        <field name="res_model">sem.report.google.business</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

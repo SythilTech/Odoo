@@ -88,6 +88,67 @@ class SemSearchEngine(models.Model):
         if "geoTargetConstantSuggestions" in response_string_json:
             for geo_target_constant in response_string_json['geoTargetConstantSuggestions']:
                 geo_target_constant = geo_target_constant['geoTargetConstant']
-                geo_targets.append((geo_target_constant['id'], geo_target_constant['canonicalName']))
+                geo_targets.append({'location_id': geo_target_constant['id'], 'name': geo_target_constant['canonicalName']})
 
         return geo_targets
+
+    def _find_geo_targets_bing(self, location_string):
+        bing_api_key = self.env['ir.default'].get('sem.settings', 'bing_maps_api_key')
+        request_response = requests.get("http://dev.virtualearth.net/REST/v1/Locations/" + location_string + "?key=" + bing_api_key)
+        response_json = json.loads(request_response.text)
+        geo_targets = []
+        for resource_set in response_json['resourceSets']:
+            for resource in resource_set['resources']:
+                latitude = resource['point']['coordinates'][0]
+                longitude = resource['point']['coordinates'][1]
+                geo_targets.append({'latitude': latitude, 'longitude': longitude, 'name': resource['name'], 'accuracy_radius_meters': 22})
+
+        return geo_targets
+
+    def get_ranking(self, geo_target, domain, keyword):
+        method = '_get_ranking_%s' % (self.internal_name,)
+        action = getattr(self, method, None)
+
+        if not action:
+            raise NotImplementedError('Method %r is not implemented' % (method,))
+
+        return action(geo_target, domain, keyword)
+
+    def _get_ranking_google(self, geo_target, domain, keyword):
+        # As the Google CSE API doesn't allow geo specific results more specific then country level instead we provide a link
+        # This link aids agents in manually collecting ranking information
+        # After a Google Search Console account is setup ranking information can be obtained from that???
+        url = "https://www.google.com/search?q="
+        url += keyword.name.lower()
+        url += "&num=100&ip=0.0.0.0&source_ip=0.0.0.0&ie=UTF-8&oe=UTF-8&hl=en&adtest=on&noj=1&igu=1"
+
+        key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+
+        uule = "w+CAIQICI"
+        uule += key[len(geo_target.name) % len(key)]
+        uule += base64.b64encode(bytes(geo_target.name, "utf-8")).decode()
+        url += "&uule=" + uule
+        url += "&adtest-useragent=" + geo_target.device_id.user_agent
+        
+        return {'search_url': url}
+
+    def _get_ranking_bing(self, geo_target, domain, keyword):
+        bing_web_search_api_key = self.env['ir.default'].get('sem.settings', 'bing_web_search_api_key')
+        payload = {'count': 50}
+        headers = {'Ocp-Apim-Subscription-Key': bing_web_search_api_key, 'User-Agent': geo_target.device_id.user_agent, 'X-Search-Location': "lat:" + geo_target.latitude + ";long:" + geo_target.longitude + ";re:" + str(geo_target.accuracy_radius_meters)}
+        response = requests.get("https://api.cognitive.microsoft.com/bing/v7.0/search?q=" + keyword.name, data=payload, headers=headers)
+        response_json = json.loads(response.text)
+        rank_counter = 0
+        search_results = []
+        rank = False
+        rank_link_url = False
+        for webpage in response_json['webPages']['value']:
+            rank_counter += 1
+            link_url = webpage['url'].replace("\\","")
+            search_results.append( (0, 0,  {'name': webpage['name'], 'url': link_url, 'snippet': webpage['snippet']}) )
+            if link_url.startswith(domain):
+                rank = rank_counter
+                rank_link_url = link_url
+
+        # Return the full results as well as ranking information if the site was found
+        return {'rank': rank, 'link_url': rank_link_url, 'item_ids': search_results}

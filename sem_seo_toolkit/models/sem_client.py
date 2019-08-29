@@ -26,6 +26,12 @@ class SemClient(models.Model):
     name = fields.Char(related="partner_id.name", string="Name")
     partner_id = fields.Many2one('res.partner', string="Contact")
     website_ids = fields.One2many('sem.client.website', 'client_id', string="Websites")
+    website_count = fields.Integer(compute='_compute_website_count', string="Website Count")
+
+    @api.depends('website_ids')
+    def _compute_website_count(self):
+        for seo_client in self:
+            seo_client.website_count = len(seo_client.website_ids)
 
 class SemClientWebsite(models.Model):
 
@@ -35,7 +41,19 @@ class SemClientWebsite(models.Model):
     client_id = fields.Many2one('sem.client', string="Client")
     url = fields.Char(string="URL")
     page_ids = fields.One2many('sem.client.website.page', 'website_id', string="Web Pages")
+    page_count = fields.Integer(compute='_compute_page_count', string="Page Count")
     keyword_ids = fields.One2many('sem.client.website.keyword', 'website_id', string="Keywords")
+    keyword_count = fields.Integer(compute='_compute_keyword_count', string="Keyword Count")
+
+    @api.depends('page_ids')
+    def _compute_page_count(self):
+        for webpage in self:
+            webpage.page_count = len(webpage.page_ids)
+
+    @api.depends('keyword_ids')
+    def _compute_keyword_count(self):
+        for webpage in self:
+            webpage.keyword_count = len(webpage.keyword_ids)
 
     @api.multi
     def metric_report(self):
@@ -87,81 +105,6 @@ class SemClientWebsite(models.Model):
         }
 
     @api.multi
-    def check_website(self):
-        self.ensure_one()
-
-        sem_report = self.env['sem.report.seo'].create({'client_id': self.client_id.id, 'url': self.url})
-
-        try:
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            driver = webdriver.Chrome(chrome_options = chrome_options)
-            driver.get(self.url)
-            parsed_html = html.fromstring(driver.page_source)
-        except:
-            # Fall back to requests and skip some checks that need Selenium / Google Chrome
-            driver = False
-            parsed_html = html.fromstring(requests.get(self.url).text)
-
-        # Domain level checks
-        for seo_check in self.env['sem.check'].search([('active', '=', True), ('check_level', '=', 'domain')]):
-            method = '_seo_check_%s' % (seo_check.function_name,)
-            action = getattr(seo_check, method, None)
-
-            if not action:
-                raise NotImplementedError('Method %r is not implemented' % (method,))
-
-            try:
-                start = time.time()
-                check_result = action(driver, self.url, parsed_html)
-                end = time.time()
-                diff = end - start
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                _logger.error(e)
-                _logger.error("Line: " + str(exc_tb.tb_lineno) )
-                continue
-
-            if check_result != False:
-                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
-
-        # Page level checks
-        for seo_check in self.env['sem.check'].search([('active', '=', True), ('check_level', '=', 'page')]):
-            method = '_seo_check_%s' % (seo_check.function_name,)
-            action = getattr(seo_check, method, None)
-
-            if not action:
-                raise NotImplementedError('Method %r is not implemented' % (method,))
-
-            try:
-                start = time.time()
-                check_result = action(driver, self.url, parsed_html)
-                end = time.time()
-                diff = end - start
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                _logger.error(e)
-                _logger.error("Line: " + str(exc_tb.tb_lineno) )
-                continue
-
-            if check_result != False:
-                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
-
-        try:
-            driver.quit()
-        except:
-            pass
-
-        return {
-            'name': 'SEM Seo Report',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'sem.report.seo',
-            'type': 'ir.actions.act_window',
-            'res_id': sem_report.id
-        }
-
-    @api.multi
     def competitor_analyse(self):
         self.ensure_one()
 
@@ -180,6 +123,15 @@ class SemClientWebsite(models.Model):
             'type': 'ir.actions.act_window',
             'res_id': competitor_report.id
         }
+
+    @api.multi
+    def check_website(self):
+        self.ensure_one()
+
+        _logger.error("TODO")
+        for page in self.page_ids:
+            page.check_webpage()
+
 
     @api.multi
     def search_report(self):
@@ -251,12 +203,27 @@ class SemClientWebsite(models.Model):
         }
 
     @api.multi
-    def ranking_report(self):
+    def maps_report(self):
         self.ensure_one()
 
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(chrome_options = chrome_options)
+        for keyword in self.keyword_ids:
+            if keyword.active:
+                for geo_target in keyword.geo_target_ids:
+                    zoom_level = str(geo_target.map_zoom_level)
+                    url = "https://www.google.com/maps/search/" + keyword.name + "/@" + geo_target.latitude + "," + geo_target.lonhitude + "," + zoom_level + "z"
+
+        return {
+            'name': 'Maps Report',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sem.report.map',
+            'res_id': maps_report.id,
+            'type': 'ir.actions.act_window'
+        }
+
+    @api.multi
+    def ranking_report(self):
+        self.ensure_one()
 
         ranking_report = self.env['sem.report.ranking'].create({'website_id': self.id})
 
@@ -264,48 +231,13 @@ class SemClientWebsite(models.Model):
             if keyword.active:
                 for geo_target in keyword.geo_target_ids:
 
-                    url = "https://www.google.com/search?tbs=cdr%3A1%2Ccd_min%3A1%2F1%2F2000&q="
-                    url += keyword.name.lower()
-                    url += "&num=100&ip=0.0.0.0&source_ip=0.0.0.0&ie=UTF-8&oe=UTF-8&hl=en&adtest=on&noj=1&igu=1"
+                    create_dict = {'ranking_id': ranking_report.id, 'keyword_id': keyword.id, 'geo_target_id': geo_target.id}
 
-                    key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+                    # For Google this returns search_url, for Bing this returns rank, link_url and item_ids
+                    create_dict.update(geo_target.get_ranking(self.url, keyword))
 
-                    uule = "w+CAIQICI"
-                    uule += key[len(geo_target.name) % len(key)]
-                    uule += base64.b64encode(bytes(geo_target.name, "utf-8")).decode()
-                    url += "&uule=" + uule
-                    url += "&adtest-useragent=" + geo_target.device_id.user_agent
-
-                    driver.implicitly_wait(2)
-                    driver.get(url)
-                    organic_counter = 1
-                    rank = 0
-                    link_url = ""
-
-                    organic_hook = '//*[@class="srg"]/*[@data-hveid]'
-
-                    for organic_listing in driver.find_elements(By.XPATH, organic_hook):
-
-                        try:
-
-                            heading = organic_listing.find_element(By.XPATH, './/a//*[@role="heading"]')
-                            index_date = organic_listing.find_element(By.XPATH, './/*[@class="f"]')
-                            url_anchor = organic_listing.find_element(By.XPATH, './/a[@ping]')
-                            parsed = urlparse.urlparse(url_anchor.get_attribute('ping'))
-                            link_url = urlparse.parse_qs(parsed.query)['url'][0]
-
-                            if link_url.startswith(self.url):
-                                rank = organic_counter
-                                break
-
-                            organic_counter += 1
-                        except:
-                            pass
-
-                    # Create the ranking even if the client's website is not found
-                    self.env['sem.report.ranking.result'].create({'ranking_id': ranking_report.id, 'keyword_id': keyword.id, 'geo_target_id': geo_target.id, 'rank': rank, 'search_url': url, 'link_url': link_url, 'search_html': driver.page_source})
-
-        driver.quit()
+                    # Create the ranking entry even if the client's website is not found
+                    self.env['sem.report.ranking.result'].create(create_dict)
 
         return {
             'name': 'Ranking Report',
@@ -315,13 +247,6 @@ class SemClientWebsite(models.Model):
             'res_id': ranking_report.id,
             'type': 'ir.actions.act_window'
         }
-
-class SemClientWebsitePage(models.Model):
-
-    _name = "sem.client.website.page"
-
-    website_id = fields.Many2one('sem.client.website', string="Website")
-    url = fields.Char(string="URL")
 
 class SemClientWebsiteKeyword(models.Model):
 

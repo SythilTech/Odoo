@@ -6,13 +6,15 @@
         <field name="model">sem.client</field>
         <field name="arch" type="xml">
             <form>
+                <div class="oe_button_box" name="button_box">
+                    <button class="oe_inline oe_stat_button" type="action" name="%(sem_client_website_action)d" 
+                        context="{'search_default_client_id': active_id, 'default_client_id': active_id}"
+                        icon="fa-sitemap">
+                        <field name="website_count" string="Websites" widget="statinfo"/>
+                    </button>
+                </div>
                 <group>
                     <field name="partner_id"/>
-                    <field name="website_ids">
-                        <tree editable="bottom">
-                            <field name="url"/>
-                        </tree>
-                    </field>
                 </group>
             </form>
         </field>

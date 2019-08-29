@@ -10,16 +10,28 @@
                     <button name="find_geo_targets" type="object" string="Find Geo Targets"/>
                 </header>
                 <group>
-                    <field name="website_id"/>
+                    <field name="website_id" invisible="True"/>
                     <field name="name"/>
                     <field name="geo_target_ids">
                         <tree>
                             <field name="search_engine_id"/>
                             <field name="name"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
                         </tree>
                     </field>
                 </group>
             </form>
+        </field>
+    </record>
+
+    <record id="sem_client_website_keyword_view_search" model="ir.ui.view">
+        <field name="name">sem.client.website.keyword search view</field>
+        <field name="model">sem.client.website.keyword</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="website_id"/>
+            </search>
         </field>
     </record>
 
