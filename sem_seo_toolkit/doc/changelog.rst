@@ -1,3 +1,10 @@
+v1.0.3
+======
+* Many Bug fixes
+* SEO check an entire site or atleast all pages in the page list and view results in a single report
+* Ranking report pdf
+* Get page list from XML Sitemap
+
 v1.0.2
 ======
 * Renamed Geo Targets to Search Context as it now includes device user agent

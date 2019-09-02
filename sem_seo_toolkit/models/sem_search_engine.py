@@ -88,7 +88,7 @@ class SemSearchEngine(models.Model):
         if "geoTargetConstantSuggestions" in response_string_json:
             for geo_target_constant in response_string_json['geoTargetConstantSuggestions']:
                 geo_target_constant = geo_target_constant['geoTargetConstant']
-                geo_targets.append({'location_id': geo_target_constant['id'], 'name': geo_target_constant['canonicalName']})
+                geo_targets.append({'location_id': geo_target_constant['id'], 'name': geo_target_constant['canonicalName'].replace(",",", ")})
 
         return geo_targets
 
@@ -134,9 +134,8 @@ class SemSearchEngine(models.Model):
 
     def _get_ranking_bing(self, geo_target, domain, keyword):
         bing_web_search_api_key = self.env['ir.default'].get('sem.settings', 'bing_web_search_api_key')
-        payload = {'count': 50}
         headers = {'Ocp-Apim-Subscription-Key': bing_web_search_api_key, 'User-Agent': geo_target.device_id.user_agent, 'X-Search-Location': "lat:" + geo_target.latitude + ";long:" + geo_target.longitude + ";re:" + str(geo_target.accuracy_radius_meters)}
-        response = requests.get("https://api.cognitive.microsoft.com/bing/v7.0/search?q=" + keyword.name, data=payload, headers=headers)
+        response = requests.get("https://api.cognitive.microsoft.com/bing/v7.0/search?q=" + keyword.name + "&count=50", headers=headers)
         response_json = json.loads(response.text)
         rank_counter = 0
         search_results = []

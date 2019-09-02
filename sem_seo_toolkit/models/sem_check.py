@@ -115,6 +115,10 @@ class SemCheck(models.Model):
         link_threads = []
         request_limit = 5
         for anchor_tag in anchor_tags:
+            href = anchor_tag.attrib['href']
+            if href.startswith("mailto:") or href.startswith("tel:"):
+                continue
+        
             absolute_url = urljoin(url, anchor_tag.attrib['href'])
             urls.append(absolute_url)
 
@@ -124,7 +128,7 @@ class SemCheck(models.Model):
                 link_threads.append(link_check_thread)
                 link_check_thread.start()
                 urls.clear()
-            
+
         # Remainder goes into last thread
         if len(urls) > 0:
             link_check_thread = threading.Thread(target=self.resource_check, args=(list(urls), http_statuses))
@@ -162,26 +166,44 @@ class SemCheck(models.Model):
         check_pass = True
         check_notes = ""
 
+        urls = []
+        img_threads = []
+        http_statuses = []
+        request_limit = 5
         for img_tag in img_tags:
             if 'src' in img_tag.attrib:
                 img_url_absolute = urljoin(url, img_tag.attrib['src'])
 
-                try:
-                    img_request_response = requests.head(anchor_url_absolute)
+                urls.append(img_url_absolute)
 
-                    # Redirects are still a fail as it requires extra time to fetch the other page
-                    if img_request_response.status_code != 200:
-                        #Fail 2: Image returns status code other then http 200
-                        check_pass = False
-                        check_notes += "(" + str(img_request_response.status_code) + ") " + img_url_absolute + "<br/>"
-                except:
-                    #Fail 3: Assume it is 404 if requests can not connect
-                    check_pass = False
-                    check_notes += "(404) " + img_url_absolute + "<br/>"
+                # Divide the imgs between the threads
+                if len(urls) >= len(img_tags) / request_limit:
+                    img_check_thread = threading.Thread(target=self.resource_check, args=(list(urls), http_statuses))
+                    img_threads.append(img_check_thread)
+                    img_check_thread.start()
+                    urls.clear()
+
             else:
                 #Fail 4: Images with no src are invalid
                 check_pass = False
                 check_notes += _("Image has no src attribute") + "<br/>" + cgi.escape(html.tostring(img_tag).decode()) + "<br/>"
+
+        # Remainder goes into last thread
+        if len(urls) > 0:
+            img_check_thread = threading.Thread(target=self.resource_check, args=(list(urls), http_statuses))
+            img_threads.append(img_check_thread)
+            img_check_thread.start()
+            urls.clear()
+
+        # Wait for all threads to finish
+        for link_thread in img_threads:
+            link_thread.join()
+
+        for img_status in http_statuses:
+            # Redirects are still a fail as it requires extra time to fetch the other image
+            if img_status['status_code'] != 200:
+                check_pass = False
+                check_notes += "(" + str(img_status['status_code']) + ") " + img_status['absolute_url'] + "<br/>"
 
         return (check_pass, check_notes)
 
@@ -282,16 +304,18 @@ class SemCheck(models.Model):
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
         try:
-            sitemap_request_response = requests.get(domain + "sitemap.xml")
+            sitemap_request_response = requests.head(domain + "sitemap.xml")
             #Pass 1: File sitemap.xml
-            return (True, "")
+            if sitemap_request_response.status_code == 200:
+               return (True, "")
         except:
             pass
 
         try:
-            sitemap_request_response = requests.get(domain + "sitemap_index.xml")
+            sitemap_request_response = requests.head(domain + "sitemap_index.xml")
             #Pass 2: File sitemap_index.xml exists
-            return (True, "")
+            if sitemap_request_response.status_code == 200:
+               return (True, "")
         except:
             pass
 
@@ -325,7 +349,7 @@ class SemCheck(models.Model):
         cx = self.env['ir.default'].get('sem.settings', 'google_search_engine_id')
 
         # Skip the test if Google CSE is not setup
-        if key is None or cx is None:
+        if key == False or cx == False:
             return False
 
         parsed_uri = urlparse(url)

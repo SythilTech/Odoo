@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template name="SEM Onsite Report" id="seo_pdf_report">
+    <template name="SEM Page Report" id="seo_pdf_report">
         <t t-as="o" t-foreach="docs">
             <t t-call="web.external_layout">
                 <div class="page">
                     <h1 style="text-align:center;">SEO Report</h1>
                     <p>URL: <span t-field="o.url"/></p>
-                    <p>Keyword: <span t-field="o.keyword"/></p>
                     <h2 style="text-align:center;">Checks</h2>
                     <table style="width:100%;">
                         <tr><th>Check Name</th><th>Result</th><th>Notes</th></tr>
@@ -31,6 +30,58 @@
         </t>
     </template>
 
+    <template name="SEM Website Report" id="sem_report_seo_website_pdf">
+        <t t-as="o" t-foreach="docs">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h1 style="text-align:center;">SEO Website Report</h1>
+                    <p>Website: <span t-field="o.website_id.url"/></p>
+                    <h2 style="text-align:center;">Domain Checks</h2>
+                    <table style="width:100%;">
+                        <tr><th>Check Name</th><th>Result</th><th>Notes</th></tr>
+                        <t t-as="seo_check" t-foreach="o.check_ids">
+                            <tr style="text-align:center;">
+                                <td><span t-field="seo_check.check_id.name"/></td>
+                                <td>
+                                <t t-if="seo_check.check_pass">
+                                    <span style="color:green;">&#10004;</span>
+                                </t>
+                                <t t-if="not seo_check.check_pass">
+                                    <span style="color:red;">&#10006;</span>                                    
+                                </t>
+                                </td>
+                                <td><span t-field="seo_check.notes"/></td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+                <t t-as="seo_page" t-foreach="o.page_ids">
+                    <div class="page">
+                        <p>URL: <span t-field="seo_page.url"/></p>
+                        <h2 style="text-align:center;">Page Checks</h2>
+                        <table style="width:100%;">
+                            <tr><th>Check Name</th><th>Result</th><th>Notes</th></tr>
+                            <t t-as="seo_check" t-foreach="seo_page.check_ids">
+                                <tr style="text-align:center;">
+                                    <td><span t-field="seo_check.check_id.name"/></td>
+                                    <td>
+                                    <t t-if="seo_check.check_pass">
+                                        <span style="color:green;">&#10004;</span>
+                                    </t>
+                                    <t t-if="not seo_check.check_pass">
+                                        <span style="color:red;">&#10006;</span>                                    
+                                    </t>
+                                    </td>
+                                    <td><span t-field="seo_check.notes"/></td>
+                                </tr>
+                            </t>
+                        </table>                    
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
     <template name="SEM Search Report" id="seo_pdf_search_report">
         <t t-as="o" t-foreach="docs">
             <t t-call="web.external_layout">
@@ -47,6 +98,37 @@
                                 <td><span t-field="result.geo_target_id.name"/></td>
                                 <td><span t-field="result.monthly_searches"/></td>
                                 <td><span t-field="result.competition"/></td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template name="SEM Ranking Report" id="sem_report_ranking_pdf">
+        <t t-as="o" t-foreach="docs">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h1 style="text-align:center;">SEM Ranking Report</h1>
+                    <p>Website: <span t-field="o.website_id.url"/></p>
+                    <h2 style="text-align:center;">Results</h2>
+                    <table style="width:100%;">
+                        <tr><th>Search Engine</th><th>Keyword</th><th>Location</th><th>Device</th><th>Rank</th></tr>
+                        <t t-as="result" t-foreach="o.result_ids">
+                            <tr style="text-align:center;">
+                                <td><span t-field="result.geo_target_id.search_engine_id.name"/></td>
+                                <td><span t-field="result.keyword_id.name"/></td>
+                                <td><span t-field="result.geo_target_id.name"/></td>
+                                <td><span t-field="result.geo_target_id.device_id.name"/></td>
+                                <td>
+                                    <t t-if="result.rank > 0">
+                                        <span t-field="result.rank"/>
+                                    </t>
+                                    <t t-if="result.rank == 0">
+                                    -
+                                    </t>
+                                </td>
                             </tr>
                         </t>
                     </table>

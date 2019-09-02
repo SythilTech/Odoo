@@ -7,6 +7,13 @@ import time
 import logging
 _logger = logging.getLogger(__name__)
 
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+except:
+    _logger.error("Selenium not installed")
+
 from odoo import api, fields, models
 
 class SemClientWebsitePage(models.Model):
@@ -16,6 +23,7 @@ class SemClientWebsitePage(models.Model):
 
     website_id = fields.Many2one('sem.client.website', string="Website")
     url = fields.Char(string="URL")
+    active = fields.Boolean(string="Active", default=True)
     seo_report_ids = fields.One2many('sem.report.seo', 'page_id', string="SEO Reports")
 
     @api.onchange('website_id')
@@ -50,7 +58,10 @@ class SemClientWebsitePage(models.Model):
             driver = webdriver.Chrome(chrome_options = chrome_options)
             driver.get(self.url)
             parsed_html = html.fromstring(driver.page_source)
-        except:
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            _logger.error(e)
+            _logger.error("Line: " + str(exc_tb.tb_lineno) )
             # Fall back to requests and skip some checks that need Selenium / Google Chrome
             driver = False
             parsed_html = html.fromstring(requests.get(self.url).text)
@@ -69,6 +80,7 @@ class SemClientWebsitePage(models.Model):
                 diff = end - start
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error(seo_check.name)
                 _logger.error(e)
                 _logger.error("Line: " + str(exc_tb.tb_lineno) )
                 continue

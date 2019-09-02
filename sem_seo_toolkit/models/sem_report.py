@@ -2,11 +2,20 @@
 
 from odoo import api, fields, models
 
+class SemReportSeoWebsite(models.Model):
+    # TODO revise database structure as sem.report.seo is a child of sem.report.seo.website
+    _name = "sem.report.seo.website"
+
+    website_id = fields.Many2one('sem.client.website', string="Website")
+    check_ids = fields.One2many('sem.report.seo.check', 'website_report_id', string="Domain Checks")
+    page_ids = fields.One2many('sem.report.seo', 'report_website_id', string="Pages")
+
 class SemReportSeo(models.Model):
 
     _name = "sem.report.seo"
     _rec_name = "url"
 
+    report_website_id = fields.Many2one('sem.report.seo.website', string="Report Website")
     client_id = fields.Many2one('sem.client', string="Client")
     page_id = fields.Many2one('sem.client.website.page', string="Page")
     url = fields.Char(string="URL")
@@ -16,6 +25,7 @@ class SemReportSeoCheck(models.Model):
 
     _name = "sem.report.seo.check"
 
+    website_report_id = fields.Many2one('sem.report.seo.website', string="SEO Website Report")
     report_id = fields.Many2one('sem.report.seo', string="SEO Report")
     check_id = fields.Many2one('sem.check', string="SEO Check")
     check_pass = fields.Boolean(string="Pass", help="Did it pass or fail this check/test")
@@ -65,7 +75,7 @@ class SemReportRankingResultItem(models.Model):
 
     _name = "sem.report.ranking.result.item"
 
-    result_id = fields.Many2one('sem.report.ranking', string="Ranking Report Result")
+    result_id = fields.Many2one('sem.report.ranking.result', string="Ranking Report Result")
     name = fields.Char(string="Name")
     url = fields.Char(string="URL")
     snippet = fields.Char(string="Snippet")

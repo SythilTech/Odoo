@@ -3,9 +3,10 @@ import sys
 import requests
 from lxml import html
 import json
-import urllib.parse as urlparse
+from urllib.parse import urljoin, urlparse
 import base64
 import time
+from lxml import etree
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -54,6 +55,27 @@ class SemClientWebsite(models.Model):
     def _compute_keyword_count(self):
         for webpage in self:
             webpage.keyword_count = len(webpage.keyword_ids)
+
+    def read_sitemap(self):
+
+        parsed_uri = urlparse(self.url)
+        domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+
+        sitemap_index_request_response = requests.get(domain + "sitemap_index.xml")
+        sitemap_index_root = etree.fromstring(sitemap_index_request_response.text.encode("utf-8"))
+
+        # TODO deal better with namespaces and sitemaps that have the loc not in the first position
+        for sitemap in sitemap_index_root:
+            sitemap_url = sitemap[0].text
+
+            sitemap_request_response = requests.get(sitemap_url)
+            sitemap_root = etree.fromstring(sitemap_request_response.text.encode("utf-8"))
+            
+            # Add to the websites page list if the url is not already there
+            for sitemap_url_parent in sitemap_root:
+                sitemap_url = sitemap_url_parent[0].text
+                if self.env['sem.client.website.page'].search_count([('website_id','=',self.id), ('url','=',sitemap_url)]) == 0:
+                    self.env['sem.client.website.page'].create({'website_id': self.id, 'url': sitemap_url})
 
     @api.multi
     def metric_report(self):
@@ -128,10 +150,60 @@ class SemClientWebsite(models.Model):
     def check_website(self):
         self.ensure_one()
 
-        _logger.error("TODO")
-        for page in self.page_ids:
-            page.check_webpage()
+        sem_website_report = self.env['sem.report.seo.website'].create({'website_id': self.id})
 
+        try:
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            driver = webdriver.Chrome(chrome_options = chrome_options)
+            driver.get(self.url)
+            parsed_html = html.fromstring(driver.page_source)
+        except:
+            # Fall back to requests and skip some checks that need Selenium / Google Chrome
+            driver = False
+            parsed_html = html.fromstring(requests.get(self.url).text)
+
+        for seo_check in self.env['sem.check'].search([('active', '=', True), ('check_level', '=', 'domain')]):
+            method = '_seo_check_%s' % (seo_check.function_name,)
+            action = getattr(seo_check, method, None)
+
+            if not action:
+                raise NotImplementedError('Method %r is not implemented' % (method,))
+
+            try:
+                start = time.time()
+                check_result = action(driver, self.url, parsed_html)
+                end = time.time()
+                diff = end - start
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error(seo_check.name)
+                _logger.error(e)
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
+                continue
+
+            if check_result != False:
+                self.env['sem.report.seo.check'].create({'website_report_id': sem_website_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
+
+        try:
+            driver.quit()
+        except:
+            pass
+
+        # Run page level checks then attach them to this report as children so we can create one massive pdf with each page
+        for page in self.page_ids:
+            if page.active:
+                sem_report = page.check_webpage()
+                sem_report.report_website_id = sem_website_report.id
+
+        return {
+            'name': 'SEM Seo Website Report',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sem.report.seo.website',
+            'type': 'ir.actions.act_window',
+            'res_id': sem_website_report.id
+        }
 
     @api.multi
     def search_report(self):
@@ -257,8 +329,13 @@ class SemClientWebsiteKeyword(models.Model):
     active = fields.Boolean(string="Active", default="True", help="Keywords can not be deleted only archived so new reports don't show them")
     geo_target_ids = fields.Many2many('sem.geo_target', string="Geo Targets")
 
+    @api.multi
     def find_geo_targets(self):
         self.ensure_one()
+
+        # Clean up list from previous searches
+        for geo_result in self.env['sem.geo_target.wizard.record'].search([]):
+            geo_result.unlink()
 
         return {
             'name': 'Find Geo Targets',

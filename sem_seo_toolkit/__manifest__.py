@@ -23,6 +23,7 @@
         'views/sem_check_category_views.xml',
         'views/sem_report_metric_views.xml',
         'views/sem_report_seo_views.xml',
+        'views/sem_report_seo_website_views.xml',
         'views/sem_report_competition_views.xml',
         'views/sem_report_search_views.xml',
         'views/sem_report_ranking_views.xml',
