@@ -30,6 +30,7 @@ class SemMetric(models.Model):
     name = fields.Char(string="Name")
     function_name = fields.Char(string="Function Name")
     description = fields.Text(string="Description")
+    depend_ids = fields.Many2many('sem.depend', string="Dependencies")
     active = fields.Boolean(string="Active")
 
     def _seo_metric_page_load_time(self, driver, url, parsed_html):

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <report file="sem_seo_toolkit.seo_pdf_search_report" name="sem_seo_toolkit.seo_pdf_search_report" report_type="qweb-pdf" string="SEO Search Report" model="sem.report.search" id="seo_pdf_report_search_report"/>
+    <report id="sem_report_search_report" name="sem_seo_toolkit.sem_report_search_pdf" file="sem_seo_toolkit.sem_report_search_pdf" model="sem.report.search" report_type="qweb-pdf" string="Search Report"/>
 
     <record id="sem_report_search_view_form" model="ir.ui.view">
         <field name="name">sem.report.search form view</field>
@@ -12,8 +12,6 @@
                     <field name="website_id"/>
                     <field name="result_ids">
                         <tree>
-                            <field name="keyword_id"/>
-                            <field name="geo_target_id"/>
                             <field name="monthly_searches"/>
                             <field name="competition"/>
                         </tree>

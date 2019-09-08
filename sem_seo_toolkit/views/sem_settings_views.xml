@@ -20,9 +20,12 @@
                     <field name="google_ads_manager_account_customer_id"/>
                     <field name="bing_web_search_api_key"/>
                     <field name="bing_maps_api_key"/>
+                    <field name="google_my_business_client_id"/>
+                    <field name="google_my_business_client_secret"/>
                     <field name="tracking_code"/>
                 </group>
                 <button name="google_ads_authorize" type="object" string="Google Ads Authorize"/>
+                <button name="google_my_business_authorize" type="object" string="Google My Business Authorize"/>
       	    </form>
         </field>
     </record>

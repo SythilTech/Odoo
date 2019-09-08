@@ -11,40 +11,10 @@ from odoo import api, fields, models, _
 
 class SemSearchEngine(models.Model):
 
-    _name = "sem.search_engine"
+    _name = "sem.search.engine"
 
     name = fields.Char(string="Name")
     internal_name = fields.Char(string="Function Name")
-
-    def get_listings(self, keyword):
-        method = '_get_listings_%s' % (self.internal_name,)
-        action = getattr(self, method, None)
-
-        if not action:
-            raise NotImplementedError('Method %r is not implemented' % (method,))
-
-        return action(keyword)
-
-    def _get_listings_google(self, keyword):
-
-        key = self.env['ir.default'].get('sem.settings', 'google_cse_key')
-        cx = self.env['ir.default'].get('sem.settings', 'google_search_engine_id')
-
-        # Skip the test if Google CSE is not setup
-        if key == False or cx == False:
-            raise UserError(_("Google CSE not setup"))
-
-        keyword_response = requests.get("https://www.googleapis.com/customsearch/v1?key=" + key + "&cx=" + cx + "&q=" + keyword)
-
-        json_data = json.loads(keyword_response.text)
-
-        search_results = []
-        position_counter = 1
-        for search_result in json_data['items']:
-            search_results.append({'position': position_counter, 'title': search_result['title'], 'link': search_result['link'], 'snippet': search_result['snippet'], 'json_data': json_data})
-            position_counter += 1
-
-        return search_results
 
     def find_geo_targets(self, location_string):
         method = '_find_geo_targets_%s' % (self.internal_name,)
@@ -105,21 +75,20 @@ class SemSearchEngine(models.Model):
 
         return geo_targets
 
-    def get_ranking(self, geo_target, domain, keyword):
-        method = '_get_ranking_%s' % (self.internal_name,)
+    def perform_search(self, search_context):
+        method = '_perform_search_%s' % (self.internal_name,)
         action = getattr(self, method, None)
 
         if not action:
             raise NotImplementedError('Method %r is not implemented' % (method,))
 
-        return action(geo_target, domain, keyword)
+        return action(search_context)
 
-    def _get_ranking_google(self, geo_target, domain, keyword):
-        # As the Google CSE API doesn't allow geo specific results more specific then country level instead we provide a link
-        # This link aids agents in manually collecting ranking information
-        # After a Google Search Console account is setup ranking information can be obtained from that???
+    def _perform_search_google(self, search_context):
+        # As the Google CSE API doesn't allow very context sensitive results we instead provide a link
+        # This link aids agents in manually entering search result information
         url = "https://www.google.com/search?q="
-        url += keyword.name.lower()
+        url += search_context.keyword.lower()
         url += "&num=100&ip=0.0.0.0&source_ip=0.0.0.0&ie=UTF-8&oe=UTF-8&hl=en&adtest=on&noj=1&igu=1"
 
         key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
@@ -128,26 +97,81 @@ class SemSearchEngine(models.Model):
         uule += key[len(geo_target.name) % len(key)]
         uule += base64.b64encode(bytes(geo_target.name, "utf-8")).decode()
         url += "&uule=" + uule
-        url += "&adtest-useragent=" + geo_target.device_id.user_agent
-        
+        url += "&adtest-useragent=" + geo_target.device_id.user_agent 
+
         return {'search_url': url}
 
-    def _get_ranking_bing(self, geo_target, domain, keyword):
+    def _perform_search_bing(self, search_context):
         bing_web_search_api_key = self.env['ir.default'].get('sem.settings', 'bing_web_search_api_key')
-        headers = {'Ocp-Apim-Subscription-Key': bing_web_search_api_key, 'User-Agent': geo_target.device_id.user_agent, 'X-Search-Location': "lat:" + geo_target.latitude + ";long:" + geo_target.longitude + ";re:" + str(geo_target.accuracy_radius_meters)}
-        response = requests.get("https://api.cognitive.microsoft.com/bing/v7.0/search?q=" + keyword.name + "&count=50", headers=headers)
+        headers = {'Ocp-Apim-Subscription-Key': bing_web_search_api_key, 'User-Agent': search_context.device_id.user_agent, 'X-Search-Location': "lat:" + search_context.latitude + ";long:" + search_context.longitude + ";re:" + search_context.accuracy_radius_meters}
+        response = requests.get("https://api.cognitive.microsoft.com/bing/v7.0/search?q=" + search_context.keyword + "&count=50", headers=headers)
         response_json = json.loads(response.text)
-        rank_counter = 0
         search_results = []
-        rank = False
-        rank_link_url = False
+
         for webpage in response_json['webPages']['value']:
-            rank_counter += 1
             link_url = webpage['url'].replace("\\","")
             search_results.append( (0, 0,  {'name': webpage['name'], 'url': link_url, 'snippet': webpage['snippet']}) )
-            if link_url.startswith(domain):
-                rank = rank_counter
-                rank_link_url = link_url
 
         # Return the full results as well as ranking information if the site was found
-        return {'rank': rank, 'link_url': rank_link_url, 'item_ids': search_results}
+        return {'raw_data': response.text, 'result_ids': search_results}
+ 
+    def get_insight(self, search_context):
+        method = '_get_insight_%s' % (self.internal_name,)
+        action = getattr(self, method, None)
+
+        if not action:
+            raise NotImplementedError('Method %r is not implemented' % (method,))
+
+        return action(search_context)
+
+    def _get_insight_google(self, search_context):
+
+        if self.env['google.ads'].need_authorize():
+            raise UserError(_("Need to authorize with Google Ads first"))
+
+        #Get a new access token
+        refresh_token = self.env['ir.config_parameter'].get_param('google_ads_refresh_token')
+        all_token = self.env['google.service']._refresh_google_token_json(refresh_token, 'ads')
+        access_token = all_token.get('access_token')
+
+        manager_customer_id = self.env['ir.default'].get('sem.settings', 'google_ads_manager_account_customer_id').replace("-","")
+        developer_token = self.env['ir.default'].get('sem.settings', 'google_ads_developer_token')
+        headers = {'login-customer-id': manager_customer_id, 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + access_token, 'developer-token': developer_token}
+
+        # TODO allow for other languages
+        language = 'languageConstants/1000' #English
+
+        # TODO allow this to be configured
+        keyword_plan_network = "GOOGLE_SEARCH"
+
+        payload = json.dumps({
+            "language": language,
+            "geo_target_constants":
+            [
+                "geoTargetConstants/" + search_context.location_id
+            ],
+            "keyword_plan_network": keyword_plan_network,
+            "keyword_seed":
+            {
+                "keywords":
+                [
+                    search_context.keyword
+                ]
+            }
+        })
+
+        response_string = requests.post("https://googleads.googleapis.com/v2/customers/" + manager_customer_id + ":generateKeywordIdeas", data=payload, headers=headers)
+
+        response_string_json = json.loads(response_string.text)
+
+        monthly_searches = "-"
+        competition = "-"
+
+        if "results" in response_string_json:
+            exact_match = response_string_json['results'][0]
+            if exact_match['text'] == search_context.keyword.lower():
+                monthly_searches = exact_match['keywordIdeaMetrics']['avgMonthlySearches']
+                if 'competition' in exact_match['keywordIdeaMetrics']:
+                    competition = exact_match['keywordIdeaMetrics']['competition']
+
+        return {'monthly_searches': monthly_searches, 'competition': competition}

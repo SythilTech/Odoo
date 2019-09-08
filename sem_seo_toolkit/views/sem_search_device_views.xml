@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="sem_geo_target_device_view_form" model="ir.ui.view">
-        <field name="name">sem.geo_target.device form view</field>
-        <field name="model">sem.geo_target.device</field>
+    <record id="sem_search_device_view_form" model="ir.ui.view">
+        <field name="name">sem.search.device form view</field>
+        <field name="model">sem.search.device</field>
         <field name="arch" type="xml">
             <form>
                 <group>
@@ -14,9 +14,9 @@
         </field>
     </record>
 
-    <record id="sem_geo_target_device_view_tree" model="ir.ui.view">
-        <field name="name">sem.geo_target.device tree view</field>
-        <field name="model">sem.geo_target.device</field>
+    <record id="sem_search_device_view_tree" model="ir.ui.view">
+        <field name="name">sem.search.device tree view</field>
+        <field name="model">sem.search.device</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
@@ -25,9 +25,9 @@
         </field>
     </record>
 
-    <record id="sem_geo_target_device_action" model="ir.actions.act_window">
+    <record id="sem_search_device_action" model="ir.actions.act_window">
         <field name="name">Devices</field>
-        <field name="res_model">sem.geo_target.device</field>
+        <field name="res_model">sem.search.device</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>

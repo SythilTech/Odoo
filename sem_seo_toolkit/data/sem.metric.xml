@@ -6,6 +6,7 @@
             <field name="name">Page Load Time</field>
             <field name="function_name">page_load_time</field>
             <field name="description">Simulates a page load using Google Chrome and returns the time between navigationStart and domComplete events.</field>
+            <field name="depend_ids" eval="[(6, 0, [ref('seo_depend_selenium')])]"/>
             <field name="active">1</field>
         </record>
 

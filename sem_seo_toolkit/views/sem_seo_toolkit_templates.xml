@@ -1,40 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template name="SEM Page Report" id="seo_pdf_report">
+    <template name="Website Report" id="sem_report_website_pdf">
         <t t-as="o" t-foreach="docs">
             <t t-call="web.external_layout">
                 <div class="page">
-                    <h1 style="text-align:center;">SEO Report</h1>
-                    <p>URL: <span t-field="o.url"/></p>
-                    <h2 style="text-align:center;">Checks</h2>
-                    <table style="width:100%;">
-                        <tr><th>Check Name</th><th>Result</th><th>Notes</th></tr>
-                        <t t-as="seo_check" t-foreach="o.check_ids">
-                            <tr style="text-align:center;">
-                                <td><span t-field="seo_check.check_id.name"/></td>
-                                <td>
-                                <t t-if="seo_check.check_pass">
-                                    <span style="color:green;">&#10004;</span>
-                                </t>
-                                <t t-if="not seo_check.check_pass">
-                                    <span style="color:red;">&#10006;</span>                                    
-                                </t>
-                                </td>
-                                <td><span t-field="seo_check.notes"/></td>
-                            </tr>
-                        </t>
-                    </table>
-                </div>
-            </t>
-        </t>
-    </template>
-
-    <template name="SEM Website Report" id="sem_report_seo_website_pdf">
-        <t t-as="o" t-foreach="docs">
-            <t t-call="web.external_layout">
-                <div class="page">
-                    <h1 style="text-align:center;">SEO Website Report</h1>
+                    <h1 style="text-align:center;">Website Report</h1>
                     <p>Website: <span t-field="o.website_id.url"/></p>
                     <h2 style="text-align:center;">Domain Checks</h2>
                     <table style="width:100%;">
@@ -57,7 +28,7 @@
                 </div>
                 <t t-as="seo_page" t-foreach="o.page_ids">
                     <div class="page">
-                        <p>URL: <span t-field="seo_page.url"/></p>
+                        <p>URL: <span t-field="seo_page.page_id.url"/></p>
                         <h2 style="text-align:center;">Page Checks</h2>
                         <table style="width:100%;">
                             <tr><th>Check Name</th><th>Result</th><th>Notes</th></tr>
@@ -76,28 +47,53 @@
                                 </tr>
                             </t>
                         </table>                    
+                        <h2 style="text-align:center;">Page Metrics</h2>
+                        <table style="width:100%;">
+                            <tr><th>Metric Name</th><th>Value</th></tr>
+                            <t t-as="seo_metric" t-foreach="o.metric_ids">
+                                <tr style="text-align:center;">
+                                    <td><span t-field="seo_metric.metric_id.name"/></td>
+                                    <td><span t-field="seo_metric.value"/></td>
+                                </tr>
+                            </t>
+                        </table>
                     </div>
                 </t>
             </t>
         </t>
     </template>
 
-    <template name="SEM Search Report" id="seo_pdf_search_report">
+    <template name="Webpage Report" id="sem_report_website_page_pdf">
         <t t-as="o" t-foreach="docs">
             <t t-call="web.external_layout">
                 <div class="page">
-                    <h1 style="text-align:center;">SEO Search Report</h1>
-                    <p>Website: <span t-field="o.website_id.url"/></p>
-                    <h2 style="text-align:center;">Results</h2>
+                    <h1 style="text-align:center;">Webpage Report Report</h1>
+                    <p>URL: <span t-field="o.page_id.url"/></p>
+                    <h2 style="text-align:center;">Checks</h2>
                     <table style="width:100%;">
-                        <tr><th>Search Engine</th><th>Keyword</th><th>Location</th><th>Monthly Searches</th><th>Competition</th></tr>
-                        <t t-as="result" t-foreach="o.result_ids">
+                        <tr><th>Check Name</th><th>Result</th><th>Notes</th></tr>
+                        <t t-as="seo_check" t-foreach="o.check_ids">
                             <tr style="text-align:center;">
-                                <td><span t-field="result.geo_target_id.search_engine_id.name"/></td>
-                                <td><span t-field="result.keyword_id.name"/></td>
-                                <td><span t-field="result.geo_target_id.name"/></td>
-                                <td><span t-field="result.monthly_searches"/></td>
-                                <td><span t-field="result.competition"/></td>
+                                <td><span t-field="seo_check.check_id.name"/></td>
+                                <td>
+                                <t t-if="seo_check.check_pass">
+                                    <span style="color:green;">&#10004;</span>
+                                </t>
+                                <t t-if="not seo_check.check_pass">
+                                    <span style="color:red;">&#10006;</span>                                    
+                                </t>
+                                </td>
+                                <td><span t-field="seo_check.notes"/></td>
+                            </tr>
+                        </t>
+                    </table>
+                    <h2 style="text-align:center;">Metrics</h2>
+                    <table style="width:100%;">
+                        <tr><th>Metric Name</th><th>Value</th></tr>
+                        <t t-as="seo_metric" t-foreach="o.metric_ids">
+                            <tr style="text-align:center;">
+                                <td><span t-field="seo_metric.metric_id.name"/></td>
+                                <td><span t-field="seo_metric.value"/></td>
                             </tr>
                         </t>
                     </table>
@@ -106,29 +102,58 @@
         </t>
     </template>
 
-    <template name="SEM Ranking Report" id="sem_report_ranking_pdf">
+    <template name="Google My Business Report" id="sem_report_google_business_pdf">
         <t t-as="o" t-foreach="docs">
             <t t-call="web.external_layout">
                 <div class="page">
-                    <h1 style="text-align:center;">SEM Ranking Report</h1>
+                    <h1 style="text-align:center;">Google My Business Report</h1>
+                    <h2 style="text-align:center;">Listing stats from last 30 days (<span t-field="o.start_date"/> - <span t-field="o.end_date"/>)</h2>
+                    <table style="width:100%;">
+                        <tr><th>Metric</th><th>Value</th><th>Description</th></tr>
+                        <tr style="text-align:center;"><td>Queries Direct</td><td><span t-field="o.queries_direct"/></td><td>Customers who find your listing searching for your business name or address</td></tr>
+                        <tr style="text-align:center;"><td>Queries Indirect</td><td><span t-field="o.queries_indirect"/></td><td>Customers who find your listing searching for a category, product, or service</td></tr>
+                        <tr style="text-align:center;"><td>Queries Chain</td><td><span t-field="o.queries_chain"/></td><td>The number of times your listing was shown as a result of a search for the chain it belongs to, or a brand it sells</td></tr>
+                        <tr style="text-align:center;"><td>Views Maps</td><td><span t-field="o.views_maps"/></td><td>The number of times your listing was viewed on Google Maps</td></tr>
+                        <tr style="text-align:center;"><td>Views Search</td><td><span t-field="o.views_search"/></td><td>The number of times your listing was viewed on Google Search</td></tr>
+                        <tr style="text-align:center;"><td>Actions Website</td><td><span t-field="o.actions_website"/></td><td>The number of times the website was clicked</td></tr>
+                        <tr style="text-align:center;"><td>Actions Phone</td><td><span t-field="o.actions_phone"/></td><td>The number of times the phone number was clicked</td></tr>
+                        <tr style="text-align:center;"><td>Actions Driving Directions</td><td><span t-field="o.actions_driving_directions"/></td><td>The number of times driving directions were requested</td></tr>
+                        <tr style="text-align:center;"><td>Photos Views Merchant</td><td><span t-field="o.photos_views_merchant"/></td><td>The number of views on media items uploaded by you</td></tr>
+                        <tr style="text-align:center;"><td>Photos Views Customers</td><td><span t-field="o.photos_views_customers"/></td><td>The number of views on media items uploaded by customers</td></tr>
+                        <tr style="text-align:center;"><td>Photos Count Merchant</td><td><span t-field="o.photos_count_merchant"/></td><td>The total number of media items that are currently live that have been uploaded by you</td></tr>
+                        <tr style="text-align:center;"><td>Photos Count Customers</td><td><span t-field="o.photos_count_customers"/></td><td>The total number of media items that are currently live that have been uploaded by customers</td></tr>
+                        <tr style="text-align:center;"><td>Local Post Views Search</td><td><span t-field="o.local_post_views_search"/></td><td>The number of times the local post was viewed on Google Search</td></tr>
+                        <tr style="text-align:center;"><td>Local Post Actions Call To Action</td><td><span t-field="o.local_post_actions_call_to_action"/></td><td>The number of times the call to action button was clicked on Google</td></tr>
+                    </table>
+                    <h2 style="text-align:center;">Media Stats</h2>
+                    <table style="width:100%;">
+                        <tr><th>Image</th><th>View Count</th></tr>
+                        <t t-as="media" t-foreach="o.media_ids">
+                            <tr style="text-align:center;"><td><img t-attf-src="data:image/png;base64, #{media.image}"/></td><td><span t-field="media.view_count"/></td></tr>
+                        </t>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template name="Search Report" id="sem_report_search_pdf">
+        <t t-as="o" t-foreach="docs">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h1 style="text-align:center;">Search Report</h1>
                     <p>Website: <span t-field="o.website_id.url"/></p>
                     <h2 style="text-align:center;">Results</h2>
                     <table style="width:100%;">
-                        <tr><th>Search Engine</th><th>Keyword</th><th>Location</th><th>Device</th><th>Rank</th></tr>
+                        <tr><th>Search Engine</th><th>Keyword</th><th>Device</th><th>Location</th><th>Monthly Searches</th><th>Competition</th></tr>
                         <t t-as="result" t-foreach="o.result_ids">
                             <tr style="text-align:center;">
-                                <td><span t-field="result.geo_target_id.search_engine_id.name"/></td>
-                                <td><span t-field="result.keyword_id.name"/></td>
-                                <td><span t-field="result.geo_target_id.name"/></td>
-                                <td><span t-field="result.geo_target_id.device_id.name"/></td>
-                                <td>
-                                    <t t-if="result.rank > 0">
-                                        <span t-field="result.rank"/>
-                                    </t>
-                                    <t t-if="result.rank == 0">
-                                    -
-                                    </t>
-                                </td>
+                                <td><span t-field="result.search_context_id.search_engine_id.name"/></td>
+                                <td><span t-field="result.search_context_id.keyword"/></td>
+                                <td><span t-field="result.search_context_id.device_id.name"/></td>
+                                <td><span t-field="result.search_context_id.geo_target_name"/></td>
+                                <td><span t-field="result.monthly_searches"/></td>
+                                <td><span t-field="result.competition"/></td>
                             </tr>
                         </t>
                     </table>

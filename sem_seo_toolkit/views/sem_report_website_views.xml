@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <report id="sem_report_seo_website_report" name="sem_seo_toolkit.sem_report_seo_website_pdf" file="sem_seo_toolkit.sem_report_seo_website_pdf" model="sem.report.seo.website" report_type="qweb-pdf" string="SEO Website Report"/>
+    <report id="sem_report_website_report" name="sem_seo_toolkit.sem_report_website_pdf" file="sem_seo_toolkit.sem_report_website_pdf" model="sem.report.website" report_type="qweb-pdf" string="Website Report"/>
 
-    <record id="sem_report_seo_website_view_form" model="ir.ui.view">
-        <field name="name">sem.report.seo.website form view</field>
-        <field name="model">sem.report.seo.website</field>
+    <record id="sem_report_website_view_form" model="ir.ui.view">
+        <field name="name">sem.report.website form view</field>
+        <field name="model">sem.report.website</field>
         <field name="arch" type="xml">
             <form>
                 <group>
@@ -20,7 +20,7 @@
                     </field>
                     <field name="page_ids">
                         <tree>
-                            <field name="url"/>
+                            <field name="page_id"/>
                         </tree>
                     </field>
                 </group>
@@ -28,9 +28,9 @@
         </field>
     </record>
 
-    <record id="sem_report_seo_website_view_tree" model="ir.ui.view">
-        <field name="name">sem.report.seo.website tree view</field>
-        <field name="model">sem.report.seo.website</field>
+    <record id="sem_report_website_view_tree" model="ir.ui.view">
+        <field name="name">sem.report.website tree view</field>
+        <field name="model">sem.report.website</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="create_date"/>
@@ -39,9 +39,9 @@
         </field>
     </record>
 
-    <record id="sem_report_seo_website_action" model="ir.actions.act_window">
-        <field name="name">SEM Seo Website Report</field>
-        <field name="res_model">sem.report.seo.website</field>
+    <record id="sem_report_website_action" model="ir.actions.act_window">
+        <field name="name">Website Report</field>
+        <field name="res_model">sem.report.website</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>

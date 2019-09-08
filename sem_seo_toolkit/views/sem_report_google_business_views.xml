@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <report id="sem_report_google_business_report" name="sem_seo_toolkit.sem_report_google_business_pdf" file="sem_seo_toolkit.sem_report_google_business_pdf" model="sem.report.google.business" report_type="qweb-pdf" string="Google My Business Report"/>
+
     <record id="sem_report_google_business_view_form" model="ir.ui.view">
         <field name="name">sem.report.google.business form view</field>
         <field name="model">sem.report.google.business</field>
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="client_id"/>
+                    <field name="listing_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="media_ids">
+                        <tree>
+                            <field name="image" widget="image"/>
+                            <field name="view_count"/>
+                        </tree>
+                    </field>
                     <field name="queries_direct"/>
                     <field name="queries_indirect"/>
                     <field name="queries_chain"/>
@@ -32,7 +42,7 @@
         <field name="model">sem.report.google.business</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="client_id"/>
+                <field name="listing_id"/>
             </tree>
         </field>
     </record>

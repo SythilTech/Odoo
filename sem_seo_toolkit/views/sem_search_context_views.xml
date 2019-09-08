@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_search_context_view_form" model="ir.ui.view">
+        <field name="name">sem.search_context form view</field>
+        <field name="model">sem.search.context</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="perform_search" type="object" string="Perform Search"/>
+                </header>
+                <group>
+                    <field name="search_engine_id"/>
+                    <field name="geo_target_name"/>
+                    <field name="location_id"/>
+                    <field name="latitude"/>
+                    <field name="longitude"/>
+                    <field name="accuracy_radius_meters"/>
+                    <field name="device_id"/>
+                    <field name="map_zoom_level"/>
+                    <field name="search_result_ids">
+                        <tree>
+                            <field name="create_date"/>
+                            <field name="search_url"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_search_context_view_tree" model="ir.ui.view">
+        <field name="name">sem.search.context tree view</field>
+        <field name="model">sem.search.context</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="search_engine_id"/>
+                <field name="geo_target_name"/>
+                <field name="latitude"/>
+                <field name="longitude"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_search_context_action" model="ir.actions.act_window">
+        <field name="name">Search Context</field>
+        <field name="res_model">sem.search.context</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

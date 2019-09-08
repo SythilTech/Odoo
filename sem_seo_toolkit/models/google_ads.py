@@ -2,7 +2,7 @@
 
 from odoo import api, fields, models
 
-class SemReport(models.Model):
+class GoogleAds(models.Model):
 
     _name = "google.ads"
     _description = "Google Ads"

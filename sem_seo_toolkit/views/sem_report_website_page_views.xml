@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report id="sem_report_website_page_report" name="sem_seo_toolkit.sem_report_website_page_pdf" file="sem_seo_toolkit.sem_report_website_page_pdf" model="sem.report.website.page" report_type="qweb-pdf" string="Webpage Report"/>
+
+    <record id="sem_report_website_page_view_form" model="ir.ui.view">
+        <field name="name">sem.report.website.page form view</field>
+        <field name="model">sem.report.website.page</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="page_id"/>
+                    <field name="check_ids">
+                        <tree>
+                            <field name="check_id"/>
+                            <field name="check_pass"/>
+                            <field name="notes"/>
+                            <field name="time"/>
+                        </tree>
+                    </field>
+                    <field name="metric_ids">
+                        <tree>
+                            <field name="metric_id"/>
+                            <field name="value"/>
+                            <field name="time"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_report_website_page_view_tree" model="ir.ui.view">
+        <field name="name">sem.report.website.page tree view</field>
+        <field name="model">sem.report.website.page</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="page_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_report_website_page_action" model="ir.actions.act_window">
+        <field name="name">Website Page Report</field>
+        <field name="res_model">sem.report.website.page</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -2,12 +2,12 @@
 <odoo>
     <data noupdate="1">
 
-        <record id="seo_search_engine_google" model="sem.search_engine">
+        <record id="seo_search_engine_google" model="sem.search.engine">
             <field name="name">Google</field>
             <field name="internal_name">google</field>
         </record>
 
-        <record id="seo_search_engine_bing" model="sem.search_engine">
+        <record id="seo_search_engine_bing" model="sem.search.engine">
             <field name="name">Microsoft Bing</field>
             <field name="internal_name">bing</field>
         </record>

@@ -13,7 +13,7 @@
                     <field name="website_id" invisible="True"/>
                     <field name="url" widget="url"/>
                     <field name="active"/>
-                    <field name="seo_report_ids">
+                    <field name="page_report_ids">
                         <tree>
                             <field name="create_date"/>
                             <field name="check_ids"/>

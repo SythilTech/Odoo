@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sem_client_listing_view_form" model="ir.ui.view">
+        <field name="name">sem.client.listing form view</field>
+        <field name="model">sem.client.listing</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="client_id"/>
+                    <field name="search_engine_id"/>
+                    <field name="name"/>
+                    <field name="listing_external_id"/>
+                    <field name="media_ids">
+                        <tree>
+                            <field name="image" widget="image"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_client_listing_view_tree" model="ir.ui.view">
+        <field name="name">sem.client.listing tree view</field>
+        <field name="model">sem.client.listing</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="client_id"/>
+                <field name="search_engine_id"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_client_listing_action" model="ir.actions.act_window">
+        <field name="name">SEM Client Listing</field>
+        <field name="res_model">sem.client.listing</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

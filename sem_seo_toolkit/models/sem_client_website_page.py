@@ -24,7 +24,7 @@ class SemClientWebsitePage(models.Model):
     website_id = fields.Many2one('sem.client.website', string="Website")
     url = fields.Char(string="URL")
     active = fields.Boolean(string="Active", default=True)
-    seo_report_ids = fields.One2many('sem.report.seo', 'page_id', string="SEO Reports")
+    page_report_ids = fields.One2many('sem.report.website.page', 'page_id', string="Page Reports")
 
     @api.onchange('website_id')
     def _onchange_website_id(self):
@@ -35,22 +35,22 @@ class SemClientWebsitePage(models.Model):
     def check_webpage_wrapper(self):
         self.ensure_one()
 
-        sem_report = self.check_webpage()
+        webpage_report = self.check_webpage()
 
         return {
-            'name': 'SEM Seo Report',
+            'name': 'Webpage Report',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'sem.report.seo',
+            'res_model': 'sem.report.website.page',
             'type': 'ir.actions.act_window',
-            'res_id': sem_report.id
+            'res_id': webpage_report.id
         }
 
     @api.multi
     def check_webpage(self):
         self.ensure_one()
 
-        sem_report = self.env['sem.report.seo'].create({'client_id': self.website_id.client_id.id, 'page_id': self.id, 'url': self.url})
+        webpage_report = self.env['sem.report.website.page'].create({'page_id': self.id, 'url': self.url})
 
         try:
             chrome_options = Options()
@@ -65,6 +65,28 @@ class SemClientWebsitePage(models.Model):
             # Fall back to requests and skip some checks that need Selenium / Google Chrome
             driver = False
             parsed_html = html.fromstring(requests.get(self.url).text)
+
+        for seo_metric in self.env['sem.metric'].search([('active', '=', True)]):
+            method = '_seo_metric_%s' % (seo_metric.function_name,)
+            action = getattr(seo_metric, method, None)
+
+            if not action:
+                raise NotImplementedError('Method %r is not implemented' % (method,))
+
+            try:
+                start = time.time()
+                metric_result = action(driver, self.url, parsed_html)
+                end = time.time()
+                diff = end - start
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                _logger.error(seo_check.name)
+                _logger.error(e)
+                _logger.error("Line: " + str(exc_tb.tb_lineno) )
+                continue
+
+            if metric_result != False:
+                self.env['sem.report.website.metric'].create({'website_report_page_id': webpage_report.id, 'metric_id': seo_metric.id, 'value': metric_result, 'time': diff})
 
         for seo_check in self.env['sem.check'].search([('active', '=', True), ('check_level', '=', 'page')]):
             method = '_seo_check_%s' % (seo_check.function_name,)
@@ -86,11 +108,11 @@ class SemClientWebsitePage(models.Model):
                 continue
 
             if check_result != False:
-                self.env['sem.report.seo.check'].create({'report_id': sem_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
+                self.env['sem.report.website.check'].create({'website_report_page_id': webpage_report.id, 'check_id': seo_check.id, 'check_pass': check_result[0], 'notes': check_result[1], 'time': diff})
 
         try:
             driver.quit()
         except:
             pass
 
-        return sem_report
+        return webpage_report

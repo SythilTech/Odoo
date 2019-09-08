@@ -1,3 +1,12 @@
+v1.1.0
+======
+* Major database restructure (non back compatible)
+* Move keywords into search context
+* See search results directly from a search context
+* Removal of ranking reports (for now...)
+* Listings and Google My Business reports
+* Create many search contexts at once by entering keyword list, devices and geo targets
+
 v1.0.3
 ======
 * Many Bug fixes
