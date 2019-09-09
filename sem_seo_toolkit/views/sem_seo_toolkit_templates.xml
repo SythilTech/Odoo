@@ -125,7 +125,7 @@
                         <tr style="text-align:center;"><td>Local Post Views Search</td><td><span t-field="o.local_post_views_search"/></td><td>The number of times the local post was viewed on Google Search</td></tr>
                         <tr style="text-align:center;"><td>Local Post Actions Call To Action</td><td><span t-field="o.local_post_actions_call_to_action"/></td><td>The number of times the call to action button was clicked on Google</td></tr>
                     </table>
-                    <h2 style="text-align:center;">Media Stats</h2>
+                    <h2 style="text-align:center;">Media Stats (Lifetime)</h2>
                     <table style="width:100%;">
                         <tr><th>Image</th><th>View Count</th></tr>
                         <t t-as="media" t-foreach="o.media_ids">

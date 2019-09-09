@@ -14,7 +14,7 @@
                             <field name="name"/>
                         </tree>
                     </field>
-                    <field name="device_ids">
+                    <field name="device_ids" attrs="{'invisible':[('type', '!=', 'search')]}">
                         <tree>
                             <field name="name"/>
                         </tree>

@@ -6,11 +6,15 @@
         <field name="model">sem.client.listing</field>
         <field name="arch" type="xml">
             <form>
+                <!--<header>
+                    <button name="add_search_context" type="object" string="Create Search Context"/>
+                </header>-->
                 <group>
                     <field name="client_id"/>
                     <field name="search_engine_id"/>
                     <field name="name"/>
                     <field name="listing_external_id"/>
+                    <field name="search_context_ids"/>
                     <field name="media_ids">
                         <tree>
                             <field name="image" widget="image"/>

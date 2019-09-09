@@ -69,7 +69,7 @@ class SemSearchContextWizard(models.TransientModel):
             for device in self.device_ids:
                 for geo_target in self.geo_target_ids:
                     # Create a large amount of search contexts
-                    local_search_context = self.env['sem.search.context'].create({'search_engine_id': self.search_engine_id.id, 'location_id': geo_target.location_id, 'device_id': device.id, 'keyword': keyword.name, 'geo_target_name': geo_target.name, 'latitude': geo_target.latitude, 'longitude': geo_target.longitude, 'accuracy_radius_meters': geo_target.accuracy_radius_meters})
+                    local_search_context = self.env['sem.search.context'].create({'search_engine_id': self.search_engine_id.id, 'type': self.type, 'location_id': geo_target.location_id, 'device_id': device.id, 'keyword': keyword.name, 'geo_target_name': geo_target.name, 'latitude': geo_target.latitude, 'longitude': geo_target.longitude, 'accuracy_radius_meters': geo_target.accuracy_radius_meters})
 
                     # Also add the geo targets to the website
                     self.website_id.search_context_ids = [(4, local_search_context.id)]
