@@ -3,7 +3,6 @@
     'version': "1.2",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Adds Date of Birth and Age which is updated daily',
     'license':'LGPL-3',
     'data': [

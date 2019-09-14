@@ -3,7 +3,6 @@
     'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Email the form submit data to someone",
     'description': "Email the form submit data to someone",
     'license':'LGPL-3',

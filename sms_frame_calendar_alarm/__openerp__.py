@@ -3,7 +3,6 @@
     'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Sends a sms reminder before an event',
     'description':'Sends a sms reminder before an event',    
     'license':'LGPL-3',

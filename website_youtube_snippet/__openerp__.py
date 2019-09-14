@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Generates a responsive Youtube video embed",
     'description': "Generates a responsive Youtube video embed",
     'license':'LGPL-3',

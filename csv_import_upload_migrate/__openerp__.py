@@ -3,7 +3,6 @@
     'version': "0.1.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Uploads CSV files',
     'description':'Uploads CSV files',    
     'license':'LGPL-3',

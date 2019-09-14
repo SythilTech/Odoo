@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Designed to migrate images from proprietary system which store images in the filesystem",
     'license':'LGPL-3',
     'data': [

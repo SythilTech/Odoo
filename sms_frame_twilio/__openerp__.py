@@ -3,7 +3,6 @@
     'version': "1.1.3",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Adds Twilio sms gatway to the sms framework",
     'license':'LGPL-3',
     'data': [

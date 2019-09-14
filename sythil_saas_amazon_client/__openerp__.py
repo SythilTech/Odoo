@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Connects with the sythil_saas_server',
     'description':'Connects with the sythil_saas_server',
     'license':'LGPL-3',

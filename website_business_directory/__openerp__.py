@@ -3,7 +3,6 @@
     'version': "0.8.3",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "A directory of local companies",
     'license':'LGPL-3',
     'data': [

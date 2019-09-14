@@ -3,7 +3,6 @@
     'version': "1.8.10",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Manage both internal and external forms",
     'description': "Manage both internal and external forms",
     'license':'LGPL-3',

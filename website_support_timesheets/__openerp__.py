@@ -3,7 +3,6 @@
     'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Track time spend on tickets and send an invoice',
     'license':'LGPL-3',
     'data': [

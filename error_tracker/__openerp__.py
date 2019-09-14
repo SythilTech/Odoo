@@ -3,7 +3,6 @@
     'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Assists in the resolution of extermly ambiguous error messages',
     'description':'Assists in the resolution of extermly ambiguous error messages',
     'license':'LGPL-3',

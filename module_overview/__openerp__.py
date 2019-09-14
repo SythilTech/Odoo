@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Gives an overview of what a module does / has in it",
     'license':'LGPL-3',
     'data': [

@@ -3,7 +3,6 @@
     'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Generate a credit card token using paypal vault and make payments using the vaulted card",
     'license':'LGPL-3',
     'data': [    
