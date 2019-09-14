@@ -6,11 +6,15 @@
         <field name="model">sem.search.results</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="competition_report" type="object" string="Competitor Report"/>
+                </header>
                 <group>
                     <field name="search_context_id"/>
-                    <field name="search_url"/>
+                    <field name="search_url" widget="url"/>
                     <field name="result_ids">
-                        <tree>
+                        <tree editable="bottom">
+                            <field name="position"/>
                             <field name="name"/>
                             <field name="url"/>
                             <field name="snippet"/>

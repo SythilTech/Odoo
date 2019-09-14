@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="page_id"/>
+                    <field name="url"/>
                     <field name="check_ids">
                         <tree>
                             <field name="check_id"/>

@@ -3,7 +3,6 @@
     'version': "1.0.9",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Create your own app store",
     'license':'LGPL-3',
     'data': [

@@ -149,9 +149,11 @@ class SemCheck(models.Model):
         return (check_pass, check_notes)
 
     def resource_check(self, urls, http_statuses):
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         for url in urls:
             try:
-                request_response = requests.head(url)
+                # TODO use get if head is rejected
+                request_response = requests.head(url, headers=headers)
                 http_statuses.append({'absolute_url': url, 'status_code': request_response.status_code})
             except:
                 #Fail 3: Assume it is 404 if requests can not connect

@@ -40,6 +40,38 @@ class SemReportWebsiteMetric(models.Model):
     value = fields.Char(string="Value")
     time = fields.Float(string="Processing Time")
 
+class SemReportCompetition(models.Model):
+
+    _name = "sem.report.competition"
+
+    search_results_id = fields.Many2one('sem.search.results', string="Search Results")
+    competition_ids = fields.One2many('sem.report.competition.result', 'competition_id', string="Competitors")
+
+class SemReportCompetitionResult(models.Model):
+
+    _name = "sem.report.competition.result"
+
+    competition_id = fields.Many2one('sem.report.competition', string="Competition Report")
+    search_result_id = fields.Many2one('sem.search.results.result', string="Search Result")
+    report_id = fields.Many2one('sem.report.website.page', string="Page Report")
+
+class SemReportRanking(models.Model):
+
+    _name = "sem.report.ranking"
+
+    website_id = fields.Many2one('sem.client.website', string="Website")
+    result_ids = fields.One2many('sem.report.ranking.result', 'ranking_id', string="Results")
+
+class SemReportRankingResult(models.Model):
+
+    _name = "sem.report.ranking.result"
+
+    ranking_id = fields.Many2one('sem.report.ranking', string="Ranking Report")
+    search_context_id = fields.Many2one('sem.search.context', string="Search Context")
+    search_result_id = fields.Many2one('sem.search.results.result', string="Search Result")
+    rank = fields.Char(string="Rank")
+    url = fields.Char(string="URL")
+
 class SemReportSearch(models.Model):
 
     _name = "sem.report.search"

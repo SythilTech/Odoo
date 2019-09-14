@@ -4,7 +4,6 @@
     'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Transcodes audio into formats suitable for RTP transport",
     'license':'LGPL-3',
     'data': [

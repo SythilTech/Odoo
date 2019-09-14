@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="ranking_report" type="object" string="Ranking Report"/>
                     <button name="search_report" type="object" string="Search Report"/>
                     <button name="check_website" type="object" string="Check Website"/>
                     <button name="read_sitemap" type="object" string="Read Sitemap"/>

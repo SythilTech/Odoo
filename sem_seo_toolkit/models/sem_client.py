@@ -132,6 +132,34 @@ class SemClientWebsite(models.Model):
         }
 
     @api.multi
+    def ranking_report(self):
+        self.ensure_one()
+
+        ranking_report = self.env['sem.report.ranking'].create({'website_id': self.id})
+
+        for search_context in self.search_context_ids:
+            search_results = search_context.get_search_results()
+
+            rank = "-"
+            url = ""
+            # Quick way of finding url that starts with the domain
+            found_result = self.env['sem.search.results.result'].search([('results_id','=', search_results.id), ('url','=like', self.url + '%')], limit=1)
+            if found_result:
+                rank = found_result.position
+                url = found_result.url
+
+            self.env['sem.report.ranking.result'].create({'ranking_id': ranking_report.id, 'search_context_id': search_context.id, 'search_result_id': found_result.id or False, 'rank': rank, 'url': url})
+
+        return {
+            'name': 'Ranking Report',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sem.report.ranking',
+            'res_id': ranking_report.id,
+            'type': 'ir.actions.act_window'
+        }
+
+    @api.multi
     def search_report(self):
         self.ensure_one()
 

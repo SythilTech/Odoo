@@ -43,6 +43,15 @@ class SemMetric(models.Model):
 
         return round((dom_complete_datetime - navigation_start_datetime).total_seconds(), 2)
 
+    def _seo_metric_http_requests(self, driver, url, parsed_html):
+
+        http_requests = driver.execute_script("var performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;")
+        resource_counter = 0
+        for performance_entry in http_requests:
+            if performance_entry['entryType'] == "resource":
+                 resource_counter += 1
+        return resource_counter
+
     @api.model
     def create(self, values):
         sequence=self.env['ir.sequence'].next_by_code('sem.metric')

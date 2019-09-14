@@ -3,7 +3,6 @@
     'version': "1.0.3",
     'author': "Success Made Easier",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "ManyChat Integration CRM extenstion",
     'description': "ManyChat Integration CRM extenstion",
     'license':'LGPL-3',

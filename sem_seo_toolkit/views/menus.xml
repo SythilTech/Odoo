@@ -12,9 +12,11 @@
     <menuitem id="sem_report_website_menu" name="Website Reports" sequence="10" parent="sem_reports" action="sem_report_website_action"/>
     <menuitem id="sem_report_website_page_menu" name="Webpage Reports" sequence="20" parent="sem_reports" action="sem_report_website_page_action"/>
     <menuitem id="sem_report_search_menu" name="Search Reports" sequence="30" parent="sem_reports" action="sem_report_search_action"/>
-    <menuitem id="sem_track_menu" name="Website Analytics" sequence="40" parent="sem_reports" action="sem_track_action"/>
-    <menuitem id="sem_report_google_business_menu" name="Google My Business Reports" sequence="50" parent="sem_reports" action="sem_report_google_business_action"/>
-    <menuitem id="sem_search_results_menu" name="Search Results" sequence="60" parent="sem_reports" action="sem_search_results_action"/>
+    <menuitem id="sem_report_ranking_menu" name="Ranking Reports" sequence="40" parent="sem_reports" action="sem_report_ranking_action"/>
+    <menuitem id="sem_report_competition_menu" name="Competition Reports" sequence="50" parent="sem_reports" action="sem_report_competition_action"/>
+    <menuitem id="sem_track_menu" name="Website Analytics" sequence="60" parent="sem_reports" action="sem_track_action"/>
+    <menuitem id="sem_report_google_business_menu" name="Google My Business Reports" sequence="70" parent="sem_reports" action="sem_report_google_business_action"/>
+    <menuitem id="sem_search_results_menu" name="Search Results" sequence="80" parent="sem_reports" action="sem_search_results_action"/>
 
     <menuitem id="sem_config_menu" name="Config" sequence="30" parent="sem_parent_menu"/>
     <menuitem id="sem_metric_menu" name="SEO Metrics" sequence="10" parent="sem_config_menu" action="sem_metric_action"/>

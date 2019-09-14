@@ -3,7 +3,6 @@
     'version': "1.0.4",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "ManyChat Integration",
     'description': "ManyChat Integration",
     'license':'LGPL-3',

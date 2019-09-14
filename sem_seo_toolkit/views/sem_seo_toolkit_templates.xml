@@ -50,7 +50,7 @@
                         <h2 style="text-align:center;">Page Metrics</h2>
                         <table style="width:100%;">
                             <tr><th>Metric Name</th><th>Value</th></tr>
-                            <t t-as="seo_metric" t-foreach="o.metric_ids">
+                            <t t-as="seo_metric" t-foreach="seo_page.metric_ids">
                                 <tr style="text-align:center;">
                                     <td><span t-field="seo_metric.metric_id.name"/></td>
                                     <td><span t-field="seo_metric.value"/></td>
@@ -130,6 +130,31 @@
                         <tr><th>Image</th><th>View Count</th></tr>
                         <t t-as="media" t-foreach="o.media_ids">
                             <tr style="text-align:center;"><td><img t-attf-src="data:image/png;base64, #{media.image}"/></td><td><span t-field="media.view_count"/></td></tr>
+                        </t>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template name="Ranking Report" id="sem_report_ranking_pdf">
+        <t t-as="o" t-foreach="docs">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h1 style="text-align:center;">Ranking Report</h1>
+                    <p>URL: <span t-field="o.website_id.url"/></p>
+                    <h2 style="text-align:center;">Results</h2>
+                    <table style="width:100%;">
+                        <tr><th>Search Engine</th><th>Keyword</th><th>Device</th><th>Location</th><th>Rank</th><th>URL</th></tr>
+                        <t t-as="result" t-foreach="o.result_ids">
+                            <tr>
+                                <td><span t-field="result.search_context_id.search_engine_id.name"/></td>
+                                <td><span t-field="result.search_context_id.keyword"/></td>
+                                <td><span t-field="result.search_context_id.device_id.name"/></td>
+                                <td><span t-field="result.search_context_id.geo_target_name"/></td>
+                                <td><span t-field="result.rank"/></td>
+                                <td><span t-field="result.url"/></td>
+                            </tr>
                         </t>
                     </table>
                 </div>

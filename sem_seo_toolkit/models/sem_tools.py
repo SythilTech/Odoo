@@ -16,47 +16,20 @@ except:
 
 from odoo import api, fields, models
 
-class SemClientWebsitePage(models.Model):
+class SemTools(models.TransientModel):
 
-    _name = "sem.client.website.page"
-    _rec_name = "url"
+    _name = "sem.tools"
 
-    website_id = fields.Many2one('sem.client.website', string="Website")
-    url = fields.Char(string="URL")
-    active = fields.Boolean(string="Active", default=True)
-    page_report_ids = fields.One2many('sem.report.website.page', 'page_id', string="Page Reports")
+    @api.model
+    def check_url(self, url):
 
-    @api.onchange('website_id')
-    def _onchange_website_id(self):
-        if self.website_id.url:
-            self.url = self.website_id.url
-
-    @api.multi
-    def check_webpage_wrapper(self):
-        self.ensure_one()
-
-        webpage_report = self.check_webpage()
-
-        return {
-            'name': 'Webpage Report',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'sem.report.website.page',
-            'type': 'ir.actions.act_window',
-            'res_id': webpage_report.id
-        }
-
-    @api.multi
-    def check_webpage(self):
-        self.ensure_one()
-
-        webpage_report = self.env['sem.report.website.page'].create({'page_id': self.id, 'url': self.url})
+        webpage_report = self.env['sem.report.website.page'].create({'url': url})
 
         try:
             chrome_options = Options()
             chrome_options.add_argument("--headless")
             driver = webdriver.Chrome(chrome_options = chrome_options)
-            driver.get(self.url)
+            driver.get(url)
             parsed_html = html.fromstring(driver.page_source)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -64,7 +37,7 @@ class SemClientWebsitePage(models.Model):
             _logger.error("Line: " + str(exc_tb.tb_lineno) )
             # Fall back to requests and skip some checks that need Selenium / Google Chrome
             driver = False
-            parsed_html = html.fromstring(requests.get(self.url).text)
+            parsed_html = html.fromstring(requests.get(url).text)
 
         for seo_metric in self.env['sem.metric'].search([('active', '=', True)]):
             method = '_seo_metric_%s' % (seo_metric.function_name,)
@@ -75,7 +48,7 @@ class SemClientWebsitePage(models.Model):
 
             try:
                 start = time.time()
-                metric_result = action(driver, self.url, parsed_html)
+                metric_result = action(driver, url, parsed_html)
                 end = time.time()
                 diff = end - start
             except Exception as e:
@@ -97,7 +70,7 @@ class SemClientWebsitePage(models.Model):
 
             try:
                 start = time.time()
-                check_result = action(driver, self.url, parsed_html)
+                check_result = action(driver, url, parsed_html)
                 end = time.time()
                 diff = end - start
             except Exception as e:

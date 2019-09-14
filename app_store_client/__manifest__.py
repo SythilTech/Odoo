@@ -3,7 +3,6 @@
     'version': "1.0.6",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Let's clients access your custom app store directly from within Odoo",
     'license':'LGPL-3',
     'data': [

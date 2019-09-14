@@ -18,10 +18,24 @@ class SemSearchContext(models.Model):
     map_zoom_level = fields.Char(string="Map Zoom Level")
     search_result_ids = fields.One2many('sem.search.results', 'search_context_id', string="Search Results")
 
+    @api.multi
     def perform_search(self):
-        search_results = self.search_engine_id.perform_search(self)
-        search_results['search_context_id'] = self.id
-        self.env['sem.search.results'].create(search_results)
+        self.ensure_one()
+        search_results = self.get_search_results()
+        return {
+            'name': 'Search Results',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sem.search.results',
+            'type': 'ir.actions.act_window',
+            'res_id': search_results.id
+        }
+
+    def get_search_results(self):
+        search_results_dict = self.search_engine_id.perform_search(self)
+        search_results_dict['search_context_id'] = self.id
+        search_results = self.env['sem.search.results'].create(search_results_dict)
+        return search_results
 
     def get_insight(self):
         return self.search_engine_id.get_insight(self)

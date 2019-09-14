@@ -94,10 +94,10 @@ class SemSearchEngine(models.Model):
         key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
         uule = "w+CAIQICI"
-        uule += key[len(geo_target.name) % len(key)]
-        uule += base64.b64encode(bytes(geo_target.name, "utf-8")).decode()
+        uule += key[len(search_context.geo_target_name) % len(key)]
+        uule += base64.b64encode(bytes(search_context.geo_target_name, "utf-8")).decode()
         url += "&uule=" + uule
-        url += "&adtest-useragent=" + geo_target.device_id.user_agent 
+        url += "&adtest-useragent=" + search_context.device_id.user_agent 
 
         return {'search_url': url}
 
@@ -108,9 +108,11 @@ class SemSearchEngine(models.Model):
         response_json = json.loads(response.text)
         search_results = []
 
+        position_counter = 0
         for webpage in response_json['webPages']['value']:
+            position_counter += 1
             link_url = webpage['url'].replace("\\","")
-            search_results.append( (0, 0,  {'name': webpage['name'], 'url': link_url, 'snippet': webpage['snippet']}) )
+            search_results.append( (0, 0,  {'position': position_counter, 'name': webpage['name'], 'url': link_url, 'snippet': webpage['snippet']}) )
 
         # Return the full results as well as ranking information if the site was found
         return {'raw_data': response.text, 'result_ids': search_results}

@@ -2,6 +2,7 @@
 
 from . import google_ads
 from . import google_business
+from . import sem_tools
 from . import sem_depend
 from . import sem_client
 from . import sem_client_website_page

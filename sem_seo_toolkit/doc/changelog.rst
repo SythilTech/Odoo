@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Ranking reports reintroduced
+
 v1.1.0
 ======
 * Major database restructure (non back compatible)

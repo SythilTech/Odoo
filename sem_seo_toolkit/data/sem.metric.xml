@@ -10,5 +10,13 @@
             <field name="active">1</field>
         </record>
 
+        <record id="seo_metric_http_requests" model="sem.metric">
+            <field name="name">HTTP Requests</field>
+            <field name="function_name">http_requests</field>
+            <field name="description">Number of Files that are loaded</field>
+            <field name="depend_ids" eval="[(6, 0, [ref('seo_depend_selenium')])]"/>
+            <field name="active">1</field>
+        </record>
+
     </data>
 </odoo>

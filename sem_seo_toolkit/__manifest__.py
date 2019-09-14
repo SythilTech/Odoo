@@ -1,6 +1,6 @@
 {
     'name': "Search Engine Marketing Toolkit",
-    'version': "1.1.0",
+    'version': "1.1.1",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Set of tools to help with Search Engine Marketing / Optimisation",
@@ -23,7 +23,9 @@
         'views/sem_check_category_views.xml',
         'views/sem_report_website_page_views.xml',
         'views/sem_report_website_views.xml',
+        'views/sem_report_competition_views.xml',
         'views/sem_report_search_views.xml',
+        'views/sem_report_ranking_views.xml',
         'views/sem_report_google_business_views.xml',
         'views/sem_search_context_views.xml',
         'views/sem_search_context_wizard_views.xml',

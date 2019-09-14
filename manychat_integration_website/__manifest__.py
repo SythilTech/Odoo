@@ -1,9 +1,8 @@
 {
     'name': "ManyChat Integration - Website Widgets",
     'version': "1.0.0",
-    'author': "Success Made Easier",
+    'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "ManyChat Integration website widgets extenstion",
     'description': "ManyChat Integration website widgets extenstion",
     'license':'LGPL-3',

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report id="sem_report_ranking_report" name="sem_seo_toolkit.sem_report_ranking_pdf" file="sem_seo_toolkit.sem_report_ranking_pdf" model="sem.report.ranking" report_type="qweb-pdf" string="Ranking Report"/>
+
+    <record id="sem_report_ranking_view_form" model="ir.ui.view">
+        <field name="name">sem.report.ranking form view</field>
+        <field name="model">sem.report.ranking</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="website_id"/>
+                    <field name="result_ids">
+                        <tree>
+                            <field name="search_context_id"/>
+                            <field name="rank"/>
+                            <field name="url"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="sem_report_ranking_view_tree" model="ir.ui.view">
+        <field name="name">sem.report.ranking tree view</field>
+        <field name="model">sem.report.ranking</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="website_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sem_report_ranking_action" model="ir.actions.act_window">
+        <field name="name">SEM Ranking Report</field>
+        <field name="res_model">sem.report.ranking</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
