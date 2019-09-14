@@ -3,7 +3,6 @@
     'version': "1.0.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Generate invoices based on amount of time spent on ticket / tasks',
     'license':'LGPL-3',
     'data': [
