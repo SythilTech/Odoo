@@ -3,7 +3,6 @@
     'version': "1.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Allows sending smses from / to leads',
     'description':'Allows sending smses from / to leads',    
     'license':'LGPL-3',

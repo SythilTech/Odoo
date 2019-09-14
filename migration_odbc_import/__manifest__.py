@@ -4,7 +4,6 @@
     'version': "1.4.10",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "A series of tools designed to assist in migration/synchronisation of external data",
     'description': "A series of tools designed to assist in migration/synchronisation of external data",
     'license':'LGPL-3',

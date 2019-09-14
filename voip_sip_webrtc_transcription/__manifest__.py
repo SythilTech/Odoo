@@ -4,7 +4,6 @@
     'version': "1.0.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Transcribes SIP calls made through the python automated action",
     'license':'LGPL-3',
     'data': [

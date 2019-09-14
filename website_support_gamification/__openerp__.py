@@ -3,7 +3,6 @@
     'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Adds badges to support tickets",
     'description': "Adds badges to support tickets",
     'license':'LGPL-3',

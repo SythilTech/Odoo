@@ -4,7 +4,6 @@
     'version': "1.6.12",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Make video calls with other users inside your system",
     'license':'LGPL-3',
     'data': [

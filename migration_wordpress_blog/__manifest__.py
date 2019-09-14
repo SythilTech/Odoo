@@ -4,7 +4,6 @@
     'version': "1.0.4",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Copies Wordpress blog posts and comments into Odoo",
     'description': "Copies Wordpress blog posts and comments into Odoo",
     'license':'LGPL-3',

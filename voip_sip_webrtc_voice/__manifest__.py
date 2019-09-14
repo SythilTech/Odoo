@@ -4,7 +4,6 @@
     'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Text to speech phone calls with dynamic placeholders",
     'license':'LGPL-3',
     'data': [

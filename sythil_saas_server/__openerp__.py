@@ -3,7 +3,6 @@
     'version': "1.0.5",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Share your Odoo instace with others',
     'description':'Share your Odoo instace with others',
     'license':'LGPL-3',

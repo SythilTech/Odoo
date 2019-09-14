@@ -3,7 +3,6 @@
     'version': "1.1.5",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Allows you to send smses using the Yeastar TG 100 gateway',
     'description':'Allows you to send smses using the Yeastar TG 100 gateway',    
     'license':'LGPL-3',

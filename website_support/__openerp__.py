@@ -3,7 +3,6 @@
     'version': "2.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "A helpdesk / support ticket system for your website",
     'description': "A helpdesk / support ticket system for your website",
     'license':'LGPL-3',

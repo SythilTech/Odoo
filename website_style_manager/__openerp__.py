@@ -3,7 +3,6 @@
     'version': "1.1.3",
     'author': "Sythil Tech",
     'category': "Website",
-    'support': "steven@sythiltech.com.au",
     'summary': "Add site wide CSS styles and see the change in real time",
     'description': "Add site wide CSS styles and see the change in real time",
     'license':'LGPL-3',

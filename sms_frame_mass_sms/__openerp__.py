@@ -3,7 +3,6 @@
     'version': "1.0.5",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Send out a large volume of smses with unsubscribe built-in',
     'description':'Send out a large volume of smses with unsubscribe built-in',    
     'license':'LGPL-3',

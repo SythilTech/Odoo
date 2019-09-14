@@ -3,7 +3,6 @@
     'version': "1.0.2",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Backs up your Odoo databases to your backup server",
     'description': "Backs up your Odoo databases to your backup server",
     'license':'LGPL-3',

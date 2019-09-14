@@ -4,7 +4,6 @@
     'version': "1.2.2",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Copy data (pages, media) from wordpress CMS into Odoo",
     'description': "Copy data (pages, media) from wordpress CMS into Odoo",
     'license':'LGPL-3',

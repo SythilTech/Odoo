@@ -3,7 +3,6 @@
     'version': "1.0.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Allow non technical users access to sms messages',
     'description':'Allow non technical users access to sms messages',
     'license':'LGPL-3',

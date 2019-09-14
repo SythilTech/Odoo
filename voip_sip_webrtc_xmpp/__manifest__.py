@@ -4,7 +4,6 @@
     'version': "1.0.1",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Extends thae main voip module to allow XMPP (Jabber) messenging",
     'license':'LGPL-3',
     'data': [

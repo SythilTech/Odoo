@@ -3,7 +3,6 @@
     'version': "1.0.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Send an sms on a contacts birthday',
     'description':'Send an sms on a contacts birthday',    
     'license':'LGPL-3',

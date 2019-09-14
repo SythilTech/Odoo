@@ -3,7 +3,6 @@
     'version': "0.3.3",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Backs up important files on your desktop computers",
     'description': "Backs up important files on your desktop computers",
     'license':'LGPL-3',

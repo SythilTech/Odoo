@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Submit and receive tasks via your mobile phone",
     'description': "Submit and receive tasks via your mobile phone",
     'license':'LGPL-3',

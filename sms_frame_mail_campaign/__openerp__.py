@@ -3,7 +3,6 @@
     'version': "1.0.6",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Adds the ability to more easily send smses from a marketing campaign",
     'license':'LGPL-3',
     'data': [

@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary':'Creates an Entity Relationship Diagram (ERD)',
     'license':'LGPL-3',
     'data': [

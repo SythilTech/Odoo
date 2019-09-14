@@ -4,7 +4,6 @@
     'version': "1.1.1",
     'author': "Sythil Tech",
     'category': "Point of Sale",
-    'support': "steven@sythiltech.com.au",
     'summary': "Keep your website menu in sync with the POS prices and products",
     'license':'LGPL-3',
     'data': [

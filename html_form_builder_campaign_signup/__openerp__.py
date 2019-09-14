@@ -3,7 +3,6 @@
     'version': "1.0",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Signs the person who fills in the form into a campaign",
     'description': "Signs the person who fills in the form into a campaign",
     'license':'LGPL-3',

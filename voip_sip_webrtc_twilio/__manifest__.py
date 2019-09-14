@@ -4,7 +4,6 @@
     'version': "1.0.3",
     'author': "Sythil Tech",
     'category': "Tools",
-    'support': "steven@sythiltech.com.au",
     'summary': "Add support for Twilio XML",
     'license':'LGPL-3',
     'data': [

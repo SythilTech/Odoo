@@ -3,7 +3,6 @@
     'version': "1.4.0",
     'author': "Sythil Tech",
     'category': "CRM",
-    'support': "steven@sythiltech.com.au",
     'summary': "Allows users in the 'Sales / Manager' group to add additional fields to the partner form",
     'license':'LGPL-3',
     'data': [
