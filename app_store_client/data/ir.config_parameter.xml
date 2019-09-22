@@ -12,5 +12,10 @@
             <field name="value">/.local/share/Odoo/addons/11.0/</field>
         </record>
 
+        <record id="custom_app_store_access_token" model="ir.config_parameter">
+            <field name="key">custom_app_store_access_token</field>
+            <field name="value"></field>
+        </record>
+
     </data>
 </odoo>

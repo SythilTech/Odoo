@@ -13,7 +13,7 @@
 
             <div class="container" style="margin-top:16px;">
                 <t t-foreach="modules" t-as="module">
-                    <div class="col-md-3" t-if="module.published">
+                    <div class="col-md-3">
                         <div class="panel panel-default" style="padding:10px;">
                             <a t-attf-href="/client/apps/modules/#{module.name}"><img t-att-src="website.image_url(module, 'icon')" class="img-rounded mb8" t-attf-alt="#{module.module_name}" width="200" height="200"/></a><br/>
                             <a t-attf-href="/client/apps/modules/#{module.name}" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;display:block;"><b><t t-esc="module.module_name"/></b></a>

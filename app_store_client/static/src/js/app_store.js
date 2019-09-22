@@ -18,7 +18,16 @@ rpc.query({
     args: ['custom_app_store_url']
 }).then(function(app_url){
 	my_app_url = app_url;
-    console.log(app_url);
+});
+
+//Get the app store access token from parameters
+var my_app_access_token = ""
+rpc.query({
+    model: 'ir.config_parameter',
+    method: 'get_param',
+    args: ['custom_app_store_access_token']
+}).then(function(access_token){
+	my_app_access_token = access_token;
 });
 
 window.onmessage = function(e){
@@ -46,7 +55,7 @@ var CustomApps = Widget.extend({
     start: function() {
         var my_iframe = this.$el;
         my_iframe.css({height: '100%', width: '100%', border: 0});
-        my_iframe.attr({src: my_app_url + "/client/apps"});
+        my_iframe.attr({src: my_app_url + "/client/apps?acess_token=" + my_app_access_token});
 
         return this._super();
     },

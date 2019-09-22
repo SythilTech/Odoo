@@ -19,6 +19,9 @@ class AppstoreAccount(models.Model):
     name = fields.Char(string="Name")
     repositories_ids = fields.One2many('appstore.account.repository', 'asa_id', string="Repositories")
 
+    def sync_repos(self):
+        self.env['appstore.account.repository'].check_all_repositories()
+
 class AppstoreAccountRepository(models.Model):
 
     _name = "appstore.account.repository"

@@ -6,6 +6,9 @@
         <field name="model">appstore.account</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name="sync_repos" type="object" string="Sync Repositories"/>
+                </header>
                 <group>
                     <field name="name"/>
                     <field name="repositories_ids" context="{'asa_id':active_id}">

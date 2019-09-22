@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+      <record id="module_access_view_form" model="ir.ui.view">
+          <field name="name">module_access.view.form</field>
+          <field name="model">module.access</field>
+          <field name="arch" type="xml">
+             <form>
+                 <group>
+                     <field name="name"/>
+                     <field name="access_token"/>
+                     <field name="module_access_ids"/>
+                  </group>
+              </form>
+          </field>
+      </record>
+
+      <record id="module_access_view_tree" model="ir.ui.view">
+          <field name="name">module_access.view.tree</field>
+          <field name="model">module.access</field>
+          <field name="arch" type="xml">
+              <tree>
+                  <field name="name"/>
+                  <field name="access_token"/>
+                  <field name="module_access_ids"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="module_access_action" model="ir.actions.act_window">
+          <field name="name">Module Access</field>
+          <field name="res_model">module.access</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+      </record>
+
+</odoo>

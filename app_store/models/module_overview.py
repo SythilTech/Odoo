@@ -23,6 +23,7 @@ class ModuleOverview(models.Model):
     _description = "Module Overview"
 
     name = fields.Char(string="Internal Name")
+    private_access_ids = fields.Many2many('module.access', string="Private Access")
     models_ids = fields.One2many('module.overview.model', 'mo_id', string="Models")
     model_count = fields.Integer(string="Model Count", compute="_compute_model_count")
     menu_ids = fields.One2many('module.overview.menu', 'mo_id', string="Menus")
@@ -58,6 +59,15 @@ class ModuleOverview(models.Model):
     @api.depends('models_ids')
     def _compute_model_count(self):
         self.model_count = len(self.models_ids)
+
+class ModuleAccess(models.Model):
+
+    _name = "module.access"
+    _description = "Module Access"
+
+    name = fields.Char(string="Name")
+    access_token = fields.Char(string="Access Token")
+    module_access_ids = fields.Many2many('module.overview', tring="Module Access", help="Inactive modules this token allows access too")
 
 class ModuleOverviewStoreView(models.Model):
 

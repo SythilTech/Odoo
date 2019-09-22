@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store Client",
-    'version': "1.0.6",
+    'version': "1.1.0",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Let's clients access your custom app store directly from within Odoo",

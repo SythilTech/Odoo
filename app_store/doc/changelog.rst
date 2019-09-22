@@ -1,3 +1,7 @@
+v1.1.0
+======
+* Private access to unpublished modules (alpha/beta access)
+
 v1.0.9
 ======
 * Skip repos on error (better error handling later...)

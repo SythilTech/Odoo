@@ -14,6 +14,8 @@ import io
 import csv
 import werkzeug.utils
 import werkzeug.wrappers
+import logging
+_logger = logging.getLogger(__name__)
 
 from openerp.tools import ustr
 import openerp.http as http
@@ -29,7 +31,8 @@ class AppsController(http.Controller):
         for field_name, field_value in kwargs.items():
             values[field_name] = field_value
 
-        modules = request.env['module.overview'].search([])
+        modules = request.env['module.overview'].search(['|', ('published', '=', True), ('private_access_ids.access_token', '=', values['acess_token'])])
+
         return http.request.render('app_store.client_app_list', {'modules':modules})
 
     @http.route('/apps', type="http", auth="public", website=True)

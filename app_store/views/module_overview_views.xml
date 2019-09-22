@@ -8,6 +8,7 @@
              <form>
                  <group>
                      <field name="published"/>
+                     <field name="private_access_ids" widget="many2many_tags"/>
                      <field name="name"/>
                      <field name="author"/>
                      <field name="version"/>

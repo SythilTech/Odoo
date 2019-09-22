@@ -1,3 +1,7 @@
+v1.1.0
+======
+* Private access to unpublished access to modules (alpha/beta access)
+
 v1.0.6
 ======
 * Allows you to change where the module is downloaded too instead of the default .local folder

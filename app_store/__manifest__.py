@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store",
-    'version': "1.0.9",
+    'version': "1.1.0",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Create your own app store",
@@ -9,6 +9,7 @@
         'views/module_overview_templates.xml',
         'views/module_overview_views.xml',
         'views/appstore_account_views.xml',
+        'views/module_access_views.xml',
         'views/menus.xml',
         'data/website.menu.csv',
         'data/ir.cron.csv',
