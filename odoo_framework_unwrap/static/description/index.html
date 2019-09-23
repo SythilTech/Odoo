@@ -1,0 +1,50 @@
+<div class="container">
+<h2>Description</h2>
+Converts an Odoo module into non framework code such as PHP and MySQL<br/>
+<b>*IMPORTANT*</b> This module is designed for developers, do not use it to convert Odoo module or other community modules without permission<br/>
+<b>*IMPORTANT*</b> The module only converts content within the selected module and skips content that inherits other modules<br/>
+<br/>
+What this modules currently does<br/>
+<ul>
+<li>Connects to MySQL database via odbc</li>
+<li>Creates MySQL tables from models created by the selected module</li>
+<li>Converts Odoo char fields to MySQL varchar datatype</li>
+</ul>
+<br/>
+What this modules currently does not do<br/>
+<ul>
+<li>Everthing else</li>
+</ul>
+<h3>Install PyODBC Ubuntu</h3>
+<ul>
+<li>sudo apt install python3-pip</li>
+<li>sudo apt install unixodbc-dev</li>
+<li>sudo pip3 install pyodbc</li>
+</ul>
+<h3>Setup MySQL connection</h3>
+<ul>
+<li>Download driver from offical website <a href="https://dev.mysql.com/downloads/connector/odbc/">https://dev.mysql.com/downloads/connector/odbc/</a></li>
+<li>Extract and copy files under lib folder to /usr/lib/x86_64-linux-gnu/odbc/</li>
+<li>Edit /etc/odbcinst.ini file and specify driver path</li>
+</ul>
+MySQL 5 example
+<pre>
+[MySQL]
+Description = ODBC for MySQL
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libmyodbc5a.so
+Setup = /usr/lib/x86_64-linux-gnu/odbc/libodbcmyS.so
+FileUsage = 1
+</pre>
+<ul>
+<li>Edit the /etc/odbc.ini file, actual connection details are provided inside Odoo</li>
+</ul>
+<pre>
+[my-connector]
+Description           = MySQL connection to  database
+Driver                = MySQL
+</pre>
+<ul>
+<li>In Odoo hit the "Check Data Sources" button so the newly setup driver can be selected</li>
+<li>Finally hit the "Test Connection" button to make sure everything works, you may need to specify that the MySQL user can connect from the Odoo server host IP</li>
+</ul>
+</div>

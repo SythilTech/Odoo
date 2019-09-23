@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_convert_view_form" model="ir.ui.view">
+        <field name="name">module.convert view form</field>
+        <field name="model">module.convert</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button type="object" name="check_data_sources" string="Check Data Sources"/>
+                    <button type="object" name="test_connection" string="Test Connection"/>
+                    <button name="convert_models" type="object" string="Convert Models"/>
+                </header>
+                <group>
+                    <field name="module_id"/>
+                    <field name="database_id"/>
+                    <field name="language_id"/>
+                    <field name="mode"/>
+                    <field name="connection_string_template_id"/>
+                    <field name="dsn_id"/>
+                    <field name="connect_server"/>
+                    <field name="connect_database"/>
+                    <field name="connect_username"/>
+                    <field name="connect_password"/>
+                    <field name="connection_string"/>
+                </group>
+                See <a target="_blank" href="https://www.connectionstrings.com">https://www.connectionstrings.com</a> if you want to manually create your own connection string
+            </form>
+        </field>
+    </record>
+
+    <record id="module_convert_model_view_tree" model="ir.ui.view">
+        <field name="name">module.convert view tree</field>
+        <field name="model">module.convert</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="module_id"/>
+                <field name="database_id"/>
+                <field name="language_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="module_convert_action" model="ir.actions.act_window">
+        <field name="name">Module Convert</field>
+        <field name="res_model">module.convert</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

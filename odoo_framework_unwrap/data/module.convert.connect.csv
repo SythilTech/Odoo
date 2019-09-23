@@ -1,0 +1,2 @@
+"id","name","driver","connection_string"
+"mysql","MySQL Standard Connect","MySQL","DRIVER=$driver;Server=$server;Database=$database;Uid=$username;Pwd=$password;Charset=utf8;"

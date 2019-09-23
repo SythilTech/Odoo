@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="module_convert_menu" name="Module Convert" action="module_convert_action" sequence="50"/>
+
+</odoo>
