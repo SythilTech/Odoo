@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="video_parent_menu" name="Videos" parent="website.menu_website_configuration" sequence="32"/>
+    <menuitem id="video_video_menu" name="Videos" parent="video_parent_menu" action="video_video_action" sequence="10"/>
+
+</odoo>

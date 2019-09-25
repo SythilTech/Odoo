@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="home_page" name="Videos Home Page">
+        <t t-call="website.layout">
+            <div class="container">
+                <div class="mt16 mb16">
+                    <form metho="GET" action="/videos/search">
+                        <div class="form-group">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-6">
+                                <input type="search" class="form-control" name="query" placeholder="Search"/>
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="upload" name="Videos Upload">
+        <t t-call="website.layout">
+            <div class="container">
+                <div class="mt16 mb16">
+                    <h1 class="text-center">Upload Video</h1>
+                </div>
+
+               <script>
+
+               $(document).ready(function() {
+
+                   $('#file').change(function(){
+
+                       for (var x in this.files) {
+                           if (this.files[x].size / 1024 > (20 * 1024) ) { //20MB
+                               alert(this.files[x].name + " exceeds the 20MB file size limit");
+                               $('#file').val('');
+                           }
+                       }
+                   
+                   });
+
+                });
+
+                </script>
+
+                <form action="/videos/upload/process" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <div class="form-group">
+                        <label class="col-md-3 control-label" for="name">Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="name" required="True"/>
+                        </div>
+                    </div>
+                    <div name="file_container" class="form-group">
+                        <label class="col-md-3 control-label" for="file">Upload MP4</label>
+                        <div class="col-md-9">
+                            <div class="btn btn-default btn-file col-md-12"><input name="file" id="file" type="file"/></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-primary btn-lg">Submit Video</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <template id="search" name="Videos Search">
+        <t t-call="website.layout">
+            <div class="container">
+                <t t-foreach="videos" t-as="video">
+                    <a t-attf-href="/videos/video/#{slug(video)}"><span t-esc="video.name"/></a><br/>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="video" name="Videos Video">
+        <t t-call="website.layout">
+            <div class="container">
+                <h1 class="text-center" t-esc="video.name"/>
+                <p>Uploader: <span t-esc="video.uploader_id.name"/></p>
+                <video style="width:100%;" autoplay="autoplay" controls="controls">
+                    <source t-attf-src="/videos/stream/#{video.id}.mp4" type="video/mp4"/>
+                    Your browser does not support the video tag.
+                </video>
+                <p>Comments</p>
+                <t t-foreach="video.comment_ids" t-as="comment">
+                    <div style="border: 1px black solid;padding:5px;">
+                         <p t-esc="comment.author_id.name"/>
+                         <p t-esc="comment.content"/>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+</odoo>

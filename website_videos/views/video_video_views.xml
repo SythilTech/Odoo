@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="video_video_view_form" model="ir.ui.view">
+        <field name="name">video.video view form</field>
+        <field name="model">video.video</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="uploader_id"/>
+                    <field name="view_count"/>
+                    <field name="comment_ids">
+                        <tree editable="bottom">
+                            <field name="author_id"/>
+                            <field name="content"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="video_video_model_view_tree" model="ir.ui.view">
+        <field name="name">video.video view tree</field>
+        <field name="model">video.video</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="view_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="video_video_action" model="ir.actions.act_window">
+        <field name="name">Videos</field>
+        <field name="res_model">video.video</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

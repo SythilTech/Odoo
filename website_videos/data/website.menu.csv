@@ -1,0 +1,4 @@
+"id","name","url","parent_id/id"
+"video_website_parent_menu","Videos","/","website.main_menu"
+"video_website_menu","Home","/videos","video_website_parent_menu"
+"video_upload_website_menu","Upload","/videos/upload","video_website_parent_menu"
