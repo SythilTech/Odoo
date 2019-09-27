@@ -82,41 +82,47 @@ class SEMSettings(models.Model):
         end_date = datetime.datetime.utcnow()
         start_date = datetime.datetime.now() - datetime.timedelta(30)
 
+        locations = []
+        location_ids = []
         for account in account_response_json['accounts']:
             account_name = account['name']
             location_response = requests.get("https://mybusiness.googleapis.com/v4/" + account_name + "/locations", headers=headers)
             location_response_json = json.loads(location_response.text)
 
             # Just add all locations to a list so we can feed them all into the one reportInsights call
-            locations = []
             for location in location_response_json['locations']:
-                locations.append(location['name'])
+                # Only include locations that are open and verified, and non duplicate
+                location_id = location['name'].split("locations/")[1]
+                if location['openInfo']['status'] == 'OPEN' and 'isVerified' in location['locationState'] and location_id not in location_ids:
 
-                # Create or find a local listing entry so we can track performance since last report
-                local_listing_search = self.env['sem.client.listing'].search([('search_engine_id','=', google_search_engine.id), ('listing_external_id','=', location['name'])])
-                if len(local_listing_search) == 0:
-                    local_listing = self.env['sem.client.listing'].create({'search_engine_id': google_search_engine.id, 'name': location['locationName'], 'listing_external_id': location['name']})
-                else:
-                    local_listing = local_listing_search[0]
+                    locations.append(location['name'])
+                    location_ids.append(location_id)
 
-                location_report = self.env['sem.report.google.business'].create({'listing_id': local_listing.id, 'start_date': start_date, 'end_date': end_date})
+                    # Create or find a local listing entry so we can track performance since last report
+                    local_listing_search = self.env['sem.client.listing'].search([('search_engine_id','=', google_search_engine.id), ('listing_external_id','=', location['name'])])
+                    if len(local_listing_search) == 0:
+                        local_listing = self.env['sem.client.listing'].create({'search_engine_id': google_search_engine.id, 'name': location['locationName'], 'listing_external_id': location['name']})
+                    else:
+                        local_listing = local_listing_search[0]
 
-                media_response = requests.get("https://mybusiness.googleapis.com/v4/" + location['name'] + "/media", headers=headers)
-                media_response_json = json.loads(media_response.text)
+                    location_report = self.env['sem.report.google.business'].create({'listing_id': local_listing.id, 'start_date': start_date, 'end_date': end_date})
+
+                    media_response = requests.get("https://mybusiness.googleapis.com/v4/" + location['name'] + "/media", headers=headers)
+                    media_response_json = json.loads(media_response.text)
                 
-                if 'mediaItems' in media_response_json:
-                    for media_item in media_response_json['mediaItems']:
+                    if 'mediaItems' in media_response_json:
+                        for media_item in media_response_json['mediaItems']:
 
-                        # Create or find a local copy of the media so we can use it in the report
-                        local_media_search = self.env['sem.client.listing.media'].search([('media_external_id','=', media_item['name'])])
-                        if len(local_media_search) == 0:
-                            google_thumbnail_image = base64.b64encode( requests.get(media_item['thumbnailUrl']).content )
-                            local_media = self.env['sem.client.listing.media'].create({'listing_id': local_listing.id, 'image': google_thumbnail_image, 'media_external_id': media_item['name']})
-                        else:
-                            local_media = local_media_search[0]
+                            # Create or find a local copy of the media so we can use it in the report
+                            local_media_search = self.env['sem.client.listing.media'].search([('media_external_id','=', media_item['name'])])
+                            if len(local_media_search) == 0:
+                                google_thumbnail_image = base64.b64encode( requests.get(media_item['thumbnailUrl']).content )
+                                local_media = self.env['sem.client.listing.media'].create({'listing_id': local_listing.id, 'image': google_thumbnail_image, 'media_external_id': media_item['name']})
+                            else:
+                                local_media = local_media_search[0]
 
-                        if 'viewCount' in media_item['insights']:
-                            self.env['sem.report.google.business.media'].create({'report_id': location_report.id, 'media_id': local_media.id, 'view_count': media_item['insights']['viewCount']})
+                            if 'viewCount' in media_item['insights']:
+                                self.env['sem.report.google.business.media'].create({'report_id': location_report.id, 'media_id': local_media.id, 'view_count': media_item['insights']['viewCount']})
 
         # All metrics within last 30 days
         # TODO feed 10 locations in at a time as that is the limit (https://developers.google.com/my-business/reference/rest/v4/accounts.locations/reportInsights)

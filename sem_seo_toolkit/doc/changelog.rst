@@ -1,3 +1,8 @@
+v1.1.2
+======
+* Bug fix for Google my Business reports when a listing was on multiple accounts.
+* Skip unverified and closed listings from the report
+
 v1.1.1
 ======
 * Ranking reports reintroduced

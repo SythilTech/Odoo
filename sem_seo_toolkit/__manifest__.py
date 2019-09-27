@@ -1,6 +1,6 @@
 {
     'name': "Search Engine Marketing Toolkit",
-    'version': "1.1.1",
+    'version': "1.1.2",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Set of tools to help with Search Engine Marketing / Optimisation",

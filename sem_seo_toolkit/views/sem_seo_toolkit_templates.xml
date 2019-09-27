@@ -107,6 +107,7 @@
             <t t-call="web.external_layout">
                 <div class="page">
                     <h1 style="text-align:center;">Google My Business Report</h1>
+                    <p style="text-align:center;" t-esc="o.listing_id.name"/>
                     <h2 style="text-align:center;">Listing stats from last 30 days (<span t-field="o.start_date"/> - <span t-field="o.end_date"/>)</h2>
                     <table style="width:100%;">
                         <tr><th>Metric</th><th>Value</th><th>Description</th></tr>
