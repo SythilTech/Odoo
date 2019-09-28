@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Bug fix for systems with old version of app_store client without access_token
+
 v1.1.0
 ======
 * Private access to unpublished modules (alpha/beta access)

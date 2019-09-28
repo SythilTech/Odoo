@@ -31,7 +31,10 @@ class AppsController(http.Controller):
         for field_name, field_value in kwargs.items():
             values[field_name] = field_value
 
-        modules = request.env['module.overview'].search(['|', ('published', '=', True), ('private_access_ids.access_token', '=', values['acess_token'])])
+        if 'acess_token' in values:
+            modules = request.env['module.overview'].search(['|', ('published', '=', True), ('private_access_ids.access_token', '=', values['acess_token'])])
+        else:
+            modules = request.env['module.overview'].search([('published', '=', True)])
 
         return http.request.render('app_store.client_app_list', {'modules':modules})
 
