@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Add a missing permission
+
 v1.1.2
 ======
 * Stop updates from breaking if a module lacks a  proper version number
