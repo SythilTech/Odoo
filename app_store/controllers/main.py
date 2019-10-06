@@ -139,7 +139,7 @@ class AppsController(http.Controller):
     @http.route('/custom/store/updates', type="http", auth="public")
     def custom_app_store_updates(self, **kwargs):
         module_list = []
-        for md in request.env['module.overview'].search([]):
+        for md in request.env['module.overview'].search([('version', '!=', False)]):
             if md.version.startswith("11.0."):
                 module_list.append({'name': md.name, 'latest_version': md.version})            
             else:

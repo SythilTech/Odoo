@@ -1,3 +1,7 @@
+v1.1.2
+======
+* Stop updates from breaking if a module lacks a  proper version number
+
 v1.1.1
 ======
 * Bug fix for systems with old version of app_store client without access_token
