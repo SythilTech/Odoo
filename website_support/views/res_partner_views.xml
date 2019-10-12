@@ -16,7 +16,7 @@
                     </button>
                 </xpath>
                 <notebook position="inside">
-                    <page string="Support Ticket">
+                    <page string="Support Ticket" groups="website_support.support_staff">
                         <group>
                             <field name="stp_ids"/>
                         </group>

@@ -1,3 +1,7 @@
+v2.0.2
+======
+* Fix access rights for non support staff employees
+
 v2.0.1
 ======
 * Fix permission issue
