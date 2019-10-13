@@ -1,3 +1,7 @@
+v1.0.9
+======
+* Group access for timesheet menu
+
 v1.0.8
 ======
 * Task fields in tree view

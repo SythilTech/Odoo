@@ -39,7 +39,7 @@
 	  <field name="view_mode">tree,pivot</field>
       </record>
       
-      <menuitem id="website_support_ticket_timesheets_menu" name="Support Tickets Timesheets" parent="website_support.website_support_parent_menu" action="website_support_ticket_timesheet_action" sequence="20"/>
+      <menuitem id="website_support_ticket_timesheets_menu" name="Support Tickets Timesheets" parent="website_support.website_support_parent_menu" action="website_support_ticket_timesheet_action" groups="website_support.support_staff" sequence="20"/>
         
   </data>
 </openerp>

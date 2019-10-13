@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Group access for timesheet menu
+
 v1.1.2
 ======
 * Tree view for support timesheets

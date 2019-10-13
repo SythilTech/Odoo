@@ -36,7 +36,7 @@
 	  <field name="view_id" ref="website_support_ticket_view_form_inherit_hr_timesheet_line_tree"/>
       </record>
       
-      <menuitem id="website_support_analytics" name="Timesheet Reports" parent="website_support.website_support_parent_menu" action="website_support_analytics_action" sequence="30"/>
+      <menuitem id="website_support_analytics" name="Timesheet Reports" parent="website_support.website_support_parent_menu" action="website_support_analytics_action" groups="website_support.support_staff" sequence="30"/>
       
   </data>
 </openerp>
