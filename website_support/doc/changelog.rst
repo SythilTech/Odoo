@@ -1,3 +1,7 @@
+v1.6.9
+======
+* Fix custom fields many2one with no filter producing an error
+
 v1.6.8
 ======
 * Fix comment attachments in portal reply

@@ -1,3 +1,7 @@
+v1.1.4
+======
+* Skip views without names
+
 v1.1.3
 ======
 * Add a missing permission

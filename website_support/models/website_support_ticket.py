@@ -667,7 +667,7 @@ class WebsiteSupportTicketSubCategoryField(models.Model):
     type = fields.Selection([('textbox','Textbox'), ('many2one','Dropdown(m2o)')], default="textbox", required="True", string="Type")
     model_id = fields.Many2one('ir.model', string="Model")
     model_name = fields.Char(related="model_id.model", string="Model Name")
-    filter = fields.Char(string="Filter")
+    filter = fields.Char(string="Filter", default="[]", required="True")
 
 class WebsiteSupportTicketStates(models.Model):
 

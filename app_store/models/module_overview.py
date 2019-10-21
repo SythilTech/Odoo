@@ -320,8 +320,11 @@ class ModuleOverviewWizard(models.Model):
 
             #If it's a view
             if rec.attrib['model'] == "ir.ui.view":
+                if record_name = rec.find(".//field[@name='name']"):
+                    record_name = rec.find(".//field[@name='name']").text
+                else:
+                    continue
 
-                record_name = rec.find(".//field[@name='name']").text
                 model_name = rec.find(".//field[@name='model']").text
                 model_exist = self.env['module.overview.model'].search([('name','=',model_name),('mo_id','=',m_id) ])
                 model = ""
