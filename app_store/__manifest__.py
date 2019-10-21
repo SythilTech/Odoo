@@ -1,6 +1,6 @@
 {
     'name': "Custom App Store",
-    'version': "1.1.4",
+    'version': "1.1.5",
     'author': "Sythil Tech",
     'category': "Tools",
     'summary': "Create your own app store",

@@ -320,7 +320,7 @@ class ModuleOverviewWizard(models.Model):
 
             #If it's a view
             if rec.attrib['model'] == "ir.ui.view":
-                if record_name = rec.find(".//field[@name='name']"):
+                if record_name == rec.find(".//field[@name='name']"):
                     record_name = rec.find(".//field[@name='name']").text
                 else:
                     continue

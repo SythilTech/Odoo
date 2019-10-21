@@ -1,3 +1,7 @@
+v1.1.5
+======
+* Fix code syntax error
+
 v1.1.4
 ======
 * Skip views without names
