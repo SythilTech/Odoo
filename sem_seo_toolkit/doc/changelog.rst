@@ -1,3 +1,7 @@
+v1.1.3
+======
+* Canonical URL check
+
 v1.1.2
 ======
 * Bug fix for Google my Business reports when a listing was on multiple accounts.

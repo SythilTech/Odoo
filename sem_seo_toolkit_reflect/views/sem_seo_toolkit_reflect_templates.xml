@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+<template id="reflect_copyright" inherit_id="website.layout" name="SEM SEO Reflect">
+    <xpath expr="//header" position="inside">
+        <t t-set="canonical_url" t-value="main_object and 'canonical_url' in main_object and main_object.canonical_url or canonical_url"/>
+        <link t-if="canonical_url" rel="canonical" t-att-href="canonical_url"/>
+    </xpath>
+</template>
+
+    </data>
+</odoo>

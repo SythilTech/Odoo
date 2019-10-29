@@ -24,6 +24,15 @@ Check fails if zero or more then one meta description tags are found or meta des
             <field name="active">1</field>
         </record>
 
+        <record id="seo_check_canonical_tag_exists" model="sem.check">
+            <field name="name">Has Canonical Tag</field>
+            <field name="function_name">has_canonical_tag</field>
+            <field name="description">Checks if a HTML canonical tag exists.
+Check fails if zero or more then one canonical tags are found or canonical tag is empty.</field>
+            <field name="check_level">page</field>
+            <field name="active">1</field>
+        </record>
+
         <record id="seo_check_valid_links" model="sem.check">
             <field name="name">Valid Links</field>
             <field name="function_name">valid_links</field>

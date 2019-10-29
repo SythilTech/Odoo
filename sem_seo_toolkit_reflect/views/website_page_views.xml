@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="website_page_form_view_inherit_reflect" model="ir.ui.view">
+            <field name="name">website.page form view inheriot reflect</field>
+            <field name="model">website.page</field>
+            <field name="inherit_id" ref="website.website_pages_form_view"/>
+            <field name="arch" type="xml">
+                <field name="view_id" position="after">
+                    <field name="canonical_url"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

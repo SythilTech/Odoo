@@ -99,6 +99,26 @@ class SemCheck(models.Model):
                 #Fail 3: Meta description is empty
                 return (False, _("Empty Meta description"))
 
+    def _seo_check_has_canonical_tag(self, driver, url, parsed_html):
+
+        canonical_tag = parsed_html.xpath("//link[@rel='canonical']")
+
+        if len(canonical_tag) == 0:
+            #Fail 1: No canonical tag
+            return (False, _("No Canonical Tag detected"))
+
+        if len(canonical_tag) > 1:
+            #Fail 2: More then one canonical tag
+            return (False, _("Multiple canonical tags detected"))
+ 
+        if len(canonical_tag) == 1:
+            #Pass 1: Only 1 canonical tag
+            if len(canonical_tag[0].attrib['href']) > 0:
+                return (True, canonical_tag[0].attrib['href'])
+            else:
+                #Fail 3: Canonical Tag is empty
+                return (False, _("Empty canonical tag"))
+
     def _seo_check_valid_links(self, driver, url, parsed_html):
         anchor_tags = parsed_html.xpath("//a[@href]")
 
