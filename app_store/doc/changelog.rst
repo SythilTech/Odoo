@@ -1,3 +1,7 @@
+v1.1.7
+======
+* Unpublished modules can not be updated
+
 v1.1.6
 ======
 * Skips analyses of view/models if an error is encountered
