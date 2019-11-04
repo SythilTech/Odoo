@@ -1,3 +1,7 @@
+v1.1.6
+======
+* Skips analyses of view/models if an error is encountered
+
 v1.1.5
 ======
 * Fix code syntax error

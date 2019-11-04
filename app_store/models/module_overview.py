@@ -174,6 +174,13 @@ class ModuleOverviewWizard(models.Model):
             module_overview.icon = icon_base64
             module_overview.version = op_settings['version']
 
+        except Exception as e:
+            _logger.error(module_name)
+            _logger.error(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            _logger.error("Line: " + str(exc_tb.tb_lineno) )
+
+        try:
             #Read /doc/changelog.rst file
             if os.path.exists(app_directory + "/" + module_name + "/doc/changelog.rst"):
                 with open(app_directory + "/" + module_name + "/doc/changelog.rst", 'r') as changelogfile:
@@ -217,10 +224,7 @@ class ModuleOverviewWizard(models.Model):
             zf.close()
 
         except Exception as e:
-            _logger.error(module_name)
-            _logger.error(e)
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            _logger.error("Line: " + str(exc_tb.tb_lineno) )
+            pass
                         
     def _read_csv(self, file_name, file_content, m_id):
         if "ir.model.access":
