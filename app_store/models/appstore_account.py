@@ -179,20 +179,20 @@ class AppstoreAccountRepository(models.Model):
                 #for filename in fnmatch.filter(filenames, '*.csv'):
                 #    self._read_csv(filename, open( os.path.join(root, filename) ).read(), module_overview.id)
 
-            #Create a zip of the module (TODO include dependacies)
-            zf = zipfile.ZipFile(os.path.expanduser('~') + "/apps/" + module_name + ".zip", "w")
-            for dirname, subdirs, files in os.walk(app_directory + "/" + module_name):
-                for filename in files:
-                    full_file_path = os.path.join(dirname, filename)
-                    zf.write(full_file_path, arcname=os.path.relpath(full_file_path, app_directory + "/" + module_name))
-            zf.close()
-
         except Exception as e:
             _logger.error(module_name)
             _logger.error(e)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             _logger.error("Line: " + str(exc_tb.tb_lineno) )
             pass
+
+        #Create a zip of the module (TODO include dependacies)
+        zf = zipfile.ZipFile(os.path.expanduser('~') + "/apps/" + module_name + ".zip", "w")
+        for dirname, subdirs, files in os.walk(app_directory + "/" + module_name):
+            for filename in files:
+                full_file_path = os.path.join(dirname, filename)
+                zf.write(full_file_path, arcname=os.path.relpath(full_file_path, app_directory + "/" + module_name))
+        zf.close()
                         
     def _read_csv(self, file_name, file_content, m_id):
         if "ir.model.access":
